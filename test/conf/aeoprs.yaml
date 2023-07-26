@@ -1,0 +1,17 @@
+arlas:
+  collection_name: 
+  url: http://localhost:81/server
+
+index:
+  endpoint_url: http://localhost:9200
+  collection_prefix: tests
+
+s3:
+  bucket: arlaseotest
+  access_key_id: arlaseo
+  secret_access_key: arlaseosecret
+  region: None
+  tier: "Standard"
+  platform: "minio"
+  endpoint_url: http://127.0.0.1:9000
+  asset_http_endpoint_url: http://127.0.0.1:9000/{}/{}

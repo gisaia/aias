@@ -1,9 +1,10 @@
-# aeoprs
-ARLAS EO Product Registration Services
+# ARLAS EO Product Registration Services
+
+ARLAS EO Product Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
 
 ## Data model
 
-The AEOPRS Model is based in the STAC specifications. It supports the folling extensions:
+The AEOPRS Model is based on the STAC specifications. It supports the folling extensions:
 - view
 - storage
 - eo
@@ -13,14 +14,184 @@ The AEOPRS Model is based in the STAC specifications. It supports the folling ex
 - sar
 - proj
 
-Also, metadata are enriched and placed in the `generated`` namespace.
+Also, metadata are enriched by the service and placed in the `generated` namespace.
 
 Namespaces are prefixes in the key names of the JSON. The `:` is used for seperating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation.
 
+## ARLAS EO Product Registration Services
 
-## Tests
-To run the tests:
+The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
+
+STAC-T methods:
+
+| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
+| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `POST /collections/{collectionID}/items`               | `application/json`  | partial Item or partial ItemCollection | 201, 202       | Adds a new item to a collection.                                  |
+| `PUT /collections/{collectionId}/items/{featureId}`    | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a complete item description. |
+| `PATCH /collections/{collectionId}/items/{featureId}`  | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a partial item description.  |
+| `DELETE /collections/{collectionID}/items/{featureId}` | n/a                 | n/a                                    | 200, 202, 204  | Deletes an existing item by ID.                                   |
+
+Also, a convenient method is provided to get the item:
+
+| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
+| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `GET /collections/{collectionId}/items/{featureId}`    | `application/json`  |                            | 200, 404  | Returns the item if exists, 404 otherwise.                                         |
+
+Asset methods
+
+| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
+| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `POST /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  | Asset file | 200       | Adds a new asset to the data store.                                         |
+| `HEAD /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
+| `DELETE /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
+
+By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the maneged assets. An assest can be unmanged by setting `asset.aeo:managed=False` (or `asset.aeo__managed=False`)
+
+## Running AEOPRS
+
+AEOPRS requires
+- python 3.10
+- an elasticsearch
+- a object store (S3, GS or minio)
+- docker and docker compose to run a test stack
+
+### With your own elasticsearch and minio
+
+To configure AEOPRS, edit `conf/aeprs.yaml`. An example is provided in `test/conf/aeoprs.yaml`. Then start the service:
 
 ```shell
-./test/tests.sh 
+export PYTHONPATH=`pwd`
+python3 aeoprs.py conf/aeoprs.yaml &
+```
+
+For more details about the command line, run `python3 aeoprs.py --help` :
+
+```shell                
+Usage: aeoprs.py CONFIGURATION_FILE [HOST] [PORT]
+
+  Start the ARLAS Earth Observation Product Registration Service.
+
+Arguments:
+  CONFIGURATION_FILE  Configuration file  [required]
+  [HOST]              host  [default: 127.0.0.1]
+  [PORT]              port  [default: 8000]
+
+  --help                          Show this message and exit.
+```
+
+Once the service up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
+
+### Stack for tests
+
+If you do not have elasticsearch and minio running, you can start a test stack:
+```shell
+./test/start_stack.sh 
+```
+## Using AEOPRS
+
+In the following examples, we will:
+- add an asset
+- check it exists
+- add an item
+- get the item
+- delete the item and its asset
+
+### Add an asset
+
+```shell
+curl -X POST \
+    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification?content_type=image/tiff" \
+    -F file=@test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif
+```
+Result:
+```json
+{"msg":"Object has been uploaded to bucket successfully"}
+```
+
+### Check that the asset exists
+
+```shell
+curl -I \
+    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification" 
+```
+Result:
+
+```shell
+HTTP/1.1 204 No Content
+```
+
+### Add an item
+
+```shell
+curl -X POST \
+    -H "Content-Type: application/json" \
+    "http://127.0.0.1:8000/collections/digitalearth.africa/items" \
+    -d @test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json
+```
+
+Result:
+```json
+{
+   "collection":"digitalearth.africa",
+   "catalog":"theia-snow",
+   "id":"077cb463-1f68-5532-aa8b-8df0b510231a",
+   "geometry":{...},
+   "bbox": ...,
+   "assets":{
+      "classification":{...},
+      "arlas_eo_item":{...}
+   },
+   "properties":{
+      "datetime":1640908800.0,
+      "start_datetime":1609459200.0,
+      "end_datetime":1640908800.0,
+      "eo:bands":[
+         {
+            "name":"classification"
+         }
+      ],
+      "proj:epsg":4326,
+      "proj:shape":[
+         36000.0,
+         36000.0
+      ],
+      "generated:day_of_week":4,
+      "generated:day_of_year":365,
+      "generated:hour_of_day":1,
+      "generated:minute_of_day":60,
+      ...
+   }
+}
+```
+### Check the item exists
+
+```shell
+curl -X GET \
+    -H "Content-Type: application/json" \
+    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
+```
+
+Result: same as previous call (registration).
+
+### Delete the item and its assets
+
+```shell
+curl -X DELETE \
+    -H "Content-Type: application/json" \
+    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
+```
+
+
+## Tests
+
+To run the unit tests:
+
+```shell
+./test/unit_tests.sh 
+```
+
+To run the service tests:
+
+```shell
+./test/service_tests.sh 
 ```

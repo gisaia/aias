@@ -37,7 +37,7 @@ def to_arlaseo_json(item: Item)->str:
      Returns:
          str: the json. Keys contain __ as namespace seperator
      """
-     return json.dumps(to_arlaseo_dict(item), default=str)
+     return json.dumps(to_arlaseo_dict(item), default=str, indent=2)
 
 def to_json(item: Item)->str:
      """ create a json from the Item. Keys contain : as namespace seperator
@@ -48,7 +48,7 @@ def to_json(item: Item)->str:
      Returns:
          str: the json. Keys contain : as namespace seperator
      """
-     return json.dumps(to_dict(item), default=str)
+     return json.dumps(to_dict(item), default=str, indent=2)
 
 def item_from_json_file(jsonfile)->Item:
      """ load a json file containing an Item
@@ -71,6 +71,17 @@ def item_from_json(json_string:str)->Item:
          Item: the Item
      """
      return Item(**__replaceKeys(json.loads(json_string), ":", "__"))
+
+def item_from_dict(object:dict)->Item:
+     """ load a dict Item
+
+     Args:
+         object (dict): the Item as dict
+
+     Returns:
+         Item: the Item
+     """
+     return Item(**__replaceKeys(object, ":", "__"))
 
 def __replaceKeys(o, before:str, after:str):
      if type(o) is dict:

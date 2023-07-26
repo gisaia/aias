@@ -1,0 +1,23 @@
+arlas:
+  collection_name: 
+  url: http://localhost:81/server
+
+index:
+  endpoint_url: 
+  login: 
+  pwd: 
+  collection_prefix: 
+
+s3:
+  bucket: 
+  access_key_id: 
+  secret_access_key: 
+  endpoint_url: https://storage.googleapis.com
+  region: 
+  tier:
+  platform:
+
+
+# asset_http_endpoint_url must look like https://storage.googleapis.com/{}/{}
+# first element is the bucket, second is the path to the object
+  asset_http_endpoint_url: https://storage.googleapis.com/{}/{}
