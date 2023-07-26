@@ -1,0 +1,84 @@
+from aeoprs.core.models.model import Item
+import json
+from pydantic.fields import FieldInfo
+from pydantic.json import pydantic_encoder
+from pydantic import BaseModel, Extra, Field
+
+def to_dict(item: Item)->dict:
+     """ create a dictionnary from the Item. Keys contain : as namespace seperator
+
+     Args:
+         item (Item): The item
+
+     Returns:
+         dict: The dictionary. Keys contain : as namespace seperator
+     """
+     dictionary=item.model_dump(exclude_unset=True, by_alias=True, exclude_none=True)
+     return __replaceKeys(dictionary, "__", ":")
+
+def to_arlaseo_dict(item: Item)->dict:
+     """ create a dictionnary from the Item. Keys contain __ as namespace seperator
+
+     Args:
+         item (Item): The item
+
+     Returns:
+         dict: The dictionary. Keys contain __ as namespace seperator
+     """
+     dictionary=item.model_dump(exclude_unset=True, by_alias=False, exclude_none=True)
+     return __replaceKeys(dictionary, ":", "__")
+
+def to_arlaseo_json(item: Item)->str:
+     """ create a json from the Item. Keys contain __ as namespace seperator
+
+     Args:
+         item (Item): The item
+
+     Returns:
+         str: the json. Keys contain __ as namespace seperator
+     """
+     return json.dumps(to_arlaseo_dict(item), default=str)
+
+def to_json(item: Item)->str:
+     """ create a json from the Item. Keys contain : as namespace seperator
+
+     Args:
+         item (Item): The item
+
+     Returns:
+         str: the json. Keys contain : as namespace seperator
+     """
+     return json.dumps(to_dict(item), default=str)
+
+def item_from_json_file(jsonfile)->Item:
+     """ load a json file containing an Item
+
+     Args:
+         jsonfile (file): the json file
+
+     Returns:
+         Item: _description_
+     """
+     return Item(**__replaceKeys(json.load(jsonfile), ":", "__"))
+
+def item_from_json(json_string:str)->Item:
+     """ load a json Item
+
+     Args:
+         json_string (str): the Item as json
+
+     Returns:
+         Item: the Item
+     """
+     return Item(**__replaceKeys(json.loads(json_string), ":", "__"))
+
+def __replaceKeys(o, before:str, after:str):
+     if type(o) is dict:
+          d={}
+          for key in o:
+               d[key.replace(before, after)]=__replaceKeys(o[key], before, after)
+          return d
+     if type(o) is list:
+          return list(map(lambda elt:__replaceKeys(elt, before, after), o))
+     else:
+          return o

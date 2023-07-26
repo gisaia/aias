@@ -1,0 +1,7 @@
+pygeohash==1.2.0
+boto3==1.24.89
+elasticsearch==8.4.3
+click
+typer
+pydantic
+python-dateutil==3.0
