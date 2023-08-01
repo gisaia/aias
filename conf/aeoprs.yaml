@@ -21,4 +21,4 @@ s3:
   asset_http_endpoint_url: $ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL
 
 # if you don't use aws s3, then please prov
-  endpoint_url: $ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL
+  endpoint_url: $ARLASEO_S3_ENDPOINT_URL

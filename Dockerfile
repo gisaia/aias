@@ -9,10 +9,10 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-COPY ./aeoprs /app/
+COPY ./aeoprs /app/aeoprs
+COPY ./conf /app/conf
+COPY ./start.sh /app/
 COPY ./aeoprs.py /app/
 
-ENTRYPOINT [ "python3" ]
-
 EXPOSE 8000
-CMD [ "aeoprs.py"]
+ENTRYPOINT ["./start.sh"]

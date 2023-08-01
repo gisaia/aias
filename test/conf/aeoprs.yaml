@@ -14,7 +14,7 @@ s3:
   secret_access_key: $ARLASEO_S3_SECRET_ACCESS_KEY|arlaseosecret
   tier: $ARLASEO_S3_TIER|Standard
   platform: $ARLASEO_S3_PLATFORM|minio
-  endpoint_url: $ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL|http://127.0.0.1:9000
+  endpoint_url: $ARLASEO_S3_ENDPOINT_URL|http://127.0.0.1:9000
 
 # asset_http_endpoint_url must look like https://storage.googleapis.com/{}/{}
 # first element is the bucket, second is the path to the object

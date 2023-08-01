@@ -81,12 +81,40 @@ Arguments:
 
 Once the service is up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
 
+## With docker
+
+Instead of launching the service with python, you can launch it with docker:
+
+```shell                
+docker run -d --name aeoprs -p 8000:8000 -e XXX:VVV ... -e XXX:VVV gisaia/aeoprs:latest
+```
+
+with `XXX:VVV` the environment variable that you want to specify. The table below lists the variable that you can set:
+
+| Variable                                               |
+| ------------------------------------------------------ |
+| ARLASEO_ARLAS_COLLECTION_NAME                          |
+| ARLASEO_ARLAS_URL                                      |
+| ARLASEO_INDEX_ENDPOINT_URL                             |
+| ARLASEO_INDEX_COLLECTION_PREFIX                        |
+| ARLASEO_INDEX_LOGIN                                    |
+| ARLASEO_S3_BUCKET                                      |
+| ARLASEO_S3_ACCESS_KEY_ID                               |
+| ARLASEO_S3_SECRET_ACCESS_KEY                           |
+| ARLASEO_S3_REGION                                      |
+| ARLASEO_S3_TIER                                        |
+| ARLASEO_S3_PLATFORM                                    |
+| ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL                     |
+| ARLASEO_S3_ENDPOINT_URL                                |
+
+
 ### Stack for tests
 
 If you do not have elasticsearch and minio running, you can start a test stack:
 ```shell
 ./test/start_stack.sh 
 ```
+
 ## Using AEOPRS
 
 In the following examples, we will:
