@@ -3,3 +3,4 @@ private
 .vscode
 .minio
 .DS_Store
+target
