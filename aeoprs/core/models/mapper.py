@@ -13,7 +13,7 @@ def to_dict(item: Item)->dict:
      Returns:
          dict: The dictionary. Keys contain : as namespace seperator
      """
-     dictionary=item.model_dump(exclude_unset=True, by_alias=True, exclude_none=True)
+     dictionary=item.dict(exclude_unset=True, by_alias=True, exclude_none=True)
      return __replaceKeys(dictionary, "__", ":")
 
 def to_arlaseo_dict(item: Item)->dict:
@@ -25,7 +25,7 @@ def to_arlaseo_dict(item: Item)->dict:
      Returns:
          dict: The dictionary. Keys contain __ as namespace seperator
      """
-     dictionary=item.model_dump(exclude_unset=True, by_alias=False, exclude_none=True)
+     dictionary=item.dict(exclude_unset=True, by_alias=False, exclude_none=True)
      return __replaceKeys(dictionary, ":", "__")
 
 def to_arlaseo_json(item: Item)->str:

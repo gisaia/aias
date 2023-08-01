@@ -1,23 +1,24 @@
 arlas:
-  collection_name: 
-  url: http://localhost:81/server
+  collection_name: $ARLASEO_ARLAS_COLLECTION_NAME|arlaseo
+  url: $ARLASEO_ARLAS_URL|http://localhost:81/server
 
 index:
-  endpoint_url: 
-  login: 
-  pwd: 
-  collection_prefix: 
+  endpoint_url: $ARLASEO_INDEX_ENDPOINT_URL| http://localhost:9200
+  collection_prefix: $ARLASEO_INDEX_COLLECTION_PREFIX|arlaseo
+  login: $ARLASEO_INDEX_LOGIN
+  pwd: $ARLASEO_INDEX_LOGIN
 
 s3:
-  bucket: 
-  access_key_id: 
-  secret_access_key: 
-  endpoint_url: https://storage.googleapis.com
-  region: 
-  tier:
-  platform:
-
+  bucket: $ARLASEO_S3_BUCKET|arlaseo
+  access_key_id: $ARLASEO_S3_ACCESS_KEY_ID
+  secret_access_key: $ARLASEO_S3_SECRET_ACCESS_KEY
+  region: $ARLASEO_S3_REGION|None
+  tier: $ARLASEO_S3_TIER|"Standard"
+  platform: $ARLASEO_S3_PLATFORM
 
 # asset_http_endpoint_url must look like https://storage.googleapis.com/{}/{}
 # first element is the bucket, second is the path to the object
-  asset_http_endpoint_url: https://storage.googleapis.com/{}/{}
+  asset_http_endpoint_url: $ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL
+
+# if you don't use aws s3, then please prov
+  endpoint_url: $ARLASEO_S3_ENDPOINT_URL
