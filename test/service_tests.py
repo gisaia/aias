@@ -42,7 +42,7 @@ class Tests(unittest.TestCase):
         with open(ITEM_PATH,'r') as file:
             data = file.read()
             r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
-            self.assertFalse(r.ok,msg="Item registration did not failed")
+            self.assertFalse(r.ok,msg="Item registration did not fail")
 
         # ASSET NOT FOUND
         r=requests.head(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))

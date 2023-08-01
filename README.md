@@ -45,19 +45,19 @@ Asset methods
 | `HEAD /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
 | `DELETE /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
 
-By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the maneged assets. An assest can be unmanged by setting `asset.aeo:managed=False` (or `asset.aeo__managed=False`)
+By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.aeo:managed=False` (or `asset.aeo__managed=False`)
 
 ## Running AEOPRS
 
 AEOPRS requires
 - python 3.10
 - an elasticsearch
-- a object store (S3, GS or minio)
+- an object store (S3, GS or minio)
 - docker and docker compose to run a test stack
 
 ### With your own elasticsearch and minio
 
-To configure AEOPRS, edit `conf/aeprs.yaml`. An example is provided in `test/conf/aeoprs.yaml`. Then start the service:
+To configure AEOPRS, edit `conf/aeoprs.yaml`. An example is provided in `test/conf/aeoprs.yaml`. Then start the service:
 
 ```shell
 export PYTHONPATH=`pwd`
@@ -79,7 +79,7 @@ Arguments:
   --help                          Show this message and exit.
 ```
 
-Once the service up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
+Once the service is up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
 
 ### Stack for tests
 

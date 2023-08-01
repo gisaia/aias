@@ -4,8 +4,11 @@ class lonlat:
     lon:float
     lat:float
     def __init__(self, coords:List[float]):
-        self.lon=coords[0]
-        self.lat=coords[1]
+        if len(coords)== 2:
+            self.lon=coords[0]
+            self.lat=coords[1]
+        else:
+            raise ValueError("The length of the coordinate array must be 2 but is {}".format(len(coords)))
 
 class BOX:
     no:lonlat

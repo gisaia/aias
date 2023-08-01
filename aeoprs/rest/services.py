@@ -21,7 +21,7 @@ api = FastAPI(version='0.0', title='ARLAS Earth Observation Product Registration
 )
 
 
-@api.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset should/must exist (depends on the server configuration)")
+@api.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)")
 def create_item(collection:str, item: Item, request: Request)->str:
     """ From https://github.com/stac-api-extensions/transaction:
         POST

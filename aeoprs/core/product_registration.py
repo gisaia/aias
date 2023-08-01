@@ -279,6 +279,7 @@ def __dates_to_times(item:Item)->Item:
         item.properties.start_datetime=item.properties.start_datetime.timestamp()
     if item.properties.end_datetime is not None:
         item.properties.end_datetime=item.properties.end_datetime.timestamp()
+    return item
 
 def __add_generated_fields(item:Item)->Item:
     if item.centroid:
@@ -316,8 +317,9 @@ def __add_generated_fields(item:Item)->Item:
         item.properties.generated__tltrbrbl=geo.getCorners(item.geometry["coordinates"][0]).tltrbrbl()
     item.properties.generated__band_names=list(filter(lambda name: name is not None, map(lambda band: band.name, item.properties.eo__bands)))
     item.properties.generated__band_common_names=list(filter(lambda common_name: common_name is not None, map(lambda band: band.common_name, item.properties.eo__bands)))
+    return item
 
-def __set_assets_links(item:Item):
+def __set_assets_links(item:Item)->Item:
     for asset_name in item.assets:
         asset=item.assets[asset_name]
         if asset.aeo__managed is True:
@@ -342,7 +344,7 @@ def __set_assets_links(item:Item):
     item.assets[Role.arlas_eo_item.value].aeo__object_store_key=item_relative_path
     item.assets[Role.arlas_eo_item.value].storage__platform=Configuration.settings.s3.platform
     item.assets[Role.arlas_eo_item.value].storage__tier=Configuration.settings.s3.tier
-
+    return item
 
 def __not_found_assets(item:Item)->List[str]:
     not_found=[]
