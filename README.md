@@ -37,7 +37,7 @@ Also, a convenient method is provided to get the item:
 | ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
 | `GET /collections/{collectionId}/items/{featureId}`    | `application/json`  |                            | 200, 404  | Returns the item if exists, 404 otherwise.                                         |
 
-Asset methods
+Asset methods:
 
 | Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
 | ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
@@ -91,7 +91,7 @@ If you do not have elasticsearch and minio running, you can start a test stack:
 
 In the following examples, we will:
 - add an asset
-- check it exists
+- check that it exists
 - add an item
 - get the item
 - delete the item and its asset
