@@ -14,3 +14,5 @@ docker push gisaia/${IMAGE}:${VERSION}
 
 git tag -a ${VERSION} -m "ARLAS Earth Observation Product Registration Services ${VERSION}"
 git push origin ${VERSION}
+
+./publish/publish.sh $VERSION
