@@ -4,4 +4,8 @@ elasticsearch==8.4.3
 click
 typer
 pydantic
-python-dateutil==3.0
+python-dateutil
+fastapi
+uvicorn
+pytz
+python-multipart

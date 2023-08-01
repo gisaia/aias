@@ -14,6 +14,7 @@
       "datetime": "2021-12-31T00:00:00Z",
       "cubedash:region_code": "E000_N15"
     },
+    "centroid":[0.0,15.0],
     "geometry": {
       "type": "Polygon",
       "coordinates": [
@@ -104,6 +105,7 @@
       "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
       "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
     ],
-    "collection": "esa_worldcover_2021"
+    "collection": "digitalearth.africa",
+    "catalog": "theia-snow"
   }
   
