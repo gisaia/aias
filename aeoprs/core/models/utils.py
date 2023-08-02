@@ -16,6 +16,7 @@ def __short_titles(o):
     else:
         return o
 
-model=__short_titles(Item.model_json_schema())
-model["$id"]="aeopres_model"
-print(json.dumps(model))
+if __name__ == '__main__':
+    model=__short_titles(Item.model_json_schema())
+    model["$id"]="aeopres_model"
+    print(json.dumps(model))
