@@ -16,7 +16,9 @@ The AEOPRS Model is based on the STAC specifications. It supports the folling ex
 
 Also, metadata are enriched by the service and placed in the `generated` namespace.
 
-Namespaces are prefixes in the key names of the JSON. The `:` is used for seperating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation.
+Namespaces are prefixes in the key names of the JSON. The `:` is used for seperating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation. 
+
+For more details, see the [model documentation](docs/model/model.md)
 
 ## ARLAS EO Product Registration Services
 

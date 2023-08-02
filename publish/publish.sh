@@ -4,10 +4,12 @@ rm -r target
 mkdir -p target/src/aeoprs/core/models
 cp aeoprs/core/models/* target/src/aeoprs/core/models
 cp publish/materials/* target/
+sed -i.bak 's/aeoprsmodel_version/\"'$1'\"/' target/setup.py
+
+cat target/README_head.md > target/README.md
+cat docs/model/model.md >> target/README.md
+
 cd target
-sed -i.bak 's/aeoprsmodel_version/\"'$1'\"/' setup.py
-
-
 docker run \
         -e GROUP_ID="$(id -g)" \
         -e USER_ID="$(id -u)" \
