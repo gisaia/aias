@@ -1,4 +1,3 @@
-import json
 from datetime import datetime as Datetime
 from enum import Enum
 from typing import (TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar,
@@ -6,7 +5,6 @@ from typing import (TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar,
 
 from pydantic import BaseModel, Extra, Field
 from pydantic.fields import FieldInfo
-from pydantic.json import pydantic_encoder
 
 class ProcessingLevel(Enum):
     RAW="RAW"
