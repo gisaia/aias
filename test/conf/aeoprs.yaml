@@ -5,8 +5,6 @@ arlas:
 index:
   endpoint_url: $ARLASEO_INDEX_ENDPOINT_URL| http://localhost:9200
   collection_prefix: $ARLASEO_INDEX_COLLECTION_PREFIX|arlaseotest
-  login:
-  pwd: 
 
 s3:
   bucket: $ARLASEO_S3_BUCKET|arlaseotest

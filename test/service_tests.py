@@ -86,6 +86,7 @@ class Tests(unittest.TestCase):
         # FILE FOUND FOR THE MANAGED ASSET
         r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
         item=mapper.item_from_json(r.content)
+        print(item.assets["classification"].href)
         r=requests.head(url=item.assets["classification"].href)
         self.assertTrue(r.ok,msg="Asset found")
 
@@ -104,6 +105,27 @@ class Tests(unittest.TestCase):
         # ASSET NOT FOUND
         r=requests.head(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
         self.assertFalse(r.ok,msg="Asset must not be found")
+
+
+    def test_reindex(self):
+        self.test_add_item()
+        # REMOVE ITEM
+        Configuration.init(configuration_file="test/conf/aeoprs.yaml")
+        es = elasticsearch.Elasticsearch(Configuration.settings.index.endpoint_url)
+        try:
+            # Clean the index
+            es.indices.delete(index=Configuration.settings.index.collection_prefix+"_"+COLLECTION)
+        except Exception:
+            ...
+        # ITEM NOT FOUND
+        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        self.assertFalse(r.ok,msg="Item must not be found")
+
+        # REINDEX
+        r=requests.post(url=os.path.join(AEOPRS_URL,"collections", COLLECTION,"_reindex"), headers={"Content-Type": "application/json"})
+        # ITEM FOUND
+        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        self.assertTrue(r.ok,msg="Item must not found")
 
 if __name__ == '__main__':
     unittest.main()

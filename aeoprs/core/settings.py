@@ -32,5 +32,5 @@ class Configuration:
     @staticmethod
     def init(configuration_file:str):
         envyaml=EnvYAML(configuration_file, strict=False)
-        Configuration.settings=Settings.parse_obj(envyaml)
-        print(Configuration.settings.dict())
+        print(envyaml.export())
+        Configuration.settings=Settings.parse_obj(envyaml.export())
