@@ -11,3 +11,4 @@ pytz==2023.3
 python-multipart==0.0.6
 envyaml==1.10.211231
 requests==2.31.0
+celery==5.3.1
