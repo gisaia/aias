@@ -163,3 +163,7 @@ async def delete_asset(collection:str, item_id:str, asset_name:str):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Asset not found")
+
+@api.post('/collections/{collection}/_reindex', description="Reindex a collection")
+async def delete_asset(collection:str):
+    rs.reindex(collection=collection)

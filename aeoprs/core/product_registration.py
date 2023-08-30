@@ -2,7 +2,7 @@ import os
 from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple
-
+import tempfile
 import boto3 as boto3
 import elasticsearch
 import pygeohash as pgh
@@ -14,7 +14,7 @@ import aeoprs.core.exceptions as exceptions
 import aeoprs.core.geo as geo
 import aeoprs.core.s3 as s3
 import aeoprs.core.utils as utils
-from aeoprs.core.models.mapper import (to_json, item_from_json, item_from_dict)
+from aeoprs.core.models.mapper import (to_json, item_from_json, item_from_dict, item_from_json_file)
 from aeoprs.core.models.model import (Asset, Item, Properties, Band, Role)
 from aeoprs.core.models.mapper import to_arlaseo_json
 from aeoprs.core.settings import Configuration
@@ -39,7 +39,10 @@ def get_asset_relative_path(collection:str, item_id:str, asset_name:str)->str:
     Returns:
         str: relative path to the asset
     """
-    return os.path.join(collection, "items", item_id, "assets", asset_name)
+    if asset_name == "arlas_eo_item":
+        return os.path.join(collection, "items", item_id, item_id+ITEM_ARLAS_SUFFIX)
+    else:
+        return os.path.join(collection, "items", item_id, "assets", asset_name)
 
 def get_assets_relative_path(collection:str, item_id:str)->str:
     """ return the relative path to the assets directory of an item
@@ -204,7 +207,7 @@ def delete_item(collection:str, item_id:str):
     LOGGER.info("{} deleted.".format(get_item_relative_path(collection, item_id)))
 
 def register_item(item:Item)->Item:
-    """_summary_
+    """ Register an item
 
     Args:
         collection (str): collection name
@@ -246,6 +249,23 @@ def register_item(item:Item)->Item:
     resp = __getES().index(index=__get_es_collection_name(item.collection), id=item.id, document=to_arlaseo_json(item))
     LOGGER.info("Indexing result:{}".format(resp['result']))
     return item
+
+def reindex(collection:str):
+    """ Reindex a collection based on the object storage
+    Args:
+        collection (str): name of the collection to reindex
+    """
+    keys=s3.get_matching_s3_objects(Configuration.settings.s3.bucket, collection, ITEM_ARLAS_SUFFIX)
+    LOGGER.info("Start reindexing collection {}".format(collection))
+    for key in keys:
+        LOGGER.info("Reindexing item from {}".format(key))
+        LOGGER.info(s3.get_client().download_file(Configuration.settings.s3.bucket, key, "tmp"+ITEM_ARLAS_SUFFIX))
+        with open("tmp"+ITEM_ARLAS_SUFFIX,"r") as f:
+            item=item_from_json_file(f)
+            LOGGER.debug(item)
+            register_item(item)
+        os.remove("tmp"+ITEM_ARLAS_SUFFIX)
+    LOGGER.info("Done with reindexing collection {}".format(collection))
 
 def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_collection_name(collection)):
