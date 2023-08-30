@@ -7,6 +7,8 @@ export PYTHONPATH=`pwd`
 sleep 5
 python3 test/service_tests.py
 
+python3 test/ingestion_tests.py
+
 # Stop the AEOPRS Service
 kill $(pgrep Python)
 

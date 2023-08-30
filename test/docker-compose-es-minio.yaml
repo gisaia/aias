@@ -35,3 +35,16 @@ services:
       - xpack.security.transport.ssl.enabled=false
     ports:
       - 9200:9200
+
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION:-3-management}
+    container_name: rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis:
+    image: redis:${REDIS_VERSION:-7.2}
+    container_name: redis
+    ports:
+      - 6379:6379

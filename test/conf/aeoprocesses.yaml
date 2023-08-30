@@ -1,0 +1,13 @@
+ingesters:
+  -
+    name: theia
+    class_name: aeoprocesses.ingest.drivers.impl.theia
+    assets_dir: /tmp/aeoproc
+    configuration:
+      token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
+      login: ${THEIA_LOGIN} #sylvain.gaudan@gisaia.com
+      pwd: ${THEIA_PWD} #Theia.gisaia1
+    priority: 1
+celery_broker_url: pyamqp://guest:guest@127.0.0.1:5672//
+celery_result_backend: redis://127.0.0.1:6379/0
+aeoprs_endpoint: http://127.0.0.1:8000
