@@ -33,4 +33,4 @@ class Configuration:
     def init(configuration_file:str):
         envyaml=EnvYAML(configuration_file, strict=False)
         print(envyaml.export())
-        Configuration.settings=Settings.parse_obj(envyaml.export())
+        Configuration.settings=Settings.model_validate(envyaml.export())

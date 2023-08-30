@@ -271,6 +271,7 @@ def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_collection_name(collection)):
         return False
     try:
+        print("item:"+str(item_id))
         r=__getES().get(index=__get_es_collection_name(collection), id=item_id)
     except elasticsearch.NotFoundError as e:
         return False
