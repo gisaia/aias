@@ -5,8 +5,8 @@ ingesters:
     assets_dir: /tmp/aeoproc
     configuration:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
-      login: ${THEIA_LOGIN} #sylvain.gaudan@gisaia.com
-      pwd: ${THEIA_PWD} #Theia.gisaia1
+      login: ${THEIA_LOGIN}
+      pwd: ${THEIA_PWD}
     priority: 1
 celery_broker_url: pyamqp://guest:guest@127.0.0.1:5672//
 celery_result_backend: redis://127.0.0.1:6379/0

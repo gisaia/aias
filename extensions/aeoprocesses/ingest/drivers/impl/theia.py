@@ -56,14 +56,15 @@ class Driver(ProcDriver):
             token=Driver.__getTheiaToken__(Driver.login, Driver.pwd)
             Driver.LOGGER.debug("Using token {} ".format(token))
             time_start = time.time()
-            get_product = 'curl -o {} -k -H "Authorization: Bearer {}" {}'.format(filepath+".download", token, asset.href)
+            tmp_file=filepath+".download"
+            get_product = 'curl -o {} -k -H "Authorization: Bearer {}" {}'.format(tmp_file, token, asset.href)
             Driver.LOGGER.debug("Downloading product with {} ".format(get_product))
             os.system(get_product)
-            if not os.path.exists(filepath+".download"):
+            if not os.path.exists(tmp_file):
                 msg="Fetching assets failed for connection reasons ({})".format(asset.href)
                 Driver.LOGGER.error(msg)
                 raise ConnectionException(msg)
-            os.rename(filepath+".download", filepath)
+            os.rename(tmp_file, filepath)
             Driver.LOGGER.debug("Product downloaded in {}s ({} Mb)".format(round(time.time() - time_start), round(os.path.getsize(filepath)/1000000)))
             asset.href=filepath
         return assets

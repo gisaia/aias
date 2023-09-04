@@ -2,7 +2,7 @@
 
 ARLAS EO Product Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
 
-AEO Processes aim at offering asynchron services, among them ingestion services.
+AEO Processes aim at offering asynchronous services, among them ingestion services.
 
 AEOPRS can run without AEO Processes, while the later relies on the first.
 
@@ -220,7 +220,7 @@ curl -X DELETE \
 
 ### How AEO Processes work
 
-AEO Processes exposes an OGC API Processes (to be implemented).
+AEO Processes exposes an OGC API Processes compliant API (to be implemented).
 
 List of processes:
 - `ingest` : it ingest an archive.
@@ -242,7 +242,7 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 - transform the assets
 - create an AEOPRS Item
 
-A driver must implement the following methods:
+A [driver](aeoprocesses/ingest/drivers/driver.py) must implement the following methods:
 
 ```python
     @staticmethod
@@ -261,11 +261,11 @@ A driver must implement the following methods:
 ```
 
 The following drivers are available in the `extensions` directory:
-- theia
+- [theia](extensions/aeoprocesses/ingest/drivers/impl/theia.py)
 
 ### Running AEO Processing
 
-AEOPRS requires
+AEO Processes requires
 - python 3.10
 - AEOPRS
 - celery backend (redis)
@@ -278,6 +278,18 @@ The following environment variables must be set to run the celery workers and th
 | ------------------------------------------------------ |
 | AEOPROCESSES_CONFIGURATION_FILE                        |
 
+
+For starting the service or a celery worker, you need to set two environment variables:
+
+```sh
+export PYTHONPATH=pwd:pwd/extensions:pwd/test
+export AEOPROCESSES_CONFIGURATION_FILE=pwd/test/conf/aeoprocesses.yaml
+```
+
+For starting the celery worker:
+```sh
+celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
+```
 
 TODO : implement and document the OGC Processes api
 

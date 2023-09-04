@@ -75,7 +75,7 @@ def ingest(self, driver_name:str, url:str, collection:str, catalog:str)->dict:
         LOGGER.debug("ingestion: 5 - upload")
         i:int=0
         for asset_name,asset in item.assets.items():
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'upload', 'current': i, 'total': len(item.assets)})
+            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'upload', 'current': i, 'asset':asset_name, 'total': len(item.assets)})
             i+=1
             asset:Asset=asset
             if asset.aeo__managed == True:
