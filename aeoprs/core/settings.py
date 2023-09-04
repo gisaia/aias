@@ -32,5 +32,4 @@ class Configuration:
     @staticmethod
     def init(configuration_file:str):
         envyaml=EnvYAML(configuration_file, strict=False)
-        print(envyaml.export())
         Configuration.settings=Settings.model_validate(envyaml.export())
