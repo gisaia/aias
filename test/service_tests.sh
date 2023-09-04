@@ -7,6 +7,9 @@ export PYTHONPATH=`pwd`
 sleep 5
 python3 test/service_tests.py
 
+celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO &
+
+
 python3 test/ingestion_tests.py
 
 # Stop the AEOPRS Service
@@ -14,3 +17,5 @@ kill $(pgrep Python)
 
 # Stop ES and minio
 docker-compose -f test/docker-compose-es-minio.yaml down
+
+pkill -f "celery worker"
