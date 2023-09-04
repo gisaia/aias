@@ -7,7 +7,6 @@ import elasticsearch
 from aeoprs.core.settings import Configuration
 import aeoprs.core.s3 as s3
 import aeoprs.core.product_registration as rs
-import boto3 as boto3
 from aeoprs.core.models import mapper as mapper
 
 AEOPRS_URL="http://127.0.0.1:8000"
@@ -70,6 +69,20 @@ class Tests(unittest.TestCase):
             data = file.read()
             r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok,msg="Item registration")
+
+        # ITEM FOUND
+        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        self.assertTrue(r.ok,msg="Item must not found")
+
+    def test_update_item(self):
+        # ADD ITEM
+        self.test_add_item()
+
+        # UPDATE
+        with open(ITEM_PATH,'r') as file:
+            data = file.read()
+            r=requests.put(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID), data=data, headers={"Content-Type": "application/json"})
+            self.assertTrue(r.ok,msg="Item update")
 
         # ITEM FOUND
         r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))

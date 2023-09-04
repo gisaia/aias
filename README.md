@@ -2,7 +2,11 @@
 
 ARLAS EO Product Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
 
-## Data model
+AEO Processes aim at offering asynchronous services, among them ingestion services.
+
+AEOPRS can run without AEO Processes, while the later relies on the first.
+
+## AEOPRS Data model
 
 The AEOPRS Model is based on the STAC specifications. It supports the folling extensions:
 - view
@@ -49,7 +53,7 @@ Asset methods:
 
 By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.aeo:managed=False` (or `asset.aeo__managed=False`)
 
-## Running AEOPRS
+### Running AEOPRS
 
 AEOPRS requires
 - python 3.10
@@ -57,7 +61,7 @@ AEOPRS requires
 - an object store (S3, GS or minio)
 - docker and docker compose to run a test stack
 
-### With your own elasticsearch and minio
+#### With your own elasticsearch and minio
 
 To configure AEOPRS, edit `conf/aeoprs.yaml`. An example is provided in `test/conf/aeoprs.yaml`. Then start the service:
 
@@ -83,7 +87,7 @@ Arguments:
 
 Once the service is up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
 
-## With docker
+### With docker
 
 Instead of launching the service with python, you can launch it with docker:
 
@@ -110,14 +114,14 @@ with `XXX:VVV` the environment variable that you want to specify. The table belo
 | ARLASEO_S3_ENDPOINT_URL                                |
 
 
-### Stack for tests
+#### Stack for tests
 
 If you do not have elasticsearch and minio running, you can start a test stack:
 ```shell
 ./test/start_stack.sh 
 ```
 
-## Using AEOPRS
+### Using AEOPRS
 
 In the following examples, we will:
 - add an asset
@@ -126,7 +130,7 @@ In the following examples, we will:
 - get the item
 - delete the item and its asset
 
-### Add an asset
+#### Add an asset
 
 ```shell
 curl -X POST \
@@ -138,7 +142,7 @@ Result:
 {"msg":"Object has been uploaded to bucket successfully"}
 ```
 
-### Check that the asset exists
+#### Check that the asset exists
 
 ```shell
 curl -I \
@@ -150,7 +154,7 @@ Result:
 HTTP/1.1 204 No Content
 ```
 
-### Add an item
+#### Add an item
 
 ```shell
 curl -X POST \
@@ -193,7 +197,7 @@ Result:
    }
 }
 ```
-### Check the item exists
+#### Check the item exists
 
 ```shell
 curl -X GET \
@@ -203,7 +207,7 @@ curl -X GET \
 
 Result: same as previous call (registration).
 
-### Delete the item and its assets
+#### Delete the item and its assets
 
 ```shell
 curl -X DELETE \
@@ -211,6 +215,83 @@ curl -X DELETE \
     "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
 ```
 
+
+## AEO Processes
+
+### How AEO Processes work
+
+AEO Processes exposes an OGC API Processes compliant API (to be implemented).
+
+List of processes:
+- `ingest` : it ingest an archive.
+
+### Ingest process
+
+The `ingest` process takes a url pointing at an archive. The process runs the following steps:
+- identify the driver for ingestion
+- identify the assets to fetch (done by the driver)
+- fetch the assets (e.g. copy/download)  (done by the driver)
+- transform the assets if necessary (e.g. create cog)  (done by the driver)
+- upload the assets
+- register the item in AEOPRS
+
+As mentioned, the process is "driver" based. Each data source must have a compliant driver in order to be ingested in AEOPRS. A driver has to
+- say whether it supports a given archive or not
+- identify the archive's assets to be fetched
+- fetch the assets
+- transform the assets
+- create an AEOPRS Item
+
+A [driver](aeoprocesses/ingest/drivers/driver.py) must implement the following methods:
+
+```python
+    @staticmethod
+    def init(configuration:dict) -> None:
+
+    @staticmethod
+    def supports(url:str)->bool:
+
+    def identify_assets(self, url:str)->list[Asset]:
+
+    def fetch_assets(self, url:str, resources:list[Asset])->list[Asset]:
+
+    def transform_assets(self, url:str, resources:list[Asset])->list[Asset]:
+
+    def to_item(self, url:str, resources:list[Asset])->Item:
+```
+
+The following drivers are available in the `extensions` directory:
+- [theia](extensions/aeoprocesses/ingest/drivers/impl/theia.py)
+
+### Running AEO Processing
+
+AEO Processes requires
+- python 3.10
+- AEOPRS
+- celery backend (redis)
+- celery brocker (rabbitmq)
+- docker and docker compose for running the tests
+
+The following environment variables must be set to run the celery workers and the service:
+
+| Variable                                               |
+| ------------------------------------------------------ |
+| AEOPROCESSES_CONFIGURATION_FILE                        |
+
+
+For starting the service or a celery worker, you need to set two environment variables:
+
+```sh
+export PYTHONPATH=pwd:pwd/extensions:pwd/test
+export AEOPROCESSES_CONFIGURATION_FILE=pwd/test/conf/aeoprocesses.yaml
+```
+
+For starting the celery worker:
+```sh
+celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
+```
+
+TODO : implement and document the OGC Processes api
 
 ## Tests
 

@@ -2,7 +2,6 @@ import os
 from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple
-import tempfile
 import boto3 as boto3
 import elasticsearch
 import pygeohash as pgh
@@ -258,19 +257,21 @@ def reindex(collection:str):
     keys=s3.get_matching_s3_objects(Configuration.settings.s3.bucket, collection, ITEM_ARLAS_SUFFIX)
     LOGGER.info("Start reindexing collection {}".format(collection))
     for key in keys:
+        tmp_file="tmp"+ITEM_ARLAS_SUFFIX
         LOGGER.info("Reindexing item from {}".format(key))
-        LOGGER.info(s3.get_client().download_file(Configuration.settings.s3.bucket, key, "tmp"+ITEM_ARLAS_SUFFIX))
-        with open("tmp"+ITEM_ARLAS_SUFFIX,"r") as f:
+        LOGGER.info(s3.get_client().download_file(Configuration.settings.s3.bucket, key, tmp_file))
+        with open(tmp_file,"r") as f:
             item=item_from_json_file(f)
             LOGGER.debug(item)
             register_item(item)
-        os.remove("tmp"+ITEM_ARLAS_SUFFIX)
+        os.remove(tmp_file)
     LOGGER.info("Done with reindexing collection {}".format(collection))
 
 def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_collection_name(collection)):
         return False
     try:
+        print("item:"+str(item_id))
         r=__getES().get(index=__get_es_collection_name(collection), id=item_id)
     except elasticsearch.NotFoundError as e:
         return False

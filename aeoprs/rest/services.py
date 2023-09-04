@@ -86,13 +86,13 @@ def update_item(collection:str, id:str, item: Item, request: Request)->str:
     if not item.collection == collection:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Invalid collection in the item, must be the same as the one provided in the url")
-    if not rs.item_exists(item):
+    if not rs.item_exists(collection, item.id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Item does not exist, can not update")
     try:
         return Response(content=to_json(rs.register_item(item=item)),
                             status_code=status.HTTP_200_OK,
-                            headers={"Location":request.base_url.path+"/"+rs.get_item_relative_path(item)})
+                            headers={"Location":request.base_url.path+"/"+rs.get_item_relative_path(collection, item.id)})
     except exceptions.InvalidAssetsException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Invalid asset {}: {}".format(e.assets, e.reason))

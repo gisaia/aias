@@ -20,19 +20,20 @@ def get_client():
     else:
         return get_session().client("s3")
 
-import boto3
-
-
-def get_matching_s3_objects(bucket, prefix="", suffix=""):
+def get_matching_s3_objects(bucket, prefix="", suffix="")->str:
     """
     Generate objects in an S3 bucket.
 
     :param bucket: Name of the S3 bucket.
     :param prefix: Only fetch objects whose key starts with
-        this prefix (optional).
+        this prefix (optional) or any of these prefixes if a list/tuple is provided.
     :param suffix: Only fetch objects whose keys end with
-        this suffix (optional).
+        this suffix (optional) or any of these suffixes if a list/tuple is provided.
+    Yields:
+        _type_: yealds keys (str)
+
     """
+
     s3 = get_client()
     paginator = s3.get_paginator("list_objects_v2")
 
