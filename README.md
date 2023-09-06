@@ -295,6 +295,15 @@ celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --log
 
 TODO : implement and document the OGC Processes api
 
+#### Ingest synchronously
+
+Ingestion can be launched synchronously with the ingest command line:
+
+```shell
+python3 aeoprocesses/ingest/cli.py test/conf/aeoprocesses.yaml "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&size=1" 
+```
+Note: AEOPRS must be running.
+
 ## Tests
 
 To run the unit tests:
