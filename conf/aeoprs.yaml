@@ -1,9 +1,5 @@
-arlas:
-  collection_name: $ARLASEO_ARLAS_COLLECTION_NAME|arlaseo
-  url: $ARLASEO_ARLAS_URL|http://localhost:81/server
-
 index:
-  endpoint_url: $ARLASEO_INDEX_ENDPOINT_URL| http://localhost:9200
+  endpoint_url: $ARLASEO_INDEX_ENDPOINT_URL|http://localhost:9200
   collection_prefix: $ARLASEO_INDEX_COLLECTION_PREFIX|arlaseo
   login: $ARLASEO_INDEX_LOGIN
   pwd: $ARLASEO_INDEX_LOGIN
@@ -22,3 +18,6 @@ s3:
 
 # if you don't use aws s3, then please prov
   endpoint_url: $ARLASEO_S3_ENDPOINT_URL
+
+arlaseo_mapping_url: $ARLASEO_MAPPING_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json"
+arlaseo_collection_url: $ARLASEO_COLLECTION_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/collection.json"
