@@ -1,4 +1,5 @@
-export PYTHONPATH=`pwd`
+export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
+export AEOPROCESSES_CONFIGURATION_FILE=`pwd`/test/conf/aeoprocesses.yaml
 # This script starts a es/minio stack, runs aeoprs, then launches the tests and finally stops the stack
 
 ./test/start_stack.sh
@@ -10,7 +11,7 @@ python3 test/service_tests.py
 celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO &
 
 
-python3 test/ingestion_tests.py
+python3 test/ingest_tests.py
 
 # Stop the AEOPRS Service
 kill $(pgrep Python)
