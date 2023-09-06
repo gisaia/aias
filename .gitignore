@@ -4,3 +4,4 @@ private
 .minio
 .DS_Store
 target
+.idea/

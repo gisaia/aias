@@ -4,7 +4,13 @@ export AEOPROCESSES_CONFIGURATION_FILE=`pwd`/test/conf/aeoprocesses.yaml
 
 ./test/start_stack.sh
 
-# Wait a bit then launch the tests
+# Waiting for elastic ready
+code=""
+code_OK="OK"
+while [[ "$code" != *$code_OK* ]];do
+    code="$(curl -IL --silent http://localhost:9200 | grep "^HTTP\/")"
+    eval "sleep 5"
+done
 sleep 5
 python3 test/service_tests.py
 
