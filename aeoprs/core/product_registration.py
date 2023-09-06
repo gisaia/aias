@@ -19,8 +19,6 @@ from aeoprs.core.models.mapper import to_arlaseo_json
 from aeoprs.core.settings import Configuration
 from aeoprs.logger import CustomLogger as Logger
 
-ARLASEO_MAPPING_URL = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json"
-ARLASEO_COLLECTION_URL = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/master/collection.json"
 ASSETS_NOT_FOUND="Asset(s) not found"
 LOGGER = Logger.get_logger()
 ITEM_ARLAS_SUFFIX=".arlaseo.json"
@@ -235,8 +233,8 @@ def register_item(item:Item)->Item:
     __add_generated_fields(item)
     upload_item(item)
     if not __getES().indices.exists(index=__get_es_collection_name(item.collection)):
-        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_collection_name(item.collection), ARLASEO_MAPPING_URL))
-        r = requests.get(ARLASEO_MAPPING_URL, verify=False)
+        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_collection_name(item.collection), Configuration.settings.arlaseo_mapping_url))
+        r = requests.get(Configuration.settings.arlaseo_mapping_url, verify=False)
         if r.ok:
             __getES().indices.create(index=__get_es_collection_name(item.collection), mappings=r.json()["mappings"])
             LOGGER.info("Index {} created.".format(__get_es_collection_name(item.collection)))

@@ -112,6 +112,8 @@ with `XXX:VVV` the environment variable that you want to specify. The table belo
 | ARLASEO_S3_PLATFORM                                    |
 | ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL                     |
 | ARLASEO_S3_ENDPOINT_URL                                |
+| ARLASEO_MAPPING_URL                                    |
+| ARLASEO_COLLECTION_URL                                 |
 
 
 #### Stack for tests
