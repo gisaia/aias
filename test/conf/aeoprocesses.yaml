@@ -7,6 +7,13 @@ ingesters:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
       login: ${THEIA_LOGIN}
       pwd: ${THEIA_PWD}
+    priority: 3
+  -
+    name: geoeye
+    class_name: aeoprocesses.ingest.drivers.impl.geoeye
+    assets_dir: /tmp/aeoproc/geoeye
+    configuration:
+      root_directory: ${ROOT_DIRECTORY}
     priority: 2
   -
     name: dimap
