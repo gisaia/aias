@@ -137,5 +137,5 @@ class Driver(ProcDriver):
                 Driver.quicklook_path = raw_all_quick_path
             return Driver.thumbnail_path is not None and Driver.quicklook_path is not None and Driver.dim_path is not None
         else:
-            Driver.LOGGER.info("The folder does not exist.")
+            Driver.LOGGER.error("The folder {} does not exist.".format(all_path))
             return False
