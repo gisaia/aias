@@ -1,6 +1,7 @@
 from aeoprs.core.settings import Configuration as AEOPRSConfiguration
 from aeoprocesses.ingest.drivers.drivers import Drivers
 from aeoprocesses.ingest.ingest_services import ProcServices, TaskState
+import aeoprs.core.product_registration as rs
 import aeoprs.core.s3 as s3
 from service_tests import COLLECTION
 from celery import states
@@ -9,6 +10,8 @@ import unittest
 import boto3 as boto3
 import elasticsearch
 
+
+ID="SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D"
 
 class Tests(unittest.TestCase):
 
@@ -25,7 +28,7 @@ class Tests(unittest.TestCase):
             # Clean the bucket
             objects=s3.get_client().list_objects(Bucket=AEOPRSConfiguration.settings.s3.bucket, Prefix=rs.get_assets_relative_path(COLLECTION, ID))
             for object in objects["Contents"]:
-                objects=s3.get_client().delete_object(Bucket=AEOPRSConfiguration.settings.s3.bucket, Key=object["Key"])
+                s3.get_client().delete_object(Bucket=AEOPRSConfiguration.settings.s3.bucket, Key=object["Key"])
             s3.get_client().delete_object(Bucket=AEOPRSConfiguration.settings.s3.bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
         except Exception as e:
             print(e)
