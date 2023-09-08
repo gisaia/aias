@@ -313,7 +313,7 @@ To run the unit tests:
 ```
 
 To run the service tests:
-
+gdal 3.7.X must be available
 ```shell
 ./test/service_tests.sh 
 ```

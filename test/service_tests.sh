@@ -1,7 +1,8 @@
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
 export AEOPROCESSES_CONFIGURATION_FILE=`pwd`/test/conf/aeoprocesses.yaml
+export ROOT_DIRECTORY=`pwd`/test/inputs
 # This script starts a es/minio stack, runs aeoprs, then launches the tests and finally stops the stack
-
+gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
 ./test/start_stack.sh
 
 # Waiting for elastic ready
@@ -26,3 +27,4 @@ kill $(pgrep Python)
 docker-compose -f test/docker-compose-es-minio.yaml down
 
 pkill -f "celery worker"
+rm -rf $ROOT_DIRECTORY"/DIMAP"
