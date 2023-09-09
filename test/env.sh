@@ -1,4 +1,14 @@
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
-#export AEOPROCESSES_CONFIGURATION_FILE=`pwd`/test/conf/aeoprocesses_theia.yaml
 export AEOPROCESSES_CONFIGURATION_FILE=`pwd`/test/conf/aeoprocesses.yaml
 export ROOT_DIRECTORY=`pwd`/test/inputs
+export ARLASEO_ARLAS_COLLECTION_NAME=tests
+export ARLASEO_ARLAS_URL=http://localhost:81/server
+export ARLASEO_INDEX_ENDPOINT_URL=http://elasticsearch:9200
+export ARLASEO_INDEX_COLLECTION_PREFIX=arlaseotest
+export ARLASEO_S3_BUCKET=arlaseotest
+export ARLASEO_S3_ACCESS_KEY_ID=arlaseo
+export ARLASEO_S3_SECRET_ACCESS_KEY=arlaseosecret
+export ARLASEO_S3_TIER=Standard
+export ARLASEO_S3_PLATFORM=minio
+export ARLASEO_S3_ENDPOINT_URL=http://minio:9000
+export ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL=http://127.0.0.1:9000/{}/{}

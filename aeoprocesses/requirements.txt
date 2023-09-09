@@ -1,0 +1,6 @@
+pydantic==2.1
+envyaml==1.10.211231
+celery==5.3.1
+gdal==3.6.3
+requests==2.31.0
+celery[redis]==5.3.1

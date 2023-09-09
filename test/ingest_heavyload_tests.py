@@ -1,38 +1,19 @@
 import requests
 import os
 import json
-from aeoprs.core.settings import Configuration as AEOPRSConfiguration
-from aeoprocesses.ingest.drivers.drivers import Drivers
 from aeoprocesses.ingest.ingest_services import ProcServices, TaskState
-import aeoprs.core.product_registration as rs
-import aeoprs.core.s3 as s3
-from service_tests import COLLECTION
 from celery import states
 import time
 import unittest
-import boto3 as boto3
-import elasticsearch
+
+from utils import setUpTest, AEOPRS_URL
 
 BATCH_SIZE = 1000
 class Tests(unittest.TestCase):
 
     def setUp(self):
         ProcServices.init(os.environ.get("AEOPROCESSES_CONFIGURATION_FILE"))
-        AEOPRSConfiguration.init(configuration_file="test/conf/aeoprs.yaml")
-        es = elasticsearch.Elasticsearch(AEOPRSConfiguration.settings.index.endpoint_url)
-        try:
-            # Clean the index
-            es.indices.delete(index=AEOPRSConfiguration.settings.index.collection_prefix+"_"+COLLECTION)
-        except Exception:
-            ...
-        try:
-            # Clean the bucket
-            objects=s3.get_client().list_objects(Bucket=AEOPRSConfiguration.settings.s3.bucket, Prefix=COLLECTION)
-            for object in objects["Contents"]:
-                s3.get_client().delete_object(Bucket=AEOPRSConfiguration.settings.s3.bucket, Key=object["Key"])
-        except Exception as e:
-            print(e)
-            ...
+        setUpTest()
 
     def test_async_ingest_theia(self):
 
@@ -57,7 +38,7 @@ class Tests(unittest.TestCase):
         print("{} archives registered in {} s".format(BATCH_SIZE, end - start))
         print("Checking that the {} archives are registered ...".format(BATCH_SIZE))
         for hit in hits:
-            url="http://localhost:8000/collections/main_catalog/items/{}".format(hit["md"]["id"])
+            url=AEOPRS_URL+"/collections/main_catalog/items/{}".format(hit["md"]["id"])
             r = requests.get(url)
             self.assertTrue(r.ok, url+" not found")
 
