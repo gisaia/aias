@@ -93,6 +93,8 @@ def ingest(self, driver_name:str, url:str, collection:str, catalog:str)->dict:
                         msg="AEOPRS Service can not be reached ({})".format(Configuration.settings.aeoprs_endpoint)
                         LOGGER.error(msg)
                         raise ConnectionException(msg)
+            else:
+                LOGGER.info("{} not managed".format(asset.name))
         LOGGER.debug("ingestion: 6 - register")
         __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'register_item'})
         item_already_exists=False
@@ -137,5 +139,5 @@ def __check_assets__(url:str, assets:list[Asset], file_exists: bool=False):
         if asset.roles is None:
             raise DriverException("Invalid asset {} for {} : no roles provided".format(asset.name, url))
         if file_exists:
-            if not os.path.exists(asset.href):
+            if asset.aeo__managed is True and not os.path.exists(asset.href):
                 raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
