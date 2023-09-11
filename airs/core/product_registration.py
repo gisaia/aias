@@ -13,7 +13,7 @@ import airs.core.exceptions as exceptions
 import airs.core.geo as geo
 import airs.core.s3 as s3
 import airs.core.utils as utils
-from airs.core.models.mapper import (to_json, to_arlaseo_json, item_from_dict, item_from_json_file, to_airs_item)
+from airs.core.models.mapper import (to_json, item_from_dict, item_from_json_file, to_airs_item, to_airs_json)
 from airs.core.models.model import (Asset, Item, Properties, Band, Role)
 from airs.core.settings import Configuration
 from airs.logger import CustomLogger as Logger
@@ -244,7 +244,7 @@ def register_item(item:Item)->Item:
             raise exceptions.InternalError("elasticsearch", r.reason)
     else:
         LOGGER.info("Index {} found.".format(__get_es_collection_name(item.collection)))
-    resp = __getES().index(index=__get_es_collection_name(item.collection), id=item.id, document=to_arlaseo_json(item))
+    resp = __getES().index(index=__get_es_collection_name(item.collection), id=item.id, document=to_airs_json(item))
     LOGGER.info("Indexing result:{}".format(resp['result']))
     return item
 

@@ -4,11 +4,11 @@ import airs.core.product_registration as rs
 import os
 
 
-index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX","arlaseotest")
-s3_access_key_id = os.getenv("AIRS_S3_ACCESS_KEY_ID","arlaseo")
-s3_access_key = os.getenv("AIRS_S3_SECRET_ACCESS_KEY","arlaseosecret")
+index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX","airs")
+s3_access_key_id = os.getenv("AIRS_S3_ACCESS_KEY_ID","airs")
+s3_access_key = os.getenv("AIRS_S3_SECRET_ACCESS_KEY","airssecret")
 s3_region = os.getenv("AIRS_S3_REGION","None")
-s3_bucket = os.getenv("AIRS_S3_BUCKET","arlaseotest")
+s3_bucket = os.getenv("AIRS_S3_BUCKET","airstest")
 
 index_endpoint_url = "http://localhost:9200"
 s3_endpoint_url = "http://localhost:9000"

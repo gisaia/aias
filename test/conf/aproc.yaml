@@ -1,5 +1,19 @@
 ingesters:
   -
+    name: geoeye
+    class_name: extensions.aproc.ingest.drivers.impl.geoeye
+    assets_dir: /tmp/aproc/geoeye
+    configuration:
+      root_directory: $ROOT_DIRECTORY
+    priority: 2
+  -
+    name: dimap
+    class_name: extensions.aproc.ingest.drivers.impl.dimap
+    assets_dir: /tmp/aproc/dimap
+    configuration:
+      root_directory: $ROOT_DIRECTORY
+    priority: 1
+  -
     name: theia
     class_name: extensions.aproc.ingest.drivers.impl.theia
     assets_dir: /tmp/aproc/theia
@@ -8,20 +22,6 @@ ingesters:
       login: ${THEIA_LOGIN}
       pwd: ${THEIA_PWD}
     priority: 3
-  -
-    name: geoeye
-    class_name: extensions.aproc.ingest.drivers.impl.geoeye
-    assets_dir: /tmp/aproc/geoeye
-    configuration:
-      root_directory: ${ROOT_DIRECTORY}
-    priority: 2
-  -
-    name: dimap
-    class_name: extensions.aproc.ingest.drivers.impl.dimap
-    assets_dir: /tmp/aproc/dimap
-    configuration:
-      root_directory: ${ROOT_DIRECTORY}
-    priority: 1
-celery_broker_url: pyamqp://guest:guest@127.0.0.1:5672//
-celery_result_backend: redis://127.0.0.1:6379/0
-airs_endpoint: http://127.0.0.1:8000
+celery_broker_url: $CELERY_BROKER_URL|pyamqp://guest:guest@127.0.0.1:5672//
+celery_result_backend: $CELERY_RESULT_BACKEND|redis://127.0.0.1:6379/0
+airs_endpoint: $AIRS_ENDPOINT|http://127.0.0.1:8000

@@ -4,6 +4,7 @@ networks:
 services:
   minio:
     image: minio/minio
+    container_name: minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -104,8 +105,8 @@ services:
       - AIRS_S3_BUCKET=${AIRS_S3_BUCKET:-airstest}
       - AIRS_S3_ACCESS_KEY_ID=${AIRS_S3_ACCESS_KEY_ID}
       - AIRS_S3_SECRET_ACCESS_KEY=${AIRS_S3_SECRET_ACCESS_KEY}
-      - AIRS_S3_REGION|=${AIRS_S3_REGION:-None}
-      - AIRS_S3_TIER=${MONGO_USERNAME:-Standard}
+      - AIRS_S3_REGION=${AIRS_S3_REGION:-None}
+      - AIRS_S3_TIER=${AIRS_S3_TIER:-Standard}
       - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
       - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
       - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}

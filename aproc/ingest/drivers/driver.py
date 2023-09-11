@@ -30,9 +30,9 @@ class Driver(ABC):
         unique=hashlib.md5(url.encode("utf-8")).hexdigest()
         dir=os.path.sep.join([self.__assets_dir__, unique])
         if not os.path.exists(self.__assets_dir__):
-            os.mkdir(self.__assets_dir__)
+            os.makedirs(self.__assets_dir__)
         if not os.path.exists(dir):
-            os.mkdir(dir)
+            os.makedirs(dir)
         return dir
 
     def get_asset_filepath(self, url: str, asset:Asset)->str:
