@@ -13,9 +13,8 @@ import aeoprs.core.exceptions as exceptions
 import aeoprs.core.geo as geo
 import aeoprs.core.s3 as s3
 import aeoprs.core.utils as utils
-from aeoprs.core.models.mapper import (to_json, item_from_json, item_from_dict, item_from_json_file)
+from aeoprs.core.models.mapper import (to_json, to_arlaseo_json, item_from_dict, item_from_json_file, to_aeo_item)
 from aeoprs.core.models.model import (Asset, Item, Properties, Band, Role)
-from aeoprs.core.models.mapper import to_arlaseo_json
 from aeoprs.core.settings import Configuration
 from aeoprs.logger import CustomLogger as Logger
 
@@ -116,6 +115,7 @@ def upload_item(item:Item):
     Returns:
         str: key, None if not uploaded
     """
+    item=to_aeo_item(item)
     key=get_item_relative_path(item.collection, item.id)
     return __upload_item(key, item)
 
@@ -219,6 +219,7 @@ def register_item(item:Item)->Item:
     Returns:
         Item: The registered item
     """
+    item=to_aeo_item(item)
     __check_register_item_params(item)
     for asset in item.assets.values():
         if asset.aeo__managed is None:
@@ -269,7 +270,6 @@ def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_collection_name(collection)):
         return False
     try:
-        print("item:"+str(item_id))
         r=__getES().get(index=__get_es_collection_name(collection), id=item_id)
     except elasticsearch.NotFoundError as e:
         return False
@@ -350,6 +350,8 @@ def __set_assets_links(item:Item)->Item:
             asset.aeo__object_store_key=object_relative_path
             asset.storage__platform=Configuration.settings.s3.platform
             asset.storage__tier=Configuration.settings.s3.tier
+        else:
+            LOGGER.info("Asset {} is not maneged".format(asset_name))
     item_relative_path=get_item_relative_path(item.collection, item.id)
     item.assets[Role.arlas_eo_item.value]=Asset(
             name=Role.arlas_eo_item.value,

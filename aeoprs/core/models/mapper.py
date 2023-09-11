@@ -4,6 +4,22 @@ from pydantic.fields import FieldInfo
 from pydantic.json import pydantic_encoder
 from pydantic import BaseModel, Extra, Field
 
+
+
+
+def to_aeo_item(item: Item)->Item:
+     """ Takes an item and makes sure to map the namespace fields to AEOPRS Item. Keys can contain : as namespace seperator
+
+     Args:
+         item (Item): The item (with : namespace separator)
+
+     Returns:
+         item: The aeoprs item
+     """
+     dictionary=item.model_dump(exclude_unset=True, by_alias=True, exclude_none=True)
+     return Item(**__replaceKeys(dictionary, ":", "__"))
+
+
 def to_dict(item: Item)->dict:
      """ create a dictionnary from the Item. Keys contain : as namespace seperator
 
@@ -26,7 +42,7 @@ def to_arlaseo_dict(item: Item)->dict:
          dict: The dictionary. Keys contain __ as namespace seperator
      """
      dictionary=item.model_dump(exclude_unset=True, by_alias=False, exclude_none=True)
-     return __replaceKeys(dictionary, ":", "__")
+     return dictionary
 
 def to_arlaseo_json(item: Item)->str:
      """ create a json from the Item. Keys contain __ as namespace seperator

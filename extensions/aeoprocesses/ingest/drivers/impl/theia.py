@@ -11,11 +11,12 @@ import time
 
 class Driver(ProcDriver):
     token=None
+    manage_data=False
 
     # Implements drivers method
     def init(configuration:Configuration):
         token=Driver.__getTheiaToken__(configuration["login"], configuration["pwd"], configuration["token_url"])
-
+        manage_data=configuration.get("manage_data", False)
 
     # Implements drivers method
     def supports(url:str)->bool:
@@ -36,7 +37,7 @@ class Driver(ProcDriver):
                     return [
                         Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value),
                         Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value),
-                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value)
+                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, aeo__managed=Driver.manage_data)
                     ]
                 else: 
                     Driver.LOGGER.error("more than one hit found ({} found)".format(len(hits.get("hits"))))
@@ -49,21 +50,22 @@ class Driver(ProcDriver):
     # Implements drivers method
     def fetch_assets(self, url:str, assets:list[Asset])->list[Asset]:
         for asset in assets:
-            filepath=self.get_asset_filepath(url, asset)
-            token=Driver.token
-            Driver.LOGGER.debug("Using token {} ".format(token))
-            time_start = time.time()
-            tmp_file=filepath+".download"
-            get_product = 'curl -o {} -k -H "Authorization: Bearer {}" {}'.format(tmp_file, token, asset.href)
-            Driver.LOGGER.debug("Downloading product with {} ".format(get_product))
-            os.system(get_product)
-            if not os.path.exists(tmp_file):
-                msg="Fetching assets failed for connection reasons ({})".format(asset.href)
-                Driver.LOGGER.error(msg)
-                raise ConnectionException(msg)
-            os.rename(tmp_file, filepath)
-            Driver.LOGGER.debug("Product downloaded in {}s ({} Mb)".format(round(time.time() - time_start), round(os.path.getsize(filepath)/1000000)))
-            asset.href=filepath
+            if asset.aeo__managed:
+                filepath=self.get_asset_filepath(url, asset)
+                token=Driver.token
+                Driver.LOGGER.debug("Using token {} ".format(token))
+                time_start = time.time()
+                tmp_file=filepath+".download"
+                get_product = 'curl -o {} -k -H "Authorization: Bearer {}" {}'.format(tmp_file, token, asset.href)
+                Driver.LOGGER.debug("Downloading product with {} ".format(get_product))
+                os.system(get_product)
+                if not os.path.exists(tmp_file):
+                    msg="Fetching assets failed for connection reasons ({})".format(asset.href)
+                    Driver.LOGGER.error(msg)
+                    raise ConnectionException(msg)
+                os.rename(tmp_file, filepath)
+                Driver.LOGGER.debug("Product downloaded in {}s ({} Mb)".format(round(time.time() - time_start), round(os.path.getsize(filepath)/1000000)))
+                asset.href=filepath
         return assets
 
     # Implements drivers method
