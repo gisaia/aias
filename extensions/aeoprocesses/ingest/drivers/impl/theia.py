@@ -10,15 +10,12 @@ import os
 import time
 
 class Driver(ProcDriver):
-    login=None
-    pwd=None
-    token_url=None
+    token=None
 
     # Implements drivers method
     def init(configuration:Configuration):
-        login=configuration["login"]
-        pwd=configuration["pwd"]
-        token_url=configuration["token_url"]
+        token=Driver.__getTheiaToken__(configuration["login"], configuration["pwd"], configuration["token_url"])
+
 
     # Implements drivers method
     def supports(url:str)->bool:
@@ -53,7 +50,7 @@ class Driver(ProcDriver):
     def fetch_assets(self, url:str, assets:list[Asset])->list[Asset]:
         for asset in assets:
             filepath=self.get_asset_filepath(url, asset)
-            token=Driver.__getTheiaToken__(Driver.login, Driver.pwd)
+            token=Driver.token
             Driver.LOGGER.debug("Using token {} ".format(token))
             time_start = time.time()
             tmp_file=filepath+".download"
@@ -128,16 +125,15 @@ class Driver(ProcDriver):
             return json.loads(r.content)
         else: return None
 
-    def __getTheiaToken__(login:str, pwd:str):
+    def __getTheiaToken__(login:str, pwd:str, url):
         Driver.LOGGER.debug("Retrieving access token from theia for {}".format(login))
-        get_token_cmd = 'curl -k -s -X POST --data-urlencode "ident={}" --data-urlencode "pass={}" {}>token.json'.format(login, pwd, Driver.token_url)
+        get_token_cmd = 'curl -k -s -X POST --data-urlencode "ident={}" --data-urlencode "pass={}" {}>token.json'.format(login, pwd, url)
         os.system(get_token_cmd)
-        token = ""
+        __token = ""
         with open('token.json') as data_file:
             try:
-                token=data_file.readline()
+                __token=data_file.readline()
             except:
                 Driver.LOGGER.error("Failed to fetch the token ... with the command line {}".format(get_token_cmd))
         os.remove('token.json')
-        return token
-
+        return __token
