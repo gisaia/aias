@@ -2,7 +2,7 @@ index:
   endpoint_url: $ARLASEO_INDEX_ENDPOINT_URL|http://localhost:9200
   collection_prefix: $ARLASEO_INDEX_COLLECTION_PREFIX|arlaseo
   login: $ARLASEO_INDEX_LOGIN
-  pwd: $ARLASEO_INDEX_LOGIN
+  pwd: $ARLASEO_INDEX_PWD
 
 s3:
   bucket: $ARLASEO_S3_BUCKET|arlaseo

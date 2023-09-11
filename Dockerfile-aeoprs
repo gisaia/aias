@@ -1,0 +1,15 @@
+FROM python:3.10
+
+COPY ./aeoprs/requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+COPY ./aeoprs /app/aeoprs
+COPY ./conf /app/conf
+COPY ./aeoprs/start.sh /app/
+COPY ./aeoprs/aeoprs.py /app/
+
+EXPOSE 8000
+ENTRYPOINT ["./start.sh"]

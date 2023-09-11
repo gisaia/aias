@@ -1,0 +1,118 @@
+version: "3"
+networks:
+  aeoprs:
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - aeoprs
+    environment:
+      - "MINIO_ACCESS_KEY=arlaseo"
+      - "MINIO_SECRET_KEY=arlaseosecret"
+    command: server /export --console-address ":9001"
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    environment:
+      - BUCKET_NAME=${BUCKET_NAME:-arlaseotest}
+      - LOGIN=${LOGIN:-arlaseo}
+      - PASSWORD=${PASSWORD:-arlaseosecret}
+    networks:
+      - aeoprs
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
+      /usr/bin/mc rm -r --force myminio/$$BUCKET_NAME;
+      /usr/bin/mc mb myminio/$$BUCKET_NAME;
+      /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
+      exit 0;
+      "
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.9.2}
+    container_name: elasticsearch
+    networks:
+      - aeoprs
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - node.name=docker-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - 9200:9200
+
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION:-3-management}
+    container_name: rabbitmq
+    networks:
+      - aeoprs
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis:
+    image: redis:${REDIS_VERSION:-7.2}
+    networks:
+      - aeoprs
+    container_name: redis
+    ports:
+      - 6379:6379
+
+  aeoprs-processes:
+    networks:
+      - aeoprs
+    build:
+      context: '.'
+      dockerfile: Dockerfile-aeoprocesses
+    image: aeoprs-processes:latest
+    #command: tail -f /dev/null
+    container_name: 'aeoprs-processes'
+    environment:
+      - AEOPROCESSES_CONFIGURATION_FILE=/home/app/worker/conf/aeoprocesses.yaml
+      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AEOPRS_ENDPOINT=http://aeoprs-server:8000
+      - ROOT_DIRECTORY=/inputs
+    volumes:
+      - ./test/inputs:/inputs
+    depends_on:
+      - redis
+      - rabbitmq
+
+  aeoprs-server:
+    networks:
+      - aeoprs
+    build:
+      context: '.'
+      dockerfile: Dockerfile-aeoprs
+    image: aeoprs-server:latest
+    container_name: 'aeoprs-server'
+    environment:
+      - AEOPRS_HOST=0.0.0.0
+      - AEOPRS_PORT=8000
+      - ARLASEO_INDEX_ENDPOINT_URL=${ARLASEO_INDEX_ENDPOINT_URL:-http://localhost:9200}
+      - ARLASEO_INDEX_COLLECTION_PREFIX=${ARLASEO_INDEX_COLLECTION_PREFIX:-arlaseo}
+      - ARLASEO_INDEX_LOGIN=${ARLASEO_INDEX_LOGIN:-None}
+      - ARLASEO_INDEX_PWD=${ARLASEO_INDEX_PWD:-None}
+      - ARLASEO_S3_BUCKET=${ARLASEO_S3_BUCKET:-arlaseotest}
+      - ARLASEO_S3_ACCESS_KEY_ID=${ARLASEO_S3_ACCESS_KEY_ID}
+      - ARLASEO_S3_SECRET_ACCESS_KEY=${ARLASEO_S3_SECRET_ACCESS_KEY}
+      - ARLASEO_S3_REGION|=${ARLASEO_S3_REGION:-None}
+      - ARLASEO_S3_TIER=${MONGO_USERNAME:-Standard}
+      - ARLASEO_S3_PLATFORM=${ARLASEO_S3_PLATFORM}
+      - ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL=${ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL}
+      - ARLASEO_S3_ENDPOINT_URL=${ARLASEO_S3_ENDPOINT_URL}
+      - ARLASEO_MAPPING_URL=${ARLASEO_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json}
+      - ARLASEO_COLLECTION_URL=${ARLASEO_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/collection.json}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - elasticsearch
+      - minio

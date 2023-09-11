@@ -1,7 +1,7 @@
 ingesters:
   -
     name: theia
-    class_name: aeoprocesses.ingest.drivers.impl.theia
+    class_name: extensions.aeoprocesses.ingest.drivers.impl.theia
     assets_dir: /tmp/aeoproc
     configuration:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
@@ -10,14 +10,14 @@ ingesters:
     priority: 3
   -
     name: geoeye
-    class_name: aeoprocesses.ingest.drivers.impl.geoeye
+    class_name: extensions.aeoprocesses.ingest.drivers.impl.geoeye
     assets_dir: /tmp/aeoproc/geoeye
     configuration:
       root_directory: ${ROOT_DIRECTORY}
     priority: 2
   -
     name: dimap
-    class_name: aeoprocesses.ingest.drivers.impl.dimap
+    class_name: extensions.aeoprocesses.ingest.drivers.impl.dimap
     assets_dir: /tmp/aeoproc/dimap
     configuration:
       root_directory: ${ROOT_DIRECTORY}
