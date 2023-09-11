@@ -1,7 +1,7 @@
 # Name of the collection the item belongs to. Schema
 
 ```txt
-aeopres_model#/properties/collection
+airs_model#/properties/collection
 ```
 
 

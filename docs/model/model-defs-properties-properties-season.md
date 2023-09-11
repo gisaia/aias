@@ -1,7 +1,7 @@
 # Season Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:season
+airs_model#/$defs/Properties/properties/generated__season
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:season
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:season Type
+## generated\_\_season Type
 
 merged type ([Season](model-defs-properties-properties-season.md))
 

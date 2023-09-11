@@ -1,7 +1,7 @@
 # Path Schema
 
 ```txt
-aeopres_model#/$defs/Raster/properties/path
+airs_model#/$defs/Raster/properties/path
 ```
 
 

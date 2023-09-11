@@ -1,7 +1,7 @@
 # Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:quality_indicators
+airs_model#/$defs/Properties/properties/dc3__quality_indicators
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/dc3:quality_indicators
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## dc3:quality\_indicators Type
+## dc3\_\_quality\_indicators Type
 
 merged type ([Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator.](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md))
 

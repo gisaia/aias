@@ -1,7 +1,7 @@
 # Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:looks_range
+airs_model#/$defs/Asset/properties/sar__looks_range
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/sar:looks_range
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:looks\_range Type
+## sar\_\_looks\_range Type
 
 merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
 

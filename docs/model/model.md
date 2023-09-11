@@ -1,7 +1,7 @@
 # Item Schema
 
 ```txt
-aeopres_model
+airs_model
 ```
 
 
@@ -16,16 +16,17 @@ aeopres_model
 
 # Item Properties
 
-| Property                  | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                |
-| :------------------------ | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [collection](#collection) | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "aeopres_model#/properties/collection")                                                                                                                                                             |
-| [catalog](#catalog)       | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "aeopres_model#/properties/catalog")                                                                                                                                                                   |
-| [id](#id)                 | Merged | Optional | cannot be null | [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "aeopres_model#/properties/id")                                                                                                                                                             |
-| [geometry](#geometry)     | Merged | Optional | cannot be null | [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "aeopres_model#/properties/geometry")                                                        |
-| [bbox](#bbox)             | Merged | Optional | cannot be null | [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "aeopres_model#/properties/bbox") |
-| [centroid](#centroid)     | Merged | Optional | cannot be null | [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "aeopres_model#/properties/centroid")                                                                                                                                                             |
-| [assets](#assets)         | Merged | Optional | cannot be null | [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "aeopres_model#/properties/assets")                                                               |
-| [properties](#properties) | Merged | Optional | cannot be null | [Item](model-properties-item-properties.md "aeopres_model#/properties/properties")                                                                                                                                                                                        |
+| Property                  | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                             |
+| :------------------------ | :----- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [collection](#collection) | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "airs_model#/properties/collection")                                                                                                                                                             |
+| [catalog](#catalog)       | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "airs_model#/properties/catalog")                                                                                                                                                                   |
+| [id](#id)                 | Merged | Optional | cannot be null | [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "airs_model#/properties/id")                                                                                                                                                             |
+| [geometry](#geometry)     | Merged | Optional | cannot be null | [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")                                                        |
+| [bbox](#bbox)             | Merged | Optional | cannot be null | [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox") |
+| [centroid](#centroid)     | Merged | Optional | cannot be null | [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "airs_model#/properties/centroid")                                                                                                                                                             |
+| [assets](#assets)         | Merged | Optional | cannot be null | [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "airs_model#/properties/assets")                                                               |
+| [properties](#properties) | Merged | Optional | cannot be null | [Item](model-properties-item-properties.md "airs_model#/properties/properties")                                                                                                                                                                                        |
+| Additional Properties     | Any    | Optional | can be null    |                                                                                                                                                                                                                                                                        |
 
 ## collection
 
@@ -39,7 +40,7 @@ aeopres_model
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "aeopres_model#/properties/collection")
+*   defined in: [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "airs_model#/properties/collection")
 
 ### collection Type
 
@@ -63,7 +64,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "aeopres_model#/properties/catalog")
+*   defined in: [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "airs_model#/properties/catalog")
 
 ### catalog Type
 
@@ -87,7 +88,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "aeopres_model#/properties/id")
+*   defined in: [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "airs_model#/properties/id")
 
 ### id Type
 
@@ -111,7 +112,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "aeopres_model#/properties/geometry")
+*   defined in: [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")
 
 ### geometry Type
 
@@ -135,7 +136,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "aeopres_model#/properties/bbox")
+*   defined in: [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox")
 
 ### bbox Type
 
@@ -159,7 +160,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "aeopres_model#/properties/centroid")
+*   defined in: [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "airs_model#/properties/centroid")
 
 ### centroid Type
 
@@ -183,7 +184,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "aeopres_model#/properties/assets")
+*   defined in: [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "airs_model#/properties/assets")
 
 ### assets Type
 
@@ -207,7 +208,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-item-properties.md "aeopres_model#/properties/properties")
+*   defined in: [Item](model-properties-item-properties.md "airs_model#/properties/properties")
 
 ### properties Type
 
@@ -219,6 +220,10 @@ any of
 
 *   [Untitled null in Item](model-properties-item-properties-anyof-1.md "check type definition")
 
+## Additional Properties
+
+Additional properties are allowed and do not have to follow a specific schema
+
 # Item Definitions
 
 ## Definitions group Asset
@@ -226,47 +231,48 @@ any of
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Asset"}
+{"$ref":"airs_model#/$defs/Asset"}
 ```
 
-| Property                                                     | Type      | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                              |
-| :----------------------------------------------------------- | :-------- | :------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [name](#name)                                                | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "aeopres_model#/$defs/Asset/properties/name")                                                                                                                                     |
-| [href](#href)                                                | `string`  | Optional | cannot be null | [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "aeopres_model#/$defs/Asset/properties/href")                                                                                                                                                                   |
-| [storage:requester\_pays](#storagerequester_pays)            | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "aeopres_model#/$defs/Asset/properties/storage:requester_pays")                                             |
-| [storage:tier](#storagetier)                                 | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "aeopres_model#/$defs/Asset/properties/storage:tier")                                                                                                                                           |
-| [storage:platform](#storageplatform)                         | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "aeopres_model#/$defs/Asset/properties/storage:platform")                                                                                                                                   |
-| [storage:region](#storageregion)                             | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "aeopres_model#/$defs/Asset/properties/storage:region")                                                                 |
-| [aeo:managed](#aeomanaged)                                   | `boolean` | Optional | cannot be null | [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-aeoprs-or-not.md "aeopres_model#/$defs/Asset/properties/aeo:managed")                                                                                                                                                |
-| [aeo:object\_store\_bucket](#aeoobject_store_bucket)         | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "aeopres_model#/$defs/Asset/properties/aeo:object_store_bucket")                                                                                                                                         |
-| [aeo:object\_store\_key](#aeoobject_store_key)               | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "aeopres_model#/$defs/Asset/properties/aeo:object_store_key")                                                                                                                                                |
-| [title](#title)                                              | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "aeopres_model#/$defs/Asset/properties/title")                                                                                                                                                     |
-| [description](#description)                                  | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Asset/properties/description")                               |
-| [type](#type)                                                | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "aeopres_model#/$defs/Asset/properties/type")                                                                                    |
-| [roles](#roles)                                              | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "aeopres_model#/$defs/Asset/properties/roles")                                                                                                                           |
-| [extra\_fields](#extra_fields)                               | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "aeopres_model#/$defs/Asset/properties/extra_fields")                                                  |
-| [gsd](#gsd)                                                  | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "aeopres_model#/$defs/Asset/properties/gsd")                                                                                                                                                     |
-| [eo:bands](#eobands)                                         | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "aeopres_model#/$defs/Asset/properties/eo:bands")                                                                                              |
-| [sar:instrument\_mode](#sarinstrument_mode)                  | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "aeopres_model#/$defs/Asset/properties/sar:instrument_mode")      |
-| [sar:frequency\_band](#sarfrequency_band)                    | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "aeopres_model#/$defs/Asset/properties/sar:frequency_band")                  |
-| [sar:center\_frequency](#sarcenter_frequency)                | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "aeopres_model#/$defs/Asset/properties/sar:center_frequency")                                                                                                                             |
-| [sar:polarizations](#sarpolarizations)                       | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-any-combination-of-polarizations.md "aeopres_model#/$defs/Asset/properties/sar:polarizations")                                                                                                                                                       |
-| [sar:product\_type](#sarproduct_type)                        | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "aeopres_model#/$defs/Asset/properties/sar:product_type")                                                                                                                                             |
-| [sar:resolution\_range](#sarresolution_range)                | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Asset/properties/sar:resolution_range")                                                  |
-| [sar:resolution\_azimuth](#sarresolution_azimuth)            | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Asset/properties/sar:resolution_azimuth")                                                   |
-| [sar:pixel\_spacing\_range](#sarpixel_spacing_range)         | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_range") |
-| [sar:pixel\_spacing\_azimuth](#sarpixel_spacing_azimuth)     | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_azimuth")  |
-| [sar:looks\_range](#sarlooks_range)                          | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "aeopres_model#/$defs/Asset/properties/sar:looks_range")                                                                             |
-| [sar:looks\_azimuth](#sarlooks_azimuth)                      | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "aeopres_model#/$defs/Asset/properties/sar:looks_azimuth")                                                                              |
-| [sar:looks\_equivalent\_number](#sarlooks_equivalent_number) | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "aeopres_model#/$defs/Asset/properties/sar:looks_equivalent_number")                                                                                                                                           |
-| [sar:observation\_direction](#sarobservation_direction)      | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "aeopres_model#/$defs/Asset/properties/sar:observation_direction")                                                                             |
-| [proj:epsg](#projepsg)                                       | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "aeopres_model#/$defs/Asset/properties/proj:epsg")                                                                                                                                                                    |
-| [proj:wkt2](#projwkt2)                                       | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "aeopres_model#/$defs/Asset/properties/proj:wkt2")                                                                           |
-| [proj:geometry](#projgeometry)                               | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "aeopres_model#/$defs/Asset/properties/proj:geometry")                                                                                                                                                         |
-| [proj:bbox](#projbbox)                                       | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "aeopres_model#/$defs/Asset/properties/proj:bbox")                                                                                                                                 |
-| [proj:centroid](#projcentroid)                               | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "aeopres_model#/$defs/Asset/properties/proj:centroid")                                                                                                                               |
-| [proj:shape](#projshape)                                     | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "aeopres_model#/$defs/Asset/properties/proj:shape")                                                                                                                                   |
-| [proj:transform](#projtransform)                             | Merged    | Optional | cannot be null | [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "aeopres_model#/$defs/Asset/properties/proj:transform")                                                                                                                               |
+| Property                                                          | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                            |
+| :---------------------------------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [name](#name)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")                                                                                                                                      |
+| [href](#href)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")                                                                                                                                                                    |
+| [storage\_\_requester\_pays](#storage__requester_pays)            | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Asset/properties/storage__requester_pays")                                             |
+| [storage\_\_tier](#storage__tier)                                 | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Asset/properties/storage__tier")                                                                                                                                           |
+| [storage\_\_platform](#storage__platform)                         | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Asset/properties/storage__platform")                                                                                                                                   |
+| [storage\_\_region](#storage__region)                             | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Asset/properties/storage__region")                                                                 |
+| [airs\_\_managed](#airs__managed)                                 | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md "airs_model#/$defs/Asset/properties/airs__managed")                                                                                                                                                 |
+| [airs\_\_object\_store\_bucket](#airs__object_store_bucket)       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_bucket")                                                                                                                                        |
+| [airs\_\_object\_store\_key](#airs__object_store_key)             | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_key")                                                                                                                                               |
+| [title](#title)                                                   | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "airs_model#/$defs/Asset/properties/title")                                                                                                                                                      |
+| [description](#description)                                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Asset/properties/description")                                |
+| [type](#type)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "airs_model#/$defs/Asset/properties/type")                                                                                     |
+| [roles](#roles)                                                   | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "airs_model#/$defs/Asset/properties/roles")                                                                                                                            |
+| [extra\_fields](#extra_fields)                                    | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "airs_model#/$defs/Asset/properties/extra_fields")                                                   |
+| [gsd](#gsd)                                                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "airs_model#/$defs/Asset/properties/gsd")                                                                                                                                                      |
+| [eo\_\_bands](#eo__bands)                                         | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Asset/properties/eo__bands")                                                                                              |
+| [sar\_\_instrument\_mode](#sar__instrument_mode)                  | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Asset/properties/sar__instrument_mode")      |
+| [sar\_\_frequency\_band](#sar__frequency_band)                    | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Asset/properties/sar__frequency_band")                  |
+| [sar\_\_center\_frequency](#sar__center_frequency)                | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Asset/properties/sar__center_frequency")                                                                                                                             |
+| [sar\_\_polarizations](#sar__polarizations)                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-any-combination-of-polarizations.md "airs_model#/$defs/Asset/properties/sar__polarizations")                                                                                                                                                       |
+| [sar\_\_product\_type](#sar__product_type)                        | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Asset/properties/sar__product_type")                                                                                                                                             |
+| [sar\_\_resolution\_range](#sar__resolution_range)                | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_range")                                                  |
+| [sar\_\_resolution\_azimuth](#sar__resolution_azimuth)            | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_azimuth")                                                   |
+| [sar\_\_pixel\_spacing\_range](#sar__pixel_spacing_range)         | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_range") |
+| [sar\_\_pixel\_spacing\_azimuth](#sar__pixel_spacing_azimuth)     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_azimuth")  |
+| [sar\_\_looks\_range](#sar__looks_range)                          | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_range")                                                                             |
+| [sar\_\_looks\_azimuth](#sar__looks_azimuth)                      | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_azimuth")                                                                              |
+| [sar\_\_looks\_equivalent\_number](#sar__looks_equivalent_number) | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Asset/properties/sar__looks_equivalent_number")                                                                                                                                           |
+| [sar\_\_observation\_direction](#sar__observation_direction)      | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Asset/properties/sar__observation_direction")                                                                             |
+| [proj\_\_epsg](#proj__epsg)                                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Asset/properties/proj__epsg")                                                                                                                                                                    |
+| [proj\_\_wkt2](#proj__wkt2)                                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Asset/properties/proj__wkt2")                                                                           |
+| [proj\_\_geometry](#proj__geometry)                               | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Asset/properties/proj__geometry")                                                                                                                                                         |
+| [proj\_\_bbox](#proj__bbox)                                       | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Asset/properties/proj__bbox")                                                                                                                                 |
+| [proj\_\_centroid](#proj__centroid)                               | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Asset/properties/proj__centroid")                                                                                                                               |
+| [proj\_\_shape](#proj__shape)                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__shape")                                                                                                                                   |
+| [proj\_\_transform](#proj__transform)                             | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__transform")                                                                                                                               |
+| Additional Properties                                             | Any    | Optional | can be null    |                                                                                                                                                                                                                                                                                       |
 
 ### name
 
@@ -280,7 +286,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "aeopres_model#/$defs/Asset/properties/name")
+*   defined in: [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")
 
 #### name Type
 
@@ -300,21 +306,27 @@ any of
 
 *   is optional
 
-*   Type: `string` ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
+*   Type: merged type ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "aeopres_model#/$defs/Asset/properties/href")
+*   defined in: [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")
 
 #### href Type
 
-`string` ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
+merged type ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
 
-### storage:requester\_pays
+any of
+
+*   [Untitled string in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-1.md "check type definition")
+
+### storage\_\_requester\_pays
 
 
 
-`storage:requester_pays`
+`storage__requester_pays`
 
 *   is optional
 
@@ -322,9 +334,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "aeopres_model#/$defs/Asset/properties/storage:requester_pays")
+*   defined in: [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Asset/properties/storage__requester_pays")
 
-#### storage:requester\_pays Type
+#### storage\_\_requester\_pays Type
 
 merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
 
@@ -334,11 +346,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
 
-### storage:tier
+### storage\_\_tier
 
 
 
-`storage:tier`
+`storage__tier`
 
 *   is optional
 
@@ -346,9 +358,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "aeopres_model#/$defs/Asset/properties/storage:tier")
+*   defined in: [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Asset/properties/storage__tier")
 
-#### storage:tier Type
+#### storage\_\_tier Type
 
 merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
 
@@ -358,11 +370,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
 
-### storage:platform
+### storage\_\_platform
 
 
 
-`storage:platform`
+`storage__platform`
 
 *   is optional
 
@@ -370,9 +382,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "aeopres_model#/$defs/Asset/properties/storage:platform")
+*   defined in: [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Asset/properties/storage__platform")
 
-#### storage:platform Type
+#### storage\_\_platform Type
 
 merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
 
@@ -382,11 +394,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
 
-### storage:region
+### storage\_\_region
 
 
 
-`storage:region`
+`storage__region`
 
 *   is optional
 
@@ -394,9 +406,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "aeopres_model#/$defs/Asset/properties/storage:region")
+*   defined in: [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Asset/properties/storage__region")
 
-#### storage:region Type
+#### storage\_\_region Type
 
 merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
 
@@ -406,25 +418,31 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
 
-### aeo:managed
+### airs\_\_managed
 
 
 
-`aeo:managed`
+`airs__managed`
 
 *   is optional
 
-*   Type: `boolean` ([Whether the asset is managed by AEOPRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-aeoprs-or-not.md))
+*   Type: merged type ([Whether the asset is managed by AIRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-aeoprs-or-not.md "aeopres_model#/$defs/Asset/properties/aeo:managed")
+*   defined in: [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md "airs_model#/$defs/Asset/properties/airs__managed")
 
-#### aeo:managed Type
+#### airs\_\_managed Type
 
-`boolean` ([Whether the asset is managed by AEOPRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-aeoprs-or-not.md))
+merged type ([Whether the asset is managed by AIRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md))
 
-#### aeo:managed Default Value
+any of
+
+*   [Untitled boolean in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-1.md "check type definition")
+
+#### airs\_\_managed Default Value
 
 The default value is:
 
@@ -432,11 +450,11 @@ The default value is:
 true
 ```
 
-### aeo:object\_store\_bucket
+### airs\_\_object\_store\_bucket
 
 
 
-`aeo:object_store_bucket`
+`airs__object_store_bucket`
 
 *   is optional
 
@@ -444,9 +462,9 @@ true
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "aeopres_model#/$defs/Asset/properties/aeo:object_store_bucket")
+*   defined in: [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_bucket")
 
-#### aeo:object\_store\_bucket Type
+#### airs\_\_object\_store\_bucket Type
 
 merged type ([Object store bucket for the asset object.](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md))
 
@@ -456,11 +474,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object-anyof-1.md "check type definition")
 
-### aeo:object\_store\_key
+### airs\_\_object\_store\_key
 
 
 
-`aeo:object_store_key`
+`airs__object_store_key`
 
 *   is optional
 
@@ -468,9 +486,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "aeopres_model#/$defs/Asset/properties/aeo:object_store_key")
+*   defined in: [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_key")
 
-#### aeo:object\_store\_key Type
+#### airs\_\_object\_store\_key Type
 
 merged type ([Object store key of the asset object.](model-defs-asset-properties-object-store-key-of-the-asset-object.md))
 
@@ -492,7 +510,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "aeopres_model#/$defs/Asset/properties/title")
+*   defined in: [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "airs_model#/$defs/Asset/properties/title")
 
 #### title Type
 
@@ -516,7 +534,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Asset/properties/description")
+*   defined in: [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Asset/properties/description")
 
 #### description Type
 
@@ -540,7 +558,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "aeopres_model#/$defs/Asset/properties/type")
+*   defined in: [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "airs_model#/$defs/Asset/properties/type")
 
 #### type Type
 
@@ -564,7 +582,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "aeopres_model#/$defs/Asset/properties/roles")
+*   defined in: [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "airs_model#/$defs/Asset/properties/roles")
 
 #### roles Type
 
@@ -588,7 +606,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "aeopres_model#/$defs/Asset/properties/extra_fields")
+*   defined in: [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "airs_model#/$defs/Asset/properties/extra_fields")
 
 #### extra\_fields Type
 
@@ -612,7 +630,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "aeopres_model#/$defs/Asset/properties/gsd")
+*   defined in: [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "airs_model#/$defs/Asset/properties/gsd")
 
 #### gsd Type
 
@@ -624,11 +642,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset-anyof-1.md "check type definition")
 
-### eo:bands
+### eo\_\_bands
 
 
 
-`eo:bands`
+`eo__bands`
 
 *   is optional
 
@@ -636,9 +654,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "aeopres_model#/$defs/Asset/properties/eo:bands")
+*   defined in: [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Asset/properties/eo__bands")
 
-#### eo:bands Type
+#### eo\_\_bands Type
 
 merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
 
@@ -648,11 +666,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
 
-### sar:instrument\_mode
+### sar\_\_instrument\_mode
 
 
 
-`sar:instrument_mode`
+`sar__instrument_mode`
 
 *   is optional
 
@@ -660,9 +678,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "aeopres_model#/$defs/Asset/properties/sar:instrument_mode")
+*   defined in: [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Asset/properties/sar__instrument_mode")
 
-#### sar:instrument\_mode Type
+#### sar\_\_instrument\_mode Type
 
 merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
 
@@ -672,11 +690,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
 
-### sar:frequency\_band
+### sar\_\_frequency\_band
 
 
 
-`sar:frequency_band`
+`sar__frequency_band`
 
 *   is optional
 
@@ -684,9 +702,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "aeopres_model#/$defs/Asset/properties/sar:frequency_band")
+*   defined in: [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Asset/properties/sar__frequency_band")
 
-#### sar:frequency\_band Type
+#### sar\_\_frequency\_band Type
 
 merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
 
@@ -696,11 +714,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
 
-### sar:center\_frequency
+### sar\_\_center\_frequency
 
 
 
-`sar:center_frequency`
+`sar__center_frequency`
 
 *   is optional
 
@@ -708,9 +726,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "aeopres_model#/$defs/Asset/properties/sar:center_frequency")
+*   defined in: [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Asset/properties/sar__center_frequency")
 
-#### sar:center\_frequency Type
+#### sar\_\_center\_frequency Type
 
 merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
 
@@ -720,11 +738,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
 
-### sar:polarizations
+### sar\_\_polarizations
 
 
 
-`sar:polarizations`
+`sar__polarizations`
 
 *   is optional
 
@@ -732,9 +750,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-any-combination-of-polarizations.md "aeopres_model#/$defs/Asset/properties/sar:polarizations")
+*   defined in: [Item](model-defs-asset-properties-any-combination-of-polarizations.md "airs_model#/$defs/Asset/properties/sar__polarizations")
 
-#### sar:polarizations Type
+#### sar\_\_polarizations Type
 
 merged type ([Any combination of polarizations.](model-defs-asset-properties-any-combination-of-polarizations.md))
 
@@ -744,11 +762,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
 
-### sar:product\_type
+### sar\_\_product\_type
 
 
 
-`sar:product_type`
+`sar__product_type`
 
 *   is optional
 
@@ -756,9 +774,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "aeopres_model#/$defs/Asset/properties/sar:product_type")
+*   defined in: [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Asset/properties/sar__product_type")
 
-#### sar:product\_type Type
+#### sar\_\_product\_type Type
 
 merged type ([The product type, for example SSC, MGD, or SGC](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
 
@@ -768,11 +786,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
 
-### sar:resolution\_range
+### sar\_\_resolution\_range
 
 
 
-`sar:resolution_range`
+`sar__resolution_range`
 
 *   is optional
 
@@ -780,9 +798,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Asset/properties/sar:resolution_range")
+*   defined in: [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_range")
 
-#### sar:resolution\_range Type
+#### sar\_\_resolution\_range Type
 
 merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
 
@@ -792,11 +810,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
-### sar:resolution\_azimuth
+### sar\_\_resolution\_azimuth
 
 
 
-`sar:resolution_azimuth`
+`sar__resolution_azimuth`
 
 *   is optional
 
@@ -804,9 +822,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Asset/properties/sar:resolution_azimuth")
+*   defined in: [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_azimuth")
 
-#### sar:resolution\_azimuth Type
+#### sar\_\_resolution\_azimuth Type
 
 merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
 
@@ -816,11 +834,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
-### sar:pixel\_spacing\_range
+### sar\_\_pixel\_spacing\_range
 
 
 
-`sar:pixel_spacing_range`
+`sar__pixel_spacing_range`
 
 *   is optional
 
@@ -828,9 +846,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_range")
+*   defined in: [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_range")
 
-#### sar:pixel\_spacing\_range Type
+#### sar\_\_pixel\_spacing\_range Type
 
 merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
@@ -840,11 +858,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
-### sar:pixel\_spacing\_azimuth
+### sar\_\_pixel\_spacing\_azimuth
 
 
 
-`sar:pixel_spacing_azimuth`
+`sar__pixel_spacing_azimuth`
 
 *   is optional
 
@@ -852,9 +870,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_azimuth")
+*   defined in: [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_azimuth")
 
-#### sar:pixel\_spacing\_azimuth Type
+#### sar\_\_pixel\_spacing\_azimuth Type
 
 merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
@@ -864,11 +882,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
-### sar:looks\_range
+### sar\_\_looks\_range
 
 
 
-`sar:looks_range`
+`sar__looks_range`
 
 *   is optional
 
@@ -876,9 +894,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "aeopres_model#/$defs/Asset/properties/sar:looks_range")
+*   defined in: [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_range")
 
-#### sar:looks\_range Type
+#### sar\_\_looks\_range Type
 
 merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
 
@@ -888,11 +906,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
 
-### sar:looks\_azimuth
+### sar\_\_looks\_azimuth
 
 
 
-`sar:looks_azimuth`
+`sar__looks_azimuth`
 
 *   is optional
 
@@ -900,9 +918,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "aeopres_model#/$defs/Asset/properties/sar:looks_azimuth")
+*   defined in: [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_azimuth")
 
-#### sar:looks\_azimuth Type
+#### sar\_\_looks\_azimuth Type
 
 merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
 
@@ -912,11 +930,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
 
-### sar:looks\_equivalent\_number
+### sar\_\_looks\_equivalent\_number
 
 
 
-`sar:looks_equivalent_number`
+`sar__looks_equivalent_number`
 
 *   is optional
 
@@ -924,9 +942,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "aeopres_model#/$defs/Asset/properties/sar:looks_equivalent_number")
+*   defined in: [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Asset/properties/sar__looks_equivalent_number")
 
-#### sar:looks\_equivalent\_number Type
+#### sar\_\_looks\_equivalent\_number Type
 
 merged type ([The equivalent number of looks (ENL).](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md))
 
@@ -936,11 +954,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
 
-### sar:observation\_direction
+### sar\_\_observation\_direction
 
 
 
-`sar:observation_direction`
+`sar__observation_direction`
 
 *   is optional
 
@@ -948,9 +966,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "aeopres_model#/$defs/Asset/properties/sar:observation_direction")
+*   defined in: [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Asset/properties/sar__observation_direction")
 
-#### sar:observation\_direction Type
+#### sar\_\_observation\_direction Type
 
 merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
 
@@ -960,11 +978,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
 
-### proj:epsg
+### proj\_\_epsg
 
 
 
-`proj:epsg`
+`proj__epsg`
 
 *   is optional
 
@@ -972,9 +990,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "aeopres_model#/$defs/Asset/properties/proj:epsg")
+*   defined in: [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Asset/properties/proj__epsg")
 
-#### proj:epsg Type
+#### proj\_\_epsg Type
 
 merged type ([EPSG code of the datasource.](model-defs-asset-properties-epsg-code-of-the-datasource.md))
 
@@ -984,11 +1002,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
 
-### proj:wkt2
+### proj\_\_wkt2
 
 
 
-`proj:wkt2`
+`proj__wkt2`
 
 *   is optional
 
@@ -996,9 +1014,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "aeopres_model#/$defs/Asset/properties/proj:wkt2")
+*   defined in: [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Asset/properties/proj__wkt2")
 
-#### proj:wkt2 Type
+#### proj\_\_wkt2 Type
 
 merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
 
@@ -1008,11 +1026,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
 
-### proj:geometry
+### proj\_\_geometry
 
 
 
-`proj:geometry`
+`proj__geometry`
 
 *   is optional
 
@@ -1020,9 +1038,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "aeopres_model#/$defs/Asset/properties/proj:geometry")
+*   defined in: [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Asset/properties/proj__geometry")
 
-#### proj:geometry Type
+#### proj\_\_geometry Type
 
 merged type ([Defines the footprint of this Item.](model-defs-asset-properties-defines-the-footprint-of-this-item.md))
 
@@ -1032,11 +1050,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
 
-### proj:bbox
+### proj\_\_bbox
 
 
 
-`proj:bbox`
+`proj__bbox`
 
 *   is optional
 
@@ -1044,9 +1062,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "aeopres_model#/$defs/Asset/properties/proj:bbox")
+*   defined in: [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Asset/properties/proj__bbox")
 
-#### proj:bbox Type
+#### proj\_\_bbox Type
 
 merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
 
@@ -1056,11 +1074,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
 
-### proj:centroid
+### proj\_\_centroid
 
 
 
-`proj:centroid`
+`proj__centroid`
 
 *   is optional
 
@@ -1068,9 +1086,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "aeopres_model#/$defs/Asset/properties/proj:centroid")
+*   defined in: [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Asset/properties/proj__centroid")
 
-#### proj:centroid Type
+#### proj\_\_centroid Type
 
 merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
 
@@ -1080,11 +1098,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
 
-### proj:shape
+### proj\_\_shape
 
 
 
-`proj:shape`
+`proj__shape`
 
 *   is optional
 
@@ -1092,9 +1110,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "aeopres_model#/$defs/Asset/properties/proj:shape")
+*   defined in: [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__shape")
 
-#### proj:shape Type
+#### proj\_\_shape Type
 
 merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
 
@@ -1104,11 +1122,11 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
 
-### proj:transform
+### proj\_\_transform
 
 
 
-`proj:transform`
+`proj__transform`
 
 *   is optional
 
@@ -1116,9 +1134,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "aeopres_model#/$defs/Asset/properties/proj:transform")
+*   defined in: [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__transform")
 
-#### proj:transform Type
+#### proj\_\_transform Type
 
 merged type ([The affine transformation coefficients for the default grid.](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
 
@@ -1128,23 +1146,28 @@ any of
 
 *   [Untitled null in Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
 
+### Additional Properties
+
+Additional properties are allowed and do not have to follow a specific schema
+
 ## Definitions group Band
 
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Band"}
+{"$ref":"airs_model#/$defs/Band"}
 ```
 
-| Property                                       | Type     | Required | Nullable       | Defined by                                                                                                                                                                                                                          |
-| :--------------------------------------------- | :------- | :------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [name](#name-1)                                | `string` | Required | cannot be null | [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "aeopres_model#/$defs/Band/properties/name")                                                                                                          |
-| [common\_name](#common_name)                   | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "aeopres_model#/$defs/Band/properties/common_name") |
-| [description](#description-1)                  | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Band/properties/description")                                       |
-| [center\_wavelength](#center_wavelength)       | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/center_wavelength")                                                                                  |
-| [full\_width\_half\_max](#full_width_half_max) | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/full_width_half_max")               |
-| [solar\_illumination](#solar_illumination)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "aeopres_model#/$defs/Band/properties/solar_illumination")                                   |
-| [quality\_indicators](#quality_indicators)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "aeopres_model#/$defs/Band/properties/quality_indicators")                                                          |
+| Property                                       | Type     | Required | Nullable       | Defined by                                                                                                                                                                                                                       |
+| :--------------------------------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [name](#name-1)                                | `string` | Required | cannot be null | [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")                                                                                                          |
+| [common\_name](#common_name)                   | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name") |
+| [description](#description-1)                  | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")                                       |
+| [center\_wavelength](#center_wavelength)       | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")                                                                                  |
+| [full\_width\_half\_max](#full_width_half_max) | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")               |
+| [solar\_illumination](#solar_illumination)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")                                   |
+| [quality\_indicators](#quality_indicators)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")                                                          |
+| Additional Properties                          | Any      | Optional | can be null    |                                                                                                                                                                                                                                  |
 
 ### name
 
@@ -1158,7 +1181,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "aeopres_model#/$defs/Band/properties/name")
+*   defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")
 
 #### name Type
 
@@ -1180,7 +1203,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "aeopres_model#/$defs/Band/properties/common_name")
+*   defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name")
 
 #### common\_name Type
 
@@ -1204,7 +1227,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Band/properties/description")
+*   defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")
 
 #### description Type
 
@@ -1228,7 +1251,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/center_wavelength")
+*   defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")
 
 #### center\_wavelength Type
 
@@ -1252,7 +1275,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/full_width_half_max")
+*   defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")
 
 #### full\_width\_half\_max Type
 
@@ -1276,7 +1299,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "aeopres_model#/$defs/Band/properties/solar_illumination")
+*   defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")
 
 #### solar\_illumination Type
 
@@ -1300,7 +1323,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "aeopres_model#/$defs/Band/properties/quality_indicators")
+*   defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")
 
 #### quality\_indicators Type
 
@@ -1312,12 +1335,16 @@ any of
 
 *   [Untitled null in Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band-anyof-1.md "check type definition")
 
+### Additional Properties
+
+Additional properties are allowed and do not have to follow a specific schema
+
 ## Definitions group DimensionType
 
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/DimensionType"}
+{"$ref":"airs_model#/$defs/DimensionType"}
 ```
 
 | Property | Type | Required | Nullable | Defined by |
@@ -1328,14 +1355,14 @@ Reference this group by using
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Group"}
+{"$ref":"airs_model#/$defs/Group"}
 ```
 
-| Property                                     | Type   | Required | Nullable       | Defined by                                                                                                                                                                                          |
-| :------------------------------------------- | :----- | :------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [timestamp](#timestamp)                      | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "aeopres_model#/$defs/Group/properties/timestamp")                                                                       |
-| [rasters](#rasters)                          | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "aeopres_model#/$defs/Group/properties/rasters")                                                                 |
-| [quality\_indicators](#quality_indicators-1) | Merged | Optional | cannot be null | [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "aeopres_model#/$defs/Group/properties/quality_indicators") |
+| Property                                     | Type   | Required | Nullable       | Defined by                                                                                                                                                                                       |
+| :------------------------------------------- | :----- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [timestamp](#timestamp)                      | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")                                                                       |
+| [rasters](#rasters)                          | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")                                                                 |
+| [quality\_indicators](#quality_indicators-1) | Merged | Optional | cannot be null | [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators") |
 
 ### timestamp
 
@@ -1349,7 +1376,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "aeopres_model#/$defs/Group/properties/timestamp")
+*   defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")
 
 #### timestamp Type
 
@@ -1373,7 +1400,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "aeopres_model#/$defs/Group/properties/rasters")
+*   defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")
 
 #### rasters Type
 
@@ -1397,7 +1424,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "aeopres_model#/$defs/Group/properties/quality_indicators")
+*   defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators")
 
 #### quality\_indicators Type
 
@@ -1414,15 +1441,15 @@ any of
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Indicators"}
+{"$ref":"airs_model#/$defs/Indicators"}
 ```
 
-| Property                               | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                     |
-| :------------------------------------- | :----- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [time\_compacity](#time_compacity)     | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "aeopres_model#/$defs/Indicators/properties/time_compacity") |
-| [spatial\_coverage](#spatial_coverage) | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "aeopres_model#/$defs/Indicators/properties/spatial_coverage")                                  |
-| [group\_lightness](#group_lightness)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "aeopres_model#/$defs/Indicators/properties/group_lightness")             |
-| [time\_regularity](#time_regularity)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "aeopres_model#/$defs/Indicators/properties/time_regularity")                              |
+| Property                               | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                  |
+| :------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [time\_compacity](#time_compacity)     | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity") |
+| [spatial\_coverage](#spatial_coverage) | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")                                  |
+| [group\_lightness](#group_lightness)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")             |
+| [time\_regularity](#time_regularity)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")                              |
 
 ### time\_compacity
 
@@ -1436,7 +1463,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "aeopres_model#/$defs/Indicators/properties/time_compacity")
+*   defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity")
 
 #### time\_compacity Type
 
@@ -1460,7 +1487,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "aeopres_model#/$defs/Indicators/properties/spatial_coverage")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")
 
 #### spatial\_coverage Type
 
@@ -1484,7 +1511,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "aeopres_model#/$defs/Indicators/properties/group_lightness")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")
 
 #### group\_lightness Type
 
@@ -1508,7 +1535,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "aeopres_model#/$defs/Indicators/properties/time_regularity")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")
 
 #### time\_regularity Type
 
@@ -1525,92 +1552,92 @@ any of
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Properties"}
+{"$ref":"airs_model#/$defs/Properties"}
 ```
 
-| Property                                                       | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                                                 |
-| :------------------------------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [datetime](#datetime)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "aeopres_model#/$defs/Properties/properties/datetime")                                                                                                                            |
-| [start\_datetime](#start_datetime)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "aeopres_model#/$defs/Properties/properties/start_datetime")                                                                                                      |
-| [end\_datetime](#end_datetime)                                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "aeopres_model#/$defs/Properties/properties/end_datetime")                                                                                                            |
-| [programme](#programme)                                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-programme.md "aeopres_model#/$defs/Properties/properties/programme")                                                                                                                                                                                                   |
-| [constellation](#constellation)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-constellation.md "aeopres_model#/$defs/Properties/properties/constellation")                                                                                                                                                                                           |
-| [instrument](#instrument)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-instrument.md "aeopres_model#/$defs/Properties/properties/instrument")                                                                                                                                                                                                 |
-| [sensor](#sensor)                                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-sensor.md "aeopres_model#/$defs/Properties/properties/sensor")                                                                                                                                                                                                         |
-| [sensor\_type](#sensor_type)                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "aeopres_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                        |
-| [gsd](#gsd-1)                                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "aeopres_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                           |
-| [data\_type](#data_type)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data.md "aeopres_model#/$defs/Properties/properties/data_type")                                                                                                                                                                                                            |
-| [data\_coverage](#data_coverage)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-data-cover.md "aeopres_model#/$defs/Properties/properties/data_coverage")                                                                                                                                                                                              |
-| [water\_coverage](#water_coverage)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-water-cover.md "aeopres_model#/$defs/Properties/properties/water_coverage")                                                                                                                                                                                            |
-| [locations](#locations)                                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "aeopres_model#/$defs/Properties/properties/locations")                                                                                                                                                                                   |
-| [create\_datetime](#create_datetime)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service.md "aeopres_model#/$defs/Properties/properties/create_datetime")                                                                                                                                 |
-| [update\_datetime](#update_datetime)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service.md "aeopres_model#/$defs/Properties/properties/update_datetime")                                                                                                                               |
-| [view:off\_nadir](#viewoff_nadir)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "aeopres_model#/$defs/Properties/properties/view:off_nadir")                                                                                                                |
-| [view:incidence\_angle](#viewincidence_angle)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "aeopres_model#/$defs/Properties/properties/view:incidence_angle")                            |
-| [view:azimuth](#viewazimuth)                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "aeopres_model#/$defs/Properties/properties/view:azimuth")                  |
-| [sview:un\_azimuth](#sviewun_azimuth)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "aeopres_model#/$defs/Properties/properties/sview:un_azimuth")                                                                |
-| [view:sun\_elevation](#viewsun_elevation)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "aeopres_model#/$defs/Properties/properties/view:sun_elevation") |
-| [storage:requester\_pays](#storagerequester_pays-1)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "aeopres_model#/$defs/Properties/properties/storage:requester_pays")                                                                      |
-| [storage:tier](#storagetier-1)                                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "aeopres_model#/$defs/Properties/properties/storage:tier")                                                                                                                                                                    |
-| [storage:platform](#storageplatform-1)                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "aeopres_model#/$defs/Properties/properties/storage:platform")                                                                                                                                                            |
-| [storage:region](#storageregion-1)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "aeopres_model#/$defs/Properties/properties/storage:region")                                                                                          |
-| [eo:cloud\_cover](#eocloud_cover)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "aeopres_model#/$defs/Properties/properties/eo:cloud_cover")                                                                                                                                                                                            |
-| [eo:snow\_cover](#eosnow_cover)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "aeopres_model#/$defs/Properties/properties/eo:snow_cover")                                                                                                                                                                                      |
-| [eo:bands](#eobands-1)                                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "aeopres_model#/$defs/Properties/properties/eo:bands")                                                                                                                       |
-| [processing:expression](#processingexpression)                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "aeopres_model#/$defs/Properties/properties/processing:expression")               |
-| [processing:lineage](#processinglineage)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "aeopres_model#/$defs/Properties/properties/processing:lineage")                                       |
-| [processing:level](#processinglevel)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "aeopres_model#/$defs/Properties/properties/processing:level")                                   |
-| [processing:facility](#processingfacility)                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "aeopres_model#/$defs/Properties/properties/processing:facility")                                                                      |
-| [processing:software](#processingsoftware)                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "aeopres_model#/$defs/Properties/properties/processing:software")                                                                                                            |
-| [dc3:quality\_indicators](#dc3quality_indicators)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "aeopres_model#/$defs/Properties/properties/dc3:quality_indicators")                  |
-| [dc3:composition](#dc3composition)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "aeopres_model#/$defs/Properties/properties/dc3:composition")                                                                                                                                               |
-| [dc3:number\_of\_chunks](#dc3number_of_chunks)                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "aeopres_model#/$defs/Properties/properties/dc3:number_of_chunks")                                                                                                                                       |
-| [dc3:chunk\_weight](#dc3chunk_weight)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "aeopres_model#/$defs/Properties/properties/dc3:chunk_weight")                                                                                                                                                                                |
-| [dc3:fill\_ratio](#dc3fill_ratio)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "aeopres_model#/$defs/Properties/properties/dc3:fill_ratio")                                                                                                                                     |
-| [cube:dimensions](#cubedimensions)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "aeopres_model#/$defs/Properties/properties/cube:dimensions")                                                                                                                                                                         |
-| [cube:variables](#cubevariables)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "aeopres_model#/$defs/Properties/properties/cube:variables")                                                                                                                                                                           |
-| [sar:instrument\_mode](#sarinstrument_mode-1)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "aeopres_model#/$defs/Properties/properties/sar:instrument_mode")                               |
-| [sar:frequency\_band](#sarfrequency_band-1)                    | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "aeopres_model#/$defs/Properties/properties/sar:frequency_band")                                           |
-| [sar:center\_frequency](#sarcenter_frequency-1)                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "aeopres_model#/$defs/Properties/properties/sar:center_frequency")                                                                                                                                                      |
-| [sar:polarizations](#sarpolarizations-1)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-any-combination-of-polarizations.md "aeopres_model#/$defs/Properties/properties/sar:polarizations")                                                                                                                                                                                |
-| [sar:product\_type](#sarproduct_type-1)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "aeopres_model#/$defs/Properties/properties/sar:product_type")                                                                                                                                                                      |
-| [sar:resolution\_range](#sarresolution_range-1)                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Properties/properties/sar:resolution_range")                                                                           |
-| [sar:resolution\_azimuth](#sarresolution_azimuth-1)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Properties/properties/sar:resolution_azimuth")                                                                            |
-| [sar:pixel\_spacing\_range](#sarpixel_spacing_range-1)         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Properties/properties/sar:pixel_spacing_range")                          |
-| [sar:pixel\_spacing\_azimuth](#sarpixel_spacing_azimuth-1)     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Properties/properties/sar:pixel_spacing_azimuth")                           |
-| [sar:looks\_range](#sarlooks_range-1)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "aeopres_model#/$defs/Properties/properties/sar:looks_range")                                                                                                      |
-| [sar:looks\_azimuth](#sarlooks_azimuth-1)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "aeopres_model#/$defs/Properties/properties/sar:looks_azimuth")                                                                                                       |
-| [sar:looks\_equivalent\_number](#sarlooks_equivalent_number-1) | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "aeopres_model#/$defs/Properties/properties/sar:looks_equivalent_number")                                                                                                                                                                    |
-| [sar:observation\_direction](#sarobservation_direction-1)      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "aeopres_model#/$defs/Properties/properties/sar:observation_direction")                                                                                                      |
-| [proj:epsg](#projepsg-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "aeopres_model#/$defs/Properties/properties/proj:epsg")                                                                                                                                                                                             |
-| [proj:wkt2](#projwkt2-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "aeopres_model#/$defs/Properties/properties/proj:wkt2")                                                                                                    |
-| [proj:geometry](#projgeometry-1)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "aeopres_model#/$defs/Properties/properties/proj:geometry")                                                                                                                                                                                  |
-| [proj:bbox](#projbbox-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "aeopres_model#/$defs/Properties/properties/proj:bbox")                                                                                                                                                          |
-| [proj:centroid](#projcentroid-1)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "aeopres_model#/$defs/Properties/properties/proj:centroid")                                                                                                                                                        |
-| [proj:shape](#projshape-1)                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "aeopres_model#/$defs/Properties/properties/proj:shape")                                                                                                                                                            |
-| [proj:transform](#projtransform-1)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "aeopres_model#/$defs/Properties/properties/proj:transform")                                                                                                                                                        |
-| [generated:has\_overview](#generatedhas_overview)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_overview")                                                                                                                                                                    |
-| [generated:has\_thumbnail](#generatedhas_thumbnail)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_thumbnail")                                                                                                                                                                   |
-| [generated:has\_metadata](#generatedhas_metadata)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_metadata")                                                                                                                                                                |
-| [generated:has\_data](#generatedhas_data)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_data")                                                                                                                                                                        |
-| [generated:has\_cog](#generatedhas_cog)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_cog")                                                                                                                                                                               |
-| [generated:has\_zarr](#generatedhas_zarr)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_zarr")                                                                                                                                                                             |
-| [generated:date\_keywords](#generateddate_keywords)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "aeopres_model#/$defs/Properties/properties/generated:date_keywords")                                                                                                                                                           |
-| [generated:day\_of\_week](#generatedday_of_week)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-day-of-week.md "aeopres_model#/$defs/Properties/properties/generated:day_of_week")                                                                                                                                                                                                 |
-| [generated:day\_of\_year](#generatedday_of_year)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-day-of-year.md "aeopres_model#/$defs/Properties/properties/generated:day_of_year")                                                                                                                                                                                                 |
-| [generated:hour\_of\_day](#generatedhour_of_day)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-hour-of-day.md "aeopres_model#/$defs/Properties/properties/generated:hour_of_day")                                                                                                                                                                                                 |
-| [generated:minute\_of\_day](#generatedminute_of_day)           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-minute-of-day.md "aeopres_model#/$defs/Properties/properties/generated:minute_of_day")                                                                                                                                                                                             |
-| [generated:month](#generatedmonth)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-month.md "aeopres_model#/$defs/Properties/properties/generated:month")                                                                                                                                                                                                             |
-| [generated:year](#generatedyear)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-year.md "aeopres_model#/$defs/Properties/properties/generated:year")                                                                                                                                                                                                               |
-| [generated:season](#generatedseason)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-season.md "aeopres_model#/$defs/Properties/properties/generated:season")                                                                                                                                                                                                           |
-| [generated:tltrbrbl](#generatedtltrbrbl)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "aeopres_model#/$defs/Properties/properties/generated:tltrbrbl")                                                                                                                         |
-| [generated:band\_common\_names](#generatedband_common_names)   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-the-band-common-names.md "aeopres_model#/$defs/Properties/properties/generated:band_common_names")                                                                                                                                                                         |
-| [generated:band\_names](#generatedband_names)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-the-band-names.md "aeopres_model#/$defs/Properties/properties/generated:band_names")                                                                                                                                                                                       |
-| [generated:geohash2](#generatedgeohash2)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash2")                                                                                                                                                                            |
-| [generated:geohash3](#generatedgeohash3)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash3")                                                                                                                                                                          |
-| [generated:geohash4](#generatedgeohash4)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash4")                                                                                                                                                                           |
-| [generated:geohash5](#generatedgeohash5)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash5")                                                                                                                                                                           |
-| Additional Properties                                          | Any    | Optional | can be null    |                                                                                                                                                                                                                                                                                                                            |
+| Property                                                            | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                                               |
+| :------------------------------------------------------------------ | :----- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [datetime](#datetime)                                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "airs_model#/$defs/Properties/properties/datetime")                                                                                                                             |
+| [start\_datetime](#start_datetime)                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/start_datetime")                                                                                                       |
+| [end\_datetime](#end_datetime)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/end_datetime")                                                                                                             |
+| [programme](#programme)                                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")                                                                                                                                                                                                    |
+| [constellation](#constellation)                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")                                                                                                                                                                                            |
+| [instrument](#instrument)                                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")                                                                                                                                                                                                  |
+| [sensor](#sensor)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")                                                                                                                                                                                                          |
+| [sensor\_type](#sensor_type)                                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                         |
+| [gsd](#gsd-1)                                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                            |
+| [data\_type](#data_type)                                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")                                                                                                                                                                                                             |
+| [data\_coverage](#data_coverage)                                    | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")                                                                                                                                                                                               |
+| [water\_coverage](#water_coverage)                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")                                                                                                                                                                                             |
+| [locations](#locations)                                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "airs_model#/$defs/Properties/properties/locations")                                                                                                                                                                                    |
+| [create\_datetime](#create_datetime)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/create_datetime")                                                                                                                                |
+| [update\_datetime](#update_datetime)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/update_datetime")                                                                                                                              |
+| [view\_\_off\_nadir](#view__off_nadir)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__off_nadir")                                                                                                                |
+| [view\_\_incidence\_angle](#view__incidence_angle)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__incidence_angle")                            |
+| [view\_\_azimuth](#view__azimuth)                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__azimuth")                  |
+| [view\_\_sun\_azimuth](#view__sun_azimuth)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__sun_azimuth")                                                                |
+| [view\_\_sun\_elevation](#view__sun_elevation)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "airs_model#/$defs/Properties/properties/view__sun_elevation") |
+| [storage\_\_requester\_pays](#storage__requester_pays-1)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Properties/properties/storage__requester_pays")                                                                      |
+| [storage\_\_tier](#storage__tier-1)                                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Properties/properties/storage__tier")                                                                                                                                                                    |
+| [storage\_\_platform](#storage__platform-1)                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Properties/properties/storage__platform")                                                                                                                                                            |
+| [storage\_\_region](#storage__region-1)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Properties/properties/storage__region")                                                                                          |
+| [eo\_\_cloud\_cover](#eo__cloud_cover)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "airs_model#/$defs/Properties/properties/eo__cloud_cover")                                                                                                                                                                                            |
+| [eo\_\_snow\_cover](#eo__snow_cover)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "airs_model#/$defs/Properties/properties/eo__snow_cover")                                                                                                                                                                                      |
+| [eo\_\_bands](#eo__bands-1)                                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Properties/properties/eo__bands")                                                                                                                       |
+| [processing\_\_expression](#processing__expression)                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "airs_model#/$defs/Properties/properties/processing__expression")               |
+| [processing\_\_lineage](#processing__lineage)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "airs_model#/$defs/Properties/properties/processing__lineage")                                       |
+| [processing\_\_level](#processing__level)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "airs_model#/$defs/Properties/properties/processing__level")                                   |
+| [processing\_\_facility](#processing__facility)                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "airs_model#/$defs/Properties/properties/processing__facility")                                                                      |
+| [processing\_\_software](#processing__software)                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "airs_model#/$defs/Properties/properties/processing__software")                                                                                                            |
+| [dc3\_\_quality\_indicators](#dc3__quality_indicators)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "airs_model#/$defs/Properties/properties/dc3__quality_indicators")                  |
+| [dc3\_\_composition](#dc3__composition)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "airs_model#/$defs/Properties/properties/dc3__composition")                                                                                                                                               |
+| [dc3\_\_number\_of\_chunks](#dc3__number_of_chunks)                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "airs_model#/$defs/Properties/properties/dc3__number_of_chunks")                                                                                                                                       |
+| [dc3\_\_chunk\_weight](#dc3__chunk_weight)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "airs_model#/$defs/Properties/properties/dc3__chunk_weight")                                                                                                                                                                                |
+| [dc3\_\_fill\_ratio](#dc3__fill_ratio)                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "airs_model#/$defs/Properties/properties/dc3__fill_ratio")                                                                                                                                     |
+| [cube\_\_dimensions](#cube__dimensions)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__dimensions")                                                                                                                                                                         |
+| [cube\_\_variables](#cube__variables)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__variables")                                                                                                                                                                           |
+| [sar\_\_instrument\_mode](#sar__instrument_mode-1)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Properties/properties/sar__instrument_mode")                               |
+| [sar\_\_frequency\_band](#sar__frequency_band-1)                    | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Properties/properties/sar__frequency_band")                                           |
+| [sar\_\_center\_frequency](#sar__center_frequency-1)                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Properties/properties/sar__center_frequency")                                                                                                                                                      |
+| [sar\_\_polarizations](#sar__polarizations-1)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-any-combination-of-polarizations.md "airs_model#/$defs/Properties/properties/sar__polarizations")                                                                                                                                                                                |
+| [sar\_\_product\_type](#sar__product_type-1)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Properties/properties/sar__product_type")                                                                                                                                                                      |
+| [sar\_\_resolution\_range](#sar__resolution_range-1)                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_range")                                                                           |
+| [sar\_\_resolution\_azimuth](#sar__resolution_azimuth-1)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_azimuth")                                                                            |
+| [sar\_\_pixel\_spacing\_range](#sar__pixel_spacing_range-1)         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_range")                          |
+| [sar\_\_pixel\_spacing\_azimuth](#sar__pixel_spacing_azimuth-1)     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_azimuth")                           |
+| [sar\_\_looks\_range](#sar__looks_range-1)                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_range")                                                                                                      |
+| [sar\_\_looks\_azimuth](#sar__looks_azimuth-1)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_azimuth")                                                                                                       |
+| [sar\_\_looks\_equivalent\_number](#sar__looks_equivalent_number-1) | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Properties/properties/sar__looks_equivalent_number")                                                                                                                                                                    |
+| [sar\_\_observation\_direction](#sar__observation_direction-1)      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Properties/properties/sar__observation_direction")                                                                                                      |
+| [proj\_\_epsg](#proj__epsg-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Properties/properties/proj__epsg")                                                                                                                                                                                             |
+| [proj\_\_wkt2](#proj__wkt2-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Properties/properties/proj__wkt2")                                                                                                    |
+| [proj\_\_geometry](#proj__geometry-1)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Properties/properties/proj__geometry")                                                                                                                                                                                  |
+| [proj\_\_bbox](#proj__bbox-1)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Properties/properties/proj__bbox")                                                                                                                                                          |
+| [proj\_\_centroid](#proj__centroid-1)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Properties/properties/proj__centroid")                                                                                                                                                        |
+| [proj\_\_shape](#proj__shape-1)                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__shape")                                                                                                                                                            |
+| [proj\_\_transform](#proj__transform-1)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__transform")                                                                                                                                                        |
+| [generated\_\_has\_overview](#generated__has_overview)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "airs_model#/$defs/Properties/properties/generated__has_overview")                                                                                                                                                                    |
+| [generated\_\_has\_thumbnail](#generated__has_thumbnail)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "airs_model#/$defs/Properties/properties/generated__has_thumbnail")                                                                                                                                                                   |
+| [generated\_\_has\_metadata](#generated__has_metadata)              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_metadata")                                                                                                                                                                |
+| [generated\_\_has\_data](#generated__has_data)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_data")                                                                                                                                                                        |
+| [generated\_\_has\_cog](#generated__has_cog)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "airs_model#/$defs/Properties/properties/generated__has_cog")                                                                                                                                                                               |
+| [generated\_\_has\_zarr](#generated__has_zarr)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "airs_model#/$defs/Properties/properties/generated__has_zarr")                                                                                                                                                                             |
+| [generated\_\_date\_keywords](#generated__date_keywords)            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "airs_model#/$defs/Properties/properties/generated__date_keywords")                                                                                                                                                           |
+| [generated\_\_day\_of\_week](#generated__day_of_week)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-day-of-week.md "airs_model#/$defs/Properties/properties/generated__day_of_week")                                                                                                                                                                                                 |
+| [generated\_\_day\_of\_year](#generated__day_of_year)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-day-of-year.md "airs_model#/$defs/Properties/properties/generated__day_of_year")                                                                                                                                                                                                 |
+| [generated\_\_hour\_of\_day](#generated__hour_of_day)               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-hour-of-day.md "airs_model#/$defs/Properties/properties/generated__hour_of_day")                                                                                                                                                                                                 |
+| [generated\_\_minute\_of\_day](#generated__minute_of_day)           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-minute-of-day.md "airs_model#/$defs/Properties/properties/generated__minute_of_day")                                                                                                                                                                                             |
+| [generated\_\_month](#generated__month)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-month.md "airs_model#/$defs/Properties/properties/generated__month")                                                                                                                                                                                                             |
+| [generated\_\_year](#generated__year)                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-year.md "airs_model#/$defs/Properties/properties/generated__year")                                                                                                                                                                                                               |
+| [generated\_\_season](#generated__season)                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-season.md "airs_model#/$defs/Properties/properties/generated__season")                                                                                                                                                                                                           |
+| [generated\_\_tltrbrbl](#generated__tltrbrbl)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "airs_model#/$defs/Properties/properties/generated__tltrbrbl")                                                                                                                         |
+| [generated\_\_band\_common\_names](#generated__band_common_names)   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-the-band-common-names.md "airs_model#/$defs/Properties/properties/generated__band_common_names")                                                                                                                                                                         |
+| [generated\_\_band\_names](#generated__band_names)                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-the-band-names.md "airs_model#/$defs/Properties/properties/generated__band_names")                                                                                                                                                                                       |
+| [generated\_\_geohash2](#generated__geohash2)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "airs_model#/$defs/Properties/properties/generated__geohash2")                                                                                                                                                                            |
+| [generated\_\_geohash3](#generated__geohash3)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "airs_model#/$defs/Properties/properties/generated__geohash3")                                                                                                                                                                          |
+| [generated\_\_geohash4](#generated__geohash4)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "airs_model#/$defs/Properties/properties/generated__geohash4")                                                                                                                                                                           |
+| [generated\_\_geohash5](#generated__geohash5)                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "airs_model#/$defs/Properties/properties/generated__geohash5")                                                                                                                                                                           |
+| Additional Properties                                               | Any    | Optional | can be null    |                                                                                                                                                                                                                                                                                                                          |
 
 ### datetime
 
@@ -1624,7 +1651,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "aeopres_model#/$defs/Properties/properties/datetime")
+*   defined in: [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "airs_model#/$defs/Properties/properties/datetime")
 
 #### datetime Type
 
@@ -1648,7 +1675,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "aeopres_model#/$defs/Properties/properties/start_datetime")
+*   defined in: [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/start_datetime")
 
 #### start\_datetime Type
 
@@ -1672,7 +1699,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "aeopres_model#/$defs/Properties/properties/end_datetime")
+*   defined in: [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/end_datetime")
 
 #### end\_datetime Type
 
@@ -1696,7 +1723,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-programme.md "aeopres_model#/$defs/Properties/properties/programme")
+*   defined in: [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")
 
 #### programme Type
 
@@ -1720,7 +1747,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-constellation.md "aeopres_model#/$defs/Properties/properties/constellation")
+*   defined in: [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")
 
 #### constellation Type
 
@@ -1744,7 +1771,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-instrument.md "aeopres_model#/$defs/Properties/properties/instrument")
+*   defined in: [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")
 
 #### instrument Type
 
@@ -1768,7 +1795,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-sensor.md "aeopres_model#/$defs/Properties/properties/sensor")
+*   defined in: [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")
 
 #### sensor Type
 
@@ -1792,7 +1819,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-sensor.md "aeopres_model#/$defs/Properties/properties/sensor_type")
+*   defined in: [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")
 
 #### sensor\_type Type
 
@@ -1816,7 +1843,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "aeopres_model#/$defs/Properties/properties/gsd")
+*   defined in: [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")
 
 #### gsd Type
 
@@ -1840,7 +1867,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-data.md "aeopres_model#/$defs/Properties/properties/data_type")
+*   defined in: [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")
 
 #### data\_type Type
 
@@ -1864,7 +1891,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-data-cover.md "aeopres_model#/$defs/Properties/properties/data_coverage")
+*   defined in: [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")
 
 #### data\_coverage Type
 
@@ -1888,7 +1915,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-water-cover.md "aeopres_model#/$defs/Properties/properties/water_coverage")
+*   defined in: [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")
 
 #### water\_coverage Type
 
@@ -1912,7 +1939,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "aeopres_model#/$defs/Properties/properties/locations")
+*   defined in: [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "airs_model#/$defs/Properties/properties/locations")
 
 #### locations Type
 
@@ -1932,21 +1959,21 @@ any of
 
 *   is optional
 
-*   Type: merged type ([Date of item creation in the catalog, managed by the ARLAS EO Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service.md))
+*   Type: merged type ([Date of item creation in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service.md "aeopres_model#/$defs/Properties/properties/create_datetime")
+*   defined in: [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/create_datetime")
 
 #### create\_datetime Type
 
-merged type ([Date of item creation in the catalog, managed by the ARLAS EO Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service.md))
+merged type ([Date of item creation in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service-anyof-0.md "check type definition")
+*   [Untitled integer in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-eo-registration-service-anyof-1.md "check type definition")
+*   [Untitled null in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
 
 ### update\_datetime
 
@@ -1956,27 +1983,27 @@ any of
 
 *   is optional
 
-*   Type: merged type ([Update date of the item in the catalog, managed by the ARLAS EO Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service.md))
+*   Type: merged type ([Update date of the item in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service.md "aeopres_model#/$defs/Properties/properties/update_datetime")
+*   defined in: [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/update_datetime")
 
 #### update\_datetime Type
 
-merged type ([Update date of the item in the catalog, managed by the ARLAS EO Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service.md))
+merged type ([Update date of the item in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service-anyof-0.md "check type definition")
+*   [Untitled integer in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-eo-registration-service-anyof-1.md "check type definition")
+*   [Untitled null in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
 
-### view:off\_nadir
+### view\_\_off\_nadir
 
 
 
-`view:off_nadir`
+`view__off_nadir`
 
 *   is optional
 
@@ -1984,9 +2011,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "aeopres_model#/$defs/Properties/properties/view:off_nadir")
+*   defined in: [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__off_nadir")
 
-#### view:off\_nadir Type
+#### view\_\_off\_nadir Type
 
 merged type ([The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md))
 
@@ -1996,11 +2023,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
 
-### view:incidence\_angle
+### view\_\_incidence\_angle
 
 
 
-`view:incidence_angle`
+`view__incidence_angle`
 
 *   is optional
 
@@ -2008,9 +2035,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "aeopres_model#/$defs/Properties/properties/view:incidence_angle")
+*   defined in: [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__incidence_angle")
 
-#### view:incidence\_angle Type
+#### view\_\_incidence\_angle Type
 
 merged type ([The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md))
 
@@ -2020,11 +2047,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
 
-### view:azimuth
+### view\_\_azimuth
 
 
 
-`view:azimuth`
+`view__azimuth`
 
 *   is optional
 
@@ -2032,9 +2059,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "aeopres_model#/$defs/Properties/properties/view:azimuth")
+*   defined in: [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__azimuth")
 
-#### view:azimuth Type
+#### view\_\_azimuth Type
 
 merged type ([Viewing azimuth angle. The angle measured from the sub-satellite point (point on the ground below the platform) between the scene center and true north. Measured clockwise from north in degrees (0-360).](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md))
 
@@ -2044,11 +2071,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360-anyof-1.md "check type definition")
 
-### sview:un\_azimuth
+### view\_\_sun\_azimuth
 
 
 
-`sview:un_azimuth`
+`view__sun_azimuth`
 
 *   is optional
 
@@ -2056,9 +2083,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "aeopres_model#/$defs/Properties/properties/sview:un_azimuth")
+*   defined in: [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__sun_azimuth")
 
-#### sview:un\_azimuth Type
+#### view\_\_sun\_azimuth Type
 
 merged type ([Sun azimuth angle. From the scene center point on the ground, this is the angle between truth north and the sun. Measured clockwise in degrees (0-360).](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md))
 
@@ -2068,11 +2095,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360-anyof-1.md "check type definition")
 
-### view:sun\_elevation
+### view\_\_sun\_elevation
 
 
 
-`view:sun_elevation`
+`view__sun_elevation`
 
 *   is optional
 
@@ -2080,9 +2107,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "aeopres_model#/$defs/Properties/properties/view:sun_elevation")
+*   defined in: [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "airs_model#/$defs/Properties/properties/view__sun_elevation")
 
-#### view:sun\_elevation Type
+#### view\_\_sun\_elevation Type
 
 merged type ([Sun elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° \[...\]](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md))
 
@@ -2092,11 +2119,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10--anyof-1.md "check type definition")
 
-### storage:requester\_pays
+### storage\_\_requester\_pays
 
 
 
-`storage:requester_pays`
+`storage__requester_pays`
 
 *   is optional
 
@@ -2104,9 +2131,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "aeopres_model#/$defs/Properties/properties/storage:requester_pays")
+*   defined in: [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Properties/properties/storage__requester_pays")
 
-#### storage:requester\_pays Type
+#### storage\_\_requester\_pays Type
 
 merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
 
@@ -2116,11 +2143,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
 
-### storage:tier
+### storage\_\_tier
 
 
 
-`storage:tier`
+`storage__tier`
 
 *   is optional
 
@@ -2128,9 +2155,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "aeopres_model#/$defs/Properties/properties/storage:tier")
+*   defined in: [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Properties/properties/storage__tier")
 
-#### storage:tier Type
+#### storage\_\_tier Type
 
 merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
 
@@ -2140,11 +2167,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
 
-### storage:platform
+### storage\_\_platform
 
 
 
-`storage:platform`
+`storage__platform`
 
 *   is optional
 
@@ -2152,9 +2179,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "aeopres_model#/$defs/Properties/properties/storage:platform")
+*   defined in: [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Properties/properties/storage__platform")
 
-#### storage:platform Type
+#### storage\_\_platform Type
 
 merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
 
@@ -2164,11 +2191,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
 
-### storage:region
+### storage\_\_region
 
 
 
-`storage:region`
+`storage__region`
 
 *   is optional
 
@@ -2176,9 +2203,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "aeopres_model#/$defs/Properties/properties/storage:region")
+*   defined in: [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Properties/properties/storage__region")
 
-#### storage:region Type
+#### storage\_\_region Type
 
 merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
 
@@ -2188,11 +2215,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
 
-### eo:cloud\_cover
+### eo\_\_cloud\_cover
 
 
 
-`eo:cloud_cover`
+`eo__cloud_cover`
 
 *   is optional
 
@@ -2200,9 +2227,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "aeopres_model#/$defs/Properties/properties/eo:cloud_cover")
+*   defined in: [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "airs_model#/$defs/Properties/properties/eo__cloud_cover")
 
-#### eo:cloud\_cover Type
+#### eo\_\_cloud\_cover Type
 
 merged type ([Estimate of cloud cover.](model-defs-properties-properties-estimate-of-cloud-cover.md))
 
@@ -2212,11 +2239,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-estimate-of-cloud-cover-anyof-1.md "check type definition")
 
-### eo:snow\_cover
+### eo\_\_snow\_cover
 
 
 
-`eo:snow_cover`
+`eo__snow_cover`
 
 *   is optional
 
@@ -2224,9 +2251,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "aeopres_model#/$defs/Properties/properties/eo:snow_cover")
+*   defined in: [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "airs_model#/$defs/Properties/properties/eo__snow_cover")
 
-#### eo:snow\_cover Type
+#### eo\_\_snow\_cover Type
 
 merged type ([Estimate of snow and ice cover.](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md))
 
@@ -2236,11 +2263,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover-anyof-1.md "check type definition")
 
-### eo:bands
+### eo\_\_bands
 
 
 
-`eo:bands`
+`eo__bands`
 
 *   is optional
 
@@ -2248,9 +2275,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "aeopres_model#/$defs/Properties/properties/eo:bands")
+*   defined in: [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Properties/properties/eo__bands")
 
-#### eo:bands Type
+#### eo\_\_bands Type
 
 merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
 
@@ -2260,11 +2287,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
 
-### processing:expression
+### processing\_\_expression
 
 
 
-`processing:expression`
+`processing__expression`
 
 *   is optional
 
@@ -2272,9 +2299,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "aeopres_model#/$defs/Properties/properties/processing:expression")
+*   defined in: [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "airs_model#/$defs/Properties/properties/processing__expression")
 
-#### processing:expression Type
+#### processing\_\_expression Type
 
 merged type ([An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below).](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md))
 
@@ -2284,11 +2311,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below-anyof-1.md "check type definition")
 
-### processing:lineage
+### processing\_\_lineage
 
 
 
-`processing:lineage`
+`processing__lineage`
 
 *   is optional
 
@@ -2296,9 +2323,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "aeopres_model#/$defs/Properties/properties/processing:lineage")
+*   defined in: [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "airs_model#/$defs/Properties/properties/processing__lineage")
 
-#### processing:lineage Type
+#### processing\_\_lineage Type
 
 merged type ([Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO.](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md))
 
@@ -2308,11 +2335,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso-anyof-1.md "check type definition")
 
-### processing:level
+### processing\_\_level
 
 
 
-`processing:level`
+`processing__level`
 
 *   is optional
 
@@ -2320,9 +2347,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "aeopres_model#/$defs/Properties/properties/processing:level")
+*   defined in: [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "airs_model#/$defs/Properties/properties/processing__level")
 
-#### processing:level Type
+#### processing\_\_level Type
 
 merged type ([The name commonly used to refer to the processing level to make it easier to search for product level across collections or items. The short name must be used (only L, not Level).](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md))
 
@@ -2332,11 +2359,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level-anyof-1.md "check type definition")
 
-### processing:facility
+### processing\_\_facility
 
 
 
-`processing:facility`
+`processing__facility`
 
 *   is optional
 
@@ -2344,9 +2371,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "aeopres_model#/$defs/Properties/properties/processing:facility")
+*   defined in: [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "airs_model#/$defs/Properties/properties/processing__facility")
 
-#### processing:facility Type
+#### processing\_\_facility Type
 
 merged type ([The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites.](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md))
 
@@ -2356,11 +2383,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites-anyof-1.md "check type definition")
 
-### processing:software
+### processing\_\_software
 
 
 
-`processing:software`
+`processing__software`
 
 *   is optional
 
@@ -2368,9 +2395,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "aeopres_model#/$defs/Properties/properties/processing:software")
+*   defined in: [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "airs_model#/$defs/Properties/properties/processing__software")
 
-#### processing:software Type
+#### processing\_\_software Type
 
 merged type ([A dictionary with name/version for key/value describing one or more softwares that produced the data.](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md))
 
@@ -2380,11 +2407,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data-anyof-1.md "check type definition")
 
-### dc3:quality\_indicators
+### dc3\_\_quality\_indicators
 
 
 
-`dc3:quality_indicators`
+`dc3__quality_indicators`
 
 *   is optional
 
@@ -2392,9 +2419,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "aeopres_model#/$defs/Properties/properties/dc3:quality_indicators")
+*   defined in: [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "airs_model#/$defs/Properties/properties/dc3__quality_indicators")
 
-#### dc3:quality\_indicators Type
+#### dc3\_\_quality\_indicators Type
 
 merged type ([Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator.](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md))
 
@@ -2404,11 +2431,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator-anyof-1.md "check type definition")
 
-### dc3:composition
+### dc3\_\_composition
 
 
 
-`dc3:composition`
+`dc3__composition`
 
 *   is optional
 
@@ -2416,9 +2443,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "aeopres_model#/$defs/Properties/properties/dc3:composition")
+*   defined in: [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "airs_model#/$defs/Properties/properties/dc3__composition")
 
-#### dc3:composition Type
+#### dc3\_\_composition Type
 
 merged type ([List of raster groups used for elaborating the cube temporal slices.](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md))
 
@@ -2428,11 +2455,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices-anyof-1.md "check type definition")
 
-### dc3:number\_of\_chunks
+### dc3\_\_number\_of\_chunks
 
 
 
-`dc3:number_of_chunks`
+`dc3__number_of_chunks`
 
 *   is optional
 
@@ -2440,9 +2467,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "aeopres_model#/$defs/Properties/properties/dc3:number_of_chunks")
+*   defined in: [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "airs_model#/$defs/Properties/properties/dc3__number_of_chunks")
 
-#### dc3:number\_of\_chunks Type
+#### dc3\_\_number\_of\_chunks Type
 
 merged type ([Number of chunks (if zarr or similar partitioned format) within the cube.](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md))
 
@@ -2452,11 +2479,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube-anyof-1.md "check type definition")
 
-### dc3:chunk\_weight
+### dc3\_\_chunk\_weight
 
 
 
-`dc3:chunk_weight`
+`dc3__chunk_weight`
 
 *   is optional
 
@@ -2464,9 +2491,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "aeopres_model#/$defs/Properties/properties/dc3:chunk_weight")
+*   defined in: [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "airs_model#/$defs/Properties/properties/dc3__chunk_weight")
 
-#### dc3:chunk\_weight Type
+#### dc3\_\_chunk\_weight Type
 
 merged type ([Weight of a chunk (number of bytes).](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md))
 
@@ -2476,11 +2503,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes-anyof-1.md "check type definition")
 
-### dc3:fill\_ratio
+### dc3\_\_fill\_ratio
 
 
 
-`dc3:fill_ratio`
+`dc3__fill_ratio`
 
 *   is optional
 
@@ -2488,9 +2515,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "aeopres_model#/$defs/Properties/properties/dc3:fill_ratio")
+*   defined in: [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "airs_model#/$defs/Properties/properties/dc3__fill_ratio")
 
-#### dc3:fill\_ratio Type
+#### dc3\_\_fill\_ratio Type
 
 merged type ([1: the cube is full, 0 the cube is empty, in between the cube is partially filled.](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md))
 
@@ -2500,11 +2527,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled-anyof-1.md "check type definition")
 
-### cube:dimensions
+### cube\_\_dimensions
 
 
 
-`cube:dimensions`
+`cube__dimensions`
 
 *   is optional
 
@@ -2512,9 +2539,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "aeopres_model#/$defs/Properties/properties/cube:dimensions")
+*   defined in: [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__dimensions")
 
-#### cube:dimensions Type
+#### cube\_\_dimensions Type
 
 merged type ([Uniquely named dimensions of the datacube.](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md))
 
@@ -2524,11 +2551,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube-anyof-1.md "check type definition")
 
-### cube:variables
+### cube\_\_variables
 
 
 
-`cube:variables`
+`cube__variables`
 
 *   is optional
 
@@ -2536,9 +2563,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "aeopres_model#/$defs/Properties/properties/cube:variables")
+*   defined in: [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__variables")
 
-#### cube:variables Type
+#### cube\_\_variables Type
 
 merged type ([Uniquely named variables of the datacube.](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md))
 
@@ -2548,11 +2575,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube-anyof-1.md "check type definition")
 
-### sar:instrument\_mode
+### sar\_\_instrument\_mode
 
 
 
-`sar:instrument_mode`
+`sar__instrument_mode`
 
 *   is optional
 
@@ -2560,9 +2587,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "aeopres_model#/$defs/Properties/properties/sar:instrument_mode")
+*   defined in: [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Properties/properties/sar__instrument_mode")
 
-#### sar:instrument\_mode Type
+#### sar\_\_instrument\_mode Type
 
 merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
 
@@ -2572,11 +2599,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
 
-### sar:frequency\_band
+### sar\_\_frequency\_band
 
 
 
-`sar:frequency_band`
+`sar__frequency_band`
 
 *   is optional
 
@@ -2584,9 +2611,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "aeopres_model#/$defs/Properties/properties/sar:frequency_band")
+*   defined in: [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Properties/properties/sar__frequency_band")
 
-#### sar:frequency\_band Type
+#### sar\_\_frequency\_band Type
 
 merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
 
@@ -2596,11 +2623,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
 
-### sar:center\_frequency
+### sar\_\_center\_frequency
 
 
 
-`sar:center_frequency`
+`sar__center_frequency`
 
 *   is optional
 
@@ -2608,9 +2635,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "aeopres_model#/$defs/Properties/properties/sar:center_frequency")
+*   defined in: [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Properties/properties/sar__center_frequency")
 
-#### sar:center\_frequency Type
+#### sar\_\_center\_frequency Type
 
 merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
 
@@ -2620,11 +2647,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
 
-### sar:polarizations
+### sar\_\_polarizations
 
 
 
-`sar:polarizations`
+`sar__polarizations`
 
 *   is optional
 
@@ -2632,9 +2659,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-any-combination-of-polarizations.md "aeopres_model#/$defs/Properties/properties/sar:polarizations")
+*   defined in: [Item](model-defs-properties-properties-any-combination-of-polarizations.md "airs_model#/$defs/Properties/properties/sar__polarizations")
 
-#### sar:polarizations Type
+#### sar\_\_polarizations Type
 
 merged type ([Any combination of polarizations.](model-defs-properties-properties-any-combination-of-polarizations.md))
 
@@ -2644,11 +2671,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
 
-### sar:product\_type
+### sar\_\_product\_type
 
 
 
-`sar:product_type`
+`sar__product_type`
 
 *   is optional
 
@@ -2656,9 +2683,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "aeopres_model#/$defs/Properties/properties/sar:product_type")
+*   defined in: [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Properties/properties/sar__product_type")
 
-#### sar:product\_type Type
+#### sar\_\_product\_type Type
 
 merged type ([The product type, for example SSC, MGD, or SGC](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
 
@@ -2668,11 +2695,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
 
-### sar:resolution\_range
+### sar\_\_resolution\_range
 
 
 
-`sar:resolution_range`
+`sar__resolution_range`
 
 *   is optional
 
@@ -2680,9 +2707,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Properties/properties/sar:resolution_range")
+*   defined in: [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_range")
 
-#### sar:resolution\_range Type
+#### sar\_\_resolution\_range Type
 
 merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
 
@@ -2692,11 +2719,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
-### sar:resolution\_azimuth
+### sar\_\_resolution\_azimuth
 
 
 
-`sar:resolution_azimuth`
+`sar__resolution_azimuth`
 
 *   is optional
 
@@ -2704,9 +2731,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "aeopres_model#/$defs/Properties/properties/sar:resolution_azimuth")
+*   defined in: [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_azimuth")
 
-#### sar:resolution\_azimuth Type
+#### sar\_\_resolution\_azimuth Type
 
 merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
 
@@ -2716,11 +2743,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
-### sar:pixel\_spacing\_range
+### sar\_\_pixel\_spacing\_range
 
 
 
-`sar:pixel_spacing_range`
+`sar__pixel_spacing_range`
 
 *   is optional
 
@@ -2728,9 +2755,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Properties/properties/sar:pixel_spacing_range")
+*   defined in: [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_range")
 
-#### sar:pixel\_spacing\_range Type
+#### sar\_\_pixel\_spacing\_range Type
 
 merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
@@ -2740,11 +2767,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
-### sar:pixel\_spacing\_azimuth
+### sar\_\_pixel\_spacing\_azimuth
 
 
 
-`sar:pixel_spacing_azimuth`
+`sar__pixel_spacing_azimuth`
 
 *   is optional
 
@@ -2752,9 +2779,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "aeopres_model#/$defs/Properties/properties/sar:pixel_spacing_azimuth")
+*   defined in: [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_azimuth")
 
-#### sar:pixel\_spacing\_azimuth Type
+#### sar\_\_pixel\_spacing\_azimuth Type
 
 merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
@@ -2764,11 +2791,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
-### sar:looks\_range
+### sar\_\_looks\_range
 
 
 
-`sar:looks_range`
+`sar__looks_range`
 
 *   is optional
 
@@ -2776,9 +2803,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "aeopres_model#/$defs/Properties/properties/sar:looks_range")
+*   defined in: [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_range")
 
-#### sar:looks\_range Type
+#### sar\_\_looks\_range Type
 
 merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
 
@@ -2788,11 +2815,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
 
-### sar:looks\_azimuth
+### sar\_\_looks\_azimuth
 
 
 
-`sar:looks_azimuth`
+`sar__looks_azimuth`
 
 *   is optional
 
@@ -2800,9 +2827,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "aeopres_model#/$defs/Properties/properties/sar:looks_azimuth")
+*   defined in: [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_azimuth")
 
-#### sar:looks\_azimuth Type
+#### sar\_\_looks\_azimuth Type
 
 merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
 
@@ -2812,11 +2839,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
 
-### sar:looks\_equivalent\_number
+### sar\_\_looks\_equivalent\_number
 
 
 
-`sar:looks_equivalent_number`
+`sar__looks_equivalent_number`
 
 *   is optional
 
@@ -2824,9 +2851,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "aeopres_model#/$defs/Properties/properties/sar:looks_equivalent_number")
+*   defined in: [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Properties/properties/sar__looks_equivalent_number")
 
-#### sar:looks\_equivalent\_number Type
+#### sar\_\_looks\_equivalent\_number Type
 
 merged type ([The equivalent number of looks (ENL).](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md))
 
@@ -2836,11 +2863,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
 
-### sar:observation\_direction
+### sar\_\_observation\_direction
 
 
 
-`sar:observation_direction`
+`sar__observation_direction`
 
 *   is optional
 
@@ -2848,9 +2875,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "aeopres_model#/$defs/Properties/properties/sar:observation_direction")
+*   defined in: [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Properties/properties/sar__observation_direction")
 
-#### sar:observation\_direction Type
+#### sar\_\_observation\_direction Type
 
 merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
 
@@ -2860,11 +2887,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
 
-### proj:epsg
+### proj\_\_epsg
 
 
 
-`proj:epsg`
+`proj__epsg`
 
 *   is optional
 
@@ -2872,9 +2899,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "aeopres_model#/$defs/Properties/properties/proj:epsg")
+*   defined in: [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Properties/properties/proj__epsg")
 
-#### proj:epsg Type
+#### proj\_\_epsg Type
 
 merged type ([EPSG code of the datasource.](model-defs-properties-properties-epsg-code-of-the-datasource.md))
 
@@ -2884,11 +2911,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
 
-### proj:wkt2
+### proj\_\_wkt2
 
 
 
-`proj:wkt2`
+`proj__wkt2`
 
 *   is optional
 
@@ -2896,9 +2923,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "aeopres_model#/$defs/Properties/properties/proj:wkt2")
+*   defined in: [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Properties/properties/proj__wkt2")
 
-#### proj:wkt2 Type
+#### proj\_\_wkt2 Type
 
 merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
 
@@ -2908,11 +2935,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
 
-### proj:geometry
+### proj\_\_geometry
 
 
 
-`proj:geometry`
+`proj__geometry`
 
 *   is optional
 
@@ -2920,9 +2947,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "aeopres_model#/$defs/Properties/properties/proj:geometry")
+*   defined in: [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Properties/properties/proj__geometry")
 
-#### proj:geometry Type
+#### proj\_\_geometry Type
 
 merged type ([Defines the footprint of this Item.](model-defs-properties-properties-defines-the-footprint-of-this-item.md))
 
@@ -2932,11 +2959,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
 
-### proj:bbox
+### proj\_\_bbox
 
 
 
-`proj:bbox`
+`proj__bbox`
 
 *   is optional
 
@@ -2944,9 +2971,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "aeopres_model#/$defs/Properties/properties/proj:bbox")
+*   defined in: [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Properties/properties/proj__bbox")
 
-#### proj:bbox Type
+#### proj\_\_bbox Type
 
 merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
 
@@ -2956,11 +2983,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
 
-### proj:centroid
+### proj\_\_centroid
 
 
 
-`proj:centroid`
+`proj__centroid`
 
 *   is optional
 
@@ -2968,9 +2995,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "aeopres_model#/$defs/Properties/properties/proj:centroid")
+*   defined in: [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Properties/properties/proj__centroid")
 
-#### proj:centroid Type
+#### proj\_\_centroid Type
 
 merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
 
@@ -2980,11 +3007,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
 
-### proj:shape
+### proj\_\_shape
 
 
 
-`proj:shape`
+`proj__shape`
 
 *   is optional
 
@@ -2992,9 +3019,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "aeopres_model#/$defs/Properties/properties/proj:shape")
+*   defined in: [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__shape")
 
-#### proj:shape Type
+#### proj\_\_shape Type
 
 merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
 
@@ -3004,11 +3031,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
 
-### proj:transform
+### proj\_\_transform
 
 
 
-`proj:transform`
+`proj__transform`
 
 *   is optional
 
@@ -3016,9 +3043,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "aeopres_model#/$defs/Properties/properties/proj:transform")
+*   defined in: [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__transform")
 
-#### proj:transform Type
+#### proj\_\_transform Type
 
 merged type ([The affine transformation coefficients for the default grid.](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
 
@@ -3028,11 +3055,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
 
-### generated:has\_overview
+### generated\_\_has\_overview
 
 
 
-`generated:has_overview`
+`generated__has_overview`
 
 *   is optional
 
@@ -3040,9 +3067,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_overview")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "airs_model#/$defs/Properties/properties/generated__has_overview")
 
-#### generated:has\_overview Type
+#### generated\_\_has\_overview Type
 
 merged type ([Whether the item has an overview or not.](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md))
 
@@ -3052,11 +3079,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not-anyof-1.md "check type definition")
 
-### generated:has\_thumbnail
+### generated\_\_has\_thumbnail
 
 
 
-`generated:has_thumbnail`
+`generated__has_thumbnail`
 
 *   is optional
 
@@ -3064,9 +3091,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_thumbnail")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "airs_model#/$defs/Properties/properties/generated__has_thumbnail")
 
-#### generated:has\_thumbnail Type
+#### generated\_\_has\_thumbnail Type
 
 merged type ([Whether the item has a thumbnail or not.](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md))
 
@@ -3076,11 +3103,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not-anyof-1.md "check type definition")
 
-### generated:has\_metadata
+### generated\_\_has\_metadata
 
 
 
-`generated:has_metadata`
+`generated__has_metadata`
 
 *   is optional
 
@@ -3088,9 +3115,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_metadata")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_metadata")
 
-#### generated:has\_metadata Type
+#### generated\_\_has\_metadata Type
 
 merged type ([Whether the item has a metadata file or not.](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md))
 
@@ -3100,11 +3127,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not-anyof-1.md "check type definition")
 
-### generated:has\_data
+### generated\_\_has\_data
 
 
 
-`generated:has_data`
+`generated__has_data`
 
 *   is optional
 
@@ -3112,9 +3139,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_data")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_data")
 
-#### generated:has\_data Type
+#### generated\_\_has\_data Type
 
 merged type ([Whether the item has a data file or not.](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md))
 
@@ -3124,11 +3151,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not-anyof-1.md "check type definition")
 
-### generated:has\_cog
+### generated\_\_has\_cog
 
 
 
-`generated:has_cog`
+`generated__has_cog`
 
 *   is optional
 
@@ -3136,9 +3163,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_cog")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "airs_model#/$defs/Properties/properties/generated__has_cog")
 
-#### generated:has\_cog Type
+#### generated\_\_has\_cog Type
 
 merged type ([Whether the item has a cog or not.](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md))
 
@@ -3148,11 +3175,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not-anyof-1.md "check type definition")
 
-### generated:has\_zarr
+### generated\_\_has\_zarr
 
 
 
-`generated:has_zarr`
+`generated__has_zarr`
 
 *   is optional
 
@@ -3160,9 +3187,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "aeopres_model#/$defs/Properties/properties/generated:has_zarr")
+*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "airs_model#/$defs/Properties/properties/generated__has_zarr")
 
-#### generated:has\_zarr Type
+#### generated\_\_has\_zarr Type
 
 merged type ([Whether the item has a zarr or not.](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md))
 
@@ -3172,11 +3199,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not-anyof-1.md "check type definition")
 
-### generated:date\_keywords
+### generated\_\_date\_keywords
 
 
 
-`generated:date_keywords`
+`generated__date_keywords`
 
 *   is optional
 
@@ -3184,9 +3211,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "aeopres_model#/$defs/Properties/properties/generated:date_keywords")
+*   defined in: [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "airs_model#/$defs/Properties/properties/generated__date_keywords")
 
-#### generated:date\_keywords Type
+#### generated\_\_date\_keywords Type
 
 merged type ([A list of keywords indicating clues on the date](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md))
 
@@ -3196,11 +3223,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date-anyof-1.md "check type definition")
 
-### generated:day\_of\_week
+### generated\_\_day\_of\_week
 
 
 
-`generated:day_of_week`
+`generated__day_of_week`
 
 *   is optional
 
@@ -3208,9 +3235,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-day-of-week.md "aeopres_model#/$defs/Properties/properties/generated:day_of_week")
+*   defined in: [Item](model-defs-properties-properties-day-of-week.md "airs_model#/$defs/Properties/properties/generated__day_of_week")
 
-#### generated:day\_of\_week Type
+#### generated\_\_day\_of\_week Type
 
 merged type ([Day of week.](model-defs-properties-properties-day-of-week.md))
 
@@ -3220,11 +3247,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-day-of-week-anyof-1.md "check type definition")
 
-### generated:day\_of\_year
+### generated\_\_day\_of\_year
 
 
 
-`generated:day_of_year`
+`generated__day_of_year`
 
 *   is optional
 
@@ -3232,9 +3259,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-day-of-year.md "aeopres_model#/$defs/Properties/properties/generated:day_of_year")
+*   defined in: [Item](model-defs-properties-properties-day-of-year.md "airs_model#/$defs/Properties/properties/generated__day_of_year")
 
-#### generated:day\_of\_year Type
+#### generated\_\_day\_of\_year Type
 
 merged type ([Day of year.](model-defs-properties-properties-day-of-year.md))
 
@@ -3244,11 +3271,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-day-of-year-anyof-1.md "check type definition")
 
-### generated:hour\_of\_day
+### generated\_\_hour\_of\_day
 
 
 
-`generated:hour_of_day`
+`generated__hour_of_day`
 
 *   is optional
 
@@ -3256,9 +3283,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-hour-of-day.md "aeopres_model#/$defs/Properties/properties/generated:hour_of_day")
+*   defined in: [Item](model-defs-properties-properties-hour-of-day.md "airs_model#/$defs/Properties/properties/generated__hour_of_day")
 
-#### generated:hour\_of\_day Type
+#### generated\_\_hour\_of\_day Type
 
 merged type ([Hour of day.](model-defs-properties-properties-hour-of-day.md))
 
@@ -3268,11 +3295,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-hour-of-day-anyof-1.md "check type definition")
 
-### generated:minute\_of\_day
+### generated\_\_minute\_of\_day
 
 
 
-`generated:minute_of_day`
+`generated__minute_of_day`
 
 *   is optional
 
@@ -3280,9 +3307,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-minute-of-day.md "aeopres_model#/$defs/Properties/properties/generated:minute_of_day")
+*   defined in: [Item](model-defs-properties-properties-minute-of-day.md "airs_model#/$defs/Properties/properties/generated__minute_of_day")
 
-#### generated:minute\_of\_day Type
+#### generated\_\_minute\_of\_day Type
 
 merged type ([Minute of day.](model-defs-properties-properties-minute-of-day.md))
 
@@ -3292,11 +3319,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-minute-of-day-anyof-1.md "check type definition")
 
-### generated:month
+### generated\_\_month
 
 
 
-`generated:month`
+`generated__month`
 
 *   is optional
 
@@ -3304,9 +3331,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-month.md "aeopres_model#/$defs/Properties/properties/generated:month")
+*   defined in: [Item](model-defs-properties-properties-month.md "airs_model#/$defs/Properties/properties/generated__month")
 
-#### generated:month Type
+#### generated\_\_month Type
 
 merged type ([Month](model-defs-properties-properties-month.md))
 
@@ -3316,11 +3343,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-month-anyof-1.md "check type definition")
 
-### generated:year
+### generated\_\_year
 
 
 
-`generated:year`
+`generated__year`
 
 *   is optional
 
@@ -3328,9 +3355,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-year.md "aeopres_model#/$defs/Properties/properties/generated:year")
+*   defined in: [Item](model-defs-properties-properties-year.md "airs_model#/$defs/Properties/properties/generated__year")
 
-#### generated:year Type
+#### generated\_\_year Type
 
 merged type ([Year](model-defs-properties-properties-year.md))
 
@@ -3340,11 +3367,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-year-anyof-1.md "check type definition")
 
-### generated:season
+### generated\_\_season
 
 
 
-`generated:season`
+`generated__season`
 
 *   is optional
 
@@ -3352,9 +3379,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-season.md "aeopres_model#/$defs/Properties/properties/generated:season")
+*   defined in: [Item](model-defs-properties-properties-season.md "airs_model#/$defs/Properties/properties/generated__season")
 
-#### generated:season Type
+#### generated\_\_season Type
 
 merged type ([Season](model-defs-properties-properties-season.md))
 
@@ -3364,11 +3391,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-season-anyof-1.md "check type definition")
 
-### generated:tltrbrbl
+### generated\_\_tltrbrbl
 
 
 
-`generated:tltrbrbl`
+`generated__tltrbrbl`
 
 *   is optional
 
@@ -3376,9 +3403,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "aeopres_model#/$defs/Properties/properties/generated:tltrbrbl")
+*   defined in: [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "airs_model#/$defs/Properties/properties/generated__tltrbrbl")
 
-#### generated:tltrbrbl Type
+#### generated\_\_tltrbrbl Type
 
 merged type ([The coordinates of the top left, top right, bottom right, bottom left corners of the item.](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md))
 
@@ -3388,11 +3415,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item-anyof-1.md "check type definition")
 
-### generated:band\_common\_names
+### generated\_\_band\_common\_names
 
 
 
-`generated:band_common_names`
+`generated__band_common_names`
 
 *   is optional
 
@@ -3400,9 +3427,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-the-band-common-names.md "aeopres_model#/$defs/Properties/properties/generated:band_common_names")
+*   defined in: [Item](model-defs-properties-properties-list-of-the-band-common-names.md "airs_model#/$defs/Properties/properties/generated__band_common_names")
 
-#### generated:band\_common\_names Type
+#### generated\_\_band\_common\_names Type
 
 merged type ([List of the band common names.](model-defs-properties-properties-list-of-the-band-common-names.md))
 
@@ -3412,11 +3439,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-list-of-the-band-common-names-anyof-1.md "check type definition")
 
-### generated:band\_names
+### generated\_\_band\_names
 
 
 
-`generated:band_names`
+`generated__band_names`
 
 *   is optional
 
@@ -3424,9 +3451,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-the-band-names.md "aeopres_model#/$defs/Properties/properties/generated:band_names")
+*   defined in: [Item](model-defs-properties-properties-list-of-the-band-names.md "airs_model#/$defs/Properties/properties/generated__band_names")
 
-#### generated:band\_names Type
+#### generated\_\_band\_names Type
 
 merged type ([List of the band names.](model-defs-properties-properties-list-of-the-band-names.md))
 
@@ -3436,11 +3463,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-list-of-the-band-names-anyof-1.md "check type definition")
 
-### generated:geohash2
+### generated\_\_geohash2
 
 
 
-`generated:geohash2`
+`generated__geohash2`
 
 *   is optional
 
@@ -3448,9 +3475,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash2")
+*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "airs_model#/$defs/Properties/properties/generated__geohash2")
 
-#### generated:geohash2 Type
+#### generated\_\_geohash2 Type
 
 merged type ([Geohash on the first two characters.](model-defs-properties-properties-geohash-on-the-first-two-characters.md))
 
@@ -3460,11 +3487,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-two-characters-anyof-1.md "check type definition")
 
-### generated:geohash3
+### generated\_\_geohash3
 
 
 
-`generated:geohash3`
+`generated__geohash3`
 
 *   is optional
 
@@ -3472,9 +3499,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash3")
+*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "airs_model#/$defs/Properties/properties/generated__geohash3")
 
-#### generated:geohash3 Type
+#### generated\_\_geohash3 Type
 
 merged type ([Geohash on the first three characters.](model-defs-properties-properties-geohash-on-the-first-three-characters.md))
 
@@ -3484,11 +3511,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-three-characters-anyof-1.md "check type definition")
 
-### generated:geohash4
+### generated\_\_geohash4
 
 
 
-`generated:geohash4`
+`generated__geohash4`
 
 *   is optional
 
@@ -3496,9 +3523,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash4")
+*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "airs_model#/$defs/Properties/properties/generated__geohash4")
 
-#### generated:geohash4 Type
+#### generated\_\_geohash4 Type
 
 merged type ([Geohash on the first four characters.](model-defs-properties-properties-geohash-on-the-first-four-characters.md))
 
@@ -3508,11 +3535,11 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-four-characters-anyof-1.md "check type definition")
 
-### generated:geohash5
+### generated\_\_geohash5
 
 
 
-`generated:geohash5`
+`generated__geohash5`
 
 *   is optional
 
@@ -3520,9 +3547,9 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "aeopres_model#/$defs/Properties/properties/generated:geohash5")
+*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "airs_model#/$defs/Properties/properties/generated__geohash5")
 
-#### generated:geohash5 Type
+#### generated\_\_geohash5 Type
 
 merged type ([Geohash on the first five characters.](model-defs-properties-properties-geohash-on-the-first-five-characters.md))
 
@@ -3541,14 +3568,14 @@ Additional properties are allowed and do not have to follow a specific schema
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/Raster"}
+{"$ref":"airs_model#/$defs/Raster"}
 ```
 
-| Property        | Type     | Required | Nullable       | Defined by                                                                                 |
-| :-------------- | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
-| [type](#type-1) | `object` | Required | cannot be null | [Item](model-defs-rastertype.md "aeopres_model#/$defs/Raster/properties/type")             |
-| [path](#path)   | `string` | Required | cannot be null | [Item](model-defs-raster-properties-path.md "aeopres_model#/$defs/Raster/properties/path") |
-| [id](#id-1)     | `string` | Required | cannot be null | [Item](model-defs-raster-properties-id.md "aeopres_model#/$defs/Raster/properties/id")     |
+| Property        | Type     | Required | Nullable       | Defined by                                                                              |
+| :-------------- | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------- |
+| [type](#type-1) | `object` | Required | cannot be null | [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")             |
+| [path](#path)   | `string` | Required | cannot be null | [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path") |
+| [id](#id-1)     | `string` | Required | cannot be null | [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")     |
 
 ### type
 
@@ -3562,7 +3589,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype.md "aeopres_model#/$defs/Raster/properties/type")
+*   defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
 
 #### type Type
 
@@ -3580,7 +3607,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-path.md "aeopres_model#/$defs/Raster/properties/path")
+*   defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
 
 #### path Type
 
@@ -3598,7 +3625,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-id.md "aeopres_model#/$defs/Raster/properties/id")
+*   defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
 
 #### id Type
 
@@ -3609,13 +3636,13 @@ Reference this group by using
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/RasterType"}
+{"$ref":"airs_model#/$defs/RasterType"}
 ```
 
-| Property          | Type     | Required | Nullable       | Defined by                                                                                             |
-| :---------------- | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------- |
-| [source](#source) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-source.md "aeopres_model#/$defs/RasterType/properties/source") |
-| [format](#format) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-format.md "aeopres_model#/$defs/RasterType/properties/format") |
+| Property          | Type     | Required | Nullable       | Defined by                                                                                          |
+| :---------------- | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------------------- |
+| [source](#source) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source") |
+| [format](#format) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format") |
 
 ### source
 
@@ -3629,7 +3656,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-source.md "aeopres_model#/$defs/RasterType/properties/source")
+*   defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
 
 #### source Type
 
@@ -3647,7 +3674,7 @@ Reference this group by using
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-format.md "aeopres_model#/$defs/RasterType/properties/format")
+*   defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
 
 #### format Type
 
@@ -3658,7 +3685,7 @@ Reference this group by using
 Reference this group by using
 
 ```json
-{"$ref":"aeopres_model#/$defs/VariableType"}
+{"$ref":"airs_model#/$defs/VariableType"}
 ```
 
 | Property | Type | Required | Nullable | Defined by |

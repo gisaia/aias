@@ -1,4 +1,4 @@
-from aeoprocesses.ingest.ingest_services import ProcServices, TaskState
+from aproc.ingest.ingest_services import ProcServices, TaskState
 from celery import states
 from time import sleep
 import unittest
@@ -7,7 +7,7 @@ from utils import setUpTest
 class Tests(unittest.TestCase):
 
     def setUp(self):
-        ProcServices.init("test/conf/aeoprocesses.yaml")
+        ProcServices.init("test/conf/aproc.yaml")
         setUpTest()
 
     def test_async_ingest_theia(self):

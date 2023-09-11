@@ -1,7 +1,7 @@
 # Indicates whether the temporal extend of the temporal slices (groups) are compact or not compared to the cube temporal extend. Computed as follow: 1-range(group rasters) / range(cube rasters). Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/time_compacity
+airs_model#/$defs/Indicators/properties/time_compacity
 ```
 
 

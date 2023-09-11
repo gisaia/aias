@@ -1,7 +1,7 @@
 # Untitled null in Item Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/center_wavelength/anyOf/1
+airs_model#/$defs/Band/properties/center_wavelength/anyOf/1
 ```
 
 

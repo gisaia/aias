@@ -1,7 +1,7 @@
 # Uniquely named dimensions of the datacube. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/cube:dimensions
+airs_model#/$defs/Properties/properties/cube__dimensions
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/cube:dimensions
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## cube:dimensions Type
+## cube\_\_dimensions Type
 
 merged type ([Uniquely named dimensions of the datacube.](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md))
 

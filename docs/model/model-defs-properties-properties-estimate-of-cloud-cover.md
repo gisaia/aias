@@ -1,7 +1,7 @@
 # Estimate of cloud cover. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/eo:cloud_cover
+airs_model#/$defs/Properties/properties/eo__cloud_cover
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/eo:cloud_cover
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## eo:cloud\_cover Type
+## eo\_\_cloud\_cover Type
 
 merged type ([Estimate of cloud cover.](model-defs-properties-properties-estimate-of-cloud-cover.md))
 

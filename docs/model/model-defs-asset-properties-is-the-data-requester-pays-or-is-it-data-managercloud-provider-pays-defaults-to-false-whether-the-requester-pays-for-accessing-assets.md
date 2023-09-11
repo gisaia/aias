@@ -1,7 +1,7 @@
 # Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/storage:requester_pays
+airs_model#/$defs/Asset/properties/storage__requester_pays
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/storage:requester_pays
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## storage:requester\_pays Type
+## storage\_\_requester\_pays Type
 
 merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
 

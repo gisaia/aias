@@ -1,7 +1,7 @@
 # Geohash on the first three characters. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:geohash3
+airs_model#/$defs/Properties/properties/generated__geohash3
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:geohash3
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:geohash3 Type
+## generated\_\_geohash3 Type
 
 merged type ([Geohash on the first three characters.](model-defs-properties-properties-geohash-on-the-first-three-characters.md))
 

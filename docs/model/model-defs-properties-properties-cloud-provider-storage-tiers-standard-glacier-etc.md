@@ -1,7 +1,7 @@
 # Cloud Provider Storage Tiers (Standard, Glacier, etc.) Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/storage:tier
+airs_model#/$defs/Properties/properties/storage__tier
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/storage:tier
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## storage:tier Type
+## storage\_\_tier Type
 
 merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
 

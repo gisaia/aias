@@ -1,7 +1,7 @@
 # Untitled string in Item Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:polarizations/anyOf/0
+airs_model#/$defs/Asset/properties/sar__polarizations/anyOf/0
 ```
 
 

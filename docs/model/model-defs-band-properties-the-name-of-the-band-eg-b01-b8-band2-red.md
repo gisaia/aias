@@ -1,7 +1,7 @@
 # The name of the band (e.g., B01, B8, band2, red). Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/name
+airs_model#/$defs/Band/properties/name
 ```
 
 

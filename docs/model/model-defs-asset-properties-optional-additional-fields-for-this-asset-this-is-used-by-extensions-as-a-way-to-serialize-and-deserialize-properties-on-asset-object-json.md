@@ -1,7 +1,7 @@
 # Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/extra_fields
+airs_model#/$defs/Asset/properties/extra_fields
 ```
 
 

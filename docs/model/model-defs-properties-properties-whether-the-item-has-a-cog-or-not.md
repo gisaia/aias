@@ -1,7 +1,7 @@
 # Whether the item has a cog or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_cog
+airs_model#/$defs/Properties/properties/generated__has_cog
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_cog
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_cog Type
+## generated\_\_has\_cog Type
 
 merged type ([Whether the item has a cog or not.](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md))
 

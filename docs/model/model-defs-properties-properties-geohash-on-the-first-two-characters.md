@@ -1,7 +1,7 @@
 # Geohash on the first two characters. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:geohash2
+airs_model#/$defs/Properties/properties/generated__geohash2
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:geohash2
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:geohash2 Type
+## generated\_\_geohash2 Type
 
 merged type ([Geohash on the first two characters.](model-defs-properties-properties-geohash-on-the-first-two-characters.md))
 

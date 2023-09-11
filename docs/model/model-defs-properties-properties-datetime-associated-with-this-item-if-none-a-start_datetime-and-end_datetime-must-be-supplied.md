@@ -1,7 +1,7 @@
 # datetime associated with this item. If None, a start\_datetime and end\_datetime must be supplied. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/datetime
+airs_model#/$defs/Properties/properties/datetime
 ```
 
 

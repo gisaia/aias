@@ -1,7 +1,7 @@
 # Untitled array in Item Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/eo:bands/anyOf/0
+airs_model#/$defs/Asset/properties/eo__bands/anyOf/0
 ```
 
 

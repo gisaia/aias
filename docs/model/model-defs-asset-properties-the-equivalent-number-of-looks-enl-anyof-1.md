@@ -1,7 +1,7 @@
 # Untitled null in Item Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:looks_equivalent_number/anyOf/1
+airs_model#/$defs/Asset/properties/sar__looks_equivalent_number/anyOf/1
 ```
 
 

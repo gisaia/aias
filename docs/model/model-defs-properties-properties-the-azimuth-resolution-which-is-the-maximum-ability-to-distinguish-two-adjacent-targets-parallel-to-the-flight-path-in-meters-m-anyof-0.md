@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:resolution_azimuth/anyOf/0
+airs_model#/$defs/Properties/properties/sar__resolution_azimuth/anyOf/0
 ```
 
 

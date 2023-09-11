@@ -1,7 +1,7 @@
 # Provider identifier. Must be unique within the STAC. Schema
 
 ```txt
-aeopres_model#/properties/id
+airs_model#/properties/id
 ```
 
 

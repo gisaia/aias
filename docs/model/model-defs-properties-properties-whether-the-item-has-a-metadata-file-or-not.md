@@ -1,7 +1,7 @@
 # Whether the item has a metadata file or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_metadata
+airs_model#/$defs/Properties/properties/generated__has_metadata
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_metadata
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_metadata Type
+## generated\_\_has\_metadata Type
 
 merged type ([Whether the item has a metadata file or not.](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md))
 

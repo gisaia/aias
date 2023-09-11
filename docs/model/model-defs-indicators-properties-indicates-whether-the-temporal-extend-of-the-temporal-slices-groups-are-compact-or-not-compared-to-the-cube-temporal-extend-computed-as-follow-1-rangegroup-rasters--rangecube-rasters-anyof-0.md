@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/time_compacity/anyOf/0
+airs_model#/$defs/Indicators/properties/time_compacity/anyOf/0
 ```
 
 

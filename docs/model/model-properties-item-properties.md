@@ -1,7 +1,7 @@
 # Item properties Schema
 
 ```txt
-aeopres_model#/properties/properties
+airs_model#/properties/properties
 ```
 
 

@@ -1,7 +1,7 @@
 # The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/processing:facility
+airs_model#/$defs/Properties/properties/processing__facility
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/processing:facility
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## processing:facility Type
+## processing\_\_facility Type
 
 merged type ([The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites.](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md))
 

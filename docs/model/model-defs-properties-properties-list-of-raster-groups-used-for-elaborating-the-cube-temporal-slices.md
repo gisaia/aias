@@ -1,7 +1,7 @@
 # List of raster groups used for elaborating the cube temporal slices. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:composition
+airs_model#/$defs/Properties/properties/dc3__composition
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/dc3:composition
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## dc3:composition Type
+## dc3\_\_composition Type
 
 merged type ([List of raster groups used for elaborating the cube temporal slices.](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md))
 

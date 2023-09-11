@@ -1,7 +1,7 @@
 # VariableType Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/cube:variables/anyOf/0/additionalProperties
+airs_model#/$defs/Properties/properties/cube__variables/anyOf/0/additionalProperties
 ```
 
 

@@ -1,7 +1,7 @@
 # Any combination of polarizations. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:polarizations
+airs_model#/$defs/Properties/properties/sar__polarizations
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:polarizations
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:polarizations Type
+## sar\_\_polarizations Type
 
 merged type ([Any combination of polarizations.](model-defs-properties-properties-any-combination-of-polarizations.md))
 

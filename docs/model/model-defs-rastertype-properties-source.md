@@ -1,7 +1,7 @@
 # Source Schema
 
 ```txt
-aeopres_model#/$defs/RasterType/properties/source
+airs_model#/$defs/RasterType/properties/source
 ```
 
 

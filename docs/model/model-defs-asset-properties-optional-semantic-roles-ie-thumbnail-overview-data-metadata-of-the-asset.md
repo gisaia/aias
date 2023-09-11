@@ -1,7 +1,7 @@
 # Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/roles
+airs_model#/$defs/Asset/properties/roles
 ```
 
 

@@ -1,7 +1,7 @@
 # Untitled null in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/storage:region/anyOf/1
+airs_model#/$defs/Properties/properties/storage__region/anyOf/1
 ```
 
 

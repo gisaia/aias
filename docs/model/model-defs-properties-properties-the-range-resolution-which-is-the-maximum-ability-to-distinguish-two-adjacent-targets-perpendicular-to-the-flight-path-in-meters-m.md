@@ -1,7 +1,7 @@
 # The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:resolution_range
+airs_model#/$defs/Properties/properties/sar__resolution_range
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:resolution_range
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:resolution\_range Type
+## sar\_\_resolution\_range Type
 
 merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
 

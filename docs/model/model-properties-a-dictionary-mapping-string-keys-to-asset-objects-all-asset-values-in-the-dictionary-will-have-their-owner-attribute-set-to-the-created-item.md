@@ -1,7 +1,7 @@
 # A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item. Schema
 
 ```txt
-aeopres_model#/properties/assets
+airs_model#/properties/assets
 ```
 
 

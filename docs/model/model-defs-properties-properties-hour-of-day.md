@@ -1,7 +1,7 @@
 # Hour of day. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:hour_of_day
+airs_model#/$defs/Properties/properties/generated__hour_of_day
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:hour_of_day
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:hour\_of\_day Type
+## generated\_\_hour\_of\_day Type
 
 merged type ([Hour of day.](model-defs-properties-properties-hour-of-day.md))
 

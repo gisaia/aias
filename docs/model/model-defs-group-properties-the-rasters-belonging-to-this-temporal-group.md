@@ -1,7 +1,7 @@
 # The rasters belonging to this temporal group. Schema
 
 ```txt
-aeopres_model#/$defs/Group/properties/rasters
+airs_model#/$defs/Group/properties/rasters
 ```
 
 

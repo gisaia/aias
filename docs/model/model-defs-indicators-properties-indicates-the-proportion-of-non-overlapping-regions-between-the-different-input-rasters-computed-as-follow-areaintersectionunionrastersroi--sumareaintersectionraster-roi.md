@@ -1,7 +1,7 @@
 # Indicates the proportion of non overlapping regions between the different input rasters. Computed as follow: area(intersection(union(rasters),roi)) / sum(area(intersection(raster, roi))) Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/group_lightness
+airs_model#/$defs/Indicators/properties/group_lightness
 ```
 
 

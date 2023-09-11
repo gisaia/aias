@@ -1,7 +1,7 @@
 # The timestamp of this temporal group. Schema
 
 ```txt
-aeopres_model#/$defs/Group/properties/timestamp
+airs_model#/$defs/Group/properties/timestamp
 ```
 
 

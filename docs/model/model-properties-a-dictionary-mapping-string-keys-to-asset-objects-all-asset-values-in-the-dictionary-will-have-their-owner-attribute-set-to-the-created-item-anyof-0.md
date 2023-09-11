@@ -1,7 +1,7 @@
 # Untitled object in Item Schema
 
 ```txt
-aeopres_model#/properties/assets/anyOf/0
+airs_model#/properties/assets/anyOf/0
 ```
 
 
@@ -16,9 +16,9 @@ aeopres_model#/properties/assets/anyOf/0
 
 # 0 Properties
 
-| Property              | Type     | Required | Nullable       | Defined by                                                                                  |
-| :-------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------ |
-| Additional Properties | `object` | Optional | cannot be null | [Item](model-defs-asset.md "aeopres_model#/properties/assets/anyOf/0/additionalProperties") |
+| Property              | Type     | Required | Nullable       | Defined by                                                                               |
+| :-------------------- | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------- |
+| Additional Properties | `object` | Optional | cannot be null | [Item](model-defs-asset.md "airs_model#/properties/assets/anyOf/0/additionalProperties") |
 
 ## Additional Properties
 
@@ -32,7 +32,7 @@ Additional properties are allowed, as long as they follow this schema:
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-asset.md "aeopres_model#/properties/assets/anyOf/0/additionalProperties")
+*   defined in: [Item](model-defs-asset.md "airs_model#/properties/assets/anyOf/0/additionalProperties")
 
 ### additionalProperties Type
 

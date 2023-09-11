@@ -1,7 +1,7 @@
 # Whether the item has a data file or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_data
+airs_model#/$defs/Properties/properties/generated__has_data
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_data
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_data Type
+## generated\_\_has\_data Type
 
 merged type ([Whether the item has a data file or not.](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md))
 

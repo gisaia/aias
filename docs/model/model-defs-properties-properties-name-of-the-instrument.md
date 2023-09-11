@@ -1,7 +1,7 @@
 # Name of the instrument Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/instrument
+airs_model#/$defs/Properties/properties/instrument
 ```
 
 

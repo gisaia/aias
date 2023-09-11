@@ -1,7 +1,7 @@
 # Type of sensor Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sensor_type
+airs_model#/$defs/Properties/properties/sensor_type
 ```
 
 

@@ -1,7 +1,7 @@
 # The affine transformation coefficients for the default grid. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/proj:transform
+airs_model#/$defs/Asset/properties/proj__transform
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/proj:transform
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:transform Type
+## proj\_\_transform Type
 
 merged type ([The affine transformation coefficients for the default grid.](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
 

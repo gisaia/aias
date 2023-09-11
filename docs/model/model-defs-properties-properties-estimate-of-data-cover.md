@@ -1,7 +1,7 @@
 # Estimate of data cover Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/data_coverage
+airs_model#/$defs/Properties/properties/data_coverage
 ```
 
 

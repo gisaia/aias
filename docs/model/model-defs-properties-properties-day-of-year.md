@@ -1,7 +1,7 @@
 # Day of year. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:day_of_year
+airs_model#/$defs/Properties/properties/generated__day_of_year
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:day_of_year
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:day\_of\_year Type
+## generated\_\_day\_of\_year Type
 
 merged type ([Day of year.](model-defs-properties-properties-day-of-year.md))
 

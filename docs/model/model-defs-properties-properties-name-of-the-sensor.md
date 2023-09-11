@@ -1,7 +1,7 @@
 # Name of the sensor Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sensor
+airs_model#/$defs/Properties/properties/sensor
 ```
 
 

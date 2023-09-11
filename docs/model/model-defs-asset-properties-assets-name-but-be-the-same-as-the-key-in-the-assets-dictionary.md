@@ -1,7 +1,7 @@
 # Asset's name. But be the same as the key in the \`assets\` dictionary. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/name
+airs_model#/$defs/Asset/properties/name
 ```
 
 

@@ -16,7 +16,7 @@
         }
     },
     "loggers": {
-        "aeoprs-logger": {
+        "airs-logger": {
             "handlers": ["default"],
             "level": "DEBUG"
         }

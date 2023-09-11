@@ -1,7 +1,7 @@
 # An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/processing:expression
+airs_model#/$defs/Properties/properties/processing__expression
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/processing:expression
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## processing:expression Type
+## processing\_\_expression Type
 
 merged type ([An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below).](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md))
 

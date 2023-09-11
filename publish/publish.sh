@@ -1,10 +1,10 @@
 if  [ -z "$PIP_LOGIN"  ] ; then echo "Please set PIP_LOGIN environment variable"; exit -1; fi
 if  [ -z "$PIP_PASSWORD"  ] ; then echo "Please set PIP_PASSWORD environment variable"; exit -1; fi
 rm -r target
-mkdir -p target/src/aeoprs/core/models
-cp aeoprs/core/models/* target/src/aeoprs/core/models
-cp publish/materials/* target/
-sed -i.bak 's/aeoprsmodel_version/\"'$1'\"/' target/setup.py
+mkdir -p target/src/airs/core/models
+cp -r airs/core/models/* target/src/airs/core/models
+cp -r  publish/materials/* target/
+sed -i.bak 's/airsmodel_version/\"'$1'\"/' target/setup.py
 
 cat target/README_head.md > target/README.md
 cat docs/model/model.md >> target/README.md

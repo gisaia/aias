@@ -1,14 +1,14 @@
-# ARLAS EO Product Registration Services
+# ARLAS Item Registration Services
 
-ARLAS EO Product Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
+ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
 
-AEO Processes aim at offering asynchronous services, among them ingestion services.
+ARLAS Processes (aproc) aim at offering asynchronous services, among them ingestion services.
 
-AEOPRS can run without AEO Processes, while the later relies on the first.
+AIRS can run without ARLAS Processes, while the later relies on the first.
 
-## AEOPRS Data model
+## AIRS Data model
 
-The AEOPRS Model is based on the STAC specifications. It supports the folling extensions:
+The AIRS Model is based on the STAC specifications. It supports the folling extensions:
 - view
 - storage
 - eo
@@ -24,7 +24,7 @@ Namespaces are prefixes in the key names of the JSON. The `:` is used for sepera
 
 For more details, see the [model documentation](docs/model/model.md)
 
-## ARLAS EO Product Registration Services
+## ARLAS Item Registration Services
 
 The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
 
@@ -51,11 +51,11 @@ Asset methods:
 | `HEAD /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
 | `DELETE /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
 
-By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.aeo:managed=False` (or `asset.aeo__managed=False`)
+By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`)
 
-### Running AEOPRS
+### Running AIRS
 
-AEOPRS requires
+AIRS requires
 - python 3.10
 - an elasticsearch
 - an object store (S3, GS or minio)
@@ -63,17 +63,17 @@ AEOPRS requires
 
 #### With your own elasticsearch and minio
 
-To configure AEOPRS, edit `conf/aeoprs.yaml`. An example is provided in `test/conf/aeoprs.yaml`. Then start the service:
+To configure AIRS, edit `conf/airs.yaml`. An example is provided in `test/conf/airs.yaml`. Then start the service:
 
 ```shell
 export PYTHONPATH=`pwd`
-python3 aeoprs.py conf/aeoprs.yaml &
+python3 airs.py conf/airs.yaml &
 ```
 
-For more details about the command line, run `python3 aeoprs.py --help` :
+For more details about the command line, run `python3 airs.py --help` :
 
 ```shell                
-Usage: aeoprs.py CONFIGURATION_FILE [HOST] [PORT]
+Usage: airs.py CONFIGURATION_FILE [HOST] [PORT]
 
   Start the ARLAS Earth Observation Product Registration Service.
 
@@ -92,28 +92,28 @@ Once the service is up & running, you can browse the service documentation at [h
 Instead of launching the service with python, you can launch it with docker:
 
 ```shell                
-docker run -d --name aeoprs -p 8000:8000 -e XXX:VVV ... -e XXX:VVV gisaia/aeoprs:latest
+docker run -d --name airs -p 8000:8000 -e XXX:VVV ... -e XXX:VVV gisaia/airs:latest
 ```
 
 with `XXX:VVV` the environment variable that you want to specify. The table below lists the variable that you can set:
 
 | Variable                                               |
 | ------------------------------------------------------ |
-| ARLASEO_ARLAS_COLLECTION_NAME                          |
-| ARLASEO_ARLAS_URL                                      |
-| ARLASEO_INDEX_ENDPOINT_URL                             |
-| ARLASEO_INDEX_COLLECTION_PREFIX                        |
-| ARLASEO_INDEX_LOGIN                                    |
-| ARLASEO_S3_BUCKET                                      |
-| ARLASEO_S3_ACCESS_KEY_ID                               |
-| ARLASEO_S3_SECRET_ACCESS_KEY                           |
-| ARLASEO_S3_REGION                                      |
-| ARLASEO_S3_TIER                                        |
-| ARLASEO_S3_PLATFORM                                    |
-| ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL                     |
-| ARLASEO_S3_ENDPOINT_URL                                |
-| ARLASEO_MAPPING_URL                                    |
-| ARLASEO_COLLECTION_URL                                 |
+| AIRS_ARLAS_COLLECTION_NAME                          |
+| AIRS_ARLAS_URL                                      |
+| AIRS_INDEX_ENDPOINT_URL                             |
+| AIRS_INDEX_COLLECTION_PREFIX                        |
+| AIRS_INDEX_LOGIN                                    |
+| AIRS_S3_BUCKET                                      |
+| AIRS_S3_ACCESS_KEY_ID                               |
+| AIRS_S3_SECRET_ACCESS_KEY                           |
+| AIRS_S3_REGION                                      |
+| AIRS_S3_TIER                                        |
+| AIRS_S3_PLATFORM                                    |
+| AIRS_S3_ASSET_HTTP_ENDPOINT_URL                     |
+| AIRS_S3_ENDPOINT_URL                                |
+| AIRS_MAPPING_URL                                    |
+| AIRS_COLLECTION_URL                                 |
 
 
 #### Stack for tests
@@ -123,7 +123,7 @@ If you do not have elasticsearch and minio running, you can start a test stack:
 ./test/start_stack.sh 
 ```
 
-### Using AEOPRS
+### Using AIRS
 
 In the following examples, we will:
 - add an asset
@@ -218,11 +218,11 @@ curl -X DELETE \
 ```
 
 
-## AEO Processes
+## ARLAS Processes (aproc)
 
-### How AEO Processes work
+### How ARLAS Processes work
 
-AEO Processes exposes an OGC API Processes compliant API (to be implemented).
+ARLAS Processes (aproc) exposes an OGC API Processes compliant API (to be implemented).
 
 List of processes:
 - `ingest` : it ingest an archive.
@@ -235,16 +235,16 @@ The `ingest` process takes a url pointing at an archive. The process runs the fo
 - fetch the assets (e.g. copy/download)  (done by the driver)
 - transform the assets if necessary (e.g. create cog)  (done by the driver)
 - upload the assets
-- register the item in AEOPRS
+- register the item in AIRS
 
-As mentioned, the process is "driver" based. Each data source must have a compliant driver in order to be ingested in AEOPRS. A driver has to
+As mentioned, the process is "driver" based. Each data source must have a compliant driver in order to be ingested in AIRS. A driver has to
 - say whether it supports a given archive or not
 - identify the archive's assets to be fetched
 - fetch the assets
 - transform the assets
-- create an AEOPRS Item
+- create an AIRS Item
 
-A [driver](aeoprocesses/ingest/drivers/driver.py) must implement the following methods:
+A [driver](aproc/ingest/drivers/driver.py) must implement the following methods:
 
 ```python
     @staticmethod
@@ -263,13 +263,13 @@ A [driver](aeoprocesses/ingest/drivers/driver.py) must implement the following m
 ```
 
 The following drivers are available in the `extensions` directory:
-- [theia](extensions/aeoprocesses/ingest/drivers/impl/theia.py)
+- [theia](extensions/aproc/ingest/drivers/impl/theia.py)
 
-### Running AEO Processing
+### Running ARLAS Processes (aproc)
 
-AEO Processes requires
+ARLAS Processes requires
 - python 3.10
-- AEOPRS
+- AIRS
 - celery backend (redis)
 - celery brocker (rabbitmq)
 - docker and docker compose for running the tests
@@ -278,19 +278,19 @@ The following environment variables must be set to run the celery workers and th
 
 | Variable                                               |
 | ------------------------------------------------------ |
-| AEOPROCESSES_CONFIGURATION_FILE                        |
+| APROC_CONFIGURATION_FILE                        |
 
 
 For starting the service or a celery worker, you need to set two environment variables:
 
 ```sh
 export PYTHONPATH=pwd:pwd/extensions:pwd/test
-export AEOPROCESSES_CONFIGURATION_FILE=pwd/test/conf/aeoprocesses.yaml
+export APROC_CONFIGURATION_FILE=pwd/test/conf/aproc.yaml
 ```
 
 For starting the celery worker:
 ```sh
-celery -A aeoprocesses.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
+celery -A aproc.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
 ```
 
 TODO : implement and document the OGC Processes api
@@ -300,9 +300,9 @@ TODO : implement and document the OGC Processes api
 Ingestion can be launched synchronously with the ingest command line:
 
 ```shell
-python3 aeoprocesses/ingest/cli.py test/conf/aeoprocesses.yaml "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&size=1" 
+python3 aproc/ingest/cli.py test/conf/aproc.yaml "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&size=1" 
 ```
-Note: AEOPRS must be running.
+Note: AIRS must be running.
 
 ## Tests
 

@@ -1,7 +1,7 @@
 # Geohash on the first five characters. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:geohash5
+airs_model#/$defs/Properties/properties/generated__geohash5
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:geohash5
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:geohash5 Type
+## generated\_\_geohash5 Type
 
 merged type ([Geohash on the first five characters.](model-defs-properties-properties-geohash-on-the-first-five-characters.md))
 

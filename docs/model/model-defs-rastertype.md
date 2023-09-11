@@ -1,7 +1,7 @@
 # RasterType Schema
 
 ```txt
-aeopres_model#/$defs/RasterType
+airs_model#/$defs/RasterType
 ```
 
 
@@ -16,10 +16,10 @@ aeopres_model#/$defs/RasterType
 
 # RasterType Properties
 
-| Property          | Type     | Required | Nullable       | Defined by                                                                                             |
-| :---------------- | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------- |
-| [source](#source) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-source.md "aeopres_model#/$defs/RasterType/properties/source") |
-| [format](#format) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-format.md "aeopres_model#/$defs/RasterType/properties/format") |
+| Property          | Type     | Required | Nullable       | Defined by                                                                                          |
+| :---------------- | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------------------- |
+| [source](#source) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source") |
+| [format](#format) | `string` | Required | cannot be null | [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format") |
 
 ## source
 
@@ -33,7 +33,7 @@ aeopres_model#/$defs/RasterType
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-source.md "aeopres_model#/$defs/RasterType/properties/source")
+*   defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
 
 ### source Type
 
@@ -51,7 +51,7 @@ aeopres_model#/$defs/RasterType
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-format.md "aeopres_model#/$defs/RasterType/properties/format")
+*   defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
 
 ### format Type
 

@@ -1,7 +1,7 @@
 # Number of chunks (if zarr or similar partitioned format) within the cube. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:number_of_chunks
+airs_model#/$defs/Properties/properties/dc3__number_of_chunks
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/dc3:number_of_chunks
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## dc3:number\_of\_chunks Type
+## dc3\_\_number\_of\_chunks Type
 
 merged type ([Number of chunks (if zarr or similar partitioned format) within the cube.](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md))
 

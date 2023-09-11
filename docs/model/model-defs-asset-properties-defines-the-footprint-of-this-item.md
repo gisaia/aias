@@ -1,7 +1,7 @@
 # Defines the footprint of this Item. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/proj:geometry
+airs_model#/$defs/Asset/properties/proj__geometry
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/proj:geometry
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:geometry Type
+## proj\_\_geometry Type
 
 merged type ([Defines the footprint of this Item.](model-defs-asset-properties-defines-the-footprint-of-this-item.md))
 

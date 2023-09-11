@@ -1,7 +1,7 @@
 # Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/processing:lineage
+airs_model#/$defs/Properties/properties/processing__lineage
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/processing:lineage
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## processing:lineage Type
+## processing\_\_lineage Type
 
 merged type ([Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO.](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md))
 

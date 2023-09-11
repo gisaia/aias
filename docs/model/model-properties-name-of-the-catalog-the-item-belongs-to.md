@@ -1,7 +1,7 @@
 # Name of the catalog the item belongs to. Schema
 
 ```txt
-aeopres_model#/properties/catalog
+airs_model#/properties/catalog
 ```
 
 

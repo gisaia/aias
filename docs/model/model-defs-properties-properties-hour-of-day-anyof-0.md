@@ -1,7 +1,7 @@
 # Untitled integer in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:hour_of_day/anyOf/0
+airs_model#/$defs/Properties/properties/generated__hour_of_day/anyOf/0
 ```
 
 

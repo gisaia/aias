@@ -1,7 +1,7 @@
 # Antenna pointing direction relative to the flight trajectory of the satellite, either left or right. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:observation_direction
+airs_model#/$defs/Properties/properties/sar__observation_direction
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:observation_direction
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:observation\_direction Type
+## sar\_\_observation\_direction Type
 
 merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
 

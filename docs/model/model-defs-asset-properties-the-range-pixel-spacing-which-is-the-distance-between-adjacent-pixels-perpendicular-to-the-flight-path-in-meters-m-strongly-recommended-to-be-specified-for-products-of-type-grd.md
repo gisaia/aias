@@ -1,7 +1,7 @@
 # The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_range
+airs_model#/$defs/Asset/properties/sar__pixel_spacing_range
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/sar:pixel_spacing_range
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:pixel\_spacing\_range Type
+## sar\_\_pixel\_spacing\_range Type
 
 merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 

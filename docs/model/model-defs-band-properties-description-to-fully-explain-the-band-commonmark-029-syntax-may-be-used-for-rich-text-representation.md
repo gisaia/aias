@@ -1,7 +1,7 @@
 # Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation. Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/description
+airs_model#/$defs/Band/properties/description
 ```
 
 

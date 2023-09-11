@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE=aeoprs
+IMAGE=airs
 [ -z "$1" ] && echo "Please provide the version" && exit 1;
 VERSION=$1
 echo "Build and releas the image with version ${VERSION}"
@@ -12,12 +12,13 @@ docker login
 docker push gisaia/${IMAGE}:latest
 docker push gisaia/${IMAGE}:${VERSION}
 
-python3 aeoprs/core/models/utils.py > docs/model/model.schema.json
+export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
+python3 airs/core/models/utils.py > docs/model/model.schema.json
 jsonschema2md -d docs/model/ -o docs/model/
 ./publish/publish.sh $VERSION
 
 git add docs/
 git commit -m "update docs for version "$VERSION
 git push origin
-git tag -a ${VERSION} -m "ARLAS Earth Observation Product Registration Services ${VERSION}"
+git tag -a ${VERSION} -m "ARLAS Item Registration Services Model ${VERSION}"
 git push origin ${VERSION}

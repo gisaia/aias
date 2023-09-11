@@ -1,7 +1,7 @@
 # Untitled string in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:band_common_names/anyOf/0/items
+airs_model#/$defs/Properties/properties/generated__band_common_names/anyOf/0/items
 ```
 
 

@@ -1,7 +1,7 @@
 # Indicators Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:quality_indicators/anyOf/0
+airs_model#/$defs/Properties/properties/dc3__quality_indicators/anyOf/0
 ```
 
 
@@ -16,12 +16,12 @@ aeopres_model#/$defs/Properties/properties/dc3:quality_indicators/anyOf/0
 
 # 0 Properties
 
-| Property                               | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                     |
-| :------------------------------------- | :----- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [time\_compacity](#time_compacity)     | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "aeopres_model#/$defs/Indicators/properties/time_compacity") |
-| [spatial\_coverage](#spatial_coverage) | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "aeopres_model#/$defs/Indicators/properties/spatial_coverage")                                  |
-| [group\_lightness](#group_lightness)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "aeopres_model#/$defs/Indicators/properties/group_lightness")             |
-| [time\_regularity](#time_regularity)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "aeopres_model#/$defs/Indicators/properties/time_regularity")                              |
+| Property                               | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                                  |
+| :------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [time\_compacity](#time_compacity)     | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity") |
+| [spatial\_coverage](#spatial_coverage) | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")                                  |
+| [group\_lightness](#group_lightness)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")             |
+| [time\_regularity](#time_regularity)   | Merged | Optional | cannot be null | [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")                              |
 
 ## time\_compacity
 
@@ -35,7 +35,7 @@ aeopres_model#/$defs/Properties/properties/dc3:quality_indicators/anyOf/0
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "aeopres_model#/$defs/Indicators/properties/time_compacity")
+*   defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity")
 
 ### time\_compacity Type
 
@@ -59,7 +59,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "aeopres_model#/$defs/Indicators/properties/spatial_coverage")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")
 
 ### spatial\_coverage Type
 
@@ -83,7 +83,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "aeopres_model#/$defs/Indicators/properties/group_lightness")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")
 
 ### group\_lightness Type
 
@@ -107,7 +107,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "aeopres_model#/$defs/Indicators/properties/time_regularity")
+*   defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")
 
 ### time\_regularity Type
 

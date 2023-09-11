@@ -1,7 +1,7 @@
 # Format Schema
 
 ```txt
-aeopres_model#/$defs/RasterType/properties/format
+airs_model#/$defs/RasterType/properties/format
 ```
 
 

@@ -1,2 +1,2 @@
--r aeoprocesses/requirements.txt
--r aeoprs/requirements.txt
+-r aproc/requirements.txt
+-r airs/requirements.txt
