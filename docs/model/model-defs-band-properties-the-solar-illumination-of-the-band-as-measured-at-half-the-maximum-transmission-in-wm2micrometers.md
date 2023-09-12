@@ -1,7 +1,7 @@
 # The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers. Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/solar_illumination
+airs_model#/$defs/Band/properties/solar_illumination
 ```
 
 

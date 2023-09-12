@@ -1,7 +1,7 @@
 # Band Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/eo:bands/anyOf/0/items
+airs_model#/$defs/Properties/properties/eo__bands/anyOf/0/items
 ```
 
 
@@ -16,15 +16,16 @@ aeopres_model#/$defs/Properties/properties/eo:bands/anyOf/0/items
 
 # items Properties
 
-| Property                                       | Type     | Required | Nullable       | Defined by                                                                                                                                                                                                                          |
-| :--------------------------------------------- | :------- | :------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [name](#name)                                  | `string` | Required | cannot be null | [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "aeopres_model#/$defs/Band/properties/name")                                                                                                          |
-| [common\_name](#common_name)                   | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "aeopres_model#/$defs/Band/properties/common_name") |
-| [description](#description)                    | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Band/properties/description")                                       |
-| [center\_wavelength](#center_wavelength)       | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/center_wavelength")                                                                                  |
-| [full\_width\_half\_max](#full_width_half_max) | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/full_width_half_max")               |
-| [solar\_illumination](#solar_illumination)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "aeopres_model#/$defs/Band/properties/solar_illumination")                                   |
-| [quality\_indicators](#quality_indicators)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "aeopres_model#/$defs/Band/properties/quality_indicators")                                                          |
+| Property                                       | Type     | Required | Nullable       | Defined by                                                                                                                                                                                                                       |
+| :--------------------------------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [name](#name)                                  | `string` | Required | cannot be null | [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")                                                                                                          |
+| [common\_name](#common_name)                   | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name") |
+| [description](#description)                    | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")                                       |
+| [center\_wavelength](#center_wavelength)       | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")                                                                                  |
+| [full\_width\_half\_max](#full_width_half_max) | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")               |
+| [solar\_illumination](#solar_illumination)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")                                   |
+| [quality\_indicators](#quality_indicators)     | Merged   | Optional | cannot be null | [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")                                                          |
+| Additional Properties                          | Any      | Optional | can be null    |                                                                                                                                                                                                                                  |
 
 ## name
 
@@ -38,7 +39,7 @@ aeopres_model#/$defs/Properties/properties/eo:bands/anyOf/0/items
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "aeopres_model#/$defs/Band/properties/name")
+*   defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")
 
 ### name Type
 
@@ -60,7 +61,7 @@ aeopres_model#/$defs/Properties/properties/eo:bands/anyOf/0/items
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "aeopres_model#/$defs/Band/properties/common_name")
+*   defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name")
 
 ### common\_name Type
 
@@ -84,7 +85,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "aeopres_model#/$defs/Band/properties/description")
+*   defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")
 
 ### description Type
 
@@ -108,7 +109,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/center_wavelength")
+*   defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")
 
 ### center\_wavelength Type
 
@@ -132,7 +133,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "aeopres_model#/$defs/Band/properties/full_width_half_max")
+*   defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")
 
 ### full\_width\_half\_max Type
 
@@ -156,7 +157,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "aeopres_model#/$defs/Band/properties/solar_illumination")
+*   defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")
 
 ### solar\_illumination Type
 
@@ -180,7 +181,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "aeopres_model#/$defs/Band/properties/quality_indicators")
+*   defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")
 
 ### quality\_indicators Type
 
@@ -191,3 +192,7 @@ any of
 *   [Indicators](model-defs-indicators.md "check type definition")
 
 *   [Untitled null in Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band-anyof-1.md "check type definition")
+
+## Additional Properties
+
+Additional properties are allowed and do not have to follow a specific schema

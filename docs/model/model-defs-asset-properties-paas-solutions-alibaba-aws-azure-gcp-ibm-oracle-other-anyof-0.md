@@ -1,7 +1,7 @@
 # Untitled string in Item Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/storage:platform/anyOf/0
+airs_model#/$defs/Asset/properties/storage__platform/anyOf/0
 ```
 
 

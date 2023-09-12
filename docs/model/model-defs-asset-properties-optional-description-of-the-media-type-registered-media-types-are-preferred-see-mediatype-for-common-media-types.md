@@ -1,7 +1,7 @@
 # Optional description of the media type. Registered Media Types are preferred. See MediaType for common media types. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/type
+airs_model#/$defs/Asset/properties/type
 ```
 
 

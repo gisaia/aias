@@ -1,7 +1,7 @@
 # Ground Sampling Distance (resolution) of the asset Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/gsd
+airs_model#/$defs/Asset/properties/gsd
 ```
 
 

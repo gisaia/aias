@@ -1,7 +1,7 @@
 # Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2\*n where n is the number of dimensions. Could also be None in the case of a null geometry. Schema
 
 ```txt
-aeopres_model#/properties/bbox
+airs_model#/properties/bbox
 ```
 
 

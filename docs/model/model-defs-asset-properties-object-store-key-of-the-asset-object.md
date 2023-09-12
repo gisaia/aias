@@ -1,7 +1,7 @@
 # Object store key of the asset object. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/aeo:object_store_key
+airs_model#/$defs/Asset/properties/airs__object_store_key
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/aeo:object_store_key
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## aeo:object\_store\_key Type
+## airs\_\_object\_store\_key Type
 
 merged type ([Object store key of the asset object.](model-defs-asset-properties-object-store-key-of-the-asset-object.md))
 

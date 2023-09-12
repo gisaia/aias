@@ -1,7 +1,7 @@
 # Name of the programme Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/programme
+airs_model#/$defs/Properties/properties/programme
 ```
 
 

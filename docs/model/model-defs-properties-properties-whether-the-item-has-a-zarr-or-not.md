@@ -1,7 +1,7 @@
 # Whether the item has a zarr or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_zarr
+airs_model#/$defs/Properties/properties/generated__has_zarr
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_zarr
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_zarr Type
+## generated\_\_has\_zarr Type
 
 merged type ([Whether the item has a zarr or not.](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md))
 

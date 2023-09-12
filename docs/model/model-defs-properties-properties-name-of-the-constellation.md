@@ -1,7 +1,7 @@
 # Name of the constellation Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/constellation
+airs_model#/$defs/Properties/properties/constellation
 ```
 
 

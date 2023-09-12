@@ -1,7 +1,7 @@
 # Untitled undefined type in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/proj:centroid/anyOf/0
+airs_model#/$defs/Properties/properties/proj__centroid/anyOf/0
 ```
 
 

@@ -1,7 +1,7 @@
 # DimensionType Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/cube:dimensions/anyOf/0/additionalProperties
+airs_model#/$defs/Properties/properties/cube__dimensions/anyOf/0/additionalProperties
 ```
 
 

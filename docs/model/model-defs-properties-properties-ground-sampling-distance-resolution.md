@@ -1,7 +1,7 @@
 # Ground Sampling Distance (resolution) Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/gsd
+airs_model#/$defs/Properties/properties/gsd
 ```
 
 

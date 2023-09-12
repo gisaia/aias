@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:looks_equivalent_number/anyOf/0
+airs_model#/$defs/Asset/properties/sar__looks_equivalent_number/anyOf/0
 ```
 
 

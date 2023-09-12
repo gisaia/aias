@@ -1,7 +1,7 @@
 # Bounding box of the Item in the asset CRS in 2 or 3 dimensions. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/proj:bbox
+airs_model#/$defs/Asset/properties/proj__bbox
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/proj:bbox
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:bbox Type
+## proj\_\_bbox Type
 
 merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
 

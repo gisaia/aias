@@ -1,7 +1,7 @@
 # Absolute link to the asset object. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/href
+airs_model#/$defs/Asset/properties/href
 ```
 
 
@@ -12,4 +12,10 @@ aeopres_model#/$defs/Asset/properties/href
 
 ## href Type
 
-`string` ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
+merged type ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-1.md "check type definition")

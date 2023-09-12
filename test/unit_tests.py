@@ -3,8 +3,8 @@ from datetime import datetime
 import dateutil.parser as parser
 import json
 
-import aeoprs.core.models.mapper as mapper
-from aeoprs.core.models.model import Item
+import airs.core.models.mapper as mapper
+from airs.core.models.model import Item
 
 class Tests(unittest.TestCase):
 

@@ -1,7 +1,7 @@
 # The product type, for example SSC, MGD, or SGC Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:product_type
+airs_model#/$defs/Properties/properties/sar__product_type
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:product_type
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:product\_type Type
+## sar\_\_product\_type Type
 
 merged type ([The product type, for example SSC, MGD, or SGC](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
 

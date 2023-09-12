@@ -1,7 +1,7 @@
 # Indicates the regularity of the extends between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps) Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/time_regularity
+airs_model#/$defs/Indicators/properties/time_regularity
 ```
 
 

@@ -1,18 +1,18 @@
 import requests
 import os
 import json
-from aeoprocesses.ingest.ingest_services import ProcServices, TaskState
+from aproc.ingest.ingest_services import ProcServices, TaskState
 from celery import states
 import time
 import unittest
 
-from utils import setUpTest, AEOPRS_URL
+from utils import setUpTest, AIRS_URL
 
 BATCH_SIZE = 1000
 class Tests(unittest.TestCase):
 
     def setUp(self):
-        ProcServices.init(os.environ.get("AEOPROCESSES_CONFIGURATION_FILE"))
+        ProcServices.init(os.environ.get("APROC_CONFIGURATION_FILE"))
         setUpTest()
 
     def test_async_ingest_theia(self):
@@ -38,7 +38,7 @@ class Tests(unittest.TestCase):
         print("{} archives registered in {} s".format(BATCH_SIZE, end - start))
         print("Checking that the {} archives are registered ...".format(BATCH_SIZE))
         for hit in hits:
-            url=AEOPRS_URL+"/collections/main_catalog/items/{}".format(hit["md"]["id"])
+            url=AIRS_URL+"/collections/main_catalog/items/{}".format(hit["md"]["id"])
             r = requests.get(url)
             self.assertTrue(r.ok, url+" not found")
 

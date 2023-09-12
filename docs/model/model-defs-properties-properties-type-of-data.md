@@ -1,7 +1,7 @@
 # Type of data Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/data_type
+airs_model#/$defs/Properties/properties/data_type
 ```
 
 

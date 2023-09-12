@@ -1,7 +1,7 @@
 # Set of indicators for estimating the quality of the datacube group. The indicators are group based. Schema
 
 ```txt
-aeopres_model#/$defs/Group/properties/quality_indicators
+airs_model#/$defs/Group/properties/quality_indicators
 ```
 
 

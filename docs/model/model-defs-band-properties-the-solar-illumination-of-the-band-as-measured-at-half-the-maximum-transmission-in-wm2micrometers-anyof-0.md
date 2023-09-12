@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/solar_illumination/anyOf/0
+airs_model#/$defs/Band/properties/solar_illumination/anyOf/0
 ```
 
 

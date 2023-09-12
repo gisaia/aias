@@ -1,7 +1,7 @@
 # Untitled array in Item Schema
 
 ```txt
-aeopres_model#/properties/bbox/anyOf/0
+airs_model#/properties/bbox/anyOf/0
 ```
 
 

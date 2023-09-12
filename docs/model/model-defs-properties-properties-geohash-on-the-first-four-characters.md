@@ -1,7 +1,7 @@
 # Geohash on the first four characters. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:geohash4
+airs_model#/$defs/Properties/properties/generated__geohash4
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:geohash4
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:geohash4 Type
+## generated\_\_geohash4 Type
 
 merged type ([Geohash on the first four characters.](model-defs-properties-properties-geohash-on-the-first-four-characters.md))
 

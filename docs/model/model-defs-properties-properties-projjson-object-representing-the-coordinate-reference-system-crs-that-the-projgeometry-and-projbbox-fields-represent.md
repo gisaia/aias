@@ -1,7 +1,7 @@
 # PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/proj:wkt2
+airs_model#/$defs/Properties/properties/proj__wkt2
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/proj:wkt2
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:wkt2 Type
+## proj\_\_wkt2 Type
 
 merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
 

@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/properties/centroid/anyOf/0/items
+airs_model#/properties/centroid/anyOf/0/items
 ```
 
 

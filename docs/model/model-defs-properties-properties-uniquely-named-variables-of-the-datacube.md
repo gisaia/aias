@@ -1,7 +1,7 @@
 # Uniquely named variables of the datacube. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/cube:variables
+airs_model#/$defs/Properties/properties/cube__variables
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/cube:variables
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## cube:variables Type
+## cube\_\_variables Type
 
 merged type ([Uniquely named variables of the datacube.](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md))
 

@@ -1,7 +1,7 @@
 # Set of indicators for estimating the quality of the datacube variable (band). Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/quality_indicators
+airs_model#/$defs/Band/properties/quality_indicators
 ```
 
 

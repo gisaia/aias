@@ -1,7 +1,7 @@
 # Group Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:composition/anyOf/0/items
+airs_model#/$defs/Properties/properties/dc3__composition/anyOf/0/items
 ```
 
 
@@ -16,11 +16,11 @@ aeopres_model#/$defs/Properties/properties/dc3:composition/anyOf/0/items
 
 # items Properties
 
-| Property                                   | Type   | Required | Nullable       | Defined by                                                                                                                                                                                          |
-| :----------------------------------------- | :----- | :------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [timestamp](#timestamp)                    | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "aeopres_model#/$defs/Group/properties/timestamp")                                                                       |
-| [rasters](#rasters)                        | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "aeopres_model#/$defs/Group/properties/rasters")                                                                 |
-| [quality\_indicators](#quality_indicators) | Merged | Optional | cannot be null | [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "aeopres_model#/$defs/Group/properties/quality_indicators") |
+| Property                                   | Type   | Required | Nullable       | Defined by                                                                                                                                                                                       |
+| :----------------------------------------- | :----- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [timestamp](#timestamp)                    | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")                                                                       |
+| [rasters](#rasters)                        | Merged | Optional | cannot be null | [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")                                                                 |
+| [quality\_indicators](#quality_indicators) | Merged | Optional | cannot be null | [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators") |
 
 ## timestamp
 
@@ -34,7 +34,7 @@ aeopres_model#/$defs/Properties/properties/dc3:composition/anyOf/0/items
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "aeopres_model#/$defs/Group/properties/timestamp")
+*   defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")
 
 ### timestamp Type
 
@@ -58,7 +58,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "aeopres_model#/$defs/Group/properties/rasters")
+*   defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")
 
 ### rasters Type
 
@@ -82,7 +82,7 @@ any of
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "aeopres_model#/$defs/Group/properties/quality_indicators")
+*   defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators")
 
 ### quality\_indicators Type
 

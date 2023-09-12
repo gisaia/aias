@@ -1,7 +1,7 @@
 # Untitled boolean in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_overview/anyOf/0
+airs_model#/$defs/Properties/properties/generated__has_overview/anyOf/0
 ```
 
 

@@ -1,7 +1,7 @@
 # The center wavelength of the band, in micrometers (μm). Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/center_wavelength
+airs_model#/$defs/Band/properties/center_wavelength
 ```
 
 

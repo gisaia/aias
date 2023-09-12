@@ -1,7 +1,7 @@
 # Number of pixels in Y and X directions for the default grid. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/proj:shape
+airs_model#/$defs/Asset/properties/proj__shape
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/proj:shape
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:shape Type
+## proj\_\_shape Type
 
 merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
 

@@ -1,7 +1,7 @@
 # Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm). Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/full_width_half_max
+airs_model#/$defs/Band/properties/full_width_half_max
 ```
 
 

@@ -1,7 +1,7 @@
 # The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names. Schema
 
 ```txt
-aeopres_model#/$defs/Band/properties/common_name
+airs_model#/$defs/Band/properties/common_name
 ```
 
 

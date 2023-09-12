@@ -1,7 +1,7 @@
 # Raster Schema
 
 ```txt
-aeopres_model#/$defs/Raster
+airs_model#/$defs/Raster
 ```
 
 
@@ -16,11 +16,11 @@ aeopres_model#/$defs/Raster
 
 # Raster Properties
 
-| Property      | Type     | Required | Nullable       | Defined by                                                                                 |
-| :------------ | :------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
-| [type](#type) | `object` | Required | cannot be null | [Item](model-defs-rastertype.md "aeopres_model#/$defs/Raster/properties/type")             |
-| [path](#path) | `string` | Required | cannot be null | [Item](model-defs-raster-properties-path.md "aeopres_model#/$defs/Raster/properties/path") |
-| [id](#id)     | `string` | Required | cannot be null | [Item](model-defs-raster-properties-id.md "aeopres_model#/$defs/Raster/properties/id")     |
+| Property      | Type     | Required | Nullable       | Defined by                                                                              |
+| :------------ | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------- |
+| [type](#type) | `object` | Required | cannot be null | [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")             |
+| [path](#path) | `string` | Required | cannot be null | [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path") |
+| [id](#id)     | `string` | Required | cannot be null | [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")     |
 
 ## type
 
@@ -34,7 +34,7 @@ aeopres_model#/$defs/Raster
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-rastertype.md "aeopres_model#/$defs/Raster/properties/type")
+*   defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
 
 ### type Type
 
@@ -52,7 +52,7 @@ aeopres_model#/$defs/Raster
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-path.md "aeopres_model#/$defs/Raster/properties/path")
+*   defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
 
 ### path Type
 
@@ -70,7 +70,7 @@ aeopres_model#/$defs/Raster
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-id.md "aeopres_model#/$defs/Raster/properties/id")
+*   defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
 
 ### id Type
 

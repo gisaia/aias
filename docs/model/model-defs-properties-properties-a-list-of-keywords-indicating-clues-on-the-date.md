@@ -1,7 +1,7 @@
 # A list of keywords indicating clues on the date Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:date_keywords
+airs_model#/$defs/Properties/properties/generated__date_keywords
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:date_keywords
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:date\_keywords Type
+## generated\_\_date\_keywords Type
 
 merged type ([A list of keywords indicating clues on the date](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md))
 

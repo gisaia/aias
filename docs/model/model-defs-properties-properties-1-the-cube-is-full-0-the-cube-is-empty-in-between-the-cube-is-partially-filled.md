@@ -1,7 +1,7 @@
 # 1: the cube is full, 0 the cube is empty, in between the cube is partially filled. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:fill_ratio
+airs_model#/$defs/Properties/properties/dc3__fill_ratio
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/dc3:fill_ratio
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## dc3:fill\_ratio Type
+## dc3\_\_fill\_ratio Type
 
 merged type ([1: the cube is full, 0 the cube is empty, in between the cube is partially filled.](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md))
 

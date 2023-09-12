@@ -1,7 +1,7 @@
 # The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:frequency_band
+airs_model#/$defs/Asset/properties/sar__frequency_band
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/sar:frequency_band
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:frequency\_band Type
+## sar\_\_frequency\_band Type
 
 merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
 

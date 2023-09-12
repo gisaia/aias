@@ -1,7 +1,7 @@
 # Whether the item has an overview or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_overview
+airs_model#/$defs/Properties/properties/generated__has_overview
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_overview
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_overview Type
+## generated\_\_has\_overview Type
 
 merged type ([Whether the item has an overview or not.](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md))
 

@@ -1,7 +1,7 @@
 # A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/description
+airs_model#/$defs/Asset/properties/description
 ```
 
 

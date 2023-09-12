@@ -1,7 +1,7 @@
 # Optional displayed title for clients and users. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/title
+airs_model#/$defs/Asset/properties/title
 ```
 
 

@@ -1,7 +1,7 @@
 # The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider) Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/storage:region
+airs_model#/$defs/Properties/properties/storage__region
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/storage:region
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## storage:region Type
+## storage\_\_region Type
 
 merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
 

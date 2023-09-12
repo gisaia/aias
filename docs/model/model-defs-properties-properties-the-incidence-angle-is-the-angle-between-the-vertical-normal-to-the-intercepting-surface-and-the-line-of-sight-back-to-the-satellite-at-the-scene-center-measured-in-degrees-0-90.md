@@ -1,7 +1,7 @@
 # The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/view:incidence_angle
+airs_model#/$defs/Properties/properties/view__incidence_angle
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/view:incidence_angle
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## view:incidence\_angle Type
+## view\_\_incidence\_angle Type
 
 merged type ([The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md))
 

@@ -1,7 +1,7 @@
 # Defines the full footprint of the asset represented by this item, formatted according to \`RFC 7946, section 3.1 (GeoJSON) \<https\://tools.ietf.org/html/rfc7946>\`\_ Schema
 
 ```txt
-aeopres_model#/properties/geometry
+airs_model#/properties/geometry
 ```
 
 

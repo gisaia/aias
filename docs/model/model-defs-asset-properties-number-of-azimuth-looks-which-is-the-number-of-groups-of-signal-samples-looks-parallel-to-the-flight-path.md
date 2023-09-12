@@ -1,7 +1,7 @@
 # Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/sar:looks_azimuth
+airs_model#/$defs/Asset/properties/sar__looks_azimuth
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/sar:looks_azimuth
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:looks\_azimuth Type
+## sar\_\_looks\_azimuth Type
 
 merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
 

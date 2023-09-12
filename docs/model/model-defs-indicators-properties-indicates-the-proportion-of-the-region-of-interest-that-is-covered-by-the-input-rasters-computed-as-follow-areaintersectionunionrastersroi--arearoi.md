@@ -1,7 +1,7 @@
 # Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi)) Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/spatial_coverage
+airs_model#/$defs/Indicators/properties/spatial_coverage
 ```
 
 

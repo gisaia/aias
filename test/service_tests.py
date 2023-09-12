@@ -2,8 +2,8 @@ import requests
 import unittest
 import os
 import elasticsearch
-from aeoprs.core.models import mapper as mapper
-from utils import setUpTest, index_endpoint_url, ITEM_PATH, AEOPRS_URL, COLLECTION, ID, ASSET, ASSET_PATH, \
+from airs.core.models import mapper as mapper
+from utils import setUpTest, index_endpoint_url, ITEM_PATH, AIRS_URL, COLLECTION, ID, ASSET, ASSET_PATH, \
     index_collection_prefix
 
 
@@ -16,26 +16,26 @@ class Tests(unittest.TestCase):
         # ADD ITEM FAIL BECAUSE ASSET MISSING
         with open(ITEM_PATH,'r') as file:
             data = file.read()
-            r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+            r=requests.post(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertFalse(r.ok,msg="Item registration did not fail")
 
         # ASSET NOT FOUND
-        r=requests.head(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
+        r=requests.head(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
         self.assertFalse(r.ok,msg="Asset must not be found")
 
         # ITEM NOT FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertFalse(r.ok,msg="Item must not be found")
 
     def test_upload(self):
         # UPLOAD ASSET
         f= open(ASSET_PATH, 'rb')
         file = {'file': (ASSET, f, "image/tiff")}
-        r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET), files=file)
+        r=requests.post(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET), files=file)
         self.assertTrue(r.ok,msg="Asset upload")
         f.close()
         # ASSET FOUND
-        r=requests.head(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
+        r=requests.head(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
         self.assertTrue(r.ok,msg="Asset not found")
 
 
@@ -44,11 +44,11 @@ class Tests(unittest.TestCase):
         self.test_upload()
         with open(ITEM_PATH,'r') as file:
             data = file.read()
-            r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+            r=requests.post(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok,msg="Item registration")
 
         # ITEM FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertTrue(r.ok,msg="Item must not found")
 
     def test_update_item(self):
@@ -58,11 +58,11 @@ class Tests(unittest.TestCase):
         # UPDATE
         with open(ITEM_PATH,'r') as file:
             data = file.read()
-            r=requests.put(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID), data=data, headers={"Content-Type": "application/json"})
+            r=requests.put(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok,msg="Item update")
 
         # ITEM FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertTrue(r.ok,msg="Item must not found")
 
     def test_access_asset(self):
@@ -70,10 +70,10 @@ class Tests(unittest.TestCase):
         self.test_upload()
         with open(ITEM_PATH,'r') as file:
             data = file.read()
-            r=requests.post(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+            r=requests.post(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok,msg="Item registration")
         # FILE FOUND FOR THE MANAGED ASSET
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         item=mapper.item_from_json(r.content)
         print(item.assets["classification"].href)
         r=requests.head(url=item.assets["classification"].href)
@@ -84,15 +84,15 @@ class Tests(unittest.TestCase):
         self.test_add_item()
 
         # DELETE ITEM
-        r=requests.delete(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.delete(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertTrue(r.ok,msg="Item must not found")
 
         # ITEM NOT FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertFalse(r.ok,msg="Item must not be found")
 
         # ASSET NOT FOUND
-        r=requests.head(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
+        r=requests.head(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID, "assets", ASSET))
         self.assertFalse(r.ok,msg="Asset must not be found")
 
 
@@ -106,13 +106,13 @@ class Tests(unittest.TestCase):
         except Exception:
             ...
         # ITEM NOT FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertFalse(r.ok,msg="Item must not be found")
 
         # REINDEX
-        r=requests.post(url=os.path.join(AEOPRS_URL,"collections", COLLECTION,"_reindex"), headers={"Content-Type": "application/json"})
+        r=requests.post(url=os.path.join(AIRS_URL,"collections", COLLECTION,"_reindex"), headers={"Content-Type": "application/json"})
         # ITEM FOUND
-        r=requests.get(url=os.path.join(AEOPRS_URL,"collections",COLLECTION, "items", ID))
+        r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         self.assertTrue(r.ok,msg="Item must not found")
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 # Untitled object in Item Schema
 
 ```txt
-aeopres_model#/properties/geometry/anyOf/0
+airs_model#/properties/geometry/anyOf/0
 ```
 
 

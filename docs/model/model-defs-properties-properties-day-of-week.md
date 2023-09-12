@@ -1,7 +1,7 @@
 # Day of week. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:day_of_week
+airs_model#/$defs/Properties/properties/generated__day_of_week
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:day_of_week
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:day\_of\_week Type
+## generated\_\_day\_of\_week Type
 
 merged type ([Day of week.](model-defs-properties-properties-day-of-week.md))
 

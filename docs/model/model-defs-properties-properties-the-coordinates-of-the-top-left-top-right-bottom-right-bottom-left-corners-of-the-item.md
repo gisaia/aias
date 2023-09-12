@@ -1,7 +1,7 @@
 # The coordinates of the top left, top right, bottom right, bottom left corners of the item. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:tltrbrbl
+airs_model#/$defs/Properties/properties/generated__tltrbrbl
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:tltrbrbl
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:tltrbrbl Type
+## generated\_\_tltrbrbl Type
 
 merged type ([The coordinates of the top left, top right, bottom right, bottom left corners of the item.](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md))
 

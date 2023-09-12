@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:fill_ratio/anyOf/0
+airs_model#/$defs/Properties/properties/dc3__fill_ratio/anyOf/0
 ```
 
 

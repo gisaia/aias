@@ -1,7 +1,7 @@
 # Coordinates representing the centroid of the Item (in lat/long). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/proj:centroid
+airs_model#/$defs/Properties/properties/proj__centroid
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/proj:centroid
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:centroid Type
+## proj\_\_centroid Type
 
 merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
 

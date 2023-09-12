@@ -1,7 +1,7 @@
 # EPSG code of the datasource. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/proj:epsg
+airs_model#/$defs/Asset/properties/proj__epsg
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/proj:epsg
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## proj:epsg Type
+## proj\_\_epsg Type
 
 merged type ([EPSG code of the datasource.](model-defs-asset-properties-epsg-code-of-the-datasource.md))
 

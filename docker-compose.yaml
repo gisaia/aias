@@ -1,17 +1,18 @@
 version: "3"
 networks:
-  aeoprs:
+  airs:
 services:
   minio:
     image: minio/minio
+    container_name: minio
     ports:
       - "9000:9000"
       - "9001:9001"
     networks:
-      - aeoprs
+      - airs
     environment:
-      - "MINIO_ACCESS_KEY=arlaseo"
-      - "MINIO_SECRET_KEY=arlaseosecret"
+      - "MINIO_ACCESS_KEY=airs"
+      - "MINIO_SECRET_KEY=airssecret"
     command: server /export --console-address ":9001"
 
   createbuckets:
@@ -19,11 +20,11 @@ services:
     depends_on:
       - minio
     environment:
-      - BUCKET_NAME=${BUCKET_NAME:-arlaseotest}
-      - LOGIN=${LOGIN:-arlaseo}
-      - PASSWORD=${PASSWORD:-arlaseosecret}
+      - BUCKET_NAME=${BUCKET_NAME:-airstest}
+      - LOGIN=${LOGIN:-airs}
+      - PASSWORD=${PASSWORD:-airssecret}
     networks:
-      - aeoprs
+      - airs
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
@@ -36,7 +37,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.9.2}
     container_name: elasticsearch
     networks:
-      - aeoprs
+      - airs
     environment:
       - discovery.type=single-node
       - cluster.name=docker-cluster
@@ -52,7 +53,7 @@ services:
     image: rabbitmq:${RABBITMQ_VERSION:-3-management}
     container_name: rabbitmq
     networks:
-      - aeoprs
+      - airs
     ports:
       - 15672:15672
       - 5672:5672
@@ -60,25 +61,25 @@ services:
   redis:
     image: redis:${REDIS_VERSION:-7.2}
     networks:
-      - aeoprs
+      - airs
     container_name: redis
     ports:
       - 6379:6379
 
-  aeoprs-processes:
+  airs-processes:
     networks:
-      - aeoprs
+      - airs
     build:
       context: '.'
-      dockerfile: Dockerfile-aeoprocesses
-    image: aeoprs-processes:latest
+      dockerfile: Dockerfile-aproc
+    image: airs-processes:latest
     #command: tail -f /dev/null
-    container_name: 'aeoprs-processes'
+    container_name: 'airs-processes'
     environment:
-      - AEOPROCESSES_CONFIGURATION_FILE=/home/app/worker/conf/aeoprocesses.yaml
+      - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - AEOPRS_ENDPOINT=http://aeoprs-server:8000
+      - AIRS_ENDPOINT=http://airs-server:8000
       - ROOT_DIRECTORY=/inputs
     volumes:
       - ./test/inputs:/inputs
@@ -86,31 +87,31 @@ services:
       - redis
       - rabbitmq
 
-  aeoprs-server:
+  airs-server:
     networks:
-      - aeoprs
+      - airs
     build:
       context: '.'
-      dockerfile: Dockerfile-aeoprs
-    image: aeoprs-server:latest
-    container_name: 'aeoprs-server'
+      dockerfile: Dockerfile-airs
+    image: airs-server:latest
+    container_name: 'airs-server'
     environment:
-      - AEOPRS_HOST=0.0.0.0
-      - AEOPRS_PORT=8000
-      - ARLASEO_INDEX_ENDPOINT_URL=${ARLASEO_INDEX_ENDPOINT_URL:-http://localhost:9200}
-      - ARLASEO_INDEX_COLLECTION_PREFIX=${ARLASEO_INDEX_COLLECTION_PREFIX:-arlaseo}
-      - ARLASEO_INDEX_LOGIN=${ARLASEO_INDEX_LOGIN:-None}
-      - ARLASEO_INDEX_PWD=${ARLASEO_INDEX_PWD:-None}
-      - ARLASEO_S3_BUCKET=${ARLASEO_S3_BUCKET:-arlaseotest}
-      - ARLASEO_S3_ACCESS_KEY_ID=${ARLASEO_S3_ACCESS_KEY_ID}
-      - ARLASEO_S3_SECRET_ACCESS_KEY=${ARLASEO_S3_SECRET_ACCESS_KEY}
-      - ARLASEO_S3_REGION|=${ARLASEO_S3_REGION:-None}
-      - ARLASEO_S3_TIER=${MONGO_USERNAME:-Standard}
-      - ARLASEO_S3_PLATFORM=${ARLASEO_S3_PLATFORM}
-      - ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL=${ARLASEO_S3_ASSET_HTTP_ENDPOINT_URL}
-      - ARLASEO_S3_ENDPOINT_URL=${ARLASEO_S3_ENDPOINT_URL}
-      - ARLASEO_MAPPING_URL=${ARLASEO_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json}
-      - ARLASEO_COLLECTION_URL=${ARLASEO_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/collection.json}
+      - AIRS_HOST=0.0.0.0
+      - AIRS_PORT=8000
+      - AIRS_INDEX_ENDPOINT_URL=${AIRS_INDEX_ENDPOINT_URL:-http://localhost:9200}
+      - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
+      - AIRS_INDEX_LOGIN=${AIRS_INDEX_LOGIN:-None}
+      - AIRS_INDEX_PWD=${AIRS_INDEX_PWD:-None}
+      - AIRS_S3_BUCKET=${AIRS_S3_BUCKET:-airstest}
+      - AIRS_S3_ACCESS_KEY_ID=${AIRS_S3_ACCESS_KEY_ID}
+      - AIRS_S3_SECRET_ACCESS_KEY=${AIRS_S3_SECRET_ACCESS_KEY}
+      - AIRS_S3_REGION=${AIRS_S3_REGION:-None}
+      - AIRS_S3_TIER=${AIRS_S3_TIER:-Standard}
+      - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
+      - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
+      - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}
+      - AIRS_MAPPING_URL=${AIRS_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json}
+      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/collection.json}
     ports:
       - "8000:8000"
     depends_on:

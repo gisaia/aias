@@ -1,7 +1,7 @@
 # List of locations covered by the item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/locations
+airs_model#/$defs/Properties/properties/locations
 ```
 
 

@@ -1,7 +1,7 @@
 # Object store bucket for the asset object. Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/aeo:object_store_bucket
+airs_model#/$defs/Asset/properties/airs__object_store_bucket
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/aeo:object_store_bucket
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## aeo:object\_store\_bucket Type
+## airs\_\_object\_store\_bucket Type
 
 merged type ([Object store bucket for the asset object.](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md))
 

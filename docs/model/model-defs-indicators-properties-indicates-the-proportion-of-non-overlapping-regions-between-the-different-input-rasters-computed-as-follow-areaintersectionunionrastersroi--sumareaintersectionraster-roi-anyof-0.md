@@ -1,7 +1,7 @@
 # Untitled number in Item Schema
 
 ```txt
-aeopres_model#/$defs/Indicators/properties/group_lightness/anyOf/0
+airs_model#/$defs/Indicators/properties/group_lightness/anyOf/0
 ```
 
 

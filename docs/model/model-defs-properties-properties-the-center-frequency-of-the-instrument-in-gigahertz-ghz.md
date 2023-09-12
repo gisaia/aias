@@ -1,7 +1,7 @@
 # The center frequency of the instrument, in gigahertz (GHz). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:center_frequency
+airs_model#/$defs/Properties/properties/sar__center_frequency
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:center_frequency
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:center\_frequency Type
+## sar\_\_center\_frequency Type
 
 merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
 

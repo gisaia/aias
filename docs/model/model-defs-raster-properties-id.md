@@ -1,7 +1,7 @@
 # Id Schema
 
 ```txt
-aeopres_model#/$defs/Raster/properties/id
+airs_model#/$defs/Raster/properties/id
 ```
 
 

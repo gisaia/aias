@@ -1,0 +1,15 @@
+FROM python:3.10
+
+COPY ./airs/requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+COPY ./airs /app/airs
+COPY ./conf /app/conf
+COPY ./airs/start.sh /app/
+COPY ./airs/airs.py /app/
+
+EXPOSE 8000
+ENTRYPOINT ["./start.sh"]

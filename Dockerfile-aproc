@@ -1,0 +1,47 @@
+FROM osgeo/gdal:ubuntu-small-3.6.3
+
+WORKDIR /usr/src
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# do not run as root ...
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/worker
+RUN mkdir -p $HOME && \
+    addgroup --system app && adduser --system app --ingroup app && \
+    mkdir $APP_HOME
+WORKDIR $HOME
+
+COPY ./aproc/requirements.txt $APP_HOME/requirements.txt
+
+# Install python 3.10
+RUN apt install python3.10 -y
+
+# Make python 3.10 the default
+RUN echo "alias python=python3.10" >> ~/.bashrc
+RUN echo "alias python3=python3.10" >> ~/.bashrc
+RUN export PATH=${PATH}:/usr/bin/python3.10
+RUN /bin/bash -c "source ~/.bashrc"
+
+# Install pip
+RUN apt install -y --no-install-recommends netcat
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+RUN pip install -r $APP_HOME/requirements.txt
+
+COPY ./aproc $APP_HOME/aproc
+COPY ./extensions $APP_HOME/extensions
+# TODO : move to python package with pip3 install
+COPY ./airs/core/models $APP_HOME/airs/core/models
+COPY ./airs/core/models/__init__.py $APP_HOME/airs/core/models/__init__.py
+COPY ./airs/__init__.py $APP_HOME/airs/__init__.py
+COPY ./airs/logger.py $APP_HOME/airs/logger.py
+
+COPY ./conf $APP_HOME/conf
+COPY ./setup.py $APP_HOME/setup.py
+
+RUN pip install -e $APP_HOME
+
+WORKDIR $APP_HOME
+
+ENTRYPOINT celery -A aproc.ingest.proc:app worker -c 2 -n worker@%h  --loglevel=INFO

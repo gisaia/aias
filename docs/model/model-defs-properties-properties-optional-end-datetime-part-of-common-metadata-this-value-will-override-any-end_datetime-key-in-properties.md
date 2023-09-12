@@ -1,7 +1,7 @@
 # Optional end datetime, part of common metadata. This value will override any end\_datetime key in properties. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/end_datetime
+airs_model#/$defs/Properties/properties/end_datetime
 ```
 
 

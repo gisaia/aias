@@ -1,7 +1,7 @@
 # Month Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:month
+airs_model#/$defs/Properties/properties/generated__month
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:month
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:month Type
+## generated\_\_month Type
 
 merged type ([Month](model-defs-properties-properties-month.md))
 

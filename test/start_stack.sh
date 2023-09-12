@@ -11,7 +11,7 @@ code_OK="OK"
     code="$(curl -IL --silent http://localhost:9000/minio/health/live | grep "^HTTP\/")"
     eval "sleep 5"
 done
-# Start  create buckets, elastic rabbitmq redis aeoprs, aeoprocesses
+# Start  create buckets, elastic rabbitmq redis airs, aproc
 docker-compose -f docker-compose.yaml up --build -d
 # Waiting for elastic ready
 code=""

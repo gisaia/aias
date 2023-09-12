@@ -1,7 +1,7 @@
 # Weight of a chunk (number of bytes). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:chunk_weight
+airs_model#/$defs/Properties/properties/dc3__chunk_weight
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/dc3:chunk_weight
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## dc3:chunk\_weight Type
+## dc3\_\_chunk\_weight Type
 
 merged type ([Weight of a chunk (number of bytes).](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md))
 

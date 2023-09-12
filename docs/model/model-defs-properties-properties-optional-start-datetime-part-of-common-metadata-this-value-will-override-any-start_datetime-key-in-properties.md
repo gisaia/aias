@@ -1,7 +1,7 @@
 # Optional start datetime, part of common metadata. This value will override any start\_datetime key in properties. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/start_datetime
+airs_model#/$defs/Properties/properties/start_datetime
 ```
 
 

@@ -1,7 +1,7 @@
 # Estimate of water cover Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/water_coverage
+airs_model#/$defs/Properties/properties/water_coverage
 ```
 
 

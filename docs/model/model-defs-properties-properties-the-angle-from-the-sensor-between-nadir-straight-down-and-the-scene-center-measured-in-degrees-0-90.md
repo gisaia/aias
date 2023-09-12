@@ -1,7 +1,7 @@
 # The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/view:off_nadir
+airs_model#/$defs/Properties/properties/view__off_nadir
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/view:off_nadir
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## view:off\_nadir Type
+## view\_\_off\_nadir Type
 
 merged type ([The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md))
 

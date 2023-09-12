@@ -1,7 +1,7 @@
 # PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER) Schema
 
 ```txt
-aeopres_model#/$defs/Asset/properties/storage:platform
+airs_model#/$defs/Asset/properties/storage__platform
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Asset/properties/storage:platform
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## storage:platform Type
+## storage\_\_platform Type
 
 merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
 

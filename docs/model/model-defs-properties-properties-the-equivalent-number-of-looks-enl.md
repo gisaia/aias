@@ -1,7 +1,7 @@
 # The equivalent number of looks (ENL). Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/sar:looks_equivalent_number
+airs_model#/$defs/Properties/properties/sar__looks_equivalent_number
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/sar:looks_equivalent_number
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## sar:looks\_equivalent\_number Type
+## sar\_\_looks\_equivalent\_number Type
 
 merged type ([The equivalent number of looks (ENL).](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md))
 

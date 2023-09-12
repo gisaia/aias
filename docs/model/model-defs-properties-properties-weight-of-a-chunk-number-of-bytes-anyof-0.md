@@ -1,7 +1,7 @@
 # Untitled integer in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/dc3:chunk_weight/anyOf/0
+airs_model#/$defs/Properties/properties/dc3__chunk_weight/anyOf/0
 ```
 
 

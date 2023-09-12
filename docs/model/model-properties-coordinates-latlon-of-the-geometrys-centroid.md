@@ -1,7 +1,7 @@
 # Coordinates (lat/lon) of the geometry's centroid. Schema
 
 ```txt
-aeopres_model#/properties/centroid
+airs_model#/properties/centroid
 ```
 
 

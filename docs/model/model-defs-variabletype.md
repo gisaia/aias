@@ -1,7 +1,7 @@
 # VariableType Schema
 
 ```txt
-aeopres_model#/$defs/VariableType
+airs_model#/$defs/VariableType
 ```
 
 

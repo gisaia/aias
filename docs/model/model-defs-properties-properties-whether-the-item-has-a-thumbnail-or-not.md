@@ -1,7 +1,7 @@
 # Whether the item has a thumbnail or not. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/generated:has_thumbnail
+airs_model#/$defs/Properties/properties/generated__has_thumbnail
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/generated:has_thumbnail
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## generated:has\_thumbnail Type
+## generated\_\_has\_thumbnail Type
 
 merged type ([Whether the item has a thumbnail or not.](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md))
 

@@ -1,7 +1,7 @@
 # An array of available bands where each object is a Band Object. If given, requires at least one band. Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/eo:bands
+airs_model#/$defs/Properties/properties/eo__bands
 ```
 
 
@@ -10,7 +10,7 @@ aeopres_model#/$defs/Properties/properties/eo:bands
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
 
-## eo:bands Type
+## eo\_\_bands Type
 
 merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
 

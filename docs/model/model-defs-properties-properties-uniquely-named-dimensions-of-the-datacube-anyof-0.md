@@ -1,7 +1,7 @@
 # Untitled object in Item Schema
 
 ```txt
-aeopres_model#/$defs/Properties/properties/cube:dimensions/anyOf/0
+airs_model#/$defs/Properties/properties/cube__dimensions/anyOf/0
 ```
 
 
@@ -16,9 +16,9 @@ aeopres_model#/$defs/Properties/properties/cube:dimensions/anyOf/0
 
 # 0 Properties
 
-| Property              | Type     | Required | Nullable       | Defined by                                                                                                                    |
-| :-------------------- | :------- | :------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| Additional Properties | `string` | Optional | cannot be null | [Item](model-defs-dimensiontype.md "aeopres_model#/$defs/Properties/properties/cube:dimensions/anyOf/0/additionalProperties") |
+| Property              | Type     | Required | Nullable       | Defined by                                                                                                                  |
+| :-------------------- | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| Additional Properties | `string` | Optional | cannot be null | [Item](model-defs-dimensiontype.md "airs_model#/$defs/Properties/properties/cube__dimensions/anyOf/0/additionalProperties") |
 
 ## Additional Properties
 
@@ -32,7 +32,7 @@ Additional properties are allowed, as long as they follow this schema:
 
 *   cannot be null
 
-*   defined in: [Item](model-defs-dimensiontype.md "aeopres_model#/$defs/Properties/properties/cube:dimensions/anyOf/0/additionalProperties")
+*   defined in: [Item](model-defs-dimensiontype.md "airs_model#/$defs/Properties/properties/cube__dimensions/anyOf/0/additionalProperties")
 
 ### additionalProperties Type
 
