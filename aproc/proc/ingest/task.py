@@ -1,31 +1,22 @@
-from aproc.settings import Configuration
-from aproc.ingest.drivers.drivers import Drivers
-from aproc.ingest.drivers.driver import Driver
-from aproc.ingest.drivers.exceptions import DriverException, RegisterException, ConnectionException
+from aproc.core.settings import Configuration
+from aproc.proc.ingest.drivers.drivers import Drivers
+from aproc.core.aproc_celery_app import APROC_CELERY_APP, LOGGER
+from aproc.proc.ingest.drivers.exceptions import DriverException, RegisterException, ConnectionException
 from airs.core.models.model import Asset
 from airs.core.models.mapper import to_json, item_from_json
-from celery import Celery
-from celery.utils.log import get_task_logger
-import requests
 import os
+import requests
 
-LOGGER = get_task_logger(__name__)
-LOGGER.debug(True)
-LOGGER.propagate = True
-Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
-Drivers.init()
-
-app = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)
-
-def __update_status__(LOGGER, task, state:str, meta:dict=None):
+def __update_status__(LOGGER, task, state: str, meta: dict = None):
     LOGGER.info(task.name+" "+state+" "+str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
 
-@app.task(
+
+@APROC_CELERY_APP.task(
         name="ingest", 
         bind=True)
-def ingest(self, driver_name:str, url:str, collection:str, catalog:str)->dict:
+def ingest(self, url: str, collection: str, catalog: str) -> dict:
     """ ingest the archive url in 6 step:
     - identify the driver for ingestion
     - identify the assets to fetch
@@ -43,46 +34,47 @@ def ingest(self, driver_name:str, url:str, collection:str, catalog:str)->dict:
     Returns:
         object: an dict pointing towards the registered item
     """
+    Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
+    Drivers.init()
 
-    driver_class:Driver=Drivers.get_driver_by_name(driver_name)
-    if driver_class is not None:
-        driver=driver_class()
+    driver = Drivers.solve(url)
+    if driver is not None:
         LOGGER.debug("ingestion: 1 - identify_assets")
         __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'identify_assets'})
-        assets:list[Asset]=driver.identify_assets(url)
+        assets: list[Asset] = driver.identify_assets(url)
         __check_assets__(url, assets)
 
         LOGGER.debug("ingestion: 2 - fetch_assets")
         __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'fetch_assets'})
         try:
-            assets=driver.fetch_assets(url, assets)
+            assets = driver.fetch_assets(url, assets)
         except requests.exceptions.ConnectionError as e:
-            msg="Fetching assets failed for connection reasons ({})".format(e.response)
+            msg = "Fetching assets failed for connection reasons ({})".format(e.response)
             LOGGER.error(msg)
             raise ConnectionException(msg)
         __check_assets__(url, assets, file_exists=True)
 
         LOGGER.debug("ingestion: 3 - transform_assets")
         __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'transform_assets'})
-        assets=driver.transform_assets(url, assets)
+        assets = driver.transform_assets(url, assets)
         __check_assets__(url, assets, file_exists=True)
 
         LOGGER.debug("ingestion: 4 - create_item")
         __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'create_item'})
-        item=driver.to_item(url, assets)
-        item.collection=collection
-        item.catalog=catalog
+        item = driver.to_item(url, assets)
+        item.collection = collection
+        item.catalog = catalog
         LOGGER.debug("ingestion: 5 - upload")
-        i:int=0
-        for asset_name,asset in item.assets.items():
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'upload', 'current': i, 'asset':asset_name, 'total': len(item.assets)})
-            i+=1
-            asset:Asset=asset
+        i: int = 0
+        for asset_name, asset in item.assets.items():
+            __update_status__(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
+            i += 1
+            asset: Asset = asset
             if asset.airs__managed == True:
                 with open(asset.href, 'rb') as filedesc:
                     file = {'file': (asset.name, filedesc, asset.type)}
                     try:
-                        r=requests.post(url=os.path.join(Configuration.settings.airs_endpoint,"collections",item.collection, "items", item.id, "assets", asset.name), files=file)
+                        r=requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections",item.collection, "items", item.id, "assets", asset.name), files=file)
                         if r.ok:
                             LOGGER.debug("asset uploaded successfully")                    
                         else:
@@ -128,7 +120,7 @@ def ingest(self, driver_name:str, url:str, collection:str, catalog:str)->dict:
     else:
         LOGGER.error("No driver found for {}".format(url))
         raise DriverException("No driver found for  {}".format(url))
-
+    
 
 def __check_assets__(url:str, assets:list[Asset], file_exists: bool=False):
     for asset in assets:

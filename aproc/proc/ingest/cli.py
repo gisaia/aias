@@ -1,5 +1,5 @@
 import typer
-from aproc.ingest.ingest_services import ProcServices
+from aproc.proc.ingest.ingest_services import ProcServices
 
 cli = typer.Typer()
 

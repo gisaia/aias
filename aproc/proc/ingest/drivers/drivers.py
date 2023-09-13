@@ -1,6 +1,6 @@
-from aproc.settings import Configuration
-from aproc.ingest.drivers.driver import Driver
-from aproc.ingest.drivers.exceptions import DriverException
+from aproc.core.settings import Configuration
+from aproc.proc.ingest.drivers.driver import Driver
+from aproc.proc.ingest.drivers.exceptions import DriverException
 import importlib
 
 class Drivers():
