@@ -1,7 +1,7 @@
-from aproc.ingest.drivers.driver import Driver as ProcDriver
-from aproc.settings import Configuration
+from aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from aproc.core.settings import Configuration
 from airs.core.models.model import Asset, Item, Role, Band, Properties
-from aproc.ingest.drivers.exceptions import ConnectionException
+from aproc.proc.ingest.drivers.exceptions import ConnectionException
 from datetime import datetime
 from dateutil.parser import parse as parse_date
 import requests

@@ -1,7 +1,7 @@
 import requests
 import os
 import json
-from aproc.ingest.ingest_services import ProcServices, TaskState
+from aproc.proc.ingest.ingest_services import ProcServices, TaskState
 from celery import states
 import time
 import unittest

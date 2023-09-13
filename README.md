@@ -262,6 +262,8 @@ A [driver](aproc/ingest/drivers/driver.py) must implement the following methods:
     def to_item(self, url:str, resources:list[Asset])->Item:
 ```
 
+IMPORTANT: The name of the class within the module __must be__ `Driver`.
+
 The following drivers are available in the `extensions` directory:
 - [theia](extensions/aproc/ingest/drivers/impl/theia.py)
 

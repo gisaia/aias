@@ -44,4 +44,4 @@ RUN pip install -e $APP_HOME
 
 WORKDIR $APP_HOME
 
-ENTRYPOINT celery -A aproc.ingest.proc:app worker -c 2 -n worker@%h  --loglevel=INFO
+ENTRYPOINT celery -A aproc.core.aproc_celery_app:APROC_CELERY_APP worker -c 2 -n worker@%h  --loglevel=INFO
