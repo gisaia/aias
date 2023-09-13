@@ -1,21 +1,21 @@
 ingesters:
   -
     name: geoeye
-    class_name: extensions.aproc.ingest.drivers.impl.geoeye
+    class_name: extensions.aproc.proc.ingest.drivers.impl.geoeye
     assets_dir: /tmp/aproc/geoeye
     configuration:
       root_directory: $ROOT_DIRECTORY
     priority: 2
   -
     name: dimap
-    class_name: extensions.aproc.ingest.drivers.impl.dimap
+    class_name: extensions.aproc.proc.ingest.drivers.impl.dimap
     assets_dir: /tmp/aproc/dimap
     configuration:
       root_directory: $ROOT_DIRECTORY
     priority: 1
   -
     name: theia
-    class_name: extensions.aproc.ingest.drivers.impl.theia
+    class_name: extensions.aproc.proc.ingest.drivers.impl.theia
     assets_dir: /tmp/aproc/theia
     configuration:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/

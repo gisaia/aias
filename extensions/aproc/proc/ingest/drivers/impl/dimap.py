@@ -1,12 +1,11 @@
-from aproc.ingest.drivers.driver import Driver as ProcDriver
-from aproc.settings import Configuration
+from aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from aproc.core.settings import Configuration
 from airs.core.models.model import Asset, Item, Role, Properties
 from datetime import datetime
 import os
-from osgeo import gdal
 import xml.etree.ElementTree as ET
 
-from extensions.aproc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
 
 
 class Driver(ProcDriver):
@@ -54,6 +53,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
+        from osgeo import gdal
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()

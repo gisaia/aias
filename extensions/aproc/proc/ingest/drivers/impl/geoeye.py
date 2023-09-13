@@ -1,11 +1,10 @@
-from aproc.ingest.drivers.driver import Driver as ProcDriver
-from aproc.settings import Configuration
+from aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from aproc.core.settings import Configuration
 from airs.core.models.model import Asset, Item, Role, Properties
 from datetime import datetime
 import os
-from osgeo import gdal, ogr
 
-from extensions.aproc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
 
 # TODO this driver must be tested with real data
 class Driver(ProcDriver):
@@ -54,6 +53,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
+        from osgeo import gdal, ogr
         setup_gdal()
         #Retrieve resolution from tiff file
         src_ds = gdal.Open(self.tif_file_path)

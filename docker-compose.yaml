@@ -66,15 +66,15 @@ services:
     ports:
       - 6379:6379
 
-  airs-processes:
+  aproc-processes:
     networks:
       - airs
     build:
       context: '.'
       dockerfile: Dockerfile-aproc
-    image: airs-processes:latest
+    image: aproc-processes:latest
     #command: tail -f /dev/null
-    container_name: 'airs-processes'
+    container_name: 'aproc-processes'
     environment:
       - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
