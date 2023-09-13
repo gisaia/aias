@@ -34,7 +34,6 @@ class Tests(unittest.TestCase):
             sleep(1)
             ts: TaskState = ProcServices.get_state(task_id=task_id)
         self.assertTrue(ts.state == states.SUCCESS, ts.state)
-        print(ts.info["item"])
 
 #    SYNC TEST NOT DONE FOR DIMAP SINCE IT REQUIRES GDAL
 #    def test_sync_ingest_dimap(self):
