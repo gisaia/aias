@@ -36,6 +36,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             ts: TaskState = ProcServices.get_state(task_id=task_id)
         self.assertTrue(ts.state == states.SUCCESS, ts.state)
+        print(ts.info["item"])
         self.assertTrue(ts.info["item"], "http://127.0.0.1:8000/collections/main_catalog/items/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A")        
 
 #    SYNC TEST NOT DONE FOR DIMAP SINCE IT REQUIRES GDAL
