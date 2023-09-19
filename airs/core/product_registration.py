@@ -35,7 +35,7 @@ def get_asset_relative_path(collection:str, item_id:str, asset_name:str)->str:
     Returns:
         str: relative path to the asset
     """
-    if asset_name == "arlas_eo_item":
+    if asset_name == Role.airs_item.value:
         return os.path.join(collection, "items", item_id, item_id+ITEM_ARLAS_SUFFIX)
     else:
         return os.path.join(collection, "items", item_id, "assets", asset_name)
@@ -353,18 +353,18 @@ def __set_assets_links(item:Item)->Item:
         else:
             LOGGER.info("Asset {} is not maneged".format(asset_name))
     item_relative_path=get_item_relative_path(item.collection, item.id)
-    item.assets[Role.arlas_eo_item.value]=Asset(
-            name=Role.arlas_eo_item.value,
+    item.assets[Role.airs_item.value]=Asset(
+            name=Role.airs_item.value,
             href=Configuration.settings.s3.asset_http_endpoint_url.format(Configuration.settings.s3.bucket, item_relative_path),
             description="ARLAS item for {}".format(item.id),
             title="ARLAS item for {}".format(item.id),
-            type="application/json",roles=[Role.arlas_eo_item.value]
+            type="application/json",roles=[Role.airs_item.value]
         )
-    item.assets[Role.arlas_eo_item.value].airs__managed=True
-    item.assets[Role.arlas_eo_item.value].airs__object_store_bucket=Configuration.settings.s3.bucket
-    item.assets[Role.arlas_eo_item.value].airs__object_store_key=item_relative_path
-    item.assets[Role.arlas_eo_item.value].storage__platform=Configuration.settings.s3.platform
-    item.assets[Role.arlas_eo_item.value].storage__tier=Configuration.settings.s3.tier
+    item.assets[Role.airs_item.value].airs__managed=True
+    item.assets[Role.airs_item.value].airs__object_store_bucket=Configuration.settings.s3.bucket
+    item.assets[Role.airs_item.value].airs__object_store_key=item_relative_path
+    item.assets[Role.airs_item.value].storage__platform=Configuration.settings.s3.platform
+    item.assets[Role.airs_item.value].storage__tier=Configuration.settings.s3.tier
     return item
 
 def __not_found_assets(item:Item)->List[str]:
