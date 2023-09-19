@@ -5,7 +5,7 @@ import typer
 import uvicorn
 
 from airs.core.settings import Configuration
-from airs.logger import CustomLogger as Logger
+from common.logger import CustomLogger as Logger
 from airs.rest.services import api
 
 cli = typer.Typer()
