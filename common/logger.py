@@ -3,7 +3,7 @@ import logging.config
 
 
 class CustomLogger:
-    logger_name = "airs-logger"
+    logger_name = "logger"
 
     @classmethod
     def get_logger(cls) -> logging.Logger:
@@ -19,8 +19,8 @@ class CustomLogger:
 
     @classmethod
     def register_logger(cls, logger_config: dict):
-        if cls.logger_name not in logger_config['loggers'].keys():
-            raise ValueError('The given configuration does not have' +
-                             f'the set logger name {cls.logger_name}')
+# TODO : Quentin : explain how to use
+#        if cls.logger_name not in logger_config['loggers'].keys():
+#            raise ValueError('The given configuration does not have ' +
+#                             f'the set logger name {cls.logger_name}')
         logging.config.dictConfig(logger_config)
-    

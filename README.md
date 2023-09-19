@@ -67,7 +67,7 @@ To configure AIRS, edit `conf/airs.yaml`. An example is provided in `test/conf/a
 
 ```shell
 export PYTHONPATH=`pwd`
-python3 airs.py conf/airs.yaml &
+python3 -m airs.cli.airs conf/airs.yaml &
 ```
 
 For more details about the command line, run `python3 airs.py --help` :

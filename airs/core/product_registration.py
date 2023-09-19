@@ -16,7 +16,7 @@ import airs.core.utils as utils
 from airs.core.models.mapper import (to_json, item_from_dict, item_from_json_file, to_airs_item, to_airs_json)
 from airs.core.models.model import (Asset, Item, Properties, Band, Role)
 from airs.core.settings import Configuration
-from airs.logger import CustomLogger as Logger
+from common.logger import CustomLogger as Logger
 
 ASSETS_NOT_FOUND="Asset(s) not found"
 LOGGER = Logger.get_logger()

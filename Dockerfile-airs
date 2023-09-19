@@ -7,9 +7,9 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 COPY ./airs /app/airs
+COPY ./common /app/common
 COPY ./conf /app/conf
-COPY ./airs/start.sh /app/
-COPY ./airs/airs.py /app/
+COPY ./scripts/airs/start.sh /app/
 
 EXPOSE 8000
 ENTRYPOINT ["./start.sh"]

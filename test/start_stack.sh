@@ -1,7 +1,11 @@
 # Set env variable
 source ./test/env.sh
 # Copy heavy data for test from gcp bucket
-gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
+if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
+    echo "${ROOT_DIRECTORY}/DIMAP exists, files are not downloaded."
+else
+    gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
+fi
 # Start  minio
 docker-compose -f docker-compose.yaml up  -d minio
 #Waiting for minio service up and running

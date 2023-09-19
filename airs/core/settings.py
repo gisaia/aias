@@ -2,7 +2,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
-from airs.logger import CustomLogger as Logger
+from common.logger import CustomLogger as Logger
 
 LOGGER = Logger.get_logger()
 

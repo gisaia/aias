@@ -1,10 +1,11 @@
-from aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from aproc.core.settings import Configuration
-from airs.core.models.model import Asset, Item, Role, Properties
-from datetime import datetime
 import os
+from datetime import datetime
 
+from airs.core.models.model import Asset, Item, Properties, Role
+from aproc.core.settings import Configuration
+from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
+
 
 # TODO this driver must be tested with real data
 class Driver(ProcDriver):
