@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 from dateutil.parser import parse as parse_date
 
-from airs.core.models.model import Asset, Band, Item, Properties, Role
+from airs.core.models.model import Asset, Band, Item, Properties, Role, ItemFormat, AssetFormat, ResourceType
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import ConnectionException
@@ -38,9 +38,9 @@ class Driver(ProcDriver):
                 if len(hits)<2:
                     hit=hits[0]
                     return [
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value),
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value),
-                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data)
+                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value, asset_format=AssetFormat.png, asset_type=ResourceType.gridded),
+                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value, asset_format=AssetFormat.png, asset_type=ResourceType.gridded),
+                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data, asset_format=AssetFormat.zip, asset_type=ResourceType.other)
                     ]
                 else: 
                     Driver.LOGGER.error("more than one hit found ({} found)".format(len(hits.get("hits"))))
