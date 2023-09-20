@@ -19,6 +19,8 @@ class ExceptionHandler(BaseModel, arbitrary_types_allowed=True):
 
 def validation_exception_handler(req: Request, exc: RequestValidationError):
     # Format the detail of the error message
+    # TODO fix loc = error["loc"][1] when [loc] is smaller than 2
+    return
     detail = ""
     for error in exc.errors():
         loc = error["loc"][1]

@@ -193,5 +193,11 @@ def post_process_execute(process_id: str, execute: Execute):
     process = __get_process(process_id)
 
     if hasattr(process, "input_model"):
-        return process.execute(process.input_model(**execute2inputs(execute)))
+        # TODO : check whether we should keep it or not
+#        return process.execute(process.input_model(**execute2inputs(execute)))
+        inputs = execute.model_dump().get("inputs")
+        job: StatusInfo = Processes.execute(process_id, process.input_model(**inputs))
+        job.processID = process_id
+        return job
+    # TODO : if no model, then inputs should be provided to the process, as it is?
     return process.execute()
