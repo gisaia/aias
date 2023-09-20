@@ -68,7 +68,6 @@ class Process(Process):
             Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
         else:
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
-        Process.input_model = InputIngestProcess
 
     @staticmethod
     def getProcessDescription() -> ProcessDescription:
