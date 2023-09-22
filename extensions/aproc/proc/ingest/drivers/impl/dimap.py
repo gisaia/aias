@@ -9,19 +9,18 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
 
 
 class Driver(ProcDriver):
-    root_directory = None
     quicklook_path = None
     thumbnail_path = None
     dim_path = None
     relative_dim_path = None
+    roi_path = None
 
     # Implements drivers method
     def init(configuration: Configuration):
-        Driver.root_directory = configuration["root_directory"]
+         return
 
     # Implements drivers method
     def supports(url: str) -> bool:
-        # url variable must be a folder path begining with a /
         try:
             result = Driver.__check_path__(url)
             return result
@@ -53,80 +52,152 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal
+        from osgeo import gdal, ogr, osr
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()
         coordinates = []
+        #Calculate bbox
         for vertex in root.iter('Vertex'):
             coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
             coordinates.append(coord)
-        coordinates.append(coordinates[0])
-        geometry = {
-            "type": "Polygon",
-            "coordinates": [coordinates]
-        }
-        for cent in root.iter('Center'):
-            centroid = [float(cent.find('LON').text), float(cent.find('LAT').text)]
+        bbox = [min(map(lambda xy: xy[0], coordinates)),
+                min(map(lambda xy: xy[1], coordinates)),
+                max(map(lambda xy: xy[0], coordinates)),
+                max(map(lambda xy: xy[1], coordinates))]
+
+        #Open ROI GML file to find the real footprint of the product
+        driver = ogr.GetDriverByName("GML")
+        component_source = driver.Open(self.roi_path, 0) # read-only
+        layer = component_source.GetLayer()
+        component_feature = layer.GetNextFeature()
+        geo_ref= component_feature.GetGeometryRef()
+        in_spatial_ref_code = None
+        if geo_ref.GetSpatialReference() is not None:
+            if geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS") is not None:
+                in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS")
+            elif geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS") is not None:
+                in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS")
+        else:
+            #Find epsg in reading directly the GML File
+            tree_gml = ET.parse(self.roi_path)
+            root_gml = tree_gml.getroot()
+            for srs in root_gml.iter():
+                if len(srs.items())>0:
+                    if(srs.items()[0][0] == "srsName"):
+                        #We suppose to the first word in the srs expression is the EPSG code
+                        #Because the string in the GML is not a classic SRS expression
+                        in_spatial_ref_code=srs.items()[0][1].split(" ")[0]
+                        break
+
+        component_geometry = component_feature.geometry()
+        # output SpatialReference
+        if in_spatial_ref_code is not None and in_spatial_ref_code.isdigit() and int(in_spatial_ref_code) != "4326":
+            outSpatialRef = osr.SpatialReference()
+            outSpatialRef.ImportFromEPSG(4326)
+            inSpatialRef = osr.SpatialReference()
+            inSpatialRef.ImportFromEPSG(int(in_spatial_ref_code))
+        # create the CoordinateTransformation
+            coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
+            component_geometry.Transform(coordTrans)
+
+        elif in_spatial_ref_code == "urn:ogc:def:derivedCRSType:OGC:1.0:image" and Driver.rpc_file is not None:
+            from rpcm import rpc_from_rpc_file
+            rpc = rpc_from_rpc_file(Driver.rpc_file)
+            print(component_geometry)
+            #TODO finish to transform the geometry with the RPC
+            #rpc.localization()
+            print("USE RPC")
+            #use RPC file if present
+
+        #Retrieve geometry and centroid
+        geometry = component_feature.ExportToJson(as_object=True)["geometry"]
+        centroid_geom = component_geometry.Centroid()
+        centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
+        centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
+
+        #Open the XML dimap file with gdal to retrieve the metadata
         src_ds = gdal.Open(self.dim_path)
         metadata = src_ds.GetMetadata()
+        # We retrieve the time
         date = metadata["IMAGING_DATE"]
         time = metadata["IMAGING_TIME"]
         if "Z" in time:
             date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%fZ").timestamp())
         else:
             date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%f").timestamp())
+
+        # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
+        cloud_cover=None
         if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
             cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
         else:
             for cloud in root.iter('Dataset_Content'):
                 if cloud.find("CLOUD_COVERAGE") is not None:
                     cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
+
+
+        # We calculate the GSD as the mean of  GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
+        gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"]))/2
         item = Item(
-            # TODO valid this formula for id
             id=str(url.replace("/", "-")),
             geometry=geometry,
-            bbox=[min(map(lambda xy: xy[0], geometry["coordinates"][0])),
-                  min(map(lambda xy: xy[1], geometry["coordinates"][0])),
-                  max(map(lambda xy: xy[0], geometry["coordinates"][0])),
-                  max(map(lambda xy: xy[1], geometry["coordinates"][0]))],
+            bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
                 processing__level=metadata["PROCESSING_LEVEL"],
-                instrument=metadata["INSTRUMENT"],
                 eo__cloud_cover=cloud_cover,
+                gsd=gsd,
+                constellation = metadata["MISSION"],
+                sensor = metadata["MISSION"],
+                sensor_type = metadata["MISSION_INDEX"],
                 view__incidence_angle=metadata["INCIDENCE_ANGLE"],
                 view__azimuth=metadata["AZIMUTH_ANGLE"],
                 view__sun_azimuth=metadata["SUN_AZIMUTH"],
                 view__sun_elevation=metadata["SUN_ELEVATION"]
-                # TODO check all the metadata available
-
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
+        # To fit the case of PNEO 30 cm with no instrument metadata
+        if "INSTRUMENT" in metadata:
+            item.properties.instrument = metadata["INSTRUMENT"]
         return item
 
-    def __check_path__(relative_folder_path: str):
+    def __check_path__(path: str):
         # relative_folder_path variable must be a folder path beginning and finishing with a /
-        all_path = Driver.root_directory + relative_folder_path
-        valid_and_exist = os.path.isdir(all_path) and os.path.exists(all_path)
+        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
+        Driver.thumbnail_path = None
+        Driver.quicklook_path = None
+        Driver.roi_path = None
+        Driver.dim_path = None
         cat_all_thumb_path = None
         cat_all_quick_path = None
+        raw_all_thumb_path =None
+        raw_all_quick_path =None
         if valid_and_exist is True:
-            for root, dirs, files in os.walk(all_path):
-                for file in files:
+            for file in os.listdir(path):
+                # check if current file is a dir
+                if os.path.isdir(os.path.join(path, file)):
+                    if file == 'MASKS':
+                        for mask in os.listdir(os.path.join(path, file)):
+                            if mask.endswith('.GML') and mask.startswith('ROI'):
+                                Driver.roi_path = os.path.join(os.path.join(path, file), mask)
+                # check if current file is a file
+                if os.path.isfile(os.path.join(path, file)):
+                    if file.endswith('.XML') and file.startswith('RPC'):
+                        Driver.rpc_file = os.path.join(path, file)
                     if file.endswith('.XML') and file.startswith('DIM'):
-                        Driver.dim_path = all_path + file
-                        Driver.relative_dim_path = relative_folder_path + file
+                        Driver.dim_path = os.path.join(path, file)
+                        Driver.relative_dim_path = Driver.dim_path
                     if file.endswith('.JPG') and file.startswith('PREVIEW'):
-                        raw_all_quick_path = all_path + file
+                        raw_all_quick_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('ICON'):
-                        raw_all_thumb_path = all_path + file
+                        raw_all_thumb_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('CAT_QL'):
-                        cat_all_quick_path = all_path + file
+                        cat_all_quick_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('CAT_TB'):
-                        cat_all_thumb_path = all_path + file
+                        cat_all_thumb_path = os.path.join(path, file)
             if cat_all_thumb_path is not None:
                 Driver.thumbnail_path = cat_all_thumb_path
             else:
@@ -135,7 +206,10 @@ class Driver(ProcDriver):
                 Driver.quicklook_path = cat_all_quick_path
             else:
                 Driver.quicklook_path = raw_all_quick_path
-            return Driver.thumbnail_path is not None and Driver.quicklook_path is not None and Driver.dim_path is not None
+            return Driver.thumbnail_path is not None and \
+                   Driver.quicklook_path is not None and \
+                   Driver.roi_path is not None and \
+                   Driver.dim_path is not None
         else:
-            Driver.LOGGER.error("The folder {} does not exist.".format(all_path))
+            Driver.LOGGER.error("The folder {} does not exist.".format(path))
             return False
