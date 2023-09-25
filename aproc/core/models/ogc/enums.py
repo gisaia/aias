@@ -1,22 +1,23 @@
 import enum
+import json
 
 
-class TransmissionMode(enum.Enum):
+class TransmissionMode(str, enum.Enum):
     value: str = "value"
     reference: str = "reference"
 
 
-class JobControlOptions(enum.Enum):
+class JobControlOptions(str, enum.Enum):
     sync_execute: str = "sync-execute"
     async_execute: str = "async-execute"
     dismiss: str = "dismiss"
 
 
-class MaxOccur(enum.Enum):
+class MaxOccur(str, enum.Enum):
     unbounded = "unbounded"
 
 
-class ObjectType(enum.Enum):
+class ObjectType(str, enum.Enum):
     array = "array"
     boolean = "boolean"
     integer = "integer"
@@ -25,17 +26,17 @@ class ObjectType(enum.Enum):
     string = "string"
 
 
-class ExceptionType(enum.Enum):
+class ExceptionType(str, enum.Enum):
     URI_NOT_FOUND = "The requested URI was not found."
     SERVER_ERROR = "A server error occurred."
     NOT_IMPLEMENTED = "The endpoint is not implemented."
 
 
-class JobType(enum.Enum):
+class JobType(str, enum.Enum):
     process = "process"
 
 
-class StatusCode(enum.Enum):
+class StatusCode(str, enum.Enum):
     accepted: str = "accepted"
     running: str = "running"
     successful: str = "successful"
@@ -43,12 +44,12 @@ class StatusCode(enum.Enum):
     dismissed: str = "dismissed"
 
 
-class Response(enum.Enum):
+class Response(str, enum.Enum):
     raw = "raw"
     document = "document"
 
 
-class Crs(enum.Enum):
+class Crs(str, enum.Enum):
     http___www_opengis_net_def_crs_OGC_1_3_CRS84 = (
         "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
     )

@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, status
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
+from aproc.core.logger import CustomLogger as Logger
 from aproc.core.models.exception import RESTException
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    InlineOrRefData, LandingPage, Link,
@@ -9,9 +11,7 @@ from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
-from aproc.core.utils import execute2inputs
 from common.exception import OGCException
-from aproc.core.logger import CustomLogger as Logger
 
 LOGGER = Logger.get_logger()
 
@@ -37,8 +37,7 @@ def get_conformance() -> Conforms:
 @ROUTER.get("/jobs",
             response_model_exclude_none=True)
 def get_jobs():
-    raise OGCException(type=ExceptionType.NOT_IMPLEMENTED.value,
-                       status=status.HTTP_501_NOT_IMPLEMENTED)
+    return Processes.list_jobs()
 
 
 @ROUTER.get("/jobs/{jobId}",
@@ -52,8 +51,7 @@ def get_jobs():
                 }
             })
 def get_job(jobId: str):
-    raise OGCException(type=ExceptionType.NOT_IMPLEMENTED.value,
-                       status=status.HTTP_501_NOT_IMPLEMENTED)
+    return Processes.status(jobId)
 
 
 @ROUTER.delete("/jobs/{jobId}",
@@ -82,8 +80,28 @@ def delete_job(jobId: str):
                 }
             })
 def get_job_result(jobId: str):
-    raise OGCException(type=ExceptionType.NOT_IMPLEMENTED.value,
-                       status=status.HTTP_501_NOT_IMPLEMENTED)
+    results = Processes.result(task_id=jobId)
+    if results is None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        return JSONResponse(results)
+
+@ROUTER.get("/jobs/resources/{resourceId}",
+            response_model_exclude_none=True,
+            responses={
+                status.HTTP_200_OK: {
+                    "model": dict[str, InlineOrRefData]
+                    },
+                status.HTTP_422_UNPROCESSABLE_ENTITY: {
+                    "model": RESTException
+                }
+            })
+def get_jobs_by_resource_id(resourceId: str):
+    results = Processes.status_by_resource_id(resource_id=resourceId)
+    if results is None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        return JSONResponse(list(map(lambda s: s.model_dump(), results)))
 
 
 @ROUTER.get("/",
@@ -118,8 +136,8 @@ def get_landing_page(request: Request) -> LandingPage:
     )
 
     return LandingPage(
-        title="Datacube Builder API",
-        description="OGC processes complaint API",
+        title="ARLAS Processing API",
+        description="ARLAS Processing API (OGC processes API)",
         links=[
             api_definition, conformance, processes, jobs
         ]
@@ -193,5 +211,11 @@ def post_process_execute(process_id: str, execute: Execute):
     process = __get_process(process_id)
 
     if hasattr(process, "input_model"):
-        return process.execute(process.input_model(**execute2inputs(execute)))
+        # TODO : check whether we should keep it or not
+#        return process.execute(process.input_model(**execute2inputs(execute)))
+        inputs = execute.model_dump().get("inputs")
+        job: StatusInfo = Processes.execute(process_id, process.input_model(**inputs))
+        job.processID = process_id
+        return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
+    # TODO : if no model, then inputs should be provided to the process, as it is?
     return process.execute()

@@ -39,3 +39,7 @@ class Process(ABC):
     @abstractmethod
     def execute(inputs: BaseModel):
         ...
+
+    @abstractmethod
+    def get_ressource_id(inputs: BaseModel):
+        ...

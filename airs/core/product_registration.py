@@ -268,6 +268,7 @@ def reindex(collection:str):
 
 def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_collection_name(collection)):
+        LOGGER.error("index {} does not exists".format(__get_es_collection_name(collection)))
         return False
     try:
         r=__getES().get(index=__get_es_collection_name(collection), id=item_id)

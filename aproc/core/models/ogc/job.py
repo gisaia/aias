@@ -21,3 +21,6 @@ class StatusInfo(BaseModel):
     updated: datetime | None = Field(default=None)
     progress: int | None = Field(default=None, ge=0, le=100)
     links: list[Link] | None = Field(default=None)
+
+    # This field is specific to airs : it stores the resource id that is the input of a process
+    resourceID: str | None = Field(default=None)
