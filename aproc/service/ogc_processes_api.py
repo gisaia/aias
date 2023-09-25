@@ -37,7 +37,8 @@ def get_conformance() -> Conforms:
 @ROUTER.get("/jobs",
             response_model_exclude_none=True)
 def get_jobs():
-    Processes.list_jobs()
+    return Processes.list_jobs()
+
 
 @ROUTER.get("/jobs/{jobId}",
             response_model_exclude_none=True,

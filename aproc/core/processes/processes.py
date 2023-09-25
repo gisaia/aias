@@ -133,21 +133,19 @@ class Processes:
     def __init_redis__():
         try:
             rs = Processes.__get_redis_client__().ft("idx:airs_jobs").info()
-            Processes.__get_redis_client__().ft("idx:airs_jobs").dropindex()
         except ResponseError:
-            ...
-        schema = (
-            TagField("$.process_id", as_name="process_id"),
-            TagField("$.job_id", as_name="job_id"),
-            TagField("$.resource_id", as_name="resource_id")
-        )
-        rs = Processes.__get_redis_client__().ft("idx:airs_jobs")
-        rs.create_index(schema,
-                        definition=IndexDefinition(
-                            prefix=[Processes.__REDIS_PREFIX__],
-                            index_type=IndexType.JSON
+            schema = (
+                TagField("$.process_id", as_name="process_id"),
+                TagField("$.job_id", as_name="job_id"),
+                TagField("$.resource_id", as_name="resource_id")
+            )
+            rs = Processes.__get_redis_client__().ft("idx:airs_jobs")
+            rs.create_index(schema,
+                            definition=IndexDefinition(
+                                prefix=[Processes.__REDIS_PREFIX__],
+                                index_type=IndexType.JSON
+                                )
                             )
-                        )
 
     def __get_redis_client__() -> Redis:
         if Processes.__REDIS_CONNECTION__ is None:
