@@ -1,6 +1,6 @@
 version: "3"
 networks:
-  airs:
+  aias:
 services:
   minio:
     image: minio/minio
@@ -9,7 +9,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     networks:
-      - airs
+      - aias
     environment:
       - "MINIO_ACCESS_KEY=airs"
       - "MINIO_SECRET_KEY=airssecret"
@@ -24,7 +24,7 @@ services:
       - LOGIN=${LOGIN:-airs}
       - PASSWORD=${PASSWORD:-airssecret}
     networks:
-      - airs
+      - aias
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
@@ -37,7 +37,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.9.2}
     container_name: elasticsearch
     networks:
-      - airs
+      - aias
     environment:
       - discovery.type=single-node
       - cluster.name=docker-cluster
@@ -53,25 +53,25 @@ services:
     image: rabbitmq:${RABBITMQ_VERSION:-3-management}
     container_name: rabbitmq
     networks:
-      - airs
+      - aias
     ports:
       - 15672:15672
       - 5672:5672
 
   redis:
-    image: redis:${REDIS_VERSION:-7.2}
+    image: redis/redis-stack:${REDIS_VERSION:-7.2.0-v2}
     networks:
-      - airs
+      - aias
     container_name: redis
     ports:
       - 6379:6379
 
   aproc-processes:
     networks:
-      - airs
+      - aias
     build:
       context: '.'
-      dockerfile: Dockerfile-aproc
+      dockerfile: Dockerfile-aproc-proc
     image: aproc-processes:latest
     #command: tail -f /dev/null
     container_name: 'aproc-processes'
@@ -89,7 +89,7 @@ services:
 
   airs-server:
     networks:
-      - airs
+      - aias
     build:
       context: '.'
       dockerfile: Dockerfile-airs
@@ -117,3 +117,24 @@ services:
     depends_on:
       - elasticsearch
       - minio
+
+  aproc-server:
+    networks:
+      - aias
+    build:
+      context: '.'
+      dockerfile: Dockerfile-aproc-service
+    image: aproc-service:latest
+    container_name: 'aproc-service'
+    environment:
+      - APROC_HOST=0.0.0.0
+      - APROC_PORT=8001
+      - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
+      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AIRS_ENDPOINT=http://airs-server:8000
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+      - rabbitmq

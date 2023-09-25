@@ -14,6 +14,7 @@ RUN mkdir -p $HOME && \
 WORKDIR $HOME
 
 COPY ./aproc/requirements.txt $APP_HOME/requirements.txt
+COPY ./extensions/requirements.txt $APP_HOME/requirements-ext.txt
 
 # Install python 3.10
 RUN apt install python3.10 -y
@@ -28,6 +29,7 @@ RUN /bin/bash -c "source ~/.bashrc"
 RUN apt install -y --no-install-recommends netcat
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 RUN pip install -r $APP_HOME/requirements.txt
+RUN pip install -r $APP_HOME/requirements-ext.txt
 
 COPY ./aproc $APP_HOME/aproc
 COPY ./extensions $APP_HOME/extensions

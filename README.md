@@ -281,7 +281,11 @@ The following environment variables must be set to run the celery workers and th
 | Variable                                               |
 | ------------------------------------------------------ |
 | APROC_CONFIGURATION_FILE                        |
-
+| APROC_HOST                        |
+| APROC_PORT                        |
+| CELERY_BROKER_URL                        |
+| CELERY_RESULT_BACKEND                        |
+| AIRS_ENDPOINT                        |
 
 For starting the service or a celery worker, you need to set two environment variables:
 
@@ -295,16 +299,10 @@ For starting the celery worker:
 celery -A aproc.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
 ```
 
-TODO : implement and document the OGC Processes api
-
-#### Ingest synchronously
-
-Ingestion can be launched synchronously with the ingest command line:
-
-```shell
-python3 aproc/ingest/cli.py test/conf/aproc.yaml "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&size=1" 
+For starting the service:
+```sh
+python3 -m aproc.cli.aproc
 ```
-Note: AIRS must be running.
 
 ## Tests
 

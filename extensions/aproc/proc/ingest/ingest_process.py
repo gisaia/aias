@@ -2,6 +2,7 @@ import os
 
 import requests
 from pydantic import BaseModel, Field
+from celery import shared_task
 
 from airs.core.models.mapper import item_from_json, to_json
 from airs.core.models.model import Asset
@@ -11,12 +12,14 @@ from aproc.core.models.ogc.description import (InputDescription,
                                                OutputDescription)
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.schema import SchemaItem
-from aproc.core.processes.process import Process
-from aproc.core.processes.processes import APROC_CELERY_APP
+from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
+
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from extensions.aproc.proc.ingest.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
+import hashlib
+
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.get_logger()
@@ -59,8 +62,11 @@ class InputIngestProcess(BaseModel):
     catalog: str = Field()
     url: str = Field()
 
+class OutputIngestProcess(BaseModel):
+    item_location: str = Field()
 
-class Process(Process):
+
+class AprocProcess(Process):
 
     @staticmethod
     def init(configuration: dict):
@@ -68,6 +74,7 @@ class Process(Process):
             Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
         else:
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
+        AprocProcess.input_model = InputIngestProcess
 
     @staticmethod
     def getProcessDescription() -> ProcessDescription:
@@ -77,7 +84,11 @@ class Process(Process):
     def getProcessSummary() -> ProcessSummary:
         return summary
 
-    @APROC_CELERY_APP.task(bind=True)
+    def get_resource_id(inputs: BaseModel):
+        hash_object = hashlib.sha1(InputIngestProcess(**inputs.model_dump()).url.encode())
+        return hash_object.hexdigest()
+
+    @shared_task(bind=True)
     def execute(self, url: str, collection: str, catalog: str) -> dict:
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
@@ -94,7 +105,7 @@ class Process(Process):
             catalog (str): target catalog
 
         Returns:
-            object: an dict pointing towards the registered item
+            object: an dict pointing towards the registered item (OutputIngestProcess)
         """
 
         driver = Drivers.solve(url)
@@ -102,7 +113,7 @@ class Process(Process):
             LOGGER.debug("ingestion: 1 - identify_assets")
             __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'identify_assets'})
             assets: list[Asset] = driver.identify_assets(url)
-            Process.__check_assets__(url, assets)
+            AprocProcess.__check_assets__(url, assets)
 
             LOGGER.debug("ingestion: 2 - fetch_assets")
             __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'fetch_assets'})
@@ -112,12 +123,12 @@ class Process(Process):
                 msg = "Fetching assets failed for connection reasons ({})".format(e.response)
                 LOGGER.error(msg)
                 raise ConnectionException(msg)
-            Process.__check_assets__(url, assets, file_exists=True)
+            AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 3 - transform_assets")
             __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'transform_assets'})
             assets = driver.transform_assets(url, assets)
-            Process.__check_assets__(url, assets, file_exists=True)
+            AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 4 - create_item")
             __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'create_item'})
@@ -165,12 +176,7 @@ class Process(Process):
                     r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
                 if r.ok:
                     item_from_json(r.content).model_dump()
-                    return
-                    return {
-                        "action": "register",
-                        "state": "SUCCESS",
-                        "item": os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)
-                        }
+                    return OutputIngestProcess(item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
                 else:
                     LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
                     raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))

@@ -16,7 +16,6 @@ class Settings(BaseModel, extra='allow'):
     celery_result_backend: str | None = Field(title="Celery's backend")
     processes: list[ProcessSettings] = Field(title="List of processes available")
 
-
 class Configuration:
     settings: Settings | None = Field(title="aproc Service configuration")
 

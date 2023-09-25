@@ -1,2 +1,3 @@
 -r aproc/requirements.txt
+-r extensions/requirements.txt
 -r airs/requirements.txt
