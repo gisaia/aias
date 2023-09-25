@@ -79,7 +79,7 @@ services:
       - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - AIRS_ENDPOINT=http://airs-server:8000
+      - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
       - ROOT_DIRECTORY=/inputs
     volumes:
       - ./test/inputs:/inputs
@@ -132,7 +132,7 @@ services:
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - AIRS_ENDPOINT=http://airs-server:8000
+      - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
     ports:
       - "8001:8001"
     depends_on:

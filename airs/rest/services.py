@@ -1,28 +1,21 @@
 import logging
-from datetime import datetime as Datetime
 
-from fastapi import (Body, FastAPI, File, HTTPException, Query, UploadFile,
-                     status)
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile, status
+from fastapi.responses import JSONResponse, Response
 from starlette.requests import Request
 
-from fastapi.responses import (JSONResponse, Response)
-from pydantic import BaseModel
-
-from airs.core.models.mapper import to_json
 import airs.core.product_registration as rs
-from airs.core import exceptions, settings
+from airs.core import exceptions
+from airs.core.models.mapper import to_json
 from airs.core.models.model import Item
-from airs.core.settings import Configuration
 
 logging.basicConfig(level=logging.INFO)
 
-api = FastAPI(version='0.0', title='ARLAS Item Product Registration Service',
-    description='ARLAS Item Registration Service API',
-)
+ROUTER = APIRouter()
 
 
-@api.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)")
-def create_item(collection:str, item: Item, request: Request)->str:
+@ROUTER.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)")
+def create_item(collection: str, item: Item, request: Request)->str:
     """ From https://github.com/stac-api-extensions/transaction:
         POST
         When the body is a partial Item:
@@ -60,7 +53,7 @@ def create_item(collection:str, item: Item, request: Request)->str:
                             detail="Invalid items {}: {}".format(e.items, e.reason))
 
 
-@api.put('/collections/{collection}/items/{id}', description="Update an item. Asset should/must exist (depends on the server configuration)")
+@ROUTER.put('/collections/{collection}/items/{id}', description="Update an item. Asset should/must exist (depends on the server configuration)")
 def update_item(collection:str, id:str, item: Item, request: Request)->str:
     """ From https://github.com/stac-api-extensions/transaction:
         PUT
@@ -100,7 +93,7 @@ def update_item(collection:str, id:str, item: Item, request: Request)->str:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Invalid items {}: {}".format(e.items, e.reason))
 
-@api.delete('/collections/{collection}/items/{id}', description="Delete an item and its assets (depends on the server configuration)")
+@ROUTER.delete('/collections/{collection}/items/{id}', description="Delete an item and its assets (depends on the server configuration)")
 def delete_item(collection:str, id:str)->str:
     """ From https://github.com/stac-api-extensions/transaction:
         DELETE
@@ -122,7 +115,7 @@ def delete_item(collection:str, id:str)->str:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Invalid items {}: {}".format(e.items, e.reason))
 
-@api.get('/collections/{collection}/items/{id}', description="Retrieve an item")
+@ROUTER.get('/collections/{collection}/items/{id}', description="Retrieve an item")
 def get_item(collection:str, id:str)->str:
     item=Item(id=id, collection=collection)
     if not rs.item_exists(collection, id):
@@ -137,7 +130,7 @@ def get_item(collection:str, id:str)->str:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Invalid items {}: {}".format(e.items, e.reason))
 
-@api.post('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Upload an asset.")
+@ROUTER.post('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Upload an asset.")
 async def upload_asset(collection:str, item_id:str, asset_name:str, file: UploadFile = File(...)):
     upload_obj = rs.upload_asset(collection=collection, item_id=item_id, asset_name=asset_name, file=file.file, content_type=file.content_type)
     if upload_obj:
@@ -147,7 +140,7 @@ async def upload_asset(collection:str, item_id:str, asset_name:str, file: Upload
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="File could not be uploaded")
 
-@api.head('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Tests if an asset exists.")
+@ROUTER.head('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Tests if an asset exists.")
 async def retrieve_asset(collection:str, item_id:str, asset_name:str):
     if rs.asset_exists(collection=collection, item_id=item_id, asset_name=asset_name):
          return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -155,7 +148,7 @@ async def retrieve_asset(collection:str, item_id:str, asset_name:str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Asset not found")
 
-@api.delete('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Delete an asset.")
+@ROUTER.delete('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Delete an asset.")
 async def delete_asset(collection:str, item_id:str, asset_name:str):
     if rs.asset_exists(collection=collection, item_id=item_id, asset_name=asset_name):
          rs.delete_asset(collection, item_id, asset_name)
@@ -164,6 +157,6 @@ async def delete_asset(collection:str, item_id:str, asset_name:str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Asset not found")
 
-@api.post('/collections/{collection}/_reindex', description="Reindex a collection")
+@ROUTER.post('/collections/{collection}/_reindex', description="Reindex a collection")
 async def delete_asset(collection:str):
     rs.reindex(collection=collection)

@@ -106,7 +106,10 @@ class Processes:
     @staticmethod
     def result(task_id: str):
         res = AsyncResult(task_id, app=APROC_CELERY_APP)
-        return res.result
+        if res.status == states.SUCCESS:
+            return res.result
+        else:
+            return None
         
     @staticmethod
     def list_jobs() -> list[str]:

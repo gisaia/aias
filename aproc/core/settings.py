@@ -15,6 +15,7 @@ class Settings(BaseModel, extra='allow'):
     celery_broker_url: str | None = Field(title="Celery's broker url")
     celery_result_backend: str | None = Field(title="Celery's backend")
     processes: list[ProcessSettings] = Field(title="List of processes available")
+    airs_endpoint: str | None = Field(title="ARLAS Item Registration Service endpoint")
 
 class Configuration:
     settings: Settings | None = Field(title="aproc Service configuration")
