@@ -3,22 +3,15 @@ import logging
 import os
 from abc import ABC, abstractmethod
 
+from airs.core.logger import Logger
 from airs.core.models.model import Asset, Item
 
 
 class Driver(ABC):
-    priority:int=0
-    name:str=None
-    __assets_dir__:str=None
-    LOGGER=logging.getLogger(__name__)
-
-    def set_logger(self, logger) -> None:
-        """ Sets the driver's logger
-
-        Args:
-            logger (logger): the driver's logger
-        """
-        LOGGER=logger
+    priority: int = 0
+    name: str = None
+    __assets_dir__: str = None
+    LOGGER = Logger.logger
 
     def get_assets_dir(self, url:str)->str:
         """Provides the directory for storing the assets

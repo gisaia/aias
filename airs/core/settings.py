@@ -1,10 +1,9 @@
-from enum import Enum
-
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
-from common.logger import CustomLogger as Logger
+from airs.core.logger import Logger
 
-LOGGER = Logger.get_logger()
+LOGGER = Logger.logger
+
 
 class S3(BaseModel):
     access_key_id:str

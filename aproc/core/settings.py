@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 from envyaml import EnvYAML
-from common.logger import CustomLogger as Logger
+from aproc.core.logger import Logger
 
-LOGGER = Logger.get_logger()
+LOGGER = Logger.logger
 
 
 class ProcessSettings(BaseModel, extra='allow'):
@@ -16,6 +16,7 @@ class Settings(BaseModel, extra='allow'):
     celery_result_backend: str | None = Field(title="Celery's backend")
     processes: list[ProcessSettings] = Field(title="List of processes available")
     airs_endpoint: str | None = Field(title="ARLAS Item Registration Service endpoint")
+
 
 class Configuration:
     settings: Settings | None = Field(title="aproc Service configuration")

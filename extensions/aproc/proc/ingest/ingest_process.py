@@ -22,7 +22,7 @@ import hashlib
 
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.get_logger()
+LOGGER = Logger.logger
 
 
 def __update_status__(LOGGER, task, state: str, meta: dict = None):
