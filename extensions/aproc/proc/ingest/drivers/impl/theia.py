@@ -38,9 +38,9 @@ class Driver(ProcDriver):
                 if len(hits)<2:
                     hit=hits[0]
                     return [
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value, asset_format=AssetFormat.png, asset_type=ResourceType.gridded),
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value, asset_format=AssetFormat.png, asset_type=ResourceType.gridded),
-                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data, asset_format=AssetFormat.zip, asset_type=ResourceType.other)
+                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value),
+                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value),
+                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data, asset_format=AssetFormat.zip.value, asset_type=ResourceType.other.value)
                     ]
                 else: 
                     Driver.LOGGER.error("more than one hit found ({} found)".format(len(hits.get("hits"))))
@@ -107,6 +107,7 @@ class Driver(ProcDriver):
             centroid=hit["md"]["centroid"]["coordinates"],
             bbox= [min(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),min(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0]))],
             properties=Properties(
+                item_format=ItemFormat.theia.value,
                 datetime=acquisition_date,
                 begin_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["temporalCoverage"]["begin"]))),
                 end_datetime= int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["temporalCoverage"]["end"]))),

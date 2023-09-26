@@ -149,7 +149,7 @@ class AprocProcess(Process):
                             if r.ok:
                                 LOGGER.debug("asset uploaded successfully")                    
                             else:
-                                msg = "Failed to upload asset: {} - {}".format(r.status_code, r.content)
+                                msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, Configuration.settings.airs_endpoint)
                                 LOGGER.error(msg)
                                 raise RegisterException(msg)
                         except requests.exceptions.ConnectionError:
@@ -179,6 +179,7 @@ class AprocProcess(Process):
                     return OutputIngestProcess(item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
                 else:
                     LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
+                    LOGGER.error(to_json(item))
                     raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
             except requests.exceptions.ConnectionError:
                 msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)

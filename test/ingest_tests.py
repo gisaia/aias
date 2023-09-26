@@ -5,14 +5,14 @@ import json
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess
 
-from utils import setUpTest
+from utils import AIRS_URL, setUpTest
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
-APROC_ENDPOINT = "http://localhost:8001"
+APROC_ENDPOINT = "http://localhost:8001/arlas/aproc"
 
 class Tests(unittest.TestCase):
 
@@ -76,7 +76,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        self.assertEqual(result["item_location"], "http://airs-server:8000/collections/main_collection/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D")
+        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/main_collection/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D")
 
     def test_get_jobs_by_resource_id(self):
         status: StatusInfo = self.__ingest_theia()

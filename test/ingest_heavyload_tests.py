@@ -13,7 +13,7 @@ from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
 BATCH_SIZE = 10
-APROC_ENDPOINT = "http://localhost:8001"
+APROC_ENDPOINT = "http://localhost:8001/arlas/aproc"
 
 
 class Tests(unittest.TestCase):

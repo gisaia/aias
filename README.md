@@ -32,24 +32,24 @@ STAC-T methods:
 
 | Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
 | ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `POST /collections/{collectionID}/items`               | `application/json`  | partial Item or partial ItemCollection | 201, 202       | Adds a new item to a collection.                                  |
-| `PUT /collections/{collectionId}/items/{featureId}`    | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a complete item description. |
-| `PATCH /collections/{collectionId}/items/{featureId}`  | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a partial item description.  |
-| `DELETE /collections/{collectionID}/items/{featureId}` | n/a                 | n/a                                    | 200, 202, 204  | Deletes an existing item by ID.                                   |
+| `POST /arlas/airs/collections/{collectionID}/items`               | `application/json`  | partial Item or partial ItemCollection | 201, 202       | Adds a new item to a collection.                                  |
+| `PUT /arlas/airs/collections/{collectionId}/items/{featureId}`    | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a complete item description. |
+| `PATCH /arlas/airs/collections/{collectionId}/items/{featureId}`  | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a partial item description.  |
+| `DELETE /arlas/airs/collections/{collectionID}/items/{featureId}` | n/a                 | n/a                                    | 200, 202, 204  | Deletes an existing item by ID.                                   |
 
 Also, a convenient method is provided to get the item:
 
 | Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
 | ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `GET /collections/{collectionId}/items/{featureId}`    | `application/json`  |                            | 200, 404  | Returns the item if exists, 404 otherwise.                                         |
+| `GET /arlas/airs/collections/{collectionId}/items/{featureId}`    | `application/json`  |                            | 200, 404  | Returns the item if exists, 404 otherwise.                                         |
 
 Asset methods:
 
 | Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
 | ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `POST /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  | Asset file | 200       | Adds a new asset to the data store.                                         |
-| `HEAD /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
-| `DELETE /collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
+| `POST /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  | Asset file | 200       | Adds a new asset to the data store.                                         |
+| `HEAD /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
+| `DELETE /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
 
 By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`)
 
@@ -114,6 +114,7 @@ with `XXX:VVV` the environment variable that you want to specify. The table belo
 | AIRS_S3_ENDPOINT_URL                                |
 | AIRS_MAPPING_URL                                    |
 | AIRS_COLLECTION_URL                                 |
+| AIRS_PREFIX                       |
 
 
 #### Stack for tests
@@ -136,7 +137,7 @@ In the following examples, we will:
 
 ```shell
 curl -X POST \
-    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification?content_type=image/tiff" \
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification?content_type=image/tiff" \
     -F file=@test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif
 ```
 Result:
@@ -148,7 +149,7 @@ Result:
 
 ```shell
 curl -I \
-    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification" 
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification" 
 ```
 Result:
 
@@ -161,7 +162,7 @@ HTTP/1.1 204 No Content
 ```shell
 curl -X POST \
     -H "Content-Type: application/json" \
-    "http://127.0.0.1:8000/collections/digitalearth.africa/items" \
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items" \
     -d @test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json
 ```
 
@@ -204,7 +205,7 @@ Result:
 ```shell
 curl -X GET \
     -H "Content-Type: application/json" \
-    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
 ```
 
 Result: same as previous call (registration).
@@ -214,7 +215,7 @@ Result: same as previous call (registration).
 ```shell
 curl -X DELETE \
     -H "Content-Type: application/json" \
-    "http://127.0.0.1:8000/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
 ```
 
 
@@ -286,6 +287,7 @@ The following environment variables must be set to run the celery workers and th
 | CELERY_BROKER_URL                        |
 | CELERY_RESULT_BACKEND                        |
 | AIRS_ENDPOINT                        |
+| APROC_PREFIX                       |
 
 For starting the service or a celery worker, you need to set two environment variables:
 

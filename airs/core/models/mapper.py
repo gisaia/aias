@@ -1,8 +1,7 @@
-from airs.core.models.model import Item
 import json
-from pydantic.fields import FieldInfo
-from pydantic.json import pydantic_encoder
-from pydantic import BaseModel, Extra, Field
+
+from airs.core.models.model import Item
+
 
 def to_airs_item(item: Item)->Item:
      """ Takes an item and makes sure to map the namespace fields to AIRS Item. Keys can contain : as namespace seperator
