@@ -28,18 +28,18 @@ class Process(ABC):
 
     @staticmethod
     @abstractmethod
-    def getProcessDescription() -> ProcessDescription:
+    def get_process_description() -> ProcessDescription:
         ...
 
     @staticmethod
     @abstractmethod
-    def getProcessSummary() -> ProcessSummary:
+    def get_process_summary() -> ProcessSummary:
         ...
 
     @abstractmethod
-    def execute(inputs: BaseModel):
+    def execute(self, inputs: BaseModel, outputs: BaseModel):
         ...
 
     @abstractmethod
-    def get_ressource_id(inputs: BaseModel):
+    def get_ressource_id(self, inputs: BaseModel):
         ...

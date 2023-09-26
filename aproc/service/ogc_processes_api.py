@@ -159,8 +159,8 @@ def get_processes_list(request: Request) -> ProcessList:
     links: list[Link] = []
 
     for process in Processes.processes:
-        processes.append(process.getProcessSummary())
-        links.append(__create_process_link(process.getProcessDescription(), request.base_url))
+        processes.append(process.get_process_summary())
+        links.append(__create_process_link(process.get_process_description(), request.base_url))
 
     return ProcessList(
         processes=processes,
@@ -192,7 +192,7 @@ def __get_process(process_id: str) -> Process:
                 }
             })
 def get_process_summary(process_id: str):
-    return __get_process(process_id).getProcessSummary()
+    return __get_process(process_id).get_process_summary()
 
 
 @ROUTER.post("/processes/{process_id}/execution",

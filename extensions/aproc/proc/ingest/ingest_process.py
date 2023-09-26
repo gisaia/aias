@@ -1,25 +1,21 @@
+import hashlib
 import os
 
 import requests
-from pydantic import BaseModel, Field
 from celery import shared_task
+from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
 from airs.core.models.model import Asset
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
-from aproc.core.models.ogc.description import (InputDescription,
-                                               OutputDescription)
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.models.ogc.schema import SchemaItem
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
-
+from aproc.core.utils import base_model2description
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from extensions.aproc.proc.ingest.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
-import hashlib
-
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
@@ -31,6 +27,16 @@ def __update_status__(LOGGER, task, state: str, meta: dict = None):
         task.update_state(state=state, meta=meta)
 
 
+class InputIngestProcess(BaseModel):
+    collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
+    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
+    url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
+
+
+class OutputIngestProcess(BaseModel):
+    item_location: str = Field(title="Item location", description="Location of the Item on the ARLAS Item Registration Service")
+
+
 summary: ProcessSummary = ProcessSummary(
             title="Ingest an archive in AIRS.",
             description="Extract the item and assets information from an archive and register the item and assets in ARLAS Item Registration Services.",
@@ -39,31 +45,15 @@ summary: ProcessSummary = ProcessSummary(
             version="0.1",
             jobControlOptions=[JobControlOptions.async_execute, JobControlOptions.dismiss, JobControlOptions.sync_execute],
             outputTransmission=[TransmissionMode.reference],
-            # TODO: provide the links if any
+            # TODO: provide the links if any => link could be the execute endpoint
             links=[]
 )
 
 description: ProcessDescription = ProcessDescription(
     **summary.model_dump(),
-    inputs={
-        # TODO: provide the schemas
-        "collection": InputDescription(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-        "catalog": InputDescription(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-        "url": InputDescription(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-    },
-    outputs={
-        "location": OutputDescription(title="Item location", description="Location of the Item on the ARLAS Item Registration Service", schema=SchemaItem())
-    }
+    inputs=base_model2description(InputIngestProcess),
+    outputs=base_model2description(OutputIngestProcess)
 )
-
-
-class InputIngestProcess(BaseModel):
-    collection: str = Field()
-    catalog: str = Field()
-    url: str = Field()
-
-class OutputIngestProcess(BaseModel):
-    item_location: str = Field()
 
 
 class AprocProcess(Process):
@@ -77,11 +67,11 @@ class AprocProcess(Process):
         AprocProcess.input_model = InputIngestProcess
 
     @staticmethod
-    def getProcessDescription() -> ProcessDescription:
+    def get_process_description() -> ProcessDescription:
         return description
 
     @staticmethod
-    def getProcessSummary() -> ProcessSummary:
+    def get_process_summary() -> ProcessSummary:
         return summary
 
     def get_resource_id(inputs: BaseModel):
