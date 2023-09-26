@@ -37,7 +37,7 @@ class Process(ABC):
         ...
 
     @abstractmethod
-    def execute(self, inputs: BaseModel, outputs: BaseModel):
+    def execute(self, **kwargs) -> BaseModel:
         ...
 
     @abstractmethod

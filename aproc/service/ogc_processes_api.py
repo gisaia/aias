@@ -201,6 +201,9 @@ def get_process_summary(process_id: str):
                 status.HTTP_200_OK: {
                     "model": BaseModel
                     },
+                status.HTTP_201_CREATED: {
+                    "model": StatusInfo
+                },
                 status.HTTP_404_NOT_FOUND: {
                     "model": RESTException
                 },
@@ -216,4 +219,4 @@ def post_process_execute(process_id: str, execute: Execute):
         job: StatusInfo = Processes.execute(process_id, process.input_model(**inputs))
         job.processID = process_id
         return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
-    return process.execute()
+    return JSONResponse(content=process.execute().model_dump(), status_code=status.HTTP_200_OK)

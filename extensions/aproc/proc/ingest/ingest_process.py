@@ -2,7 +2,7 @@ import hashlib
 import os
 
 import requests
-from celery import shared_task
+from celery import shared_task, Task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
@@ -21,7 +21,7 @@ DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-def __update_status__(LOGGER, task, state: str, meta: dict = None):
+def __update_status__(task: Task, state: str, meta: dict = None):
     LOGGER.info(task.name+" "+state+" "+str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
@@ -80,6 +80,7 @@ class AprocProcess(Process):
 
     @shared_task(bind=True)
     def execute(self, url: str, collection: str, catalog: str) -> dict:
+        # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
         - identify the assets to fetch
@@ -101,12 +102,12 @@ class AprocProcess(Process):
         driver = Drivers.solve(url)
         if driver is not None:
             LOGGER.debug("ingestion: 1 - identify_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'identify_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'identify_assets'})
             assets: list[Asset] = driver.identify_assets(url)
             AprocProcess.__check_assets__(url, assets)
 
             LOGGER.debug("ingestion: 2 - fetch_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'fetch_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'fetch_assets'})
             try:
                 assets = driver.fetch_assets(url, assets)
             except requests.exceptions.ConnectionError as e:
@@ -116,19 +117,19 @@ class AprocProcess(Process):
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 3 - transform_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'transform_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'transform_assets'})
             assets = driver.transform_assets(url, assets)
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 4 - create_item")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'create_item'})
+            __update_status__(self, state='PROGRESS', meta={'step':'create_item'})
             item = driver.to_item(url, assets)
             item.collection = collection
             item.catalog = catalog
             LOGGER.debug("ingestion: 5 - upload")
             i: int = 0
             for asset_name, asset in item.assets.items():
-                __update_status__(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
+                __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
                 i += 1
                 asset: Asset = asset
                 if asset.airs__managed is True:
@@ -149,7 +150,7 @@ class AprocProcess(Process):
                 else:
                     LOGGER.info("{} not managed".format(asset.name))
             LOGGER.debug("ingestion: 6 - register")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'register_item'})
+            __update_status__( self, state='PROGRESS', meta={'step':'register_item'})
             item_already_exists = False
             try:
                 r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
