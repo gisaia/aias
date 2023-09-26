@@ -20,7 +20,7 @@ from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration
 
-LOGGER = Logger.get_logger()
+LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 APROC_CELERY_APP = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)

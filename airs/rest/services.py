@@ -1,15 +1,11 @@
-import logging
-
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
-from starlette.requests import Request
 
 import airs.core.product_registration as rs
 from airs.core import exceptions
 from airs.core.models.mapper import to_json
 from airs.core.models.model import Item
 
-logging.basicConfig(level=logging.INFO)
 
 ROUTER = APIRouter()
 

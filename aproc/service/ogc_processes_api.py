@@ -13,7 +13,7 @@ from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
 from common.exception import OGCException
 
-LOGGER = Logger.get_logger()
+LOGGER = Logger.logger
 
 ROUTER = APIRouter()
 ROOT_CONFORMANCE = "http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf"
@@ -85,6 +85,7 @@ def get_job_result(jobId: str):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
         return JSONResponse(results)
+
 
 @ROUTER.get("/jobs/resources/{resourceId}",
             response_model_exclude_none=True,
