@@ -5,10 +5,10 @@ echo "Build and releas the image with version ${VERSION}"
 
 build_and_publish_docker (){
     IMAGE=$1
-    echo "Building the image ..."
+    echo "Building the image $IMAGE"
     docker build -f Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
 
-    echo "Publishing the image ..."
+    echo "Publishing the image $IMAGE"
     docker login
     docker push gisaia/${IMAGE}:latest
     docker push gisaia/${IMAGE}:${VERSION}
@@ -23,7 +23,7 @@ build_and_publish_docker aproc-service
 #---------------    AIRS    ----------------
 # DOCKER
 build_and_publish_docker airs
-exit
+
 
 # PYTHON PIP
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
