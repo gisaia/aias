@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from airs.core.settings import Configuration
 from airs.rest.services import ROUTER
+from common.exception_handler import EXCEPTION_HANDLERS
 
 cli = typer.Typer()
 AIRS_HOST = os.getenv("AIRS_HOST", "127.0.0.1")
@@ -22,6 +23,8 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
                   description='ARLAS Item Registration Service API',
                   )
     api.include_router(ROUTER, prefix=AIRS_PREFIX)
+    for eh in EXCEPTION_HANDLERS:
+        api.add_exception_handler(eh.exception, eh.handler)
     uvicorn.run(api, host=host, port=port)
 
 

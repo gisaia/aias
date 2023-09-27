@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from aproc.core.logger import CustomLogger as Logger
-from aproc.core.models.exception import RESTException
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    InlineOrRefData, LandingPage, Link,
                                    ProcessDescription, ProcessList,
@@ -11,7 +10,7 @@ from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
-from common.exception import OGCException
+from common.exception import OGCException, RESTException
 
 LOGGER = Logger.logger
 

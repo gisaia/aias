@@ -6,8 +6,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.requests import Request
 
-from aproc.core.models.exception import RESTException
-from common.exception import OGCException
+from common.exception import OGCException, RESTException
 
 HandledExceptions: TypeAlias = RequestValidationError | OGCException
 
@@ -32,20 +31,20 @@ def validation_exception_handler(req: Request, exc: RequestValidationError):
 
     return JSONResponse(content=RESTException(
             type="bad request",
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             title="validation error",
             detail=detail,
-            instance=str(req.url)).dict(exclude_none=True),
+            instance=str(req.url)).model_dump(exclude_none=True),
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 def server_error_handler(req: Request, exc: OGCException):
     return JSONResponse(content=RESTException(
             type=exc.type,
-            status_code=exc.status,
+            status=exc.status,
             title=exc.title,
             detail=exc.detail,
-            instance=str(req.url)).dict(exclude_none=True),
+            instance=str(req.url)).model_dump(exclude_none=True),
         status_code=exc.status if exc.status is not None
         else status.HTTP_500_INTERNAL_SERVER_ERROR)
 
