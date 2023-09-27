@@ -419,6 +419,6 @@ def __get_es_collection_name(collection: str)->str:
 
 def __getES():
     if Configuration.settings.index.login:
-        return elasticsearch.Elasticsearch(Configuration.settings.index.endpoint_url, basic_auth=(Configuration.settings.index.login, Configuration.settings.index.pwd))
+        return elasticsearch.Elasticsearch(Configuration.settings.index.endpoint_url, basic_auth=(Configuration.settings.index.login, Configuration.settings.index.pwd), verify_certs=False)
     else:
         return elasticsearch.Elasticsearch(Configuration.settings.index.endpoint_url)

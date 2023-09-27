@@ -20,6 +20,8 @@ airs_model#/properties/assets/anyOf/0/additionalProperties
 | :---------------------------------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [name](#name)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")                                                                                                                                      |
 | [href](#href)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")                                                                                                                                                                    |
+| [asset\_type](#asset_type)                                        | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-type-of-data-resourcetype.md "airs_model#/$defs/Asset/properties/asset_type")                                                                                                                                                                      |
+| [asset\_format](#asset_format)                                    | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-data-format-assetformat.md "airs_model#/$defs/Asset/properties/asset_format")                                                                                                                                                                      |
 | [storage\_\_requester\_pays](#storage__requester_pays)            | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Asset/properties/storage__requester_pays")                                             |
 | [storage\_\_tier](#storage__tier)                                 | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Asset/properties/storage__tier")                                                                                                                                           |
 | [storage\_\_platform](#storage__platform)                         | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Asset/properties/storage__platform")                                                                                                                                   |
@@ -103,6 +105,54 @@ any of
 *   [Untitled string in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-1.md "check type definition")
+
+## asset\_type
+
+
+
+`asset_type`
+
+*   is optional
+
+*   Type: merged type ([Type of data (ResourceType)](model-defs-asset-properties-type-of-data-resourcetype.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-asset-properties-type-of-data-resourcetype.md "airs_model#/$defs/Asset/properties/asset_type")
+
+### asset\_type Type
+
+merged type ([Type of data (ResourceType)](model-defs-asset-properties-type-of-data-resourcetype.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
+
+## asset\_format
+
+
+
+`asset_format`
+
+*   is optional
+
+*   Type: merged type ([Data format (AssetFormat)](model-defs-asset-properties-data-format-assetformat.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-asset-properties-data-format-assetformat.md "airs_model#/$defs/Asset/properties/asset_format")
+
+### asset\_format Type
+
+merged type ([Data format (AssetFormat)](model-defs-asset-properties-data-format-assetformat.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-asset-properties-data-format-assetformat-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-data-format-assetformat-anyof-1.md "check type definition")
 
 ## storage\_\_requester\_pays
 
