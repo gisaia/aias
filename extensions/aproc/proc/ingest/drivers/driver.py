@@ -2,15 +2,15 @@ import hashlib
 import os
 from abc import ABC, abstractmethod
 
-from common.logger import CustomLogger
 from airs.core.models.model import Asset, Item
+from aproc.core.logger import Logger
 
 
 class Driver(ABC):
     priority: int = 0
     name: str = None
     __assets_dir__: str = None
-    LOGGER = CustomLogger.logger
+    LOGGER = Logger.logger
 
     def get_assets_dir(self, url:str)->str:
         """Provides the directory for storing the assets
