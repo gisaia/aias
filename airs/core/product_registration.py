@@ -1,4 +1,5 @@
 import os
+import json
 from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple
@@ -203,6 +204,19 @@ def delete_item(collection:str, item_id:str):
     s3.get_client().delete_object(Bucket=Configuration.settings.s3.bucket, Key=get_item_relative_path(collection, item_id))
     LOGGER.info("{} deleted.".format(get_item_relative_path(collection, item_id)))
 
+def __fetch_mapping__():
+    if (Configuration.settings.arlaseo_mapping_url.startswith("http")):
+        r = requests.get(Configuration.settings.arlaseo_mapping_url, verify=False)
+        if r.ok:
+            return r.json()["mappings"]
+        else:
+            LOGGER.error("Can not fetch the mapping for creating the ARLAS index. Aborting ...")
+            raise exceptions.InternalError("elasticsearch", r.reason)
+    else:
+        with open(Configuration.settings.arlaseo_mapping_url) as f:
+            return json.load(f)["mappings"]
+
+
 def register_item(item:Item)->Item:
     """ Register an item
 
@@ -235,13 +249,9 @@ def register_item(item:Item)->Item:
     upload_item(item)
     if not __getES().indices.exists(index=__get_es_collection_name(item.collection)):
         LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_collection_name(item.collection), Configuration.settings.arlaseo_mapping_url))
-        r = requests.get(Configuration.settings.arlaseo_mapping_url, verify=False)
-        if r.ok:
-            __getES().indices.create(index=__get_es_collection_name(item.collection), mappings=r.json()["mappings"])
-            LOGGER.info("Index {} created.".format(__get_es_collection_name(item.collection)))
-        else:
-            LOGGER.error("Can not fetch the mapping for creating the ARLAS index. Aborting ...")
-            raise exceptions.InternalError("elasticsearch", r.reason)
+        mapping = __fetch_mapping__()
+        __getES().indices.create(index=__get_es_collection_name(item.collection), mappings=mapping)
+        LOGGER.info("Index {} created.".format(__get_es_collection_name(item.collection)))
     else:
         LOGGER.info("Index {} found.".format(__get_es_collection_name(item.collection)))
     resp = __getES().index(index=__get_es_collection_name(item.collection), id=item.id, document=to_airs_json(item))
@@ -401,8 +411,11 @@ def __check_register_item_params(item:Item):
     if item.assets is None:
         item.assets={}
 
-def __get_es_collection_name(collection:str)->str:
-    return Configuration.settings.index.collection_prefix+"_"+collection
+def __get_es_collection_name(collection: str)->str:
+    if Configuration.settings.index.collection_prefix:
+        return Configuration.settings.index.collection_prefix+"_"+collection
+    else:
+        return collection
 
 def __getES():
     if Configuration.settings.index.login:
