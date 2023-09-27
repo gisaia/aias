@@ -12,7 +12,7 @@ from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
-BATCH_SIZE = 10
+BATCH_SIZE = 1
 APROC_ENDPOINT = "http://localhost:8001/arlas/aproc"
 
 
