@@ -5,16 +5,14 @@ import unittest
 from time import sleep
 
 import requests
-from utils import AIRS_URL, setUpTest
+from utils import AIRS_URL, APROC_ENDPOINT, setUpTest
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
-BATCH_SIZE = 1
-APROC_ENDPOINT = "http://localhost:8001/arlas/aproc"
-
+BATCH_SIZE = 10
 
 class Tests(unittest.TestCase):
 
