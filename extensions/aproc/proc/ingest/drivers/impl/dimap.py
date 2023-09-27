@@ -17,7 +17,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def init(configuration: Configuration):
-         return
+         Driver.LOGGER.debug('init DIMAP driver')
 
     # Implements drivers method
     def supports(url: str) -> bool:

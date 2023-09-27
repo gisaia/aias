@@ -1,4 +1,3 @@
-source ./test/env.sh
 ./test/start_stack.sh
 # Set env variable
 source ./test/env.sh
