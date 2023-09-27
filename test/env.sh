@@ -12,3 +12,5 @@ export AIRS_S3_TIER=Standard
 export AIRS_S3_PLATFORM=minio
 export AIRS_S3_ENDPOINT_URL=http://minio:9000
 export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://127.0.0.1:9000/{}/{}
+export AIRS_MAPPING_URL=/app/conf/mapping.json
+export AIRS_COLLECTION_URL=/app/conf/collection.json
