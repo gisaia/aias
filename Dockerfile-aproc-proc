@@ -27,6 +27,9 @@ RUN /bin/bash -c "source ~/.bashrc"
 
 # Install pip
 RUN apt install -y --no-install-recommends netcat
+RUN apt-get update
+RUN apt-get install -y g++ make libtiff-dev
+
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 RUN pip install -r $APP_HOME/requirements.txt
 RUN pip install -r $APP_HOME/requirements-ext.txt

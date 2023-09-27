@@ -6,7 +6,7 @@ from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
-
+import json
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -100,21 +100,44 @@ class Driver(ProcDriver):
         # create the CoordinateTransformation
             coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
             component_geometry.Transform(coordTrans)
+            #Retrieve geometry and centroid
+            geometry = component_feature.ExportToJson(as_object=True)["geometry"]
+            centroid_geom = component_geometry.Centroid()
+            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
+            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
 
         elif in_spatial_ref_code == "urn:ogc:def:derivedCRSType:OGC:1.0:image" and Driver.rpc_file is not None:
+            #use RPC file if present
             from rpcm import rpc_from_rpc_file
             rpc = rpc_from_rpc_file(Driver.rpc_file)
-            print(component_geometry)
             #TODO finish to transform the geometry with the RPC
-            #rpc.localization()
+            # in the meantime we use the bbox as geom to validate the test
+            coordinates.append(coordinates[0])
+            geometry = {
+                "type": "Polygon",
+                "coordinates": [coordinates]
+            }
+            geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
+            centroid_geom = geom.Centroid()
+            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
+            #Define centroid
+            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
             print("USE RPC")
-            #use RPC file if present
-
-        #Retrieve geometry and centroid
-        geometry = component_feature.ExportToJson(as_object=True)["geometry"]
-        centroid_geom = component_geometry.Centroid()
-        centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-        centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
+            #rpc.localization()
+        else:
+            #Use bbox as geometry
+            coordinates.append(coordinates[0])
+            geometry = {
+                "type": "Polygon",
+                "coordinates": [coordinates]
+            }
+            geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
+            print(geom)
+            centroid_geom = geom.Centroid()
+            print(centroid_geom)
+            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
+            #Define centroid
+            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
 
         #Open the XML dimap file with gdal to retrieve the metadata
         src_ds = gdal.Open(self.dim_path)
