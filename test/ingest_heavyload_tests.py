@@ -38,7 +38,7 @@ class Tests(unittest.TestCase):
         print("{} archives submitted in {} s".format(BATCH_SIZE, end - start))
 
         start = time.time()
-        status: StatusInfo = Processes.status(status.jobID)
+        status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         while status.status not in [StatusCode.dismissed, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
