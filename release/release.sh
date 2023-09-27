@@ -6,7 +6,7 @@ echo "Build and releas the image with version ${VERSION}"
 build_and_publish_docker (){
     IMAGE=$1
     echo "Building the image $IMAGE"
-    docker build -f Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
+    docker build --platform "linux/amd64" -f Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
 
     echo "Publishing the image $IMAGE"
     docker login
