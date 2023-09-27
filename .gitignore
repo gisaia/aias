@@ -6,3 +6,5 @@ private
 target
 .idea/
 env_aeoprs
+test/inputs/DIMAP
+airs.egg-info/

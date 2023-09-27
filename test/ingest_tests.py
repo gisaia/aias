@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
         self.ingest(url, "main_collection", "theia")
 
     def test_async_ingest_dimap(self):
-        url = "/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         self.ingest(url, "main_collection", "spot6")
 
     def test_processes_list(self):
