@@ -28,6 +28,8 @@ airs_model#/properties/properties/anyOf/0
 | [sensor\_type](#sensor_type)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                         |
 | [gsd](#gsd)                                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                            |
 | [data\_type](#data_type)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")                                                                                                                                                                                                             |
+| [item\_type](#item_type)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")                                                                                                                                                                                                |
+| [item\_format](#item_format)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-data-format-itemformat.md "airs_model#/$defs/Properties/properties/item_format")                                                                                                                                                                                                 |
 | [data\_coverage](#data_coverage)                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")                                                                                                                                                                                               |
 | [water\_coverage](#water_coverage)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")                                                                                                                                                                                             |
 | [locations](#locations)                                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "airs_model#/$defs/Properties/properties/locations")                                                                                                                                                                                    |
@@ -339,6 +341,54 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-type-of-data-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-type-of-data-anyof-1.md "check type definition")
+
+## item\_type
+
+
+
+`item_type`
+
+*   is optional
+
+*   Type: merged type ([Type of data (ResourceType)](model-defs-properties-properties-type-of-data-resourcetype.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")
+
+### item\_type Type
+
+merged type ([Type of data (ResourceType)](model-defs-properties-properties-type-of-data-resourcetype.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
+
+## item\_format
+
+
+
+`item_format`
+
+*   is optional
+
+*   Type: merged type ([Data format (ItemFormat)](model-defs-properties-properties-data-format-itemformat.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-data-format-itemformat.md "airs_model#/$defs/Properties/properties/item_format")
+
+### item\_format Type
+
+merged type ([Data format (ItemFormat)](model-defs-properties-properties-data-format-itemformat.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-data-format-itemformat-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-data-format-itemformat-anyof-1.md "check type definition")
 
 ## data\_coverage
 
