@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from aproc.core.logger import CustomLogger as Logger
-from aproc.core.models.exception import RESTException
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    InlineOrRefData, LandingPage, Link,
                                    ProcessDescription, ProcessList,
@@ -11,7 +10,7 @@ from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
-from common.exception import OGCException
+from common.exception import OGCException, RESTException
 
 LOGGER = Logger.logger
 
@@ -159,8 +158,8 @@ def get_processes_list(request: Request) -> ProcessList:
     links: list[Link] = []
 
     for process in Processes.processes:
-        processes.append(process.getProcessSummary())
-        links.append(__create_process_link(process.getProcessDescription(), request.base_url))
+        processes.append(process.get_process_summary())
+        links.append(__create_process_link(process.get_process_description(), request.base_url))
 
     return ProcessList(
         processes=processes,
@@ -192,7 +191,7 @@ def __get_process(process_id: str) -> Process:
                 }
             })
 def get_process_summary(process_id: str):
-    return __get_process(process_id).getProcessSummary()
+    return __get_process(process_id).get_process_summary()
 
 
 @ROUTER.post("/processes/{process_id}/execution",
@@ -201,6 +200,9 @@ def get_process_summary(process_id: str):
                 status.HTTP_200_OK: {
                     "model": BaseModel
                     },
+                status.HTTP_201_CREATED: {
+                    "model": StatusInfo
+                },
                 status.HTTP_404_NOT_FOUND: {
                     "model": RESTException
                 },
@@ -216,4 +218,4 @@ def post_process_execute(process_id: str, execute: Execute):
         job: StatusInfo = Processes.execute(process_id, process.input_model(**inputs))
         job.processID = process_id
         return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
-    return process.execute()
+    return JSONResponse(content=process.execute().model_dump(), status_code=status.HTTP_200_OK)

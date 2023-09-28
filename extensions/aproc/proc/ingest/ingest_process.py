@@ -1,34 +1,40 @@
+import hashlib
 import os
 
 import requests
+from celery import shared_task, Task
 from pydantic import BaseModel, Field
-from celery import shared_task
 
 from airs.core.models.mapper import item_from_json, to_json
 from airs.core.models.model import Asset
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
-from aproc.core.models.ogc.description import (InputDescription,
-                                               OutputDescription)
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.models.ogc.schema import SchemaItem
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
-
+from aproc.core.utils import base_model2description
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from extensions.aproc.proc.ingest.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
-import hashlib
-
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-def __update_status__(LOGGER, task, state: str, meta: dict = None):
+def __update_status__(task: Task, state: str, meta: dict = None):
     LOGGER.info(task.name+" "+state+" "+str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
+
+
+class InputIngestProcess(BaseModel):
+    collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
+    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
+    url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
+
+
+class OutputIngestProcess(BaseModel):
+    item_location: str = Field(title="Item location", description="Location of the Item on the ARLAS Item Registration Service")
 
 
 summary: ProcessSummary = ProcessSummary(
@@ -39,31 +45,15 @@ summary: ProcessSummary = ProcessSummary(
             version="0.1",
             jobControlOptions=[JobControlOptions.async_execute, JobControlOptions.dismiss, JobControlOptions.sync_execute],
             outputTransmission=[TransmissionMode.reference],
-            # TODO: provide the links if any
+            # TODO: provide the links if any => link could be the execute endpoint
             links=[]
 )
 
 description: ProcessDescription = ProcessDescription(
     **summary.model_dump(),
-    inputs={
-        # TODO: provide the schemas
-        "collection": InputDescription(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-        "catalog": InputDescription(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-        "url": InputDescription(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1, schema=SchemaItem()),
-    },
-    outputs={
-        "location": OutputDescription(title="Item location", description="Location of the Item on the ARLAS Item Registration Service", schema=SchemaItem())
-    }
+    inputs=base_model2description(InputIngestProcess),
+    outputs=base_model2description(OutputIngestProcess)
 )
-
-
-class InputIngestProcess(BaseModel):
-    collection: str = Field()
-    catalog: str = Field()
-    url: str = Field()
-
-class OutputIngestProcess(BaseModel):
-    item_location: str = Field()
 
 
 class AprocProcess(Process):
@@ -77,11 +67,11 @@ class AprocProcess(Process):
         AprocProcess.input_model = InputIngestProcess
 
     @staticmethod
-    def getProcessDescription() -> ProcessDescription:
+    def get_process_description() -> ProcessDescription:
         return description
 
     @staticmethod
-    def getProcessSummary() -> ProcessSummary:
+    def get_process_summary() -> ProcessSummary:
         return summary
 
     def get_resource_id(inputs: BaseModel):
@@ -90,6 +80,7 @@ class AprocProcess(Process):
 
     @shared_task(bind=True)
     def execute(self, url: str, collection: str, catalog: str) -> dict:
+        # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
         - identify the assets to fetch
@@ -111,12 +102,12 @@ class AprocProcess(Process):
         driver = Drivers.solve(url)
         if driver is not None:
             LOGGER.debug("ingestion: 1 - identify_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'identify_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'identify_assets'})
             assets: list[Asset] = driver.identify_assets(url)
             AprocProcess.__check_assets__(url, assets)
 
             LOGGER.debug("ingestion: 2 - fetch_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'fetch_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'fetch_assets'})
             try:
                 assets = driver.fetch_assets(url, assets)
             except requests.exceptions.ConnectionError as e:
@@ -126,19 +117,19 @@ class AprocProcess(Process):
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 3 - transform_assets")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'transform_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'transform_assets'})
             assets = driver.transform_assets(url, assets)
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 4 - create_item")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'create_item'})
+            __update_status__(self, state='PROGRESS', meta={'step':'create_item'})
             item = driver.to_item(url, assets)
             item.collection = collection
             item.catalog = catalog
             LOGGER.debug("ingestion: 5 - upload")
             i: int = 0
             for asset_name, asset in item.assets.items():
-                __update_status__(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
+                __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
                 i += 1
                 asset: Asset = asset
                 if asset.airs__managed is True:
@@ -159,7 +150,7 @@ class AprocProcess(Process):
                 else:
                     LOGGER.info("{} not managed".format(asset.name))
             LOGGER.debug("ingestion: 6 - register")
-            __update_status__(LOGGER, self, state='PROGRESS', meta={'step':'register_item'})
+            __update_status__( self, state='PROGRESS', meta={'step':'register_item'})
             item_already_exists = False
             try:
                 r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
