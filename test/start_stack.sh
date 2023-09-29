@@ -6,6 +6,8 @@ if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
 else
     gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
 fi
+# Start smtp4test
+docker-compose -f test/docker-compose.yaml up -d
 # Start  minio
 docker-compose -f docker-compose.yaml up  -d minio
 #Waiting for minio service up and running
@@ -24,4 +26,3 @@ while [[ "$code" != *$code_OK* ]];do
     code="$(curl -IL --silent http://localhost:9200 | grep "^HTTP\/")"
     eval "sleep 5"
 done
-

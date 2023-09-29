@@ -1,5 +1,5 @@
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
-export APROC_CONFIGURATION_FILE=`pwd`/test/conf/aproc.yaml
+export APROC_CONFIGURATION_FILE=`pwd`/conf/aproc.yaml
 export ROOT_DIRECTORY=`pwd`/test/inputs
 export AIRS_ARLAS_COLLECTION_NAME=tests
 export AIRS_ARLAS_URL=http://localhost:81/server
@@ -14,3 +14,10 @@ export AIRS_S3_ENDPOINT_URL=http://minio:9000
 export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://127.0.0.1:9000/{}/{}
 export AIRS_MAPPING_URL=/app/conf/mapping.json
 export AIRS_COLLECTION_URL=/app/conf/collection.json
+
+export ARLAS_SMTP_ACTIVATED=true
+export ARLAS_SMTP_HOST=smtp4dev
+export ARLAS_SMTP_PORT=2525
+export ARLAS_SMTP_USERNAME=whatever
+export ARLAS_SMTP_PASSWORD=whatever
+export ARLAS_SMTP_FROM=me@arlas.io

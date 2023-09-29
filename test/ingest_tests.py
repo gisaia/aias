@@ -5,14 +5,13 @@ import json
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess
 
-from utils import AIRS_URL, setUpTest
+from utils import AIRS_URL, APROC_ENDPOINT, setUpTest
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
-APROC_ENDPOINT = "http://localhost:8001/arlas/aproc"
 
 class Tests(unittest.TestCase):
 

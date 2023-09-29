@@ -10,6 +10,7 @@ from airs.core.models.model import Asset
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
+from aproc.core.models.ogc.job import StatusInfo
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
@@ -43,7 +44,7 @@ summary: ProcessSummary = ProcessSummary(
             keywords=["AIRS", "ARLAS Item Registration Services"],
             id="ingest",
             version="0.1",
-            jobControlOptions=[JobControlOptions.async_execute, JobControlOptions.dismiss, JobControlOptions.sync_execute],
+            jobControlOptions=[JobControlOptions.async_execute],
             outputTransmission=[TransmissionMode.reference],
             # TODO: provide the links if any => link could be the execute endpoint
             links=[]
@@ -52,7 +53,7 @@ summary: ProcessSummary = ProcessSummary(
 description: ProcessDescription = ProcessDescription(
     **summary.model_dump(),
     inputs=base_model2description(InputIngestProcess),
-    outputs=base_model2description(OutputIngestProcess)
+    outputs=base_model2description(StatusInfo)
 )
 
 
@@ -102,12 +103,12 @@ class AprocProcess(Process):
         driver = Drivers.solve(url)
         if driver is not None:
             LOGGER.debug("ingestion: 1 - identify_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'identify_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'identify_assets', "ACTION": "INGEST", "TARGET": url})
             assets: list[Asset] = driver.identify_assets(url)
             AprocProcess.__check_assets__(url, assets)
 
             LOGGER.debug("ingestion: 2 - fetch_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'fetch_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'fetch_assets', "ACTION": "INGEST", "TARGET": url})
             try:
                 assets = driver.fetch_assets(url, assets)
             except requests.exceptions.ConnectionError as e:
@@ -117,19 +118,19 @@ class AprocProcess(Process):
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 3 - transform_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'transform_assets'})
+            __update_status__(self, state='PROGRESS', meta={'step':'transform_assets', "ACTION": "INGEST", "TARGET": url})
             assets = driver.transform_assets(url, assets)
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 4 - create_item")
-            __update_status__(self, state='PROGRESS', meta={'step':'create_item'})
+            __update_status__(self, state='PROGRESS', meta={'step':'create_item', "ACTION": "INGEST", "TARGET": url})
             item = driver.to_item(url, assets)
             item.collection = collection
             item.catalog = catalog
             LOGGER.debug("ingestion: 5 - upload")
             i: int = 0
             for asset_name, asset in item.assets.items():
-                __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets)})
+                __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
                 i += 1
                 asset: Asset = asset
                 if asset.airs__managed is True:
@@ -150,7 +151,7 @@ class AprocProcess(Process):
                 else:
                     LOGGER.info("{} not managed".format(asset.name))
             LOGGER.debug("ingestion: 6 - register")
-            __update_status__( self, state='PROGRESS', meta={'step':'register_item'})
+            __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
             item_already_exists = False
             try:
                 r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
