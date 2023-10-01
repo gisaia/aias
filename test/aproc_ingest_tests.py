@@ -42,7 +42,7 @@ class Tests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
         self.assertTrue(r.ok)
         processes: ProcessList = ProcessList(**json.loads(r.content))
-        self.assertEqual(len(processes.processes), 1)
+        self.assertGreater(len(processes.processes), 0)
         self.assertIn("ingest", list(map(lambda p: p.id, processes.processes)))
 
     def test_conformance(self):
@@ -75,7 +75,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/main_collection/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D")
+        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/main_collection/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D", result["item_location"])
 
     def test_get_jobs_by_resource_id(self):
         status: StatusInfo = self.__ingest_theia()

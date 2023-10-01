@@ -1,4 +1,5 @@
 source ./test/env.sh
 docker-compose -f docker-compose.yaml down
-docker-compose -f test/docker-compose.yaml down
-rm -rf $ROOT_DIRECTORY"/DIMAP"
+docker kill rnwood/smtp4dev:v3
+#rm -rf $ROOT_DIRECTORY"/DIMAP"
+rm -rf ./outbox

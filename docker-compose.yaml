@@ -58,6 +58,18 @@ services:
       - 15672:15672
       - 5672:5672
 
+  smtp4dev:
+    image: rnwood/smtp4dev:linux-${PLATFORM}-3.2.0-ci20221023104
+    platform: linux/${PLATFORM}
+    container_name: smtp4dev
+    networks:
+      - aias
+    ports:
+      - 3000:80
+    environment:
+      #Specifies the server hostname. Used in auto-generated TLS certificate if enabled.
+      - ServerOptions__HostName=smtp4dev
+
   redis:
     image: redis/redis-stack:${REDIS_VERSION:-7.2.0-v2}
     networks:
@@ -80,11 +92,27 @@ services:
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
+      - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
+      - ARLAS_SMTP_HOST=${ARLAS_SMTP_HOST}
+      - ARLAS_SMTP_PORT=${ARLAS_SMTP_PORT}
+      - ARLAS_SMTP_USERNAME=${ARLAS_SMTP_USERNAME}
+      - ARLAS_SMTP_PASSWORD=${ARLAS_SMTP_PASSWORD}
+      - ARLAS_SMTP_FROM=${ARLAS_SMTP_FROM}
+      - APROC_DOWNLOAD_ADMIN_EMAILS=${APROC_DOWNLOAD_ADMIN_EMAILS}
+      - APROC_DOWNLOAD_OUTBOX_DIR=${APROC_DOWNLOAD_OUTBOX_DIR}
+      - APROC_DOWNLOAD_CONTENT_USER=${APROC_DOWNLOAD_CONTENT_USER}
+      - APROC_DOWNLOAD_SUBJECT_USER=${APROC_DOWNLOAD_SUBJECT_USER}
+      - APROC_DOWNLOAD_CONTENT_ERROR=${APROC_DOWNLOAD_CONTENT_ERROR}
+      - APROC_DOWNLOAD_SUBJECT_ERROR=${APROC_DOWNLOAD_SUBJECT_ERROR}
+      - APROC_DOWNLOAD_CONTENT_ADMIN=${APROC_DOWNLOAD_CONTENT_ADMIN}
+      - APROC_DOWNLOAD_SUBJECT_ADMIN=${APROC_DOWNLOAD_SUBJECT_ADMIN}
     volumes:
       - ./test/inputs:/inputs
+      - ./outbox/:/outbox
     depends_on:
       - redis
       - rabbitmq
+      - smtp4dev
 
   airs-server:
     networks:
@@ -132,6 +160,20 @@ services:
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
+      - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
+      - ARLAS_SMTP_HOST=${ARLAS_SMTP_HOST}
+      - ARLAS_SMTP_PORT=${ARLAS_SMTP_PORT}
+      - ARLAS_SMTP_USERNAME=${ARLAS_SMTP_USERNAME}
+      - ARLAS_SMTP_PASSWORD=${ARLAS_SMTP_PASSWORD}
+      - ARLAS_SMTP_FROM=${ARLAS_SMTP_FROM}
+      - APROC_DOWNLOAD_ADMIN_EMAILS=${APROC_DOWNLOAD_ADMIN_EMAILS}
+      - APROC_DOWNLOAD_OUTBOX_DIR=${APROC_DOWNLOAD_OUTBOX_DIR}
+      - APROC_DOWNLOAD_CONTENT_USER=${APROC_DOWNLOAD_CONTENT_USER}
+      - APROC_DOWNLOAD_SUBJECT_USER=${APROC_DOWNLOAD_SUBJECT_USER}
+      - APROC_DOWNLOAD_CONTENT_ERROR=${APROC_DOWNLOAD_CONTENT_ERROR}
+      - APROC_DOWNLOAD_SUBJECT_ERROR=${APROC_DOWNLOAD_SUBJECT_ERROR}
+      - APROC_DOWNLOAD_CONTENT_ADMIN=${APROC_DOWNLOAD_CONTENT_ADMIN}
+      - APROC_DOWNLOAD_SUBJECT_ADMIN=${APROC_DOWNLOAD_SUBJECT_ADMIN}
     ports:
       - "8001:8001"
     depends_on:

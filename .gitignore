@@ -8,3 +8,4 @@ target
 test/inputs/DIMAP
 airs.egg-info/
 .env
+outbox

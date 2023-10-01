@@ -25,10 +25,10 @@ class Drivers():
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
-    def solve(item: Item) -> Driver:
+    def solve(item: Item, asset: str) -> Driver:
         Drivers.__check_drivers()
         for driver in Drivers.drivers:
-            if driver.supports(item) is True:
+            if driver.supports(item, asset) is True:
                 return driver()
         return None
 

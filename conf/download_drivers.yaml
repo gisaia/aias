@@ -1,12 +1,19 @@
+outbox_directory: ${APROC_DOWNLOAD_OUTBOX_DIR}
+notification_admin_emails: ${APROC_DOWNLOAD_ADMIN_EMAILS}
+email_content_user: ${APROC_DOWNLOAD_CONTENT_USER}
+email_content_error_download: ${APROC_DOWNLOAD_CONTENT_ERROR}
+email_content_admin: ${APROC_DOWNLOAD_CONTENT_ADMIN}
+email_content_download_launched_admin: ${APROC_DOWNLOAD_LAUNCHED_ADMIN}
+smtp:
+  host: ${ARLAS_SMTP_HOST}
+  port: ${ARLAS_SMTP_PORT}
+  login: ${ARLAS_SMTP_USERNAME}
+  password: ${ARLAS_SMTP_PASSWORD}
+  from_addr: ${ARLAS_SMTP_FROM}
+
 drivers:
   -
     name: simple_copy
     class_name: extensions.aproc.proc.download.drivers.impl.simple_copy
     configuration:
-      root_directory: $ROOT_DIRECTORY
-      host: ${ARLAS_SMTP_HOST}
-      port: ${ARLAS_SMTP_PORT}
-      login: ${ARLAS_SMTP_USERNAME}
-      password: ${ARLAS_SMTP_PASSWORD}
-      from_addr: ${ARLAS_SMTP_FROM}
     priority: 1
