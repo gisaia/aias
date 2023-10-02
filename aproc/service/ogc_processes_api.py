@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Header, Request, status
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
@@ -190,8 +190,8 @@ def __get_process(process_id: str) -> Process:
                     "model": RESTException
                 }
             })
-def get_process_summary(process_id: str):
-    return __get_process(process_id).get_process_summary()
+def get_process_description(process_id: str):
+    return __get_process(process_id).get_process_description()
 
 
 @ROUTER.post("/processes/{process_id}/execution",
@@ -210,12 +210,16 @@ def get_process_summary(process_id: str):
                     "model": RESTException
                 }
              })
-def post_process_execute(process_id: str, execute: Execute):
+def post_process_execute(process_id: str, execute: Execute, arlas_user_email: str = Header(None),):
     process = __get_process(process_id)
 
     if hasattr(process, "input_model"):
         inputs = execute.model_dump().get("inputs")
-        job: StatusInfo = Processes.execute(process_id, process.input_model(**inputs))
+        context = {
+            "arlas-user-email": arlas_user_email
+        }
+        LOGGER.info("user: {}".format(arlas_user_email))
+        job: StatusInfo = Processes.execute(process_id, context, process.input_model(**inputs))
         job.processID = process_id
         return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
     return JSONResponse(content=process.execute().model_dump(), status_code=status.HTTP_200_OK)

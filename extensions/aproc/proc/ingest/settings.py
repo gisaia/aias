@@ -15,7 +15,7 @@ class Settings(BaseModel, extra='allow'):
 
 
 class Configuration:
-    settings: Settings | None = Field(title="aproc Service configuration")
+    settings: Settings | None = Field(title="aproc Ingest Service configuration")
 
     @staticmethod
     def init(configuration_file: str):

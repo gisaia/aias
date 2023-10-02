@@ -6,6 +6,10 @@ if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
 else
     gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
 fi
+
+rm -rf ./outbox
+mkdir outbox
+
 # Start  minio
 docker-compose -f docker-compose.yaml up  -d minio
 #Waiting for minio service up and running
@@ -15,6 +19,7 @@ code_OK="OK"
     code="$(curl -IL --silent http://localhost:9000/minio/health/live | grep "^HTTP\/")"
     eval "sleep 5"
 done
+
 # Start  create buckets, elastic rabbitmq redis airs, aproc
 docker-compose -f docker-compose.yaml up --build -d
 # Waiting for elastic ready
@@ -24,4 +29,3 @@ while [[ "$code" != *$code_OK* ]];do
     code="$(curl -IL --silent http://localhost:9200 | grep "^HTTP\/")"
     eval "sleep 5"
 done
-

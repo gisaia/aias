@@ -75,8 +75,8 @@ class Tests(unittest.TestCase):
         # FILE FOUND FOR THE MANAGED ASSET
         r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         item=mapper.item_from_json(r.content)
-        print(item.assets["classification"].href)
-        r=requests.head(url=item.assets["classification"].href)
+        location = item.assets["classification"].href.replace("minio", "localhost")
+        r=requests.head(url=location)
         self.assertTrue(r.ok,msg="Asset found")
 
 

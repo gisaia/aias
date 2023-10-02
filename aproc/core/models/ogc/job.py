@@ -11,9 +11,9 @@ class StatusInfo(BaseModel):
         extra = Extra.allow
 
     processID: str | None = Field(default=None)
-    type: JobType
-    jobID: str
-    status: StatusCode
+    type: JobType  | None = Field(default=None)
+    jobID: str | None = Field(default=None)
+    status: StatusCode | None = Field(default=None)
     message: str | None = Field(default=None)
     created: datetime | None = Field(default=None)
     started: datetime | None = Field(default=None)

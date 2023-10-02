@@ -12,9 +12,9 @@ s3_bucket = os.getenv("AIRS_S3_BUCKET","airstest")
 
 index_endpoint_url = "http://localhost:9200"
 s3_endpoint_url = "http://localhost:9000"
-AIRS_URL = os.getenv("AIRS_URL", "http://127.0.0.1:8000/arlas/airs")
+AIRS_URL = "http://127.0.0.1:8000/arlas/airs"
 APROC_ENDPOINT = os.getenv("APROC_ENDPOINT", "http://localhost:8001/arlas/aproc")
-
+SMTP_SERVER="http://localhost:3000/api/Messages"
 COLLECTION="digitalearth.africa"
 ID="077cb463-1f68-5532-aa8b-8df0b510231a"
 ASSET="classification"
