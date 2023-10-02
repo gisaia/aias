@@ -1,9 +1,16 @@
 outbox_directory: ${APROC_DOWNLOAD_OUTBOX_DIR}
 notification_admin_emails: ${APROC_DOWNLOAD_ADMIN_EMAILS}
+
+# Usable variables in messages: {target_projection}, {target_format}, {arlas-user-email}, {item_id}, {asset_name}, {collection}, {target_directory}, {file_name}
+# Usable variables in messages: {error}
+
+email_subject_user: ${APROC_DOWNLOAD_SUBJECT_USER}
 email_content_user: ${APROC_DOWNLOAD_CONTENT_USER}
+email_subject_error_download: ${APROC_DOWNLOAD_SUBJECT_ERROR}
 email_content_error_download: ${APROC_DOWNLOAD_CONTENT_ERROR}
+email_subject_admin: ${APROC_DOWNLOAD_SUBJECT_ADMIN}
 email_content_admin: ${APROC_DOWNLOAD_CONTENT_ADMIN}
-email_content_download_launched_admin: ${APROC_DOWNLOAD_LAUNCHED_ADMIN}
+
 smtp:
   host: ${ARLAS_SMTP_HOST}
   port: ${ARLAS_SMTP_PORT}

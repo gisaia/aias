@@ -12,13 +12,14 @@ class Notifications:
     def init():
         LOGGER.info("SMTP configuration: {}".format(Configuration.settings.smtp.model_dump_json()))
 
-    def try_send_to(msg: str, to: list[str], context: dict[str, str]):
+    def try_send_to(subject: str, msg: str, to: list[str], context: dict[str, str]):
         try:
             if context is not None:
                 msg = msg.format(**context)
+                subject = subject.format(**context)
             email = EmailMessage()
             email.set_content(msg)
-            email['Subject'] = 'ARLAS - Your download request.'
+            email['Subject'] = subject
             email['From'] = Configuration.settings.smtp.from_addr
             email['To'] = ",".join(to)
             client = SMTP(host=Configuration.settings.smtp.host, 
