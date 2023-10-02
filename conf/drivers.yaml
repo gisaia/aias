@@ -1,18 +1,42 @@
 drivers:
   -
-    name: geoeye
-    class_name: extensions.aproc.proc.ingest.drivers.impl.geoeye
-    assets_dir: /tmp/aproc/geoeye
-    configuration:
-      root_directory: $ROOT_DIRECTORY
-    priority: 2
-  -
     name: dimap
     class_name: extensions.aproc.proc.ingest.drivers.impl.dimap
     assets_dir: /tmp/aproc/dimap
     configuration:
-      root_directory: $ROOT_DIRECTORY
     priority: 1
+  -
+    name: geoeye
+    class_name: extensions.aproc.proc.ingest.drivers.impl.geoeye
+    assets_dir: /tmp/aproc/geoeye
+    configuration:
+    priority: 2
+  -
+    name: digitalglobe
+    class_name: extensions.aproc.proc.ingest.drivers.impl.digitalglobe
+    assets_dir: /tmp/aproc/digitalglobe
+    configuration:
+    priority: 3
+  -
+    name: ast_dem
+    class_name: extensions.aproc.proc.ingest.drivers.impl.ast_dem
+    assets_dir: /tmp/aproc/ast_dem
+    configuration:
+    priority: 4
+
+  -
+    name: rapideye
+    class_name: extensions.aproc.proc.ingest.drivers.impl.rapideye
+    assets_dir: /tmp/aproc/rapideye
+    configuration:
+    priority: 5
+
+  - name: spot5
+    class_name: extensions.aproc.proc.ingest.drivers.impl.spot5
+    assets_dir: /tmp/aproc/spot5
+    configuration:
+    priority: 6
+
   -
     name: theia
     class_name: extensions.aproc.proc.ingest.drivers.impl.theia
@@ -21,4 +45,4 @@ drivers:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
       login: ${THEIA_LOGIN}
       pwd: ${THEIA_PWD}
-    priority: 3
+    priority: 7

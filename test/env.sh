@@ -38,4 +38,5 @@ export APROC_DOWNLOAD_SUBJECT_ERROR="Download failed."
 export APROC_DOWNLOAD_CONTENT_ADMIN="Download done."
 export APROC_DOWNLOAD_SUBJECT_ADMIN="Download done."
 
-export PLATFORM=`uname -m`
+#TODO add a function to identify the right platform
+export PLATFORM='amd64'

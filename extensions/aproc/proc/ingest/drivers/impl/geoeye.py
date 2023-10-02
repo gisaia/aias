@@ -4,21 +4,20 @@ from datetime import datetime
 from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
 
 
-# TODO this driver must be tested with real data
 class Driver(ProcDriver):
-    root_directory = None
-    tif_file_path = None
-    image_shp_file_path = None
-    component_shp_file_path = None
-    preview_file_path = None
-    tif_file = None
+    quicklook_path = None
+    thumbnail_path = None
+    tif_path = None
+    file_name = None
+    met_path = None
+    component_id = None
 
     # Implements drivers method
     def init(configuration: Configuration):
-        Driver.root_directory = configuration["root_directory"]
+        return
 
     # Implements drivers method
     def supports(url: str) -> bool:
@@ -32,17 +31,20 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
-            Asset(href=self.preview_file_path,
-                  roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                  description=Role.thumbnail.value),
-            Asset(href=self.preview_file_path,
-                  roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                  description=Role.overview.value),
-            Asset(href=self.tif_file_path, relative_href=self.relative_dim_path,
-                  roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value)
-        ]
+        assets = []
+        if self.thumbnail_path is not None:
+            assets.append(Asset(href=self.thumbnail_path,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                description=Role.thumbnail.value))
+        if self.quicklook_path is not None:
+            assets.append(Asset(href=self.quicklook_path,
+                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                description=Role.overview.value))
+        assets.append(Asset(href=self.tif_path,
+                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            description=Role.data.value, airs__managed=False))
+
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -54,83 +56,147 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal, ogr
-        setup_gdal()
-        #Retrieve resolution from tiff file
-        src_ds = gdal.Open(self.tif_file_path)
-        _, xres, _, _, _, yres  = src_ds.GetGeoTransform()
-        resolution = xres
-        #Open component shape file to retrieve feature corresponding to tiff fle name
-        driver = ogr.GetDriverByName("ESRI Shapefile")
-        component_source = driver.Open(self.component_shp_file_path, 0) # read-only
-        layer = component_source.GetLayer()
-        layer.SetAttributeFilter("Filename_1 = " + self.tif_file)
-        component_feature = layer.GetNextFeature()
+        d = {}
+        inside_component_section = False
+        inside_product_image_section = False
+        inside_coord_1 = False
+        inside_coord_2 = False
+        inside_coord_3 = False
+        inside_coord_4 = False
+        with open(self.met_path) as f:
+            for line_1 in f:
+                if inside_component_section:
+                    self.__set_lat_lon(d,line_1,inside_coord_1,1)
+                    self.__set_lat_lon(d,line_1,inside_coord_2,2)
+                    self.__set_lat_lon(d,line_1,inside_coord_3,3)
+                    self.__set_lat_lon(d,line_1,inside_coord_4,4)
+                    self.__get_field__(d,line_1,'Product Image ID')
+                    self.__get_field__(d,line_1,'Pixel Size X')
+                    self.__get_field__(d,line_1,'Pixel Size Y')
+                    self.__get_field__(d,line_1,'Percent Component Cloud Cover',True)
+                    if line_1.find('Coordinate: 1') >=0:
+                        inside_coord_1 = True
+                        inside_coord_4 = False
+                    if line_1.find('Coordinate: 2') >=0:
+                        inside_coord_2 = True
+                        inside_coord_1 = False
+                    if line_1.find('Coordinate: 3') >=0:
+                        inside_coord_3 = True
+                        inside_coord_2 = False
+                    if line_1.find('Coordinate: 4') >=0:
+                        inside_coord_4 = True
+                        inside_coord_3 = False
+                    if line_1.find('Percent Component Cloud Cover') >=0:
+                        break
+                if line_1.find('Component ID: '+ self.component_id) >=0:
+                    inside_component_section = True
 
-        #Retrieve geometry and centroid
-        component_geometry = component_feature.geometry()
-        geometry = component_feature.ExportToJson(as_object=True)["geometry"]
-        poly = ogr.Geometry(ogr.wkbPolygon)
-        poly.AddGeometry(component_geometry)
-        centroid = str(component_geometry.Centroid())
 
-        #Retrieve image ID corresponding to the component with a geographical query
-        image_source = driver.Open(self.image_shp_file_path, 0)
-        image_layer = image_source.GetLayer()
-        image_layer.SetSpatialFilter(ogr.CreateGeometryFromWkt(str(component_geometry)))
-        image_feature = image_layer.GetNextFeature()
-        metadata = image_feature.items()
-        azimuth_angle = float(metadata["Collect_Az"])
-        sun_azimuth = float(metadata["Sun_Az"])
-        sun_elevation = float(metadata["Sun_El"])
-        cloud_cover = float(metadata["CloudCover"])
-        date = metadata["Acq_Date"].split(" ")[0]
-        time = metadata["Acq_Date"].split(" ")[1] + ":00"
-        date_time = int(datetime.datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
-        image_feature.Destroy()
-        component_feature.Destroy()
+        with open(self.met_path) as f_2:
+            for line_2 in f_2:
+                self.__get_field__(d,line_2,'Sensor Type')
+                self.__get_field__(d,line_2,'Processing Level')
+                if inside_product_image_section:
+                        self.__get_field__(d,line_2,'Sensor')
+                        self.__get_field__(d,line_2,'Scan Azimuth')
+                        self.__get_field__(d,line_2,'Sun Angle Azimuth')
+                        self.__get_field__(d,line_2,'Sun Angle Elevation')
+                        self.__get_date_field__(d,line_2)
+                if line_2.find('Product Image ID: '+ d['Product Image ID']) >=0:
+                     inside_product_image_section =True
+        geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'],d['lat_1'],d['lon_2'],d['lat_2'],d['lon_3'], d['lat_3'],d['lon_4'], d['lat_4'])
+        x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
+        y_pixel_size = float(d['Pixel Size Y'].split(' ')[0])
+        gsd = (x_pixel_size+y_pixel_size)/2
+        eo__cloud_cover = d['Percent Component Cloud Cover']
+        processing__level = d['Processing Level']
+        constellation = d['Sensor']
+        instrument = d['Sensor']
+        sensor = d['Sensor']
+        sensor_type = d['Sensor Type']
+        date_time =  int(datetime.strptime(d['Acquisition Date/Time'], "%Y-%m-%d %H:%M %Z").timestamp())
+        view__azimuth=float(d['Scan Azimuth'].split(' ')[0])
+        view__sun_azimuth=float(d['Sun Angle Azimuth'].split(' ')[0])
+        view__sun_elevation=float(d['Sun Angle Elevation'].split(' ')[0])
 
         item = Item(
-            # TODO valid this formula for id
             id=str(url.replace("/", "-")),
-            gsd=resolution,
             geometry=geometry,
-            bbox=[min(map(lambda xy: xy[0], geometry["coordinates"][0])),
-                  min(map(lambda xy: xy[1], geometry["coordinates"][0])),
-                  max(map(lambda xy: xy[0], geometry["coordinates"][0])),
-                  max(map(lambda xy: xy[1], geometry["coordinates"][0]))],
+            bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                eo__cloud_cover=cloud_cover,
-                view__azimuth=azimuth_angle,
-                view__sun_azimuth=sun_azimuth,
-                view__sun_elevation=sun_elevation
-                # TODO check all the metadata available
-
+                processing__level=processing__level,
+                eo__cloud_cover=eo__cloud_cover,
+                gsd=gsd,
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                sensor_type=sensor_type,
+                view__azimuth=view__azimuth,
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
         return item
-
-    def __check_path__(relative_folder_path: str):
-        # relative_folder_path variable must be a folder path beginning and finishing with a /
-        all_path = Driver.root_directory + relative_folder_path
-        valid_and_exist = os.path.isdir(all_path) and os.path.exists(all_path)
-        if valid_and_exist is True:
-            for root, dirs, files in os.walk(all_path):
-                for file in files:
-                    if file.endswith('.tif'):
-                        Driver.tif_file = file
-                        Driver.tif_file_path = all_path + file
-                    if file.endswith('_image.shp'):
-                        Driver.image_shp_file_path = all_path + file
-                    if file.endswith('_component.shp'):
-                        Driver.component_shp_file_path = all_path + file
+    def __check_path__(file_path: str):
+        Driver.tif_path = None
+        Driver.met_path = None
+        Driver.quicklook_path = None
+        Driver.thumbnail_path = None
+        Driver.component_id = None
+        valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
+        file_name = os.path.basename(file_path)
+        path = os.path.dirname(file_path)
+        if valid_and_exist is True and file_name.endswith(".tif"):
+            Driver.tif_path = file_path
+            Driver.file_name = file_name
+            parts_of_file_name = file_name.replace('.tif','').split("_")
+            Driver.component_id = parts_of_file_name[3]
+            for file in os.listdir(path):
+                # check if current file is a file
+                if os.path.isfile(os.path.join(path, file)):
                     if file.endswith('.jpg'):
-                        Driver.preview_file_path = all_path + file
-            return Driver.tif_file_path is not None and Driver.image_shp_file_path is not None \
-                   and Driver.component_shp_file_path is not None and Driver.preview_file_path is not None
+                        if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
+                            Driver.thumbnail_path = os.path.join(path, file)
+                            Driver.quicklook_path = os.path.join(path, file)
+                    if file.endswith('_metadata.txt'):
+                        Driver.met_path = os.path.join(path, file)
+            return Driver.met_path is not None and \
+                   Driver.tif_path is not None
         else:
-            Driver.LOGGER.error("The folder {} does not exist.".format(all_path))
+            #TODO try to hide this log for file exploration service
+            Driver.LOGGER.error("The folder {} does not exist.".format(file_path))
             return False
+
+    @staticmethod
+    def __get_date_field__(data,line):
+        field ='Acquisition Date/Time'
+        if line.find(field) >=0:
+            data[field]=line.split(':')[1].strip() + ':'+line.split(':')[2].strip()
+
+    @staticmethod
+    def __get_field__(data,line,field,isFloat=False):
+        if line.find(field) >=0:
+            if isFloat:
+                data[field]=float(line.split(':')[1].strip())
+            else:
+                data[field]=line.split(':')[1].strip()
+
+    @staticmethod
+    def __get_latitude__(data,line, coord_number):
+        if line.find('Latitude') >=0:
+            data['lat_' + str(coord_number)]= float((line.split(':')[1].strip()).split(' ')[0])
+
+    @staticmethod
+    def __get_longitude__(data,line, coord_number):
+        if line.find('Longitude') >=0:
+            data['lon_' + str(coord_number)]= float((line.split(':')[1].strip()).split(' ')[0])
+
+    @staticmethod
+    def __set_lat_lon(data,line,inside_coord,coord_number):
+        if inside_coord:
+            Driver.__get_latitude__(data,line,coord_number)
+            Driver.__get_longitude__(data,line,coord_number)
+

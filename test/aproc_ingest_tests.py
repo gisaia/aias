@@ -4,13 +4,11 @@ import requests
 import json
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess
-
-from utils import AIRS_URL, APROC_ENDPOINT, setUpTest
-
+from utils import APROC_ENDPOINT, setUpTest, dir_to_list, filter_data
+import os
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
-from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
-from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
+from aproc.core.models.ogc import (Execute)
 
 
 class Tests(unittest.TestCase):
@@ -37,6 +35,19 @@ class Tests(unittest.TestCase):
     def test_async_ingest_dimap(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         self.ingest(url, "main_collection", "spot6")
+
+    def test_ingest_folder(self):
+        def ingest_folders(data):
+            for d in data:
+                if 'archive' in d:
+                    print("Try to ingest : " + d['path'])
+                    self.ingest(d['path'].replace(os.getcwd()  + "/test",''),'main_collection','dimap')
+                else:
+                    if 'children' in d:
+                        ingest_folders(d['children'])
+        url = os.getcwd() + "/test/inputs"
+        data = dir_to_list(url)
+        ingest_folders(filter_data(data))
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
@@ -71,6 +82,7 @@ class Tests(unittest.TestCase):
 
     def test_job_result(self):
         status: StatusInfo = self.__ingest_theia()
+        print(status)
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
@@ -92,6 +104,7 @@ class Tests(unittest.TestCase):
     def test_process_by_id(self):
         process: ProcessDescription = ProcessDescription(**json.loads(requests.get("/".join([APROC_ENDPOINT, "processes", "ingest"])).content))
         self.assertEqual(process.id, "ingest")
+
 
 if __name__ == '__main__':
     unittest.main()

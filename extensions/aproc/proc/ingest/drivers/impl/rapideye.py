@@ -1,10 +1,9 @@
 import os
 import xml.etree.ElementTree as ET
-import json
 from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -29,17 +28,20 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
-            Asset(href=self.thumbnail_path,
-                  roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                  description=Role.thumbnail.value),
-            Asset(href=self.quicklook_path,
-                  roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                  description=Role.overview.value),
-            Asset(href=self.tif_path,
-                  roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value)
-        ]
+        assets = []
+        if self.thumbnail_path is not None:
+            assets.append(Asset(href=self.thumbnail_path,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                description=Role.thumbnail.value))
+        if self.quicklook_path is not None:
+            assets.append(Asset(href=self.quicklook_path,
+                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                description=Role.overview.value))
+        assets.append(Asset(href=self.tif_path,
+                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            description=Role.data.value, airs__managed=False))
+
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -67,27 +69,7 @@ class Driver(ProcDriver):
         lr_lon = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:bottomRight/re:longitude",ns).text)
         ll_lat = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:bottomLeft/re:latitude",ns).text)
         ll_lon = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:bottomLeft/re:longitude",ns).text)
-
-        #Calculate bbox
-        coordinates = [[ul_lon, ul_lat],
-                       [ur_lon, ur_lat],
-                       [lr_lon, lr_lat],
-                       [ll_lon, ll_lat]]
-        bbox = [min(map(lambda xy: xy[0], coordinates)),
-                min(map(lambda xy: xy[1], coordinates)),
-                max(map(lambda xy: xy[0], coordinates)),
-                max(map(lambda xy: xy[1], coordinates))]
-        coordinates.append(coordinates[0])
-        #Define geometry
-        geometry = {
-            "type": "Polygon",
-            "coordinates": [coordinates]
-        }
-        geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
-        centroid_geom = geom.Centroid()
-        centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-        #Define centroid
-        centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
+        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
 
         date = root.find("gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/re:acquisitionDateTime",ns).text
         date_time = int(datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
@@ -144,11 +126,10 @@ class Driver(ProcDriver):
                         Driver.tif_path = os.path.join(path, file)
                     if file.endswith("_metadata.xml"):
                         Driver.xml_path = os.path.join(path, file)
-            return Driver.thumbnail_path is not None and \
-                   Driver.quicklook_path is not None and \
-                   Driver.tif_path is not None and \
+            return Driver.tif_path is not None and \
                    Driver.xml_path is not None
 
         else:
+            #TODO try to hide this log for file exploration services
             Driver.LOGGER.error("The folder {} does not exist.".format(path))
             return False

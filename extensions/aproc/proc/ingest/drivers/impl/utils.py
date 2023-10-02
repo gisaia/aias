@@ -5,3 +5,27 @@ def setup_gdal():
     gdal.UseExceptions()
     gdal.PushErrorHandler('CPLQuietErrorHandler')
     gdal.VSICurlClearCache()
+
+def get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat):
+    import json
+    from osgeo import ogr
+    coordinates = [[ul_lon, ul_lat],
+                   [ur_lon, ur_lat],
+                   [lr_lon, lr_lat],
+                   [ll_lon, ll_lat]]
+    bbox = [min(map(lambda xy: xy[0], coordinates)),
+            min(map(lambda xy: xy[1], coordinates)),
+            max(map(lambda xy: xy[0], coordinates)),
+            max(map(lambda xy: xy[1], coordinates))]
+    coordinates.append(coordinates[0])
+    # Define geometry
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [coordinates]
+    }
+    geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
+    centroid_geom = geom.Centroid()
+    centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
+    # Define centroid
+    centroid = [float(centroid_geom_list[2]), float(centroid_geom_list[1])]
+    return geometry, bbox, centroid
