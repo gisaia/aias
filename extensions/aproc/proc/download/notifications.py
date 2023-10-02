@@ -15,8 +15,7 @@ class Notifications:
     def try_send_to(msg: str, to: list[str], context: dict[str, str]):
         try:
             if context is not None:
-                for (variable, value) in context.items():
-                    msg = msg.replace("{"+variable+"}", value)
+                msg = msg.format(**context)
             email = EmailMessage()
             email.set_content(msg)
             email['Subject'] = 'ARLAS - Your download request.'
