@@ -21,7 +21,7 @@ code_OK="OK"
 done
 
 # Start  create buckets, elastic rabbitmq redis airs, aproc
-docker-compose -f docker-compose.yaml up --build -d
+docker-compose -f docker-compose.yaml up --build -d createbuckets elasticsearch rabbitmq smtp4dev redis aproc-processes airs-server aproc-server
 # Waiting for elastic ready
 code=""
 code_OK="OK"

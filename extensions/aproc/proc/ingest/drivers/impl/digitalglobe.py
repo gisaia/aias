@@ -1,10 +1,9 @@
 import os
 import xml.etree.ElementTree as ET
-import json
 from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -31,17 +30,20 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
-            Asset(href=self.thumbnail_path,
-                  roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                  description=Role.thumbnail.value),
-            Asset(href=self.quicklook_path,
-                  roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                  description=Role.overview.value),
-            Asset(href=self.tif_path,
+        assets = []
+        if self.thumbnail_path is not None:
+            assets.append(Asset(href=self.thumbnail_path,
+                                            roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                            description=Role.thumbnail.value))
+        if self.quicklook_path is not None:
+            assets.append(Asset(href=self.quicklook_path,
+                                            roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                            description=Role.overview.value))
+        assets.append(Asset(href=self.tif_path,
                   roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value)
-        ]
+                  description=Role.data.value, airs__managed=False))
+
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -57,15 +59,16 @@ class Driver(ProcDriver):
         tree = ET.parse(self.xml_path)
         root = tree.getroot()
         #Calculate bbox
-        coordinates = [[float(root.find("./TIL/TILE/ULLON").text), float(root.find("./TIL/TILE/ULLAT").text)],
-                       [float(root.find("./TIL/TILE/URLON").text), float(root.find("./TIL/TILE/URLAT").text)],
-                       [float(root.find("./TIL/TILE/LRLON").text), float(root.find("./TIL/TILE/LRLAT").text)],
-                       [float(root.find("./TIL/TILE/LLLON").text), float(root.find("./TIL/TILE/LLLAT").text)]]
-        bbox = [min(map(lambda xy: xy[0], coordinates)),
-                min(map(lambda xy: xy[1], coordinates)),
-                max(map(lambda xy: xy[0], coordinates)),
-                max(map(lambda xy: xy[1], coordinates))]
-        #Calculate geometry
+        ul_lat = float(root.find("./TIL/TILE/ULLAT").text)
+        ul_lon = float(root.find("./TIL/TILE/ULLON").text)
+        ur_lat = float(root.find("./TIL/TILE/URLAT").text)
+        ur_lon = float(root.find("./TIL/TILE/URLON").text)
+        lr_lat = float(root.find("./TIL/TILE/LRLAT").text)
+        lr_lon = float(root.find("./TIL/TILE/LRLON").text)
+        ll_lat = float(root.find("./TIL/TILE/LLLAT").text)
+        ll_lon = float(root.find("./TIL/TILE/LLLON").text)
+        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
+        #Overwrite geometry and centroid if GIS_FILE is present with order shape file
         from os.path import dirname, abspath
         d = (dirname(abspath(url)))
         if os.path.isdir(os.path.join(d,"GIS_FILE")):
@@ -83,17 +86,6 @@ class Driver(ProcDriver):
                     centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
                     centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
                     break
-        else:
-            #Use bbox as geometry
-            coordinates.append([float(root.find("./TIL/TILE/ULLON").text), float(root.find("./TIL/TILE/ULLAT").text)])
-            geometry = {
-                "type": "Polygon",
-                "coordinates": [coordinates]
-            }
-            geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
-            centroid_geom = geom.Centroid()
-            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-            centroid = [float(centroid_geom_list[1]),float(centroid_geom_list[2])]
 
         date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
@@ -157,12 +149,11 @@ class Driver(ProcDriver):
                         Driver.til_path = os.path.join(path, file)
                     if file.endswith('.IMD'):
                         Driver.imd_path = os.path.join(path, file)
-            return Driver.thumbnail_path is not None and \
-                   Driver.quicklook_path is not None and \
-                   Driver.tif_path is not None and \
+            return Driver.tif_path is not None and \
                    Driver.xml_path is not None and \
                    Driver.til_path is not None and \
                    Driver.imd_path is not None
         else:
+            #TODO try to hide this log for file exploration service
             Driver.LOGGER.error("The folder {} does not exist.".format(path))
             return False

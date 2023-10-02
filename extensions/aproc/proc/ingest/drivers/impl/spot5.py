@@ -1,10 +1,9 @@
 import os
 import xml.etree.ElementTree as ET
-import json
 from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -29,17 +28,20 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
-            Asset(href=self.thumbnail_path,
-                  roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                  description=Role.thumbnail.value),
-            Asset(href=self.quicklook_path,
-                  roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                  description=Role.overview.value),
-            Asset(href=self.tif_path,
-                  roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value)
-        ]
+        assets = []
+        if self.thumbnail_path is not None:
+            assets.append(Asset(href=self.thumbnail_path,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                description=Role.thumbnail.value))
+        if self.quicklook_path is not None:
+            assets.append(Asset(href=self.quicklook_path,
+                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                description=Role.overview.value))
+        assets.append(Asset(href=self.tif_path,
+                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            description=Role.data.value, airs__managed=False))
+
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -51,30 +53,18 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal, ogr
+        from osgeo import gdal
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()
-        coordinates = []
-        #Calculate bbox
+        coords = []
+        # Get geometry, bbox, centroid
         for vertex in root.iter('Vertex'):
             coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
-            coordinates.append(coord)
-        bbox = [min(map(lambda xy: xy[0], coordinates)),
-                min(map(lambda xy: xy[1], coordinates)),
-                max(map(lambda xy: xy[0], coordinates)),
-                max(map(lambda xy: xy[1], coordinates))]
-        #Use bbox as geometry
-        coordinates.append(coordinates[0])
-        geometry = {
-            "type": "Polygon",
-            "coordinates": [coordinates]
-        }
-        geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
-        centroid_geom = geom.Centroid()
-        centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-        centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
-        gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) +  float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
+            coords.append(coord)
+        geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
+                                                          coords[2][0], coords[2][1], coords[3][0], coords[3][1])
+        gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
         src_ds = gdal.Open(self.dim_path)
         metadata = src_ds.GetMetadata()
         # We retrieve the time
@@ -121,11 +111,10 @@ class Driver(ProcDriver):
                     if file == "icon.jpg":
                         Driver.thumbnail_path = os.path.join(path, file)
 
-            return Driver.thumbnail_path is not None and \
-                   Driver.quicklook_path is not None and \
-                   Driver.tif_path is not None and \
+            return Driver.tif_path is not None and \
                    Driver.dim_path is not None
 
         else:
+            #TODO try to hide this log for file exploration service
             Driver.LOGGER.error("The folder {} does not exist.".format(path))
             return False

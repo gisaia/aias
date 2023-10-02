@@ -5,19 +5,17 @@ from datetime import datetime
 from airs.core.models.model import Asset, Item, Properties, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal
-import json
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
 
 class Driver(ProcDriver):
     quicklook_path = None
     thumbnail_path = None
     dim_path = None
-    relative_dim_path = None
     roi_path = None
 
     # Implements drivers method
     def init(configuration: Configuration):
-         Driver.LOGGER.debug('init DIMAP driver')
+         return
 
     # Implements drivers method
     def supports(url: str) -> bool:
@@ -30,17 +28,20 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
-            Asset(href=self.thumbnail_path,
-                  roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                  description=Role.thumbnail.value),
-            Asset(href=self.quicklook_path,
-                  roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                  description=Role.overview.value),
-            Asset(href=self.dim_path, relative_href=self.relative_dim_path,
-                  roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
-                  description=Role.metadata.value)
-        ]
+        assets = []
+        if self.thumbnail_path is not None:
+            assets.append(Asset(href=self.thumbnail_path,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                description=Role.thumbnail.value))
+        if self.quicklook_path is not None:
+            assets.append(Asset(href=self.quicklook_path,
+                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                description=Role.overview.value))
+        assets.append(Asset(href=self.dim_path,
+                                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                                            description=Role.metadata.value, airs__managed=False))
+        return assets
+
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -56,15 +57,13 @@ class Driver(ProcDriver):
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()
-        coordinates = []
+        coords = []
         #Calculate bbox
         for vertex in root.iter('Vertex'):
             coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
-            coordinates.append(coord)
-        bbox = [min(map(lambda xy: xy[0], coordinates)),
-                min(map(lambda xy: xy[1], coordinates)),
-                max(map(lambda xy: xy[0], coordinates)),
-                max(map(lambda xy: xy[1], coordinates))]
+            coords.append(coord)
+        geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
+                                                              coords[2][0], coords[2][1], coords[3][0], coords[3][1])
 
         #Open ROI GML file to find the real footprint of the product
         driver = ogr.GetDriverByName("GML")
@@ -111,33 +110,8 @@ class Driver(ProcDriver):
             from rpcm import rpc_from_rpc_file
             rpc = rpc_from_rpc_file(Driver.rpc_file)
             #TODO finish to transform the geometry with the RPC
-            # in the meantime we use the bbox as geom to validate the test
-            coordinates.append(coordinates[0])
-            geometry = {
-                "type": "Polygon",
-                "coordinates": [coordinates]
-            }
-            geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
-            centroid_geom = geom.Centroid()
-            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-            #Define centroid
-            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
             print("USE RPC")
             #rpc.localization()
-        else:
-            #Use bbox as geometry
-            coordinates.append(coordinates[0])
-            geometry = {
-                "type": "Polygon",
-                "coordinates": [coordinates]
-            }
-            geom = ogr.CreateGeometryFromJson(json.dumps(geometry))
-            print(geom)
-            centroid_geom = geom.Centroid()
-            print(centroid_geom)
-            centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-            #Define centroid
-            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
 
         #Open the XML dimap file with gdal to retrieve the metadata
         src_ds = gdal.Open(self.dim_path)
@@ -212,7 +186,6 @@ class Driver(ProcDriver):
                         Driver.rpc_file = os.path.join(path, file)
                     if file.endswith('.XML') and file.startswith('DIM'):
                         Driver.dim_path = os.path.join(path, file)
-                        Driver.relative_dim_path = Driver.dim_path
                     if file.endswith('.JPG') and file.startswith('PREVIEW'):
                         raw_all_quick_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('ICON'):
@@ -229,10 +202,9 @@ class Driver(ProcDriver):
                 Driver.quicklook_path = cat_all_quick_path
             else:
                 Driver.quicklook_path = raw_all_quick_path
-            return Driver.thumbnail_path is not None and \
-                   Driver.quicklook_path is not None and \
-                   Driver.roi_path is not None and \
+            return Driver.roi_path is not None and \
                    Driver.dim_path is not None
         else:
+            #TODO try to hide this log for file exploration service
             Driver.LOGGER.error("The folder {} does not exist.".format(path))
             return False

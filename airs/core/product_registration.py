@@ -343,8 +343,11 @@ def __add_generated_fields(item:Item)->Item:
     item.properties.generated__season=utils.Utils.get_season(acquisition)
     item.properties.generated__month=acquisition.month
     item.properties.generated__year=acquisition.year
-    if item.geometry and item.geometry["coordinates"] and item.geometry["coordinates"][0]:
-        item.properties.generated__tltrbrbl=geo.getCorners(item.geometry["coordinates"][0]).tltrbrbl()
+    if item.geometry and item.geometry["coordinates"] :
+        if item.geometry["type"].lower() == 'polygon' and item.geometry["coordinates"][0]:
+            item.properties.generated__tltrbrbl=geo.getCorners(item.geometry["coordinates"][0]).tltrbrbl()
+        if item.geometry["type"].lower() == 'multipolygon' and item.geometry["coordinates"][0] and item.geometry["coordinates"][0][0]:
+            item.properties.generated__tltrbrbl=geo.getCorners(item.geometry["coordinates"][0][0]).tltrbrbl()
     item.properties.generated__band_names=list(filter(lambda name: name is not None, map(lambda band: band.name, item.properties.eo__bands)))
     item.properties.generated__band_common_names=list(filter(lambda common_name: common_name is not None, map(lambda band: band.common_name, item.properties.eo__bands)))
     return item

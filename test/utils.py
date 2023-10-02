@@ -1,8 +1,9 @@
 import elasticsearch
-from boto3 import Session
-import airs.core.product_registration as rs
 import os
+import time
+import unicodedata
 
+from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX","airs")
 s3_access_key_id = os.getenv("AIRS_S3_ACCESS_KEY_ID","airs")
@@ -23,6 +24,7 @@ ITEM_PATH="test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json"
 
 
 def get_client():
+    from boto3 import Session
     session = Session(
             aws_access_key_id=s3_access_key_id,
             aws_secret_access_key=s3_access_key,
@@ -31,6 +33,7 @@ def get_client():
 
 
 def setUpTest():
+    import airs.core.product_registration as rs
     es = elasticsearch.Elasticsearch(index_endpoint_url)
     try:
         # Clean the index
@@ -45,4 +48,52 @@ def setUpTest():
         get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
     except Exception as e:
         print(e)
-        ...
+
+Drivers.init('./conf/drivers.yaml')
+def dir_to_list(dirname, parent={}):
+    data = []
+    for name in [unicodedata.normalize('NFC', f) for f in os.listdir(dirname)]:
+        dct = {}
+        if not name.startswith('.'):
+            dct['name'] = name
+            dct['path'] = os.path.join(dirname, name)
+            dct['modification_time'] = time.strftime('%d/%m/%Y %H:%M:%S', time.localtime(os.stat(dct['path'] ).st_mtime))
+            if os.path.isfile(dct['path']):
+                driver = Drivers.solve(dct['path'])
+                if driver is not None:
+                    dct['type'] = 'file'
+                    dct["archive"] = True
+                    dct["archive_type"] = driver.name
+            if os.path.isdir(dct['path']):
+                driver = Drivers.solve(dct['path'])
+                if driver is not None:
+                    dct['type'] = 'folder'
+                    dct["archive"] = True
+                    dct["archive_type"] = driver.name
+                else:
+                    dct['type'] = 'folder'
+                    dct['children'] = dir_to_list(dct['path'] ,parent=dct)
+            data.append(dct)
+    return data
+
+def filter_data(arr):
+    def filter_condition(a):
+        if 'type' in a:
+            if a['type'] == 'folder':
+                if 'children' in a and len(a['children'])>0:
+                    return True
+                if 'children' in a and len(a['children'])==0:
+                    return False
+                if a['archive']:
+                    return True
+            if a['type'] == 'file' and a['archive'] == True:
+                return True
+        else:
+            return False
+
+    def func(item):
+        item = dict(item)
+        if 'children' in item:
+            item['children'] = filter_data(item['children'])
+        return item
+    return list(map(func,list(filter(filter_condition, arr))))
