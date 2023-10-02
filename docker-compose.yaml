@@ -179,3 +179,20 @@ services:
     depends_on:
       - redis
       - rabbitmq
+
+  aproc-ingest:
+    networks:
+      - aias
+    build:
+      context: '.'
+      dockerfile: Dockerfile-aproc-ingest
+    image: aproc-ingest:latest
+    container_name: 'aproc-ingest'
+    environment:
+      - APROC_ENDPOINT=http://aproc-server:8001/arlas/aproc
+      - DRIVERS_CONFIGURATION_FILE=/app/conf/drivers.yaml
+      - INGESTED_FOLDER=/inputs
+      - COLLECTION=main_collection
+      - CATALOG=main_catalog
+    volumes:
+      - ./test/inputs:/inputs

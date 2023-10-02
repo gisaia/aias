@@ -1,6 +1,4 @@
 import elasticsearch
-from boto3 import Session
-import airs.core.product_registration as rs
 import os
 import time
 import unicodedata
@@ -26,6 +24,7 @@ ITEM_PATH="test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json"
 
 
 def get_client():
+    from boto3 import Session
     session = Session(
             aws_access_key_id=s3_access_key_id,
             aws_secret_access_key=s3_access_key,
@@ -34,6 +33,7 @@ def get_client():
 
 
 def setUpTest():
+    import airs.core.product_registration as rs
     es = elasticsearch.Elasticsearch(index_endpoint_url)
     try:
         # Clean the index
@@ -48,7 +48,7 @@ def setUpTest():
         get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
     except Exception as e:
         print(e)
-        ...
+
 Drivers.init('./conf/drivers.yaml')
 def dir_to_list(dirname, parent={}):
     data = []
