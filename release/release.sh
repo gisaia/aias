@@ -29,7 +29,7 @@ build_and_publish_docker airs
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
 python3 airs/core/models/utils.py > docs/model/model.schema.json
 jsonschema2md -d docs/model/ -o docs/model/
-./publish/publish.sh $VERSION
+./release/publish.sh $VERSION
 
 # DOCUMENTATION
 git add docs/
