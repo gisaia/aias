@@ -3,7 +3,7 @@ if  [ -z "$PIP_PASSWORD"  ] ; then echo "Please set PIP_PASSWORD environment var
 rm -r target
 mkdir -p target/src/airs/core/models
 cp -r airs/core/models/* target/src/airs/core/models
-cp -r  publish/materials/* target/
+cp -r  release/materials/* target/
 sed -i.bak 's/airsmodel_version/\"'$1'\"/' target/setup.py
 
 cat target/README_head.md > target/README.md
