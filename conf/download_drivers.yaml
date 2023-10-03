@@ -16,4 +16,14 @@ drivers:
     name: simple_copy
     class_name: extensions.aproc.proc.download.drivers.impl.simple_copy
     configuration:
+    priority: 3
+  -
+    name: dimap
+    class_name: extensions.aproc.proc.download.drivers.impl.dimap
+    configuration:
     priority: 1
+  -
+    name: tif_file
+    class_name: extensions.aproc.proc.download.drivers.impl.tif_file
+    configuration:
+    priority: 2
