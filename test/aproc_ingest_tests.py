@@ -4,8 +4,10 @@ import requests
 import json
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess
-from utils import APROC_ENDPOINT, setUpTest, dir_to_list, filter_data
+
+from utils import APROC_ENDPOINT, setUpTest, dir_to_list, filter_data, AIRS_URL, COLLECTION
 import os
+
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Execute)
@@ -30,11 +32,11 @@ class Tests(unittest.TestCase):
 
     def test_async_ingest_theia(self):
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
-        self.ingest(url, "main_collection", "theia")
+        self.ingest(url, COLLECTION, "theia")
 
     def test_async_ingest_dimap(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-        self.ingest(url, "main_collection", "spot6")
+        self.ingest(url, COLLECTION, "spot6")
 
     def test_ingest_folder(self):
         def ingest_folders(data):
@@ -66,7 +68,7 @@ class Tests(unittest.TestCase):
 
     def __ingest_theia(self) -> StatusInfo:
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
-        collection = "main_collection"
+        collection = COLLECTION
         catalog = "theia"
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
@@ -87,7 +89,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/main_collection/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D", result["item_location"])
+        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/"+COLLECTION+"/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D", result["item_location"])
 
     def test_get_jobs_by_resource_id(self):
         status: StatusInfo = self.__ingest_theia()

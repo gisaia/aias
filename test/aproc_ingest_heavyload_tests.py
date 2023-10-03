@@ -5,7 +5,7 @@ import unittest
 from time import sleep
 
 import requests
-from utils import AIRS_URL, APROC_ENDPOINT, setUpTest
+from utils import AIRS_URL, APROC_ENDPOINT, setUpTest, COLLECTION
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.processes.processes import Processes
@@ -29,7 +29,7 @@ class Tests(unittest.TestCase):
         print("submitting {} archives".format(BATCH_SIZE))
         for hit in hits:
             url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3A{}&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120".format(hit["md"]["id"])
-            inputs = InputIngestProcess(url=url, collection="main_collection", catalog="theia")
+            inputs = InputIngestProcess(url=url, collection=COLLECTION, catalog="theia")
             execute = Execute(inputs=inputs.model_dump())
             r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok)
@@ -46,7 +46,7 @@ class Tests(unittest.TestCase):
         print("{} archives registered in {} s".format(BATCH_SIZE, end - start))
         print("Checking that the {} archives are registered ...".format(BATCH_SIZE))
         for hit in hits:
-            url = AIRS_URL+"/collections/main_collection/items/{}".format(hit["md"]["id"])
+            url = AIRS_URL+"/collections/"+COLLECTION+"/items/{}".format(hit["md"]["id"])
             r = requests.get(url)
             print(".", end="")
             self.assertTrue(r.ok, url+" not found")

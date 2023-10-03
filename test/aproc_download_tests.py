@@ -30,6 +30,22 @@ class Tests(unittest.TestCase):
         self.assertGreater(len(processes.processes), 0)
         self.assertIn("download", list(map(lambda p: p.id, processes.processes)))
 
+        # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
+        inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, asset_name=ASSET, crop_wkt="", target_format="", target_projection="")
+        execute = Execute(inputs=inputs.model_dump())
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "sylvain.gaudan@gisaia.com"})
+        self.assertTrue(r.ok)
+        # WAIT FOR FAILURE
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+            sleep(1)
+            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        self.assertEqual(status.status, StatusCode.failed)
+        # ERROR MAILS HAVE BEEN SENT
+        r = requests.get(SMTP_SERVER, headers={'Accept': 'application/json, text/plain, */*'})
+        self.assertTrue(r.ok, r.status_code)
+        self.assertEqual(len(r.json()["results"]), 2)
+
         self.__add_item__()
         # SEND DOWNLOAD REQUEST
         inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, asset_name=ASSET, crop_wkt="", target_format="", target_projection="")
@@ -55,7 +71,7 @@ class Tests(unittest.TestCase):
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER, headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
-        self.assertEqual(len(r.json()["results"]), 2)
+        self.assertEqual(len(r.json()["results"]), 4)
 
     def __add_item__(self) -> Item:
         print("create item")

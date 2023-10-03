@@ -29,14 +29,13 @@ export ARLAS_SMTP_FROM=noreply@arlas.io
 export APROC_DOWNLOAD_OUTBOX_DIR=/outbox
 export APROC_DOWNLOAD_ADMIN_EMAILS="admin@the.boss,someone.else@the.boss"
 
-export APROC_DOWNLOAD_CONTENT_USER="Download done."
-export APROC_DOWNLOAD_SUBJECT_USER="Download done."
+export APROC_DOWNLOAD_SUBJECT_USER="\"ARLAS Services: Your download of {collection}/{item_id}/{asset_name} is available.\""
+export APROC_DOWNLOAD_CONTENT_USER="\"ARLAS Services: Dear {arlas-user-email}. Your download of {collection}/{item_id}/{asset_name} is available for projection {target_projection} ({target_format}).ARLAS Services.\""
 
-export APROC_DOWNLOAD_CONTENT_ERROR="Download failed."
-export APROC_DOWNLOAD_SUBJECT_ERROR="Download failed."
+export APROC_DOWNLOAD_SUBJECT_ERROR="\"ARLAS Services: ERROR: The download of {collection}/{item_id}/{asset_name} failed ({error}).\""
+export APROC_DOWNLOAD_CONTENT_ERROR="\"ARLAS Services: The download of {collection}/{item_id}/{asset_name} failed ({error}).\""
 
-export APROC_DOWNLOAD_CONTENT_ADMIN="Download done."
-export APROC_DOWNLOAD_SUBJECT_ADMIN="Download done."
+export APROC_DOWNLOAD_SUBJECT_ADMIN="\"ARLAS Services: The download of {collection}/{item_id}/{asset_name} for {arlas-user-email} is available.\""
+export APROC_DOWNLOAD_CONTENT_ADMIN="\"ARLAS Services: The download of {collection}/{item_id}/{asset_name} for {arlas-user-email} is available in {target_directory} ({file_name}) for projection {target_projection} ({target_format}). ARLAS Services.\""
 
-#TODO add a function to identify the right platform
 export PLATFORM='amd64'

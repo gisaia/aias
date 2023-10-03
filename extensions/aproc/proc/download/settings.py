@@ -25,6 +25,9 @@ class Settings(BaseModel, extra='allow'):
     email_content_user: str = Field(title="Content of the email to be sent to the user")
     email_content_error_download: str = Field(title="Content of the email to be sent to the user")
     email_content_admin: str = Field(title="Content of the email to be sent to the admin")
+    email_subject_user: str = Field(title="Subject of the email to be sent to the user")
+    email_subject_error_download: str = Field(title="Subject of the email to be sent to the user")
+    email_subject_admin: str = Field(title="Subject of the email to be sent to the admin")
 
 class Configuration:
     settings: Settings | None = Field(title="aproc Download service configuration")
