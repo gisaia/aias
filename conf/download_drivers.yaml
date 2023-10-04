@@ -11,6 +11,14 @@ email_content_error_download: ${APROC_DOWNLOAD_CONTENT_ERROR}
 email_subject_admin: ${APROC_DOWNLOAD_SUBJECT_ADMIN}
 email_content_admin: ${APROC_DOWNLOAD_CONTENT_ADMIN}
 
+email_request_subject_user: ${APROC_DOWNLOAD_REQUEST_SUBJECT_USER}
+email_request_content_user: ${APROC_DOWNLOAD_REQUEST_CONTENT_USER}
+email_request_subject_admin: ${APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN}
+email_request_content_admin: ${APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN}
+
+email_path_prefix_add: ${APROC_EMAIL_PATH_PREFIX_ADD}
+email_path_to_windows: ${APROC_PATH_TO_WINDOWS}
+
 smtp:
   host: ${ARLAS_SMTP_HOST}
   port: ${ARLAS_SMTP_PORT}

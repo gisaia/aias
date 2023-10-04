@@ -28,6 +28,12 @@ class Settings(BaseModel, extra='allow'):
     email_subject_user: str = Field(title="Subject of the email to be sent to the user")
     email_subject_error_download: str = Field(title="Subject of the email to be sent to the user")
     email_subject_admin: str = Field(title="Subject of the email to be sent to the admin")
+    email_path_prefix_add: str = Field(title="Prefix to add to the download paths presented to the users/admin")
+    email_path_to_windows: bool = Field(False, title="Whether to change or not the path seperators for windows")
+    email_request_subject_user: str = Field(title="Content of the subject to be sent to the user when download request submitted")
+    email_request_content_user: str = Field(title="Content of the email to be sent to the user when download request submitted")
+    email_request_subject_admin: str = Field(title="Content of the subject to be sent to the admins when download request submitted")
+    email_request_content_admin: str = Field(title="Content of the email to be sent to the admins when download request submitted")
 
 class Configuration:
     settings: Settings | None = Field(title="aproc Download service configuration")
