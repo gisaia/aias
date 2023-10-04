@@ -122,7 +122,7 @@ class Driver(ProcDriver):
                     if file.endswith("_browse.tif"):
                         Driver.quicklook_path = os.path.join(path, file)
                         Driver.thumbnail_path = os.path.join(path, file)
-                    if file.endswith(".tif") and file.find("browse")<0:
+                    if file.endswith(".tif") and file.find("browse")<0 and file.find("_udm")<0:
                         Driver.tif_path = os.path.join(path, file)
                     if file.endswith("_metadata.xml"):
                         Driver.xml_path = os.path.join(path, file)

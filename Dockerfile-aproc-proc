@@ -50,4 +50,6 @@ RUN pip install -e $APP_HOME
 WORKDIR $APP_HOME
 ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
 ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
-ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -c 2 -n worker@%h  --loglevel=INFO
+#ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -c 2 -n worker@%h  --loglevel=INFO
+#Force one worker to fix ES ingestion
+ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -c 1 -n worker@%h  --loglevel=INFO
