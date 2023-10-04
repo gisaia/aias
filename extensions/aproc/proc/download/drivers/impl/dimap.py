@@ -2,8 +2,6 @@ import os
 from airs.core.models.model import Item, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import Driver as DownloadDriver
-from extensions.aproc.proc.download.drivers.impl.utils import extract
-import pyproj
 from datetime import datetime
 class Driver(DownloadDriver):
 
@@ -24,6 +22,8 @@ class Driver(DownloadDriver):
     
     # Implements drivers method
     def fetch_and_transform(self, item: Item, asset_name: str, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str):
+        from extensions.aproc.proc.download.drivers.impl.utils import extract
+        import pyproj
         asset = item.assets.get(Role.metadata.value)
         dimap_file = asset.href
         dimap_file_name = os.path.basename(dimap_file)
