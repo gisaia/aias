@@ -1,5 +1,7 @@
 #!/bin/bash
 [ -z "$1" ] && echo "Please provide the version" && exit 1;
+if  [ -z "$PIP_LOGIN"  ] ; then echo "Please set PIP_LOGIN environment variable"; exit -1; fi
+if  [ -z "$PIP_PASSWORD"  ] ; then echo "Please set PIP_PASSWORD environment variable"; exit -1; fi
 VERSION=$1
 echo "Build and releas the image with version ${VERSION}"
 
@@ -19,6 +21,8 @@ build_and_publish_docker (){
 build_and_publish_docker aproc-proc
 
 build_and_publish_docker aproc-service
+
+build_and_publish_docker aproc-ingest
 
 #---------------    AIRS    ----------------
 # DOCKER
