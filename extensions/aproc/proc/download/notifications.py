@@ -13,6 +13,8 @@ class Notifications:
         LOGGER.info("SMTP configuration: {}".format(Configuration.settings.smtp.model_dump_json()))
 
     def try_send_to(subject: str, msg: str, to: list[str], context: dict[str, str]):
+        if (not subject and not msg) or not to:
+            return
         try:
             if context is not None:
                 msg = msg.format(**context)

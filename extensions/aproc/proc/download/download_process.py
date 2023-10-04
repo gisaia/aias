@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 from celery import Task, shared_task
 from pydantic import BaseModel, Field
@@ -82,7 +83,7 @@ class AprocProcess(Process):
 
     def __get_download_location__(item: Item, asset_name: str, send_to: str) -> (str, str):
         if send_to is None: send_to = "anonymous"
-        target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.replace("@","_").replace(".","_"), item.id)
+        target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id)
         if not os.path.exists(target_directory):
             os.makedirs(target_directory)
         file_name = os.path.basename(item.assets.get(asset_name).href)
@@ -105,19 +106,26 @@ class AprocProcess(Process):
             "item_id": item_id,
             "collection": collection,
             "asset_name": asset_name,
-            "arlas-user-email": context.get("arlas-user-email", "anonymous")
+            "arlas-user-email": context.get("arlas-user-email", "anonymous"),
+            "target_directory": None,
+            "file_name": None,
+            "error": None
         }
         send_to: str = context.get("arlas-user-email")
         if send_to is None:
             LOGGER.warning("download request for {}/{}/{} is anonymous".format(collection, item_id, asset_name))
         else:
             LOGGER.info("download request for {}/{}/{} is for {}".format(collection, item_id, asset_name, send_to))
+
+        Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+        if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+
+
         item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id)
         if item is None:
             LOGGER.error("{}/{}/{} not found".format(collection, item_id, asset_name))
             mail_context["error"] = "{}/{}/{} not found".format(collection, item_id, asset_name)
             Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, to=[send_to], context=mail_context)
             raise RegisterException("{}/{}/{} not found".format(collection, item_id, asset_name))
 
         driver: Driver = Drivers.solve(item, asset_name)
@@ -128,6 +136,7 @@ class AprocProcess(Process):
                 LOGGER.info("Download will be placed in {}/{}".format(target_directory, file_name))
                 mail_context["target_directory"] = target_directory
                 mail_context["file_name"] = file_name
+                mail_context = AprocProcess.__update_paths__(mail_context)
                 driver.fetch_and_transform(
                     item=item,
                     asset_name=asset_name,
@@ -143,15 +152,12 @@ class AprocProcess(Process):
                 LOGGER.error("Failed to download the asset {}/{}/{}".format(collection, item_id, asset_name))
                 LOGGER.exception(e)
                 mail_context["error"] = str(e.__cause__)
-                if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, to=[send_to], context=mail_context)
                 raise Exception("Failed to download the asset {}/{}/{}: {}".format(collection, item_id, asset_name, e.__cause__))
         else:
             LOGGER.error("No driver found for {} in {}".format(asset_name, item.model_dump_json()))
             mail_context["error"] = str("No driver found for {}/{}/{}".format(collection, item_id, asset_name))
             Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, to=[send_to], context=mail_context)
             raise DriverException("No driver found for {}/{}/{}".format(collection, item_id, asset_name))
-
 
     def __get_item__(collection: str, item_id: str):
         try:
@@ -162,3 +168,14 @@ class AprocProcess(Process):
                 return None
         except Exception:
             return None
+
+    def __update_paths__(mail_context: dict[str, str]):
+        try:
+            if mail_context.get("target_directory"):
+                if not not Configuration.settings.email_path_prefix_add:
+                    mail_context["target_directory"] = os.path.join(Configuration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(Configuration.settings.outbox_directory).removeprefix("/"))
+                if Configuration.settings.email_path_to_windows:
+                    mail_context["target_directory"] = mail_context["target_directory"].replace("/","\\")
+        except Exception as e:
+            LOGGER.exception(e)
+        return mail_context

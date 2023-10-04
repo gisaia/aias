@@ -33,7 +33,7 @@ class Tests(unittest.TestCase):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, asset_name=ASSET, crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "sylvain.gaudan@gisaia.com"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
         # WAIT FOR FAILURE
         status: StatusInfo = StatusInfo(**json.loads(r.content))
@@ -41,16 +41,16 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.failed)
-        # ERROR MAILS HAVE BEEN SENT
-        r = requests.get(SMTP_SERVER, headers={'Accept': 'application/json, text/plain, */*'})
+        # REQUEST MAILS AND ERROR MAILS HAVE BEEN SENT
+        r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
-        self.assertEqual(len(r.json()["results"]), 2)
+        self.assertEqual(len(r.json()["results"]), 3)
 
         self.__add_item__()
         # SEND DOWNLOAD REQUEST
         inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, asset_name=ASSET, crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "sylvain.gaudan@gisaia.com"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
 
         # WAIT FOR SUCCESS
@@ -69,9 +69,9 @@ class Tests(unittest.TestCase):
         os.path.exists("./"+result.download_location)
 
         # MAILS HAVE BEEN SENT
-        r = requests.get(SMTP_SERVER, headers={'Accept': 'application/json, text/plain, */*'})
+        r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
-        self.assertEqual(len(r.json()["results"]), 4)
+        self.assertEqual(len(r.json()["results"]), 7)
 
     def __add_item__(self) -> Item:
         print("create item")
@@ -79,13 +79,13 @@ class Tests(unittest.TestCase):
         with open(ASSET_PATH, 'rb') as file:
             file = {'file': (ASSET, file, "image/tiff")}
             requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID, "assets", ASSET), files=file)
-        
         with open(ITEM_PATH, 'r') as file:
             data = file.read()
             r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok, msg=r.content)
         print("item created")
         r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID))
+        self.assertTrue(r.ok, msg=r.content)
         return mapper.item_from_json(r.content)
 
 
