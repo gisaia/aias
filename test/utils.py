@@ -18,7 +18,7 @@ APROC_ENDPOINT = os.getenv("APROC_ENDPOINT", "http://localhost:8001/arlas/aproc"
 SMTP_SERVER="http://localhost:3000/api/Messages"
 COLLECTION="digitalearth.africa"
 ID="077cb463-1f68-5532-aa8b-8df0b510231a"
-ASSET="classification"
+ASSET="data"
 ASSET_PATH="test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"
 ITEM_PATH="test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json"
 

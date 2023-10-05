@@ -45,4 +45,5 @@ drivers:
       token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
       login: ${THEIA_LOGIN}
       pwd: ${THEIA_PWD}
+      manage_data: false
     priority: 7

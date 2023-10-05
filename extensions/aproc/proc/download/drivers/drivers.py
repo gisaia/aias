@@ -1,11 +1,13 @@
 import importlib
 from airs.core.models.model import Item
+from aproc.core.logger import Logger
 
 from extensions.aproc.proc.download.drivers.driver import Driver
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import \
     Configuration as DownloadSettings
 
+LOGGER = Logger.logger
 
 class Drivers():
     drivers: list[Driver] = None
@@ -25,11 +27,14 @@ class Drivers():
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
-    def solve(item: Item, asset: str) -> Driver:
+    def solve(item: Item) -> Driver:
         Drivers.__check_drivers()
         for driver in Drivers.drivers:
-            if driver.supports(item, asset) is True:
-                return driver()
+            try:
+                if driver.supports(item) is True:
+                    return driver()
+            except Exception as e:
+                LOGGER.exception(e)
         return None
 
     def get_driver_by_name(name: str) -> Driver:
