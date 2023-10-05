@@ -83,12 +83,12 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
-    def __get_download_location__(item: Item, send_to: str) -> (str, str):
+    def __get_download_location__(item: Item, send_to: str, format:str) -> (str, str):
         if send_to is None: send_to = "anonymous"
         target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id)
         if not os.path.exists(target_directory):
             os.makedirs(target_directory)
-        file_name = os.path.basename(item.id.replace("-", "_").replace(" ", "_").replace("/", "_").replace("\\", "_").replace("@", "_"))
+        file_name = os.path.basename(item.id.replace("-", "_").replace(" ", "_").replace("/", "_").replace("\\", "_").replace("@", "_"))+"."+format
         if os.path.exists(file_name):
             file_name = hashlib.md5(str(time.time_ns()).encode("utf-8")).hexdigest()+file_name
         return (target_directory, file_name)
@@ -100,7 +100,7 @@ class AprocProcess(Process):
 
 
     @shared_task(bind=True)
-    def execute(self, context: dict[str, str], collection: str, item_id: str, crop_wkt: str, target_projection: str, target_format: str) -> dict:
+    def execute(self, context: dict[str, str], collection: str, item_id: str, crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
         # self is a celery task because bind=True
         mail_context = {
             "target_projection": target_projection,
@@ -134,7 +134,7 @@ class AprocProcess(Process):
         if driver is not None:
             try:
                 __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
-                (target_directory, file_name) = AprocProcess.__get_download_location__(item, send_to)
+                (target_directory, file_name) = AprocProcess.__get_download_location__(item, send_to, target_format)
                 LOGGER.info("Download will be placed in {}/{}".format(target_directory, file_name))
                 mail_context["target_directory"] = target_directory
                 mail_context["file_name"] = file_name
