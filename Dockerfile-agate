@@ -1,0 +1,15 @@
+FROM python:3.10
+
+COPY ./airs/requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+COPY ./agate /app/agate
+COPY ./common /app/common
+COPY ./conf/agate.yaml /app/conf/
+COPY ./scripts/agate/start.sh /app/
+
+EXPOSE 8004
+ENTRYPOINT ["./start.sh"]

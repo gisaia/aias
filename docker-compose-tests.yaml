@@ -1,0 +1,57 @@
+version: "3"
+networks:
+  aias:
+services:
+
+  smtp4dev:
+    image: rnwood/smtp4dev:linux-${PLATFORM}-3.2.0-ci20221023104
+    platform: linux/${PLATFORM}
+    container_name: smtp4dev
+    networks:
+      - aias
+    ports:
+      - 3000:80
+    environment:
+      #Specifies the server hostname. Used in auto-generated TLS certificate if enabled.
+      - ServerOptions__HostName=smtp4dev
+
+  arlas-server:
+    image: gisaia/arlas-server:${ARLAS_SERVER_VERSION:-23.0.7}
+    platform: linux/amd64
+    container_name: arlas-server
+    networks:
+      - aias
+    ports:
+      - 9999:9999
+    environment:
+      - ARLAS_ELASTIC_NODES=elasticsearch:9200
+      - ARLAS_ELASTIC_ENABLE_SSL=false
+      - ARLAS_SERVICE_WFS_ENABLE=false
+      - ARLAS_CORS_ENABLED=true
+      - ARLAS_SERVICE_CSW_ENABLE=false
+      - ARLAS_CORS_ALLOWED_HEADERS="arlas-user,arlas-groups,arlas-organization,X-Requested-With,Content-Type,Accept,Origin,Authorization,X-Forwarded-User,partition-filter"
+      - ARLAS_SERVICE_RASTER_TILES_ENABLE=false
+      - ARLAS_PREFIX=/arlas
+      - ARLAS_ELASTIC_INDEX=.arlas
+      - ARLAS_APP_PATH=/
+      - ARLAS_BASE_URI=http://localhost:9999/server/
+
+  agate:
+    networks:
+      - aias
+    build:
+      context: '.'
+      dockerfile: Dockerfile-agate
+    image: agate:latest
+    container_name: 'agate'
+    environment:
+      - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
+      - AGATE_PREFIX=$AGATE_PREFIX
+      - AGATE_HOST=$AGATE_HOST
+      - AGATE_PORT=$AGATE_PORT
+    ports:
+      - $AGATE_PORT:$AGATE_PORT
+    depends_on:
+      - arlas-server
+
+

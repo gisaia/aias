@@ -1,0 +1,7 @@
+
+arlas_url_search: $ARLAS_URL_SEARCH|http://localhost:9999/arlas/explore/{collection}/_search?f=id:eq:{item}
+agate_prefix: $AGATE_PREFIX|/arlas/agate
+host: $AGATE_HOST|127.0.0.1
+port: $AGATE_PORT|8004
+url_patterns:
+  - $ASSET_MINIO_PATTERN|(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)

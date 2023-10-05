@@ -308,14 +308,19 @@ python3 -m aproc.cli.aproc
 
 ## Tests
 
-To run the unit tests:
+To run the tests:
 
 ```shell
-./test/unit_tests.sh 
+./test/tests.sh 
 ```
 
-To run the service tests:
-gdal 3.7.X must be available
-```shell
-./test/service_tests.sh 
-```
+## AGATE
+
+AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an object store such as minio. It must be used as a forward authorisation service.
+
+| Variable                                               |
+| ------------------------------------------------------ |
+|   ARLAS_URL_SEARCH                      |
+|   AGATE_PREFIX                      |
+|   AGATE_HOST                      |
+|   AGATE_ENDPOINT                      |
