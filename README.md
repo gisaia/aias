@@ -324,3 +324,7 @@ AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an obje
 |   AGATE_PREFIX                      |
 |   AGATE_HOST                      |
 |   AGATE_ENDPOINT                      |
+|   AGATE_URL_HEADER                      |
+|   AGATE_URL_HEADER_PREFIX                      |
+
+

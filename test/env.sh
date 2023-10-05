@@ -52,6 +52,7 @@ export ARLAS_URL_SEARCH=http://arlas-server:9999/arlas/explore/{collection}/_sea
 export AGATE_PREFIX=/arlas/agate
 export AGATE_HOST=0.0.0.0
 export AGATE_PORT=8004
-export AGATE_ENDPOINT=http://localhost:8004/arlas/agate
-
+export AGATE_ENDPOINT=http://localhost:8004/arlas/agate/authorization
+export AGATE_URL_HEADER=X-Forwarded-Uri
+export AGATE_URL_HEADER_PREFIX=/object
 export PLATFORM='amd64'

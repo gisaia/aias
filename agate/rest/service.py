@@ -9,14 +9,16 @@ from agate.logger import Logger
 from agate.settings import Configuration
 
 LOGGER = Logger.logger
-
 ROUTER = APIRouter()
 
 
-@ROUTER.get("/{path:path}")
-async def path(request: Request, path: str):
-    requested_path = ("/"+str(request.url).removeprefix(str(request.base_url))).removeprefix(Configuration.settings.agate_prefix)
-    LOGGER.debug("Incopming request: {}".format(requested_path))
+@ROUTER.get("/authorization")
+async def path(request: Request):
+    requested_path = request.headers[Configuration.settings.url_header]
+    LOGGER.debug("Incoming URI: {}".format(requested_path))
+    if not not Configuration.settings.url_header_prefix:
+        requested_path = requested_path.removeprefix(Configuration.settings.url_header_prefix)
+    LOGGER.debug("URI for matching: {}".format(requested_path))
     patterns = Configuration.settings.url_patterns
     for pattern in patterns:
         LOGGER.debug("test against {}".format(pattern))

@@ -28,11 +28,10 @@ class Tests(unittest.TestCase):
         }))
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
 
-    def test_download(self):
-        # SEND DOWNLOAD REQUEST
-        r = requests.get("/".join([AGATE_ENDPOINT, "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))
+    def test_access(self):
+        r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
-        r = requests.get("/".join([AGATE_ENDPOINT, "collections", ARLAS_COLLECTION, "items", ID+"SHOULDNOTBEFOUND", "assets", ASSET]))
+        r = requests.get(AGATE_ENDPOINT,  headers={"X-Forwarded-Uri": "/"+"/".join(["collections", ARLAS_COLLECTION, "items", ID+"shouldnotwork", "assets", ASSET])})
         self.assertFalse(r.ok, str(r.status_code)+" "+str(r.content))
 
     def __add_item__(self) -> Item:

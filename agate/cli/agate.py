@@ -10,7 +10,7 @@ from common.exception_handler import EXCEPTION_HANDLERS
 
 cli = typer.Typer()
 
-@cli.command(help="Start the ARLAS Item Registration Service.")
+@cli.command(help="Start the ARLAS Asset Gateway.")
 def run(configuration_file: str = typer.Argument(..., help="Configuration file")):
     api = FastAPI(version='0.0', title='ARLAS ',
                   description='ARLAS Asset Gateway',
