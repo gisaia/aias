@@ -48,7 +48,9 @@ class Driver(ProcDriver):
             else: 
                 Driver.LOGGER.error("no hits found")
                 return []
-        else: return []
+        else:
+            Driver.LOGGER.error("no hits found")
+            return []
 
     # Implements drivers method
     def fetch_assets(self, url:str, assets:list[Asset])->list[Asset]:

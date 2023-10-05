@@ -12,7 +12,7 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     @staticmethod
-    def supports(item: Item, asset_name: str) -> bool:
+    def supports(item: Item) -> bool:
         if item.assets.get(Role.metadata.value) is not None:
             asset = item.assets.get(Role.metadata.value)
             file_name = os.path.basename(asset.href)
@@ -21,13 +21,15 @@ class Driver(DownloadDriver):
             return False
     
     # Implements drivers method
-    def fetch_and_transform(self, item: Item, asset_name: str, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str):
+    def fetch_and_transform(self, item: Item, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str):
         from extensions.aproc.proc.download.drivers.impl.utils import extract
         import pyproj
         asset = item.assets.get(Role.metadata.value)
         dimap_file = asset.href
         dimap_file_name = os.path.basename(dimap_file)
         epsg_target = pyproj.Proj(target_projection)
+        # Default driver is GTiff
+        driver_target = "GTiff"
         if target_format == "Geotiff":
             driver_target = "GTiff"
             target_file_name = os.path.splitext(dimap_file_name)[0]  + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")+'.tif'
