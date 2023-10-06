@@ -87,7 +87,7 @@ class Driver(ProcDriver):
                 view__sun_azimuth=view__sun_azimuth,
                 view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.geotiff.value,
+                item_format=ItemFormat.ast_dem.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 observation_type=ObservationType.dem.value
             ),
