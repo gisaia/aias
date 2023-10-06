@@ -55,4 +55,7 @@ export AGATE_PORT=8004
 export AGATE_ENDPOINT=http://localhost:8004/arlas/agate/authorization
 export AGATE_URL_HEADER=X-Forwarded-Uri
 export AGATE_URL_HEADER_PREFIX=/object
+export ASSET_MINIO_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)"
+export ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
+
 export PLATFORM='amd64'

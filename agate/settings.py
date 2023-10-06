@@ -11,6 +11,7 @@ class Settings(BaseModel, extra=Extra.allow):
     host: str
     port: int
     url_patterns: list[str]
+    public_url_patterns: list[str]
     url_header: str
     url_header_prefix: str
 

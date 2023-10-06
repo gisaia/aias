@@ -29,10 +29,15 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
 
     def test_access(self):
+        # TEST OK for non public
         r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["minio", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
+        # TEST KO for non public
         r = requests.get(AGATE_ENDPOINT,  headers={"X-Forwarded-Uri": "/"+"/".join(["minio", "collections", ARLAS_COLLECTION, "items", ID+"shouldnotwork", "assets", ASSET])})
         self.assertFalse(r.ok, str(r.status_code)+" "+str(r.content))
+        # TEST OK for public
+        r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["minio", "collections", ARLAS_COLLECTION, "items", ID+"shouldnotworkbutpublic", "assets", "thumbnail"])})
+        self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
 
     def __add_item__(self) -> Item:
         print("create item")

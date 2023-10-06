@@ -20,6 +20,12 @@ async def path(request: Request):
         requested_path = requested_path.removeprefix(Configuration.settings.url_header_prefix)
     LOGGER.debug("URI for matching: {}".format(requested_path))
     patterns = Configuration.settings.url_patterns
+    public_patterns = Configuration.settings.public_url_patterns
+    for pattern in public_patterns:
+        LOGGER.debug("test against public pattern {}".format(pattern))
+        matches = re.finditer(pattern=pattern, string=requested_path)
+        for match in matches:
+            return Response(status_code=status.HTTP_202_ACCEPTED)
     for pattern in patterns:
         LOGGER.debug("test against {}".format(pattern))
         matches = re.finditer(pattern=pattern, string=requested_path)
