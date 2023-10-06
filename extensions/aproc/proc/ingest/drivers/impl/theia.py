@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 from dateutil.parser import parse as parse_date
 
-from airs.core.models.model import Asset, Band, Item, Properties, Role, ItemFormat, AssetFormat, ResourceType
+from airs.core.models.model import Asset, Band, Item, ObservationType, Properties, Role, ItemFormat, AssetFormat, ResourceType
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import ConnectionException
@@ -121,7 +121,11 @@ class Driver(ProcDriver):
                 water_coverage= hit["data"]["metadata"]["ObservationContext"]["eo"]["opt"]["waterCoverPercentage"],
                 gsd=hit["data"]["metadata"]["ObservationContext"]["processusUsed"]["sensor"]["resolution"]["value"],
                 create_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["identity"]["lifecycle"]["created"]))),
-                update_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["identity"]["lifecycle"]["updated"])))
+                update_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["identity"]["lifecycle"]["updated"]))),
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.theia.value,
+                main_asset_format=AssetFormat.zip.value,
+                observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
