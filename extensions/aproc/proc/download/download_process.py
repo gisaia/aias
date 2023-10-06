@@ -32,13 +32,17 @@ def __update_status__(task: Task, state: str, meta: dict = None):
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
 
+# TODO TO BE REMOVED
+class ItemDownloadProcess(BaseModel):
+    collection: str | None = Field(default=None, title="Collection name", description="Name of the collection where the item is registered", minOccurs=1, maxOccurs=1)
+    item_id: str | None = Field(default=None, title="Item's id to be downloaded")
+
 
 class InputDownloadProcess(BaseModel):
-    collection: str = Field(title="Collection name", description="Name of the collection where the item is registered", minOccurs=1, maxOccurs=1)
-    item_id: str = Field(title="Item's id to be downloaded")
-    crop_wkt: str  = Field(default=None, title="WKT geometry for cropping the data")
-    target_projection: str  = Field(default=None, title="epsg target projection")
-    target_format: str  = Field(default=None, title="target format")
+    requests: list[dict[str, str]] = Field(default=[], title="The list of item (collection, item_id) to download")
+    crop_wkt: str = Field(default=None, title="WKT geometry for cropping the data")
+    target_projection: str = Field(default=None, title="epsg target projection")
+    target_format: str = Field(default=None, title="target format")
 
 
 class OutputDownloadProcess(BaseModel):
@@ -94,73 +98,74 @@ class AprocProcess(Process):
         return (target_directory, file_name)
 
     def get_resource_id(inputs: BaseModel):
-        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())
-        hash_object = hashlib.sha1((inputs.collection+inputs.item_id).encode())
+        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())        
+        hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"]+r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
-
     @shared_task(bind=True)
-    def execute(self, context: dict[str, str], collection: str, item_id: str, crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
+    def execute(self, context: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
         # self is a celery task because bind=True
-        mail_context = {
-            "target_projection": target_projection,
-            "target_format": target_format,
-            "item_id": item_id,
-            "collection": collection,
-            "arlas-user-email": context.get("arlas-user-email", "anonymous"),
-            "target_directory": None,
-            "file_name": None,
-            "error": None
-        }
-        send_to: str = context.get("arlas-user-email")
-        if send_to is None:
-            LOGGER.warning("download request for {}/{} is anonymous".format(collection, item_id))
-        else:
-            LOGGER.info("download request for {}/{} is for {}".format(collection, item_id, send_to))
+        for request in requests:
+            collection: str = request.get("collection")
+            item_id: str = request.get("item_id")
+            mail_context = {
+                "target_projection": target_projection,
+                "target_format": target_format,
+                "item_id": item_id,
+                "collection": collection,
+                "arlas-user-email": context.get("arlas-user-email", "anonymous"),
+                "target_directory": None,
+                "file_name": None,
+                "error": None
+            }
+            send_to: str = context.get("arlas-user-email")
+            if send_to is None:
+                LOGGER.warning("download request for {}/{} is anonymous".format(collection, item_id))
+            else:
+                LOGGER.info("download request for {}/{} is for {}".format(collection, item_id, send_to))
 
-        Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-        if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+            Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+            if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
 
-
-        item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id)
-        if item is None:
-            error_msg = "{}/{} not found".format(collection, item_id)
-            LOGGER.error(error_msg)
-            mail_context["error"] = error_msg
-            Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            raise RegisterException(error_msg)
-
-        driver: Driver = Drivers.solve(item)
-        if driver is not None:
-            try:
-                __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
-                (target_directory, file_name) = AprocProcess.__get_download_location__(item, send_to, target_format)
-                LOGGER.info("Download will be placed in {}/{}".format(target_directory, file_name))
-                mail_context["target_directory"] = target_directory
-                mail_context["file_name"] = file_name
-                mail_context = AprocProcess.__update_paths__(mail_context)
-                driver.fetch_and_transform(
-                    item=item,
-                    target_directory=target_directory,
-                    file_name=file_name,
-                    crop_wkt=crop_wkt,
-                    target_projection=target_projection,
-                    target_format=target_format)
-                if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
-                Notifications.try_send_to(Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-                return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
-            except Exception as e:
-                error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
+            item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id)
+            if item is None:
+                error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.exception(e)
                 mail_context["error"] = error_msg
-                raise Exception(error_msg)
-        else:
-            error_msg = "No driver found for {}/{}".format(collection, item_id)
-            LOGGER.error(error_msg)
-            mail_context["error"] = error_msg
-            Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            raise DriverException(error_msg)
+                Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                raise RegisterException(error_msg)
+
+            driver: Driver = Drivers.solve(item)
+            if driver is not None:
+                try:
+                    __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
+                    (target_directory, file_name) = AprocProcess.__get_download_location__(item, send_to, target_format)
+                    LOGGER.info("Download will be placed in {}/{}".format(target_directory, file_name))
+                    mail_context["target_directory"] = target_directory
+                    mail_context["file_name"] = file_name
+                    mail_context = AprocProcess.__update_paths__(mail_context)
+                    driver.fetch_and_transform(
+                        item=item,
+                        target_directory=target_directory,
+                        file_name=file_name,
+                        crop_wkt=crop_wkt,
+                        target_projection=target_projection,
+                        target_format=target_format)
+                    if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
+                    Notifications.try_send_to(Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                    return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
+                except Exception as e:
+                    error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
+                    LOGGER.error(error_msg)
+                    LOGGER.exception(e)
+                    mail_context["error"] = error_msg
+                    raise Exception(error_msg)
+            else:
+                error_msg = "No driver found for {}/{}".format(collection, item_id)
+                LOGGER.error(error_msg)
+                mail_context["error"] = error_msg
+                Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                raise DriverException(error_msg)
 
     def __get_item__(collection: str, item_id: str):
         try:
