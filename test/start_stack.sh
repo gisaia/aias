@@ -29,3 +29,12 @@ while [[ "$code" != *$code_OK* ]];do
     code="$(curl -IL --silent http://localhost:9200 | grep "^HTTP\/")"
     eval "sleep 5"
 done
+docker-compose -f docker-compose-tests.yaml up --build -d
+# Waiting for arlas ready
+code=""
+code_OK="OK"
+while [[ "$code" != *$code_OK* ]];do
+    code="$(curl -IL --silent http://localhost:9999 | grep "^HTTP\/")"
+    eval "sleep 5"
+done
+

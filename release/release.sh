@@ -24,6 +24,8 @@ build_and_publish_docker aproc-service
 
 build_and_publish_docker aproc-ingest
 
+build_and_publish_docker agate
+
 #---------------    AIRS    ----------------
 # DOCKER
 build_and_publish_docker airs
