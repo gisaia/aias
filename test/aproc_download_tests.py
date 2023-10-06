@@ -32,7 +32,7 @@ class Tests(unittest.TestCase):
         self.assertIn("download", list(map(lambda p: p.id, processes.processes)))
 
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
-        inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, crop_wkt="", target_format="", target_projection="")
+        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
 
         self.__add_item__()
         # SEND DOWNLOAD REQUEST
-        inputs = InputDownloadProcess(collection=COLLECTION, item_id=ID, crop_wkt="", target_format="", target_projection="")
+        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
