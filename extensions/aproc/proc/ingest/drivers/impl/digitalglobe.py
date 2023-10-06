@@ -1,10 +1,15 @@
 import os
 import xml.etree.ElementTree as ET
-from airs.core.models.model import Asset, Item, Properties, Role
+from datetime import datetime
+
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
-from datetime import datetime
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_geom_bbox_centroid, setup_gdal)
+
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -41,7 +46,7 @@ class Driver(ProcDriver):
                                             description=Role.overview.value))
         assets.append(Asset(href=self.tif_path,
                   roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value, airs__managed=False))
+                  description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         return assets
 
@@ -69,7 +74,7 @@ class Driver(ProcDriver):
         ll_lon = float(root.find("./TIL/TILE/LLLON").text)
         geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
         #Overwrite geometry and centroid if GIS_FILE is present with order shape file
-        from os.path import dirname, abspath
+        from os.path import abspath, dirname
         d = (dirname(abspath(url)))
         if os.path.isdir(os.path.join(d,"GIS_FILE")):
             for file in os.listdir(os.path.join(d,"GIS_FILES")):
@@ -115,11 +120,15 @@ class Driver(ProcDriver):
                 processing__level=processing__level,
                 gsd=gsd,
                 instrument=constellation,
-                constellation = constellation,
-                sensor = constellation,
+                constellation=constellation,
+                sensor=constellation,
                 view__azimuth=view__azimuth,
                 view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.digitalglobe.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )

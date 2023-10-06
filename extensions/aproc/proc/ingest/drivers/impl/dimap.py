@@ -2,10 +2,14 @@ import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from airs.core.models.model import Asset, Item, Properties, Role
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_geom_bbox_centroid, setup_gdal)
+
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -38,8 +42,8 @@ class Driver(ProcDriver):
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
                                 description=Role.overview.value))
         assets.append(Asset(href=self.dim_path,
-                                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
-                                            description=Role.metadata.value, airs__managed=False))
+                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                            description=Role.metadata.value, airs__managed=False))
         return assets
 
 
@@ -146,13 +150,17 @@ class Driver(ProcDriver):
                 processing__level=metadata["PROCESSING_LEVEL"],
                 eo__cloud_cover=cloud_cover,
                 gsd=gsd,
-                constellation = metadata["MISSION"],
-                sensor = metadata["MISSION"],
-                sensor_type = metadata["MISSION_INDEX"],
+                constellation=metadata["MISSION"],
+                sensor=metadata["MISSION"],
+                sensor_type=metadata["MISSION_INDEX"],
                 view__incidence_angle=metadata["INCIDENCE_ANGLE"],
                 view__azimuth=metadata["AZIMUTH_ANGLE"],
                 view__sun_azimuth=metadata["SUN_AZIMUTH"],
-                view__sun_elevation=metadata["SUN_ELEVATION"]
+                view__sun_elevation=metadata["SUN_ELEVATION"],
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.dimap.value,
+                main_asset_format=AssetFormat.jpg2000.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )

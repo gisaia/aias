@@ -1,10 +1,13 @@
 import os
 import xml.etree.ElementTree as ET
-from airs.core.models.model import Asset, Item, Properties, Role
+from datetime import datetime
+
+from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
-from datetime import datetime
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_geom_bbox_centroid, setup_gdal)
+
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -39,7 +42,7 @@ class Driver(ProcDriver):
                                 description=Role.overview.value))
         assets.append(Asset(href=self.tif_path,
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                            description=Role.data.value, airs__managed=False))
+                            description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         return assets
 
@@ -97,14 +100,18 @@ class Driver(ProcDriver):
                 eo__cloud_cover=eo__cloud_cover,
                 processing__level=processing__level,
                 gsd=gsd,
-                instrument= instrument,
-                constellation = constellation,
-                sensor = sensor,
-                sensor_type = sensor_type,
-                view__azimuth= view__azimuth,
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                sensor_type=sensor_type,
+                view__azimuth=view__azimuth,
                 view__incidence_angle=view__incidence_angle,
-                view__sun_azimuth= view__sun_azimuth,
-                view__sun_elevation= view__sun_elevation
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.rapideye.value,
+                main_asset_format=AssetFormat.geotiff.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )

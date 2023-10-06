@@ -13,6 +13,11 @@ class ProcessingLevel(Enum):
     L3="L3"
     L4="L4"
 
+class ObservationType(Enum):
+    image="IMAGE"
+    radar="RADAR"
+    dem="DEM"
+
 class ResourceType(Enum):
     cube="CUBE"
     gridded="GRIDDED"
@@ -25,12 +30,19 @@ class ItemFormat(Enum):
     geotiff="GEOTIFF"
     safe="SAFE"
     theia="THEIA"
+    ast_dem="AST_DEM"
+    digitalglobe="DIGITALGLOBE"
+    geoeye="GEOEYE"
+    rapideye="RAPIDEYE"
+    spot5="SPOT5"
+    spot6_7="SPOT6_7"
     other="OTHER"
 
 class AssetFormat(Enum):
     shape="SHAPE"
     geotiff="GEOTIFF"
     jpg="JPG"
+    jpg2000="JPG2000"
     png="PNG"
     csv="CSV"
     json="JSON"
@@ -194,6 +206,8 @@ class Properties(BaseModel, extra=Extra.allow):
     data_type                     :str              | None = Field(default=None, title="Type of data")
     item_type                     :str              | None = Field(default=None, title="Type of data (ResourceType)")
     item_format                   :str              | None = Field(default=None, title="Data format (ItemFormat)")
+    main_asset_format             :str              | None = Field(default=None, title="Data format of the main asset (AssetFormat)")
+    observation_type              :str              | None = Field(default=None, title="Type of observation (ObservationType)")
     data_coverage                 :float            | None = Field(default=None, title="Estimate of data cover")
     water_coverage                :float            | None = Field(default=None, title="Estimate of water cover")
     locations                     :List[str]        | None = Field(default=None, title="List of locations covered by the item")

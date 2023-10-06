@@ -1,10 +1,13 @@
 import os
 from datetime import datetime
 
-from airs.core.models.model import Asset, Item, Properties, Role
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
+from extensions.aproc.proc.ingest.drivers.impl.utils import \
+    get_geom_bbox_centroid
 
 
 class Driver(ProcDriver):
@@ -42,7 +45,7 @@ class Driver(ProcDriver):
                                 description=Role.overview.value))
         assets.append(Asset(href=self.tif_path,
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                            description=Role.data.value, airs__managed=False))
+                            description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         return assets
 
@@ -135,11 +138,16 @@ class Driver(ProcDriver):
                 sensor_type=sensor_type,
                 view__azimuth=view__azimuth,
                 view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.geoeye.value,
+                main_asset_format=AssetFormat.jpg2000.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
         return item
+
     def __check_path__(file_path: str):
         Driver.tif_path = None
         Driver.met_path = None

@@ -1,9 +1,14 @@
 import os
-from airs.core.models.model import Asset, Role, Item, Properties
+from datetime import datetime
+
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
-from datetime import datetime
+from extensions.aproc.proc.ingest.drivers.impl.utils import \
+    get_geom_bbox_centroid
+
 
 class Driver(ProcDriver):
     met_path = None
@@ -28,7 +33,7 @@ class Driver(ProcDriver):
         return [
             Asset(href=self.tif_path,
                   roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value, airs__managed=False)
+                  description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value)
         ]
 
     # Implements drivers method
@@ -76,11 +81,15 @@ class Driver(ProcDriver):
                 eo__cloud_cover=eo__cloud_cover,
                 processing__level=processing__level,
                 gsd=gsd,
-                instrument= instrument,
-                constellation = constellation,
-                sensor = sensor,
-                view__sun_azimuth= view__sun_azimuth,
-                view__sun_elevation= view__sun_elevation
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.ast_dem.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                observation_type=ObservationType.dem.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
