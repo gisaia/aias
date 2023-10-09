@@ -21,7 +21,7 @@ class Tests(unittest.TestCase):
     def ingest(self, url, collection, catalog):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
@@ -72,7 +72,7 @@ class Tests(unittest.TestCase):
         catalog = "theia"
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)
         return StatusInfo(**json.loads(r.content))
 

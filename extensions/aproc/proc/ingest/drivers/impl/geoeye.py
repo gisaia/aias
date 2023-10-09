@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid
+    get_geom_bbox_centroid, get_id
 
 
 class Driver(ProcDriver):
@@ -52,6 +52,9 @@ class Driver(ProcDriver):
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
+
+    def get_item_id(self, url: str) -> str:
+        return get_id(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -123,7 +126,7 @@ class Driver(ProcDriver):
         view__sun_elevation=float(d['Sun Angle Elevation'].split(' ')[0])
 
         item = Item(
-            id=str(url.replace("/", "-")),
+            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -141,7 +144,7 @@ class Driver(ProcDriver):
                 view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geoeye.value,
-                main_asset_format=AssetFormat.jpg2000.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                main_asset_format=AssetFormat.geotiff.value,
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
@@ -174,8 +177,7 @@ class Driver(ProcDriver):
             return Driver.met_path is not None and \
                    Driver.tif_path is not None
         else:
-            #TODO try to hide this log for file exploration service
-            Driver.LOGGER.error("The folder {} does not exist.".format(file_path))
+            Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
             return False
 
     @staticmethod

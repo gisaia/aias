@@ -6,6 +6,12 @@ def setup_gdal():
     gdal.PushErrorHandler('CPLQuietErrorHandler')
     gdal.VSICurlClearCache()
 
+def get_id(url):
+    id = str(url.replace("/", "-").replace(" ","_"))
+    if id[0] == "-":
+        return id[1:]
+    return id
+
 def get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat):
     import json
     from osgeo import ogr

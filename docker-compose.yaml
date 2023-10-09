@@ -208,7 +208,10 @@ services:
       - APROC_ENDPOINT=http://aproc-server:8001/arlas/aproc
       - DRIVERS_CONFIGURATION_FILE=/app/conf/drivers.yaml
       - INGESTED_FOLDER=/inputs
+      - OUTPUT_FILE=/tmp/results.csv
       - COLLECTION=main_collection
       - CATALOG=main_catalog
+      - DRY_RUN=True
     volumes:
       - ./test/inputs:/inputs
+      - /tmp:/tmp

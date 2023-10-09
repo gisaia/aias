@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid, get_id
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -48,6 +48,10 @@ class Driver(ProcDriver):
         return assets
 
     # Implements drivers method
+    def get_item_id(self, url: str) -> str:
+        return get_id(url)+'-'+get_id(os.path.splitext(os.path.basename(self.tif_path))[0])
+
+    # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
@@ -73,7 +77,7 @@ class Driver(ProcDriver):
         date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
         print(date_time)
         item = Item(
-            id=str(url.replace("/", "-")),
+            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -90,7 +94,7 @@ class Driver(ProcDriver):
                 view__sun_elevation= metadata["SUN_ELEVATION"],
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.spot5.value,
-                main_asset_format=AssetFormat.geotiff.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                main_asset_format=AssetFormat.geotiff.value,
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
@@ -119,6 +123,5 @@ class Driver(ProcDriver):
                    Driver.dim_path is not None
 
         else:
-            #TODO try to hide this log for file exploration service
-            Driver.LOGGER.error("The folder {} does not exist.".format(path))
+            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
             return False
