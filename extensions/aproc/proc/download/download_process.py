@@ -173,8 +173,6 @@ class AprocProcess(Process):
             if r.ok:
                 result = r.json()
                 if result.get("hits") and len(result.get("hits")) > 0:
-                    LOGGER.info(r.content)
-                    LOGGER.info(mapper.item_from_dict(result.get("hits")[0]["data"]))
                     return mapper.item_from_dict(result.get("hits")[0]["data"])
                 else:
                     LOGGER.warn("No result found for {}/{}".format(collection, item_id))

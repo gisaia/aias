@@ -30,5 +30,5 @@ class Notifications:
             client.sendmail(msg=email.as_string(), from_addr=Configuration.settings.smtp.from_addr, to_addrs=to)
             client.quit()
         except Exception as e:
-            LOGGER.error("Error wile sending email.")
+            LOGGER.error("Error while sending email.")
             LOGGER.exception(e)
