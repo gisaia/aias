@@ -216,7 +216,6 @@ def post_process_execute(process_id: str, execute: Execute, request: Request):
     if hasattr(process, "input_model"):
         inputs = execute.model_dump().get("inputs")
         context = dict(map(lambda v: v, request.headers.items()))
-        LOGGER.info("user: {}".format(context.get("arlas_user_email")))
         job: StatusInfo = Processes.execute(process_name=process_id, context=context, input=process.input_model(**inputs))
         job.processID = process_id
         return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)

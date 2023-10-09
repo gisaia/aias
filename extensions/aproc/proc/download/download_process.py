@@ -122,7 +122,7 @@ class AprocProcess(Process):
             if send_to is None:
                 LOGGER.warning("download request for {}/{} is anonymous".format(collection, item_id))
             else:
-                LOGGER.info("download request for {}/{} is for {}".format(collection, item_id, send_to))
+                LOGGER.info("download request for {}/{}".format(collection, item_id))
 
             Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
             if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
