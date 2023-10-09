@@ -6,7 +6,7 @@ from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Observa
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal)
+    get_geom_bbox_centroid, setup_gdal, get_id)
 
 
 class Driver(ProcDriver):
@@ -51,6 +51,10 @@ class Driver(ProcDriver):
         return assets
 
     # Implements drivers method
+    def get_item_id(self, url: str) -> str:
+        return get_id(url)+'-'+get_id(os.path.splitext(os.path.basename(self.tif_path))[0])
+
+    # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
@@ -91,7 +95,7 @@ class Driver(ProcDriver):
         gsd = (gsdCol + gsdRow)/2
 
         item = Item(
-            id=str(url.replace("/", "-")),
+            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -110,7 +114,7 @@ class Driver(ProcDriver):
                 view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.rapideye.value,
-                main_asset_format=AssetFormat.geotiff.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                main_asset_format=AssetFormat.geotiff.value,
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
@@ -137,6 +141,5 @@ class Driver(ProcDriver):
                    Driver.xml_path is not None
 
         else:
-            #TODO try to hide this log for file exploration services
-            Driver.LOGGER.error("The folder {} does not exist.".format(path))
+            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
             return False

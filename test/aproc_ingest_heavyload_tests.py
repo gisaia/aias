@@ -31,7 +31,7 @@ class Tests(unittest.TestCase):
             url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3A{}&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120".format(hit["md"]["id"])
             inputs = InputIngestProcess(url=url, collection=COLLECTION, catalog="theia")
             execute = Execute(inputs=inputs.model_dump())
-            r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json"})
+            r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok)
             status: StatusInfo = StatusInfo(**json.loads(r.content))
         end = time.time()

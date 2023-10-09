@@ -29,7 +29,11 @@ class Driver(ProcDriver):
         except Exception as e:
             Driver.LOGGER.debug(e)
             return False
-    
+
+    # Implements drivers method
+    def get_item_id(self, url: str) -> str:
+        ...
+
     # Implements drivers method
     def identify_assets(self, url:str)->list[Asset]:
         hits=Driver.__fetch_url__(url).get("hits")
@@ -123,7 +127,6 @@ class Driver(ProcDriver):
                 create_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["identity"]["lifecycle"]["created"]))),
                 update_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["identity"]["lifecycle"]["updated"]))),
                 item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.theia.value,
                 main_asset_format=AssetFormat.zip.value,
                 observation_type=ObservationType.image.value
             ),

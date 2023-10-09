@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
         # WAIT FOR FAILURE
         status: StatusInfo = StatusInfo(**json.loads(r.content))
@@ -63,7 +63,7 @@ class Tests(unittest.TestCase):
         # SEND DOWNLOAD REQUEST
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=execute.model_dump_json(), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
         self.assertTrue(r.ok)
 
         # WAIT FOR SUCCESS

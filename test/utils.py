@@ -67,12 +67,14 @@ def dir_to_list(dirname, parent={}):
                 if driver is not None:
                     dct['type'] = 'file'
                     dct["archive"] = True
+                    dct["id"]= driver.get_item_id(dct['path'])
                     dct["archive_type"] = driver.name
             if os.path.isdir(dct['path']):
                 driver = Drivers.solve(dct['path'])
                 if driver is not None:
                     dct['type'] = 'folder'
                     dct["archive"] = True
+                    dct["id"]= driver.get_item_id(dct['path'])
                     dct["archive_type"] = driver.name
                 else:
                     dct['type'] = 'folder'

@@ -2,13 +2,14 @@ import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal)
+    get_geom_bbox_centroid, setup_gdal, get_id)
 
 
 class Driver(ProcDriver):
@@ -52,11 +53,16 @@ class Driver(ProcDriver):
         return assets
 
     # Implements drivers method
+    def get_item_id(self, url: str) -> str:
+        return get_id(url)
+
+    # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
+        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         from osgeo import gdal, ogr, osr
         setup_gdal()
         tree = ET.parse(self.dim_path)
@@ -92,7 +98,6 @@ class Driver(ProcDriver):
                         #Because the string in the GML is not a classic SRS expression
                         in_spatial_ref_code=srs.items()[0][1].split(" ")[0]
                         break
-
         component_geometry = component_feature.geometry()
         # output SpatialReference
         if in_spatial_ref_code is not None and in_spatial_ref_code.isdigit() and int(in_spatial_ref_code) != "4326":
@@ -100,20 +105,21 @@ class Driver(ProcDriver):
             outSpatialRef.ImportFromEPSG(4326)
             inSpatialRef = osr.SpatialReference()
             inSpatialRef.ImportFromEPSG(int(in_spatial_ref_code))
-        # create the CoordinateTransformation
+            inSpatialRef.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER)
+            # create the CoordinateTransformation
             coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
             component_geometry.Transform(coordTrans)
             #Retrieve geometry and centroid
             geometry = component_feature.ExportToJson(as_object=True)["geometry"]
             centroid_geom = component_geometry.Centroid()
             centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
+            centroid = [float(centroid_geom_list[1]),float(centroid_geom_list[2])]
 
         elif in_spatial_ref_code == "urn:ogc:def:derivedCRSType:OGC:1.0:image" and Driver.rpc_file is not None:
             #use RPC file if present
             from rpcm import rpc_from_rpc_file
             rpc = rpc_from_rpc_file(Driver.rpc_file)
-            #TODO finish to transform the geometry with the RPC
+            #TODO finish to transform the geometry with the RPC (later not necessary for the moment)
             print("USE RPC")
             #rpc.localization()
 
@@ -141,7 +147,7 @@ class Driver(ProcDriver):
         # We calculate the GSD as the mean of  GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
         gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"]))/2
         item = Item(
-            id=str(url.replace("/", "-")),
+            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -159,7 +165,7 @@ class Driver(ProcDriver):
                 view__sun_elevation=metadata["SUN_ELEVATION"],
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
-                main_asset_format=AssetFormat.jpg2000.value,  # TODO MATTHIEU: voir si c'est du geotiff ou du jpeg ou jpg2000
+                main_asset_format=self.get_main_asset_format(root),
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
@@ -213,6 +219,14 @@ class Driver(ProcDriver):
             return Driver.roi_path is not None and \
                    Driver.dim_path is not None
         else:
-            #TODO try to hide this log for file exploration service
-            Driver.LOGGER.error("The folder {} does not exist.".format(path))
+            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
             return False
+
+    @staticmethod
+    def get_main_asset_format(root):
+        format = root.find('./Raster_Data/Data_Access/DATA_FILE_FORMAT').text
+        if format == "image/jp2":
+            main_asset_format=AssetFormat.jpg2000.value
+        else:
+            main_asset_format=AssetFormat.geotiff.value
+        return main_asset_format

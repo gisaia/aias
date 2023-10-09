@@ -64,6 +64,17 @@ class Driver(ABC):
             bool: True if the driver supports the archive format, False otherwise
         """
         ...
+    @abstractmethod
+    def get_item_id(self, url:str)->str:
+        """Return the id of the item currently process by the driver.
+
+        Args:
+            url (str): archive's url
+
+        Returns:
+            str: the id of the item currently process by the driver
+        """
+        ...
 
     @abstractmethod
     def identify_assets(self, url:str)->list[Asset]:

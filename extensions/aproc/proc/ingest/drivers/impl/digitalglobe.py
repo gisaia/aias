@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal)
+    get_geom_bbox_centroid, setup_gdal, get_id)
 
 
 class Driver(ProcDriver):
@@ -57,6 +57,9 @@ class Driver(ProcDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
+
+    def get_item_id(self, url: str) -> str:
+        return get_id(url)
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
@@ -111,7 +114,7 @@ class Driver(ProcDriver):
         else:
             view__sun_elevation = float(root.find("./IMD/IMAGE/MEANSUNEL").text)
         item = Item(
-            id=str(url.replace("/", "-")),
+            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -163,6 +166,5 @@ class Driver(ProcDriver):
                    Driver.til_path is not None and \
                    Driver.imd_path is not None
         else:
-            #TODO try to hide this log for file exploration service
-            Driver.LOGGER.error("The folder {} does not exist.".format(path))
+            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
             return False
