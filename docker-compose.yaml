@@ -88,10 +88,12 @@ services:
     #command: tail -f /dev/null
     container_name: 'aproc-processes'
     environment:
+      - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
+      - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
       - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
       - ARLAS_SMTP_HOST=${ARLAS_SMTP_HOST}
       - ARLAS_SMTP_PORT=${ARLAS_SMTP_PORT}
@@ -160,12 +162,14 @@ services:
     image: aproc-service:latest
     container_name: 'aproc-service'
     environment:
+      - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_HOST=0.0.0.0
       - APROC_PORT=8001
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
+      - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
       - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
       - ARLAS_SMTP_HOST=${ARLAS_SMTP_HOST}
       - ARLAS_SMTP_PORT=${ARLAS_SMTP_PORT}

@@ -2,7 +2,7 @@ import elasticsearch
 import os
 import time
 import unicodedata
-
+import requests
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX","airs")

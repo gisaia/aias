@@ -127,7 +127,7 @@ class AprocProcess(Process):
             Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
             if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
 
-            item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id)
+            item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id, headers=context)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
@@ -167,14 +167,24 @@ class AprocProcess(Process):
                 Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                 raise DriverException(error_msg)
 
-    def __get_item__(collection: str, item_id: str):
+    def __get_item__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
-            r = requests.get(url=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id))
+            r = requests.get(url=Configuration.settings.arlas_url_search.format(collection=Configuration.settings.collection_prefix+"_"+collection, item=item_id), headers=headers)
             if r.ok:
-                return mapper.item_from_json(r.content)
+                result = r.json()
+                if result.get("hits") and len(result.get("hits")) > 0:
+                    LOGGER.info(r.content)
+                    LOGGER.info(mapper.item_from_dict(result.get("hits")[0]["data"]))
+                    return mapper.item_from_dict(result.get("hits")[0]["data"])
+                else:
+                    LOGGER.warn("No result found for {}/{}".format(collection, item_id))
+                    return None
             else:
+                LOGGER.error("Error while retrieving {}/{} ({})".format(collection, item_id, r.content))
                 return None
-        except Exception:
+        except Exception as e:
+            LOGGER.error("Exception while retrieving {}/{}".format(collection, item_id))
+            LOGGER.exception(e)
             return None
 
     def __update_paths__(mail_context: dict[str, str]):
