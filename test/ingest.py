@@ -20,8 +20,8 @@ def ingest(url, collection, catalog):
 def ingest_folders(data, collection, catalog, writer):
     for d in data:
         if 'archive' in d:
-            if not DRY_RUN:
-                ingest(d['path'], collection, catalog, writer)
+            if str(DRY_RUN).lower() == "false":
+                ingest(d['path'], collection, catalog)
             else:
                 # Write a csv file with two columns path and id
                 print("Try to ingest : " + d['path'] + " with id " + d['id'])
@@ -33,7 +33,7 @@ def ingest_folders(data, collection, catalog, writer):
 
 
 dir_to_list_data = dir_to_list(os.getenv("INGESTED_FOLDER"))
-f = open(os.getenv("OUTPUT_FILE",'/tmp/result.csv'), 'a')
+f = open(os.getenv("OUTPUT_FILE",'/tmp/result.csv'), 'w')
 writer = csv.writer(f)
 ingest_folders(filter_data(dir_to_list_data), os.getenv("COLLECTION"), os.getenv("CATALOG"), writer)
 f.close()
