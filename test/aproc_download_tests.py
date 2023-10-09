@@ -8,7 +8,7 @@ from airs.core.models.model import Item, Asset, Role
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.download.download_process import InputDownloadProcess, OutputDownloadProcess
 
-from utils import AIRS_URL, APROC_ENDPOINT, setUpTest
+from utils import AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, setUpTest
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc import (Execute)
@@ -48,6 +48,18 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(r.json()["results"]), 3)
 
         self.__add_item__()
+        sleep(3)
+        # Create collection
+        print("create collection {}".format(ARLAS_COLLECTION))
+        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]),  headers={"Content-Type": "application/json"}, data=json.dumps({
+                            "index_name": ARLAS_COLLECTION,
+                            "id_path": "id",
+                            "geometry_path": "geometry",
+                            "centroid_path": "centroid",
+                            "timestamp_path": "properties.datetime"
+        }))
+        self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
+
         # SEND DOWNLOAD REQUEST
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())

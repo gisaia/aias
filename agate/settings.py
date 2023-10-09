@@ -6,7 +6,7 @@ LOGGER = Logger.logger
 
 
 class Settings(BaseModel, extra=Extra.allow):
-    arlas_url_search: str
+    arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
     agate_prefix: str
     host: str
     port: int

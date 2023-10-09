@@ -19,6 +19,9 @@ export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://minio:9000/{}/{}
 export AIRS_MAPPING_URL=/app/conf/mapping.json
 export AIRS_COLLECTION_URL=/app/conf/collection.json
 
+# APROC & AGATE
+export ARLAS_URL_SEARCH="http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item}"
+
 # APROC
 export ARLAS_SMTP_ACTIVATED=true
 export ARLAS_SMTP_HOST=smtp4dev
@@ -48,7 +51,6 @@ export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
 export APROC_PATH_TO_WINDOWS=true
 
 # AGATE
-export ARLAS_URL_SEARCH=http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item}
 export AGATE_PREFIX=/arlas/agate
 export AGATE_HOST=0.0.0.0
 export AGATE_PORT=8004

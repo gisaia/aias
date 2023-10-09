@@ -30,8 +30,6 @@ class Drivers():
         for driver in Drivers.drivers:
             if driver.supports(url) is True:
                 return driver()
-            #TODO try to hide this log for file exploration service
-            print("{} does not support {}".format(driver.name, url))
         return None
 
     def get_driver_by_name(name: str) -> Driver:

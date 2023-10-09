@@ -1,3 +1,6 @@
+arlas_url_search: ${ARLAS_URL_SEARCH}
+collection_prefix: $AIRS_INDEX_COLLECTION_PREFIX|airs
+
 outbox_directory: ${APROC_DOWNLOAD_OUTBOX_DIR}
 notification_admin_emails: ${APROC_DOWNLOAD_ADMIN_EMAILS}
 
