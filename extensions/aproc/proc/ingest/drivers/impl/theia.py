@@ -109,7 +109,6 @@ class Driver(ProcDriver):
             centroid=hit["md"]["centroid"]["coordinates"],
             bbox= [min(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),min(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0]))],
             properties=Properties(
-                item_format=ItemFormat.theia.value,
                 datetime=acquisition_date,
                 begin_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["temporalCoverage"]["begin"]))),
                 end_datetime= int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["temporalCoverage"]["end"]))),
