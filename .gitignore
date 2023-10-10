@@ -6,6 +6,8 @@ private
 target
 .idea/
 test/inputs/DIMAP
+test/inputs/SPOT5-2.5M
+out/
 airs.egg-info/
 .env
 outbox

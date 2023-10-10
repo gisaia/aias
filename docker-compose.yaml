@@ -115,7 +115,7 @@ services:
       - APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN=${APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN}
       - APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN=${APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN}
     volumes:
-      - ./test/inputs:/inputs
+      - ./test/inputs:/inputs:ro
       - ./outbox/:/outbox
     depends_on:
       - redis
@@ -211,7 +211,7 @@ services:
       - OUTPUT_FILE=/tmp/results.csv
       - COLLECTION=main_collection
       - CATALOG=main_catalog
-      - DRY_RUN=True
+      - DRY_RUN=False
     volumes:
-      - ./test/inputs:/inputs
+      - ./test/inputs:/inputs:ro
       - /tmp:/tmp

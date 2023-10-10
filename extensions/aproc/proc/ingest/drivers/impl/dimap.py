@@ -64,6 +64,7 @@ class Driver(ProcDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         from osgeo import gdal, ogr, osr
+        from osgeo.gdalconst import GA_ReadOnly
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()
@@ -124,7 +125,7 @@ class Driver(ProcDriver):
             #rpc.localization()
 
         #Open the XML dimap file with gdal to retrieve the metadata
-        src_ds = gdal.Open(self.dim_path)
+        src_ds = gdal.Open(self.dim_path, GA_ReadOnly)
         metadata = src_ds.GetMetadata()
         # We retrieve the time
         date = metadata["IMAGING_DATE"]

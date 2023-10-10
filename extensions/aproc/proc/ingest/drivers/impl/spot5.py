@@ -58,6 +58,7 @@ class Driver(ProcDriver):
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()
@@ -69,13 +70,12 @@ class Driver(ProcDriver):
         geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
                                                           coords[2][0], coords[2][1], coords[3][0], coords[3][1])
         gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
-        src_ds = gdal.Open(self.dim_path)
+        src_ds = gdal.Open(self.dim_path, GA_ReadOnly)
         metadata = src_ds.GetMetadata()
         # We retrieve the time
         date = metadata["IMAGING_DATE"]
         time = metadata["IMAGING_TIME"]
         date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
-        print(date_time)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
