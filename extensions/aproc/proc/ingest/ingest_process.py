@@ -80,7 +80,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True)
-    def execute(self, context: dict[str, str], url: str, collection: str, catalog: str) -> dict:
+    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion

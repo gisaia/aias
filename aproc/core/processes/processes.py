@@ -117,10 +117,10 @@ class Processes:
         return list(map(lambda job: job["id"], [item for sublist in list_of_list_of_jobs for item in sublist]))
 
     @staticmethod
-    def execute(process_name, context: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
+    def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump()
-        kwargs["context"] = context
+        kwargs["headers"] = headers
         job_id = Processes.send_task(task_name=process.__task_name__, kwargs=kwargs)
         Processes.__store_job__(job_id, process_name, process.get_resource_id(input))
         return Processes.status(job_id)

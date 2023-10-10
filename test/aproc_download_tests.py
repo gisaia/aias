@@ -8,7 +8,7 @@ from airs.core.models.model import Item, Asset, Role
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
 from extensions.aproc.proc.download.download_process import InputDownloadProcess, OutputDownloadProcess
 
-from utils import AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, setUpTest
+from utils import AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, TOKEN, setUpTest
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc import (Execute)
@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         self.assertTrue(r.ok)
         # WAIT FOR FAILURE
         status: StatusInfo = StatusInfo(**json.loads(r.content))
@@ -63,7 +63,7 @@ class Tests(unittest.TestCase):
         # SEND DOWNLOAD REQUEST
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "arlas-user-email": "me@somewhere"})
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         self.assertTrue(r.ok)
 
         # WAIT FOR SUCCESS
