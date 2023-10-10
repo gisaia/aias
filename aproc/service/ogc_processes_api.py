@@ -212,11 +212,10 @@ def get_process_description(process_id: str):
              })
 def post_process_execute(process_id: str, execute: Execute, request: Request):
     process = __get_process(process_id)
-
     if hasattr(process, "input_model"):
         inputs = execute.model_dump().get("inputs")
         context = dict(map(lambda v: v, request.headers.items()))
-        job: StatusInfo = Processes.execute(process_name=process_id, context=context, input=process.input_model(**inputs))
+        job: StatusInfo = Processes.execute(process_name=process_id, headers=context, input=process.input_model(**inputs))
         job.processID = process_id
         return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
     return JSONResponse(content=process.execute().model_dump(), status_code=status.HTTP_200_OK)

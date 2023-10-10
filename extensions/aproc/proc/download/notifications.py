@@ -13,10 +13,11 @@ class Notifications:
         LOGGER.info("SMTP configuration: {}".format(Configuration.settings.smtp.model_dump_json()))
 
     def try_send_to(subject: str, msg: str, to: list[str], context: dict[str, str]):
-        if (not subject and not msg) or not to:
+        if (not subject and not msg) or not to or to == "anonymous":
             return
         try:
             if context is not None:
+                context["arlas-user-email"] = to
                 msg = msg.format(**context)
                 subject = subject.format(**context)
             email = EmailMessage()

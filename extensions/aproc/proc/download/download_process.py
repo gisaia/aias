@@ -2,7 +2,6 @@ import hashlib
 import json
 import os
 import time
-
 import requests
 from celery import Task, shared_task
 from pydantic import BaseModel, Field
@@ -103,31 +102,41 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True)
-    def execute(self, context: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
+        import jwt
         # self is a celery task because bind=True
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
+            authorization = headers.get("authorization")
+            send_to: str = "anonymous"
+            try:
+                if not not authorization:
+                    token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
+                    if not not token_content.get("email"):
+                        send_to = token_content.get("email")
+                    else:
+                        LOGGER.error("email not found in token {}".format(token_content))
+                else:
+                        LOGGER.error("no token in header")
+            except Exception as e:
+                LOGGER.exception(e)
             mail_context = {
                 "target_projection": target_projection,
                 "target_format": target_format,
                 "item_id": item_id,
                 "collection": collection,
-                "arlas-user-email": context.get("arlas-user-email", "anonymous"),
                 "target_directory": None,
                 "file_name": None,
                 "error": None
             }
-            send_to: str = context.get("arlas-user-email")
-            if send_to is None:
-                LOGGER.warning("download request for {}/{} is anonymous".format(collection, item_id))
-            else:
-                LOGGER.info("download request for {}/{}".format(collection, item_id))
+            # RGPD : log level is info
+            LOGGER.debug("download request {}/{} for {}".format(collection, item_id, send_to))
 
             Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            if send_to is not None: Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+            Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
 
-            item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id, headers=context)
+            item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id, headers=headers)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
@@ -151,7 +160,7 @@ class AprocProcess(Process):
                         crop_wkt=crop_wkt,
                         target_projection=target_projection,
                         target_format=target_format)
-                    if send_to is not None: Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
+                    Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
                     Notifications.try_send_to(Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                     return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
                 except Exception as e:
