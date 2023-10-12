@@ -18,7 +18,7 @@ def extract(crop_wkt, file, driver_target, epsg_target, target_directory, target
     with rasterio.open(file) as src:
         epsg_4326 = pyproj.Proj('EPSG:4326')
         epsg_src = pyproj.Proj(src.crs)
-        if crop_wkt is not None:
+        if not not crop_wkt:
             raw = shapely.wkt.loads(crop_wkt)
             project = pyproj.Transformer.from_proj(epsg_4326, epsg_src, always_xy=True)
             geom = transform(project.transform, raw)

@@ -101,7 +101,7 @@ class AprocProcess(Process):
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"]+r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
-    @shared_task(bind=True)
+    @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
         import jwt
         # self is a celery task because bind=True

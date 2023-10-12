@@ -79,7 +79,7 @@ class AprocProcess(Process):
         hash_object = hashlib.sha1(InputIngestProcess(**inputs.model_dump()).url.encode())
         return hash_object.hexdigest()
 
-    @shared_task(bind=True)
+    @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:

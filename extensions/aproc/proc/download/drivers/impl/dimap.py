@@ -30,6 +30,8 @@ class Driver(DownloadDriver):
         epsg_target = pyproj.Proj(target_projection)
         # Default driver is GTiff
         driver_target = "GTiff"
+        if not target_format:
+            raise Exception("target_format must be either Geotiff or Jpeg2000")
         if target_format == "Geotiff":
             driver_target = "GTiff"
             target_file_name = os.path.splitext(dimap_file_name)[0]  + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")+'.tif'
