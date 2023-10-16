@@ -3,20 +3,20 @@ import os
 
 from fastapi import APIRouter, HTTPException, status
 
-from fam.core.model import File
+from fam.core.model import File, PathRequest
 from fam.core.settings import Configuration
 
 ROUTER = APIRouter()
 
 
 @ROUTER.post("/files", response_model=list[File])
-async def files(file_path: str = ""):
+async def files(path_request: PathRequest):
+    file_path = path_request.path
     if file_path and file_path.find("..") > -1:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path can not contain '..' ({})".format(file_path))
     if not file_path:
         file_path = ""
     full_path = os.path.join(Configuration.settings.inputs_directory, file_path)
-    print(full_path)
     if os.path.exists(full_path):
         if os.path.isdir(full_path):
             files: list[str] = os.listdir(full_path)
@@ -29,9 +29,11 @@ async def files(file_path: str = ""):
 
 
 @ROUTER.post("/archives", response_model=list[File])
-async def archives(file_path: str = ""):
+async def archives(path_request: PathRequest):
+    file_path = path_request.path
     if file_path and file_path.find("..") > -1:
-        raise Exception("File path can not contain '..' ({})".format(file_path))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path can not contain '..' ({})".format(file_path))
     if not file_path:
         file_path = ""
     full_path = os.path.join(Configuration.settings.inputs_directory, file_path)
+    # TODO : list archives within full_path

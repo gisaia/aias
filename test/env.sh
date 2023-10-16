@@ -60,4 +60,7 @@ export AGATE_URL_HEADER_PREFIX=/object
 export ASSET_MINIO_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)"
 export ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
 
+# FAM
+export INGESTED_FOLDER=/inputs
+
 export PLATFORM='amd64'

@@ -9,7 +9,7 @@ from fam.core.settings import Configuration
 from fam.rest.services import ROUTER
 
 cli = typer.Typer()
-FAM_HOST = os.getenv("FAM_HOST", "127.0.0.1")
+FAM_HOST = os.getenv("FAM_HOST", "0.0.0.0")
 FAM_PORT = os.getenv("FAM_PORT", "8005")
 FAM_PREFIX = os.getenv("FAM_PREFIX", "/arlas/fam")
 

@@ -231,3 +231,5 @@ services:
       - CATALOG=main_catalog
     volumes:
       - ./test/inputs:/inputs:ro
+    ports:
+      - "8005:8005"

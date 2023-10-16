@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+class PathRequest(BaseModel):
+    path: str = ""
+
 class File(BaseModel):
     name: str = ""
     path: str = ""
