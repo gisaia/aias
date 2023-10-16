@@ -18,6 +18,7 @@ export AIRS_S3_ENDPOINT_URL=http://minio:9000
 export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://minio:9000/{}/{}
 export AIRS_MAPPING_URL=/app/conf/mapping.json
 export AIRS_COLLECTION_URL=/app/conf/collection.json
+export AIRS_LOGGER_LEVEL=DEBUG
 
 # APROC & AGATE
 export ARLAS_URL_SEARCH="http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item}"
@@ -49,6 +50,7 @@ export APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN="\"ARLAS Services: {arlas-user-email
 
 export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
 export APROC_PATH_TO_WINDOWS=true
+export APROC_LOGGER_LEVEL=DEBUG
 
 # AGATE
 export AGATE_PREFIX=/arlas/agate
@@ -59,5 +61,6 @@ export AGATE_URL_HEADER=X-Forwarded-Uri
 export AGATE_URL_HEADER_PREFIX=/object
 export ASSET_MINIO_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)"
 export ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
+export AGATE_LOGGER_LEVEL=DEBUG
 
 export PLATFORM='amd64'

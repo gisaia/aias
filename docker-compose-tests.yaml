@@ -51,6 +51,7 @@ services:
       - AGATE_PORT=$AGATE_PORT
       - AGATE_URL_HEADER=$AGATE_URL_HEADER
       - AGATE_URL_HEADER_PREFIX=$AGATE_URL_HEADER_PREFIX
+      - AGATE_LOGGER_LEVEL=${AGATE_LOGGER_LEVEL:-INFO}
 #      - ASSET_MINIO_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)"
 #      - ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
     ports:
