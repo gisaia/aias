@@ -13,6 +13,7 @@ s3_bucket = os.getenv("AIRS_S3_BUCKET","airstest")
 index_endpoint_url = "http://localhost:9200"
 s3_endpoint_url = "http://localhost:9000"
 AIRS_URL = "http://localhost:8000/arlas/airs"
+FAM_URL = "http://localhost:8005/arlas/fam"
 ARLAS_URL = "http://localhost:9999"
 APROC_ENDPOINT = os.getenv("APROC_ENDPOINT", "http://localhost:8001/arlas/aproc")
 AGATE_ENDPOINT = os.getenv("AGATE_ENDPOINT", "http://localhost:8004/arlas/agate/authorization")
