@@ -43,7 +43,7 @@ class Tests(unittest.TestCase):
             for d in data:
                 if 'archive' in d:
                     print("Try to ingest : " + d['path'])
-                    self.ingest(d['path'].replace(os.getcwd()  + "/test",''),'main_collection','dimap')
+                    self.ingest(d['path'].replace(os.getcwd()  + "/test",''),COLLECTION,'dimap')
                 else:
                     if 'children' in d:
                         ingest_folders(d['children'])
