@@ -1,0 +1,15 @@
+FROM python:3.10
+
+COPY ./fam/requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+COPY ./fam /app/fam
+COPY ./common /app/common
+COPY ./conf/fam.yaml /app/conf/
+COPY ./scripts/fam/start.sh /app/
+
+EXPOSE 8005
+ENTRYPOINT ["./start.sh"]

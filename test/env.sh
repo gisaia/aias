@@ -63,4 +63,7 @@ export ASSET_MINIO_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>
 export ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
 export AGATE_LOGGER_LEVEL=DEBUG
 
+# FAM
+export INGESTED_FOLDER=/inputs
+
 export PLATFORM='amd64'

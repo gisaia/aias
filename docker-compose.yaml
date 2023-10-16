@@ -219,3 +219,20 @@ services:
     volumes:
       - ./test/inputs:/inputs:ro
       - /tmp:/tmp
+
+  fam-service:
+    networks:
+      - aias
+    build:
+      context: '.'
+      dockerfile: Dockerfile-fam
+    image: fam:latest
+    container_name: 'fam-service'
+    environment:
+      - INGESTED_FOLDER=/inputs
+      - COLLECTION=main_collection
+      - CATALOG=main_catalog
+    volumes:
+      - ./test/inputs:/inputs:ro
+    ports:
+      - "8005:8005"
