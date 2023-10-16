@@ -19,7 +19,8 @@ def run(
         host: str = typer.Argument(default=APROC_HOST, help="host"),
         port: int = typer.Argument(default=APROC_PORT, help="port")
         ):
-    app = FastAPI()
+    app = FastAPI(version='0.0', title='ARLAS Processes',
+                  description='ARLAS Processes')
     app.include_router(ROUTER, prefix=APROC_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         app.add_exception_handler(eh.exception, eh.handler)

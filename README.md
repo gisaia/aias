@@ -99,22 +99,23 @@ with `XXX:VVV` the environment variable that you want to specify. The table belo
 
 | Variable                                               |
 | ------------------------------------------------------ |
-| AIRS_ARLAS_COLLECTION_NAME                          |
-| AIRS_ARLAS_URL                                      |
-| AIRS_INDEX_ENDPOINT_URL                             |
-| AIRS_INDEX_COLLECTION_PREFIX                        |
-| AIRS_INDEX_LOGIN                                    |
-| AIRS_S3_BUCKET                                      |
-| AIRS_S3_ACCESS_KEY_ID                               |
-| AIRS_S3_SECRET_ACCESS_KEY                           |
-| AIRS_S3_REGION                                      |
-| AIRS_S3_TIER                                        |
-| AIRS_S3_PLATFORM                                    |
-| AIRS_S3_ASSET_HTTP_ENDPOINT_URL                     |
-| AIRS_S3_ENDPOINT_URL                                |
-| AIRS_MAPPING_URL                                    |
-| AIRS_COLLECTION_URL                                 |
-| AIRS_PREFIX                       |
+| AIRS_ARLAS_COLLECTION_NAME                             |
+| AIRS_ARLAS_URL                                         |
+| AIRS_INDEX_ENDPOINT_URL                                |
+| AIRS_INDEX_COLLECTION_PREFIX                           |
+| AIRS_INDEX_LOGIN                                       |
+| AIRS_S3_BUCKET                                         |
+| AIRS_S3_ACCESS_KEY_ID                                  |
+| AIRS_S3_SECRET_ACCESS_KEY                              |
+| AIRS_S3_REGION                                         |
+| AIRS_S3_TIER                                           |
+| AIRS_S3_PLATFORM                                       |
+| AIRS_S3_ASSET_HTTP_ENDPOINT_URL                        |
+| AIRS_S3_ENDPOINT_URL                                   |
+| AIRS_MAPPING_URL                                       |
+| AIRS_COLLECTION_URL                                    |
+| AIRS_PREFIX                                            |
+| AIRS_LOGGER_LEVEL                                      |
 
 
 #### Stack for tests
@@ -281,13 +282,14 @@ The following environment variables must be set to run the celery workers and th
 
 | Variable                                               |
 | ------------------------------------------------------ |
-| APROC_CONFIGURATION_FILE                        |
-| APROC_HOST                        |
-| APROC_PORT                        |
-| CELERY_BROKER_URL                        |
-| CELERY_RESULT_BACKEND                        |
-| AIRS_ENDPOINT                        |
-| APROC_PREFIX                       |
+| APROC_CONFIGURATION_FILE                               |
+| APROC_HOST                                             |
+| APROC_PORT                                             |
+| CELERY_BROKER_URL                                      |
+| CELERY_RESULT_BACKEND                                  |
+| AIRS_ENDPOINT                                          |
+| APROC_PREFIX                                           |
+| APROC_LOGGER_LEVEL                                     |
 
 For starting the service or a celery worker, you need to set two environment variables:
 
@@ -320,11 +322,10 @@ AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an obje
 
 | Variable                                               |
 | ------------------------------------------------------ |
-|   ARLAS_URL_SEARCH                      |
-|   AGATE_PREFIX                      |
-|   AGATE_HOST                      |
-|   AGATE_ENDPOINT                      |
-|   AGATE_URL_HEADER                      |
-|   AGATE_URL_HEADER_PREFIX                      |
-
-
+|   ARLAS_URL_SEARCH                                     |
+|   AGATE_PREFIX                                         |
+|   AGATE_HOST                                           |
+|   AGATE_ENDPOINT                                       |
+|   AGATE_URL_HEADER                                     |
+|   AGATE_URL_HEADER_PREFIX                              |
+|   AGATE_LOGGER_LEVEL                                   |
