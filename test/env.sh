@@ -65,5 +65,6 @@ export AGATE_LOGGER_LEVEL=DEBUG
 
 # FAM
 export INGESTED_FOLDER=/inputs
+export FAM_LOGGER_LEVEL=DEBUG
 
 export PLATFORM='amd64'

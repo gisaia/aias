@@ -2,12 +2,13 @@ import datetime
 import os
 
 from fastapi import APIRouter, HTTPException, status
+from fam.core.fam import Fam
 
-from fam.core.model import File, PathRequest
+from fam.core.model import Archive, File, PathRequest
 from fam.core.settings import Configuration
 
 ROUTER = APIRouter()
-
+MAX_SIZE = 1000
 
 @ROUTER.post("/files", response_model=list[File])
 async def files(path_request: PathRequest):
@@ -28,12 +29,15 @@ async def files(path_request: PathRequest):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File {} not found".format(file_path))
 
 
-@ROUTER.post("/archives", response_model=list[File])
+@ROUTER.post("/archives", response_model=list[Archive])
 async def archives(path_request: PathRequest):
+    path_request.size = min(path_request.size, MAX_SIZE)
     file_path = path_request.path
     if file_path and file_path.find("..") > -1:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path can not contain '..' ({})".format(file_path))
     if not file_path:
         file_path = ""
-    full_path = os.path.join(Configuration.settings.inputs_directory, file_path)
-    # TODO : list archives within full_path
+    if os.path.exists(os.path.join(Configuration.settings.inputs_directory, file_path)):
+        return Fam.list_archives(Configuration.settings.inputs_directory, file_path)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File {} not found".format(file_path))

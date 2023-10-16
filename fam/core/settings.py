@@ -8,6 +8,7 @@ LOGGER = Logger.logger
 
 class Settings(BaseModel, extra=Extra.allow):
     inputs_directory: str
+    driver_configuration_file: str
 
 
 class Configuration:

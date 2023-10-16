@@ -1,10 +1,9 @@
 import logging
+import os
+
 from common.logger import CustomLogger
 
 
 class Logger(CustomLogger):
     logger_name = "fam"
-
-    @classmethod
-    def init(cls, level=logging.DEBUG):
-        super().init(level)
+    level = os.getenv("FAM_LOGGER_LEVEL", logging.INFO)
