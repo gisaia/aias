@@ -20,8 +20,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
         port: int = typer.Argument(default=AIRS_PORT, help="port")):
     Configuration.init(configuration_file=configuration_file)
     api = FastAPI(version='0.0', title='ARLAS Item Product Registration Service',
-                  description='ARLAS Item Registration Service API',
-                  )
+                  description='ARLAS Item Registration Service API')
     api.include_router(ROUTER, prefix=AIRS_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         api.add_exception_handler(eh.exception, eh.handler)

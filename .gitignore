@@ -11,3 +11,4 @@ out/
 airs.egg-info/
 .env
 outbox
+env_aias/

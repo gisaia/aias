@@ -11,7 +11,7 @@ rm -rf ./outbox
 mkdir outbox
 
 # Start  minio
-docker-compose -f docker-compose.yaml up  -d minio
+docker compose -f docker-compose.yaml up  -d minio
 #Waiting for minio service up and running
 code=""
 code_OK="OK"
@@ -21,7 +21,7 @@ code_OK="OK"
 done
 
 # Start  create buckets, elastic rabbitmq redis airs, aproc
-docker-compose -f docker-compose.yaml up --build -d createbuckets elasticsearch rabbitmq smtp4dev redis aproc-processes airs-server aproc-server fam-service
+docker compose -f docker-compose.yaml up --build -d createbuckets elasticsearch rabbitmq smtp4dev redis aproc-processes airs-server aproc-server fam-service
 # Waiting for elastic ready
 code=""
 code_OK="OK"
@@ -29,7 +29,7 @@ while [[ "$code" != *$code_OK* ]];do
     code="$(curl -IL --silent http://localhost:9200 | grep "^HTTP\/")"
     eval "sleep 5"
 done
-docker-compose -f docker-compose-tests.yaml up --build -d
+docker compose -f docker-compose-tests.yaml up --build -d
 # Waiting for arlas ready
 code=""
 code_OK="OK"

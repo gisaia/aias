@@ -5,18 +5,19 @@ from uvicorn.logging import DefaultFormatter
 
 class CustomLogger:
     logger_name = "logger"
+    level = logging.DEBUG
     __logger: logging.Logger = None
 
     @classmethod
-    def init(cls, level=logging.DEBUG):
+    def init(cls):
         cls.__logger = logging.getLogger(cls.logger_name)
-        cls.__logger.setLevel(level)
+        cls.__logger.setLevel(cls.level)
         cls.__logger.propagate = False
 
         formatter = DefaultFormatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                                      datefmt="%Y-%m-%d %H:%M:%S")
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(level)
+        console_handler.setLevel(cls.level)
         console_handler.setFormatter(formatter)
 
         cls.__logger.addHandler(console_handler)
