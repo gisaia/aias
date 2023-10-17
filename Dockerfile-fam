@@ -6,10 +6,18 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
+COPY ./aproc /app/aproc
+COPY ./extensions /app/extensions
 COPY ./fam /app/fam
+COPY ./airs/core/models /app/airs/core/models
+COPY ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
 COPY ./common /app/common
 COPY ./conf/fam.yaml /app/conf/
+COPY ./conf/drivers.yaml /app/conf/
+
 COPY ./scripts/fam/start.sh /app/
 
 EXPOSE 8005
+
+ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:/app
 ENTRYPOINT ["./start.sh"]

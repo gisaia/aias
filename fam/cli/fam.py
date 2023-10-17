@@ -5,6 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from common.exception_handler import EXCEPTION_HANDLERS
+from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from fam.core.settings import Configuration
 from fam.rest.services import ROUTER
 
@@ -19,6 +20,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
         host: str = typer.Argument(default=FAM_HOST, help="host"),
         port: int = typer.Argument(default=FAM_PORT, help="port")):
     Configuration.init(configuration_file=configuration_file)
+    Drivers.init(configuration_file=Configuration.settings.driver_configuration_file)
     api = FastAPI(version='0.0', title='ARLAS File and Archive Management Service',
                   description='ARLAS File and Archive Management API',
                   )

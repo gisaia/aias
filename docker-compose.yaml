@@ -232,6 +232,7 @@ services:
       - INGESTED_FOLDER=/inputs
       - COLLECTION=main_collection
       - CATALOG=main_catalog
+      - FAM_PREFIX=$FAM_PREFIX|/arlas/fam
     volumes:
       - ./test/inputs:/inputs:ro
     ports:
