@@ -230,7 +230,7 @@ services:
     container_name: 'fam-service'
     environment:
       - INGESTED_FOLDER=/inputs
-      - FAM_PREFIX=${FAM_PREFIX}|/arlas/fam
+      - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
     volumes:
       - ./test/inputs:/inputs:ro
     ports:
