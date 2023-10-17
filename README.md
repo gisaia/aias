@@ -340,6 +340,7 @@ FAM is ARLAS File and Archive Management service. The endpoint lists files in a 
 | ------------------------------------------------------ |
 |   INGESTED_FOLDER                                     |
 |   FAM_LOGGER_LEVEL                                         |
+|   FAM_PREFIX                                         |
 
 Example for listing __files__ in `DIMAP`:
 

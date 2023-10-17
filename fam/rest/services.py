@@ -21,7 +21,7 @@ async def files(path_request: PathRequest):
     if os.path.exists(full_path):
         if os.path.isdir(full_path):
             files: list[str] = os.listdir(full_path)
-            return list(map(lambda f: File(name=f, path=os.path.join(file_path, f), is_dir=os.path.isdir(os.path.join(full_path, f)), last_modification_date=datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(full_path, f))), creation_date=datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(full_path, f)))), files))
+            return list(map(lambda f: File(name=f, path=os.path.join(file_path, f), is_dir=os.path.isdir(os.path.join(full_path, f)), last_modification_date=datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(full_path, f))), creation_date=datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(full_path, f)))), filter(lambda f: not os.path.basename(f).startswith("."), files)))
         else:
             f = os.path.basename(full_path)
             return [File(name=f, path=full_path, is_dir=False, last_modification_date=datetime.datetime.fromtimestamp(os.path.getmtime(full_path)), creation_date=datetime.datetime.fromtimestamp(os.path.getctime(full_path)))]
