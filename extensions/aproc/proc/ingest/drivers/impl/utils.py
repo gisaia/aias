@@ -33,5 +33,5 @@ def get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_l
     centroid_geom = geom.Centroid()
     centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
     # Define centroid
-    centroid = [float(centroid_geom_list[2]), float(centroid_geom_list[1])]
+    centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
     return geometry, bbox, centroid

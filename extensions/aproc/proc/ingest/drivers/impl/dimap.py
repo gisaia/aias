@@ -114,7 +114,7 @@ class Driver(ProcDriver):
             geometry = component_feature.ExportToJson(as_object=True)["geometry"]
             centroid_geom = component_geometry.Centroid()
             centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-            centroid = [float(centroid_geom_list[1]),float(centroid_geom_list[2])]
+            centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
 
         elif in_spatial_ref_code == "urn:ogc:def:derivedCRSType:OGC:1.0:image" and Driver.rpc_file is not None:
             #use RPC file if present
