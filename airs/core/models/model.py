@@ -285,6 +285,6 @@ class Item(BaseModel, extra=Extra.allow):
     id                            :str              | None  = Field(default=None, title="Provider identifier. Must be unique within the STAC.", max_length=300)
     geometry                      :Dict[str, Any]   | None = Field(default=None, title="Defines the full footprint of the asset represented by this item, formatted according to `RFC 7946, section 3.1 (GeoJSON) <https://tools.ietf.org/html/rfc7946>`_")
     bbox                          :List[float]      | None = Field(default=None, title="Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2*n where n is the number of dimensions. Could also be None in the case of a null geometry.")
-    centroid                      :List[float]      | None = Field(default=None, title="Coordinates (lat/lon) of the geometry's centroid.")
+    centroid                      :List[float]      | None = Field(default=None, title="Coordinates (lon/lat) of the geometry's centroid.")
     assets                        :Dict[str, Asset] | None = Field(default=None, title="A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item.")
     properties                    :Properties       | None = Field(default=None, title="Item properties")

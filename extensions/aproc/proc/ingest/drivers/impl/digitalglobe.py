@@ -92,7 +92,7 @@ class Driver(ProcDriver):
                     geometry = component_feature.ExportToJson(as_object=True)["geometry"]
                     centroid_geom = component_geometry.Centroid()
                     centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-                    centroid = [float(centroid_geom_list[2]),float(centroid_geom_list[1])]
+                    centroid = [float(centroid_geom_list[1]),float(centroid_geom_list[2])]
                     break
 
         date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
