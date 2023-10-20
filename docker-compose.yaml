@@ -134,6 +134,7 @@ services:
     environment:
       - AIRS_HOST=0.0.0.0
       - AIRS_PORT=8000
+      - AIRS_CORS=${AIRS_CORS:-*}
       - AIRS_INDEX_ENDPOINT_URL=${AIRS_INDEX_ENDPOINT_URL:-http://localhost:9200}
       - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
       - AIRS_INDEX_LOGIN=${AIRS_INDEX_LOGIN:-None}
@@ -167,6 +168,7 @@ services:
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_HOST=0.0.0.0
       - APROC_PORT=8001
+      - APROC_CORS=${APROC_CORS:-*}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -231,6 +233,7 @@ services:
     environment:
       - INGESTED_FOLDER=/inputs
       - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
+      - FAM_CORS=${FAM_CORS:-*}
     volumes:
       - ./test/inputs:/inputs:ro
     ports:
