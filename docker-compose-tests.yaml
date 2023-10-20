@@ -45,6 +45,7 @@ services:
     image: agate:latest
     container_name: 'agate'
     environment:
+      - AGATE_CORS=${AGATE_CORS:-*}
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - AGATE_PREFIX=$AGATE_PREFIX
       - AGATE_HOST=$AGATE_HOST

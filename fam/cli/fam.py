@@ -3,6 +3,8 @@ import os
 import typer
 import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
 
 from common.exception_handler import EXCEPTION_HANDLERS
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
@@ -13,6 +15,7 @@ cli = typer.Typer()
 FAM_HOST = os.getenv("FAM_HOST", "0.0.0.0")
 FAM_PORT = os.getenv("FAM_PORT", "8005")
 FAM_PREFIX = os.getenv("FAM_PREFIX", "/arlas/fam")
+FAM_CORS = os.getenv("FAM_CORS", "*")
 
 
 @cli.command(help="Start the File and Archive Management Service.")
@@ -23,10 +26,12 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
     Drivers.init(configuration_file=Configuration.settings.driver_configuration_file)
     api = FastAPI(version='0.0', title='ARLAS File and Archive Management Service',
                   description='ARLAS File and Archive Management API',
-                  )
+                  middleware=[
+                    Middleware(CORSMiddleware, allow_origins=FAM_CORS.split(","))
+                  ])
     api.include_router(ROUTER, prefix=FAM_PREFIX)
-    for eh in EXCEPTION_HANDLERS:
-        api.add_exception_handler(eh.exception, eh.handler)
+#    for eh in EXCEPTION_HANDLERS:
+#        api.add_exception_handler(eh.exception, eh.handler)
     uvicorn.run(api, host=host, port=port)
 
 if __name__ == "__main__":

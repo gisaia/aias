@@ -4,6 +4,7 @@ export APROC_ENDPOINT=http://localhost:8001/arlas/aproc
 export ROOT_DIRECTORY=`pwd`/test/inputs
 
 # AIRS
+export AIRS_CORS="*"
 export AIRS_URL=http://airs-server:8000/arlas/airs
 export AIRS_ARLAS_COLLECTION_NAME=tests
 export AIRS_ARLAS_URL=http://localhost:81/server
@@ -22,8 +23,10 @@ export AIRS_LOGGER_LEVEL=DEBUG
 
 # APROC & AGATE
 export ARLAS_URL_SEARCH="http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item}"
+export AGATE_CORS="*"
 
 # APROC
+export APROC_CORS="*"
 export ARLAS_SMTP_ACTIVATED=true
 export ARLAS_SMTP_HOST=smtp4dev
 export ARLAS_SMTP_PORT=25
@@ -66,5 +69,5 @@ export AGATE_LOGGER_LEVEL=DEBUG
 # FAM
 export INGESTED_FOLDER=/inputs
 export FAM_LOGGER_LEVEL=DEBUG
-
+export FAM_CORS="*"
 export PLATFORM='amd64'
