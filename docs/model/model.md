@@ -23,7 +23,7 @@ airs_model
 | [id](#id)                 | Merged | Optional | cannot be null | [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "airs_model#/properties/id")                                                                                                                                                             |
 | [geometry](#geometry)     | Merged | Optional | cannot be null | [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")                                                        |
 | [bbox](#bbox)             | Merged | Optional | cannot be null | [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox") |
-| [centroid](#centroid)     | Merged | Optional | cannot be null | [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "airs_model#/properties/centroid")                                                                                                                                                             |
+| [centroid](#centroid)     | Merged | Optional | cannot be null | [Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md "airs_model#/properties/centroid")                                                                                                                                                             |
 | [assets](#assets)         | Merged | Optional | cannot be null | [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "airs_model#/properties/assets")                                                               |
 | [properties](#properties) | Merged | Optional | cannot be null | [Item](model-properties-item-properties.md "airs_model#/properties/properties")                                                                                                                                                                                        |
 | Additional Properties     | Any    | Optional | can be null    |                                                                                                                                                                                                                                                                        |
@@ -156,21 +156,21 @@ any of
 
 *   is optional
 
-*   Type: merged type ([Coordinates (lat/lon) of the geometry's centroid.](model-properties-coordinates-latlon-of-the-geometrys-centroid.md))
+*   Type: merged type ([Coordinates (lon/lat) of the geometry's centroid.](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-coordinates-latlon-of-the-geometrys-centroid.md "airs_model#/properties/centroid")
+*   defined in: [Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md "airs_model#/properties/centroid")
 
 ### centroid Type
 
-merged type ([Coordinates (lat/lon) of the geometry's centroid.](model-properties-coordinates-latlon-of-the-geometrys-centroid.md))
+merged type ([Coordinates (lon/lat) of the geometry's centroid.](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md))
 
 any of
 
-*   [Untitled array in Item](model-properties-coordinates-latlon-of-the-geometrys-centroid-anyof-0.md "check type definition")
+*   [Untitled array in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-coordinates-latlon-of-the-geometrys-centroid-anyof-1.md "check type definition")
+*   [Untitled null in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-1.md "check type definition")
 
 ## assets
 

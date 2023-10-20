@@ -72,4 +72,4 @@
 
 *   [Untitled array in Item](./model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry-anyof-0.md) – `airs_model#/properties/bbox/anyOf/0`
 
-*   [Untitled array in Item](./model-properties-coordinates-latlon-of-the-geometrys-centroid-anyof-0.md) – `airs_model#/properties/centroid/anyOf/0`
+*   [Untitled array in Item](./model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-0.md) – `airs_model#/properties/centroid/anyOf/0`
