@@ -12,3 +12,6 @@ airs.egg-info/
 .env
 outbox
 env_aias/
+
+file-explorer/node_modules
+file-explorer/.angular

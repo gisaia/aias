@@ -1,0 +1,12 @@
+.content {
+  display: flex;
+  flex-direction: column;
+
+  .files {
+    display: flex;
+
+    .explorer, .archives{
+      flex: 1;
+    }
+  }
+}
