@@ -282,6 +282,7 @@ The following environment variables must be set to run the celery workers and th
 
 | Variable                                               |
 | ------------------------------------------------------ |
+| APROC_ENDPOINT_FROM_APROC                              |
 | APROC_CONFIGURATION_FILE                               |
 | APROC_HOST                                             |
 | APROC_PORT                                             |

@@ -60,6 +60,7 @@ export APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN="\"ARLAS Services: {arlas-user-email
 export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
 export APROC_PATH_TO_WINDOWS=true
 export APROC_LOGGER_LEVEL=DEBUG
+export APROC_ENDPOINT_FROM_APROC=http://aproc-service:8001/arlas/aproc
 
 # AGATE
 export AGATE_PREFIX=/arlas/agate

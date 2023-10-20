@@ -89,6 +89,7 @@ services:
     #command: tail -f /dev/null
     container_name: 'aproc-processes'
     environment:
+      - APROC_ENDPOINT_FROM_APROC=$APROC_ENDPOINT_FROM_APROC
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//

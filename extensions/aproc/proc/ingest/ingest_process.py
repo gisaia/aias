@@ -92,7 +92,6 @@ class AprocProcess(Process):
 
         Args:
             url (str): archive url
-            driver_name (str): driver name
             collection (str): target collection
             catalog (str): target catalog
 
