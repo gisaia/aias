@@ -14,7 +14,9 @@ cli = typer.Typer()
 AIRS_HOST = os.getenv("AIRS_HOST", "127.0.0.1")
 AIRS_PORT = os.getenv("AIRS_PORT", "8000")
 AIRS_PREFIX = os.getenv("AIRS_PREFIX", "/arlas/airs")
-AIRS_CORS = os.getenv("AIRS_CORS", "*")
+AIRS_CORS_ORIGINS = os.getenv("AIRS_CORS_ORIGINS", "*")
+AIRS_CORS_METHODS = os.getenv("AIRS_CORS_METHODS", "*")
+AIRS_CORS_HEADERS = os.getenv("AIRS_CORS_HEADERS", "*")
 
 
 @cli.command(help="Start the ARLAS Item Registration Service.")
@@ -24,9 +26,10 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
     Configuration.init(configuration_file=configuration_file)
     api = FastAPI(version='0.0', title='ARLAS Item Product Registration Service',
                   description='ARLAS Item Registration Service API',
-                  middleware=[
-                    Middleware(CORSMiddleware, allow_origins=AIRS_CORS.split(","))
-                  ])
+                  middleware=[Middleware(CORSMiddleware, allow_origins=AIRS_CORS_ORIGINS.split(","),
+                                         allow_methods=AIRS_CORS_ORIGINS.split(","),
+                                         allow_headers=AIRS_CORS_HEADERS.split(","))
+                              ])
     api.include_router(ROUTER, prefix=AIRS_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         api.add_exception_handler(eh.exception, eh.handler)

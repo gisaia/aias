@@ -14,7 +14,9 @@ cli = typer.Typer()
 APROC_HOST = os.getenv("APROC_HOST", "127.0.0.1")
 APROC_PORT = os.getenv("APROC_PORT", "8001")
 APROC_PREFIX = os.getenv("APROC_PREFIX", "/arlas/aproc")
-APROC_CORS = os.getenv("APROC_CORS", "*")
+APROC_CORS_ORIGINS = os.getenv("APROC_CORS_ORIGINS", "*")
+APROC_CORS_METHODS = os.getenv("APROC_CORS_METHODS", "*")
+APROC_CORS_HEADERS = os.getenv("APROC_CORS_HEADERS", "*")
 
 
 @cli.command(help="Start the ARLAS Processing Service.")
@@ -24,9 +26,10 @@ def run(
         ):
     app = FastAPI(version='0.0', title='ARLAS Processes',
                   description='ARLAS Processes',
-                  middleware=[
-                    Middleware(CORSMiddleware, allow_origins=APROC_CORS.split(","))
-                  ])
+                  middleware=[Middleware(CORSMiddleware, allow_origins=APROC_CORS_ORIGINS.split(","),
+                                         allow_methods=APROC_CORS_METHODS.split(","),
+                                         allow_headers=APROC_CORS_HEADERS.split(","))
+                              ])
     app.include_router(ROUTER, prefix=APROC_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         app.add_exception_handler(eh.exception, eh.handler)
