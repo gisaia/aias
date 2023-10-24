@@ -1,18 +1,18 @@
 import importlib
 import json
 import os
-from itertools import chain
+from threading import Thread
 from urllib.parse import urlparse
+from datetime import datetime
+from time import sleep
 
 from celery import Celery, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
-from redis import Redis, ResponseError
-from redis.commands.json.path import Path
-from redis.commands.search.document import Document
+from redis import Redis
 from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search.query import Filter, NumericFilter, Query
+from redis.commands.search.query import Query
 
 from aproc.core.logger import Logger
 from aproc.core.models.ogc.job import JobType, StatusCode, StatusInfo
@@ -31,16 +31,50 @@ class Processes:
     __REDIS_PREFIX__ = "airs_job_id:"
     __REDIS_CONNECTION__: Redis = None
 
+    def __listen_status__():
+        state = APROC_CELERY_APP.events.State()
+
+        def update_status_fct(event):
+            try:
+                state.event(event)
+                task_id = event.get('uuid', None)
+                if task_id:
+                    status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
+                    if status_info is None:
+                        sleep(5) # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
+                        status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
+                    status_info.status = Processes.__to_status_info_code__(event.get('state'))
+                    status_info.updated = round(datetime.now().timestamp())
+                    if status_info.status.is_final():
+                        status_info.finished = round(datetime.now().timestamp())
+                    if event.get('state') == states.STARTED:
+                        status_info.started = round(datetime.now().timestamp())
+                    status_info.message = event.get('result', status_info.message)
+                    Processes.__save_status_info__(status_info)
+            except Exception as e:
+                LOGGER.exception(e)
+
+        with APROC_CELERY_APP.connection() as connection:
+            recv = APROC_CELERY_APP.events.Receiver(connection, handlers={
+                'task-failed': update_status_fct,
+                'task-succeeded': update_status_fct,
+                'task-sent': update_status_fct,
+                'task-received': update_status_fct,
+                'task-revoked': update_status_fct,
+                'task-started': update_status_fct,
+            }, app=APROC_CELERY_APP)
+            recv.capture(limit=None, timeout=None, wakeup=True)
+
     @staticmethod
-    def init():
-        Processes.__init_redis__()
+    def init(is_service: bool = False):
+        if is_service:
+            Processes.__init_redis__()
         Processes.processes = []
         for configuration in Configuration.settings.processes:
             try:
                 process: Process = importlib.import_module(configuration.class_name).AprocProcess
                 process.name = configuration.name
-                LOGGER.info("Register {} as {}".format(configuration.class_name,  process.name))
-                print("Register {} as {}".format(configuration.class_name,  process.name))
+                LOGGER.info("Register {} as {}".format(configuration.class_name, process.name))
                 process.init(configuration.configuration)
                 task = importlib.import_module(configuration.class_name).Process.execute
                 process.__task_name__ = ".".join([configuration.class_name, "execute"])
@@ -48,6 +82,9 @@ class Processes:
                 Processes.processes.append(process)
             except ModuleNotFoundError:
                 raise ProcessException(f"Process {configuration.class_name} not found.")
+
+        if is_service:
+            Thread(target=Processes.__listen_status__).start()
 
     @staticmethod
     def get_process(process_name: str) -> Process:
@@ -62,48 +99,6 @@ class Processes:
         return job.task_id
 
     @staticmethod
-    def status_by_resource_id(resource_id: str) -> list[StatusInfo]:
-        jobs = Processes.__retrieve_job_by_resource_id__(resource_id)
-        return list(map(lambda j: Processes.status(j["job_id"]), jobs))
-    
-    @staticmethod
-    def status(task_id: str) -> StatusInfo:
-        res = AsyncResult(task_id, app=APROC_CELERY_APP)
-        status_code = StatusCode.accepted
-        if res.state == states.EXCEPTION_STATES:
-            status_code = StatusCode.failed
-
-        if res.state == states.RECEIVED:
-            status_code = StatusCode.accepted
-
-        if res.state == states.PENDING:
-            status_code = StatusCode.accepted
-
-        if res.state == states.REVOKED:
-            status_code = StatusCode.dismissed
-
-        if res.state == states.REJECTED:
-            status_code = StatusCode.dismissed
-
-        if res.state == states.STARTED:
-            status_code = StatusCode.running
-
-        if res.state == states.RETRY:
-            status_code = StatusCode.accepted
-
-        if res.state == states.FAILURE:
-            status_code = StatusCode.failed
-
-        if res.state == states.SUCCESS:
-            status_code = StatusCode.successful
-        
-        status = StatusInfo(jobID=task_id, status=status_code, type=JobType.process)
-        job = Processes.__retrieve_job__(task_id)
-        status.resourceID = job["resource_id"]
-        status.processID = job["process_id"]
-        return status
-
-    @staticmethod
     def result(task_id: str):
         res = AsyncResult(task_id, app=APROC_CELERY_APP)
         if res.status == states.SUCCESS:
@@ -112,45 +107,134 @@ class Processes:
             return None
         
     @staticmethod
-    def list_jobs() -> list[str]:
-        list_of_list_of_jobs = list(APROC_CELERY_APP.control.inspect().reserved().values()) + list(APROC_CELERY_APP.control.inspect().active().values())
-        return list(map(lambda job: job["id"], [item for sublist in list_of_list_of_jobs for item in sublist]))
-
-    @staticmethod
     def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump()
         kwargs["headers"] = headers
         job_id = Processes.send_task(task_name=process.__task_name__, kwargs=kwargs)
-        Processes.__store_job__(job_id, process_name, process.get_resource_id(input))
+        status_info: StatusInfo = StatusInfo(
+            processID=process_name,
+            type=JobType.process,
+            jobID=job_id,
+            resourceID=process.get_resource_id(input),
+            status=StatusCode.accepted.value,
+            message="",
+            created=round(datetime.now().timestamp()),
+            updated=round(datetime.now().timestamp()),
+            started=None,
+            finished=None,
+            progress=None,
+            links=[]
+        )
+        Processes.__save_status_info__(status_info)
         return Processes.status(job_id)
 
-    def __store_job__(job_id, process_id, resource_id):
-        Processes.__get_redis_client__().json().set(Processes.__REDIS_PREFIX__+job_id, "$",  {"job_id": job_id,  "process_id": process_id, "resource_id": resource_id})
+    @staticmethod
+    def status_by_resource_id(resource_id: str) -> list[StatusInfo]:
+        return Processes.__retrieve_status_info_by_resource_id__(resource_id)
 
-    def __retrieve_job__(job_id):
-        return Processes.__get_redis_client__().json().get(Processes.__REDIS_PREFIX__+job_id)
+    @staticmethod
+    def status(task_id: str) -> StatusInfo:
+        return Processes.__retrieve_status_info__(task_id)
 
-    def __retrieve_job_by_resource_id__(resource_id) -> list:
-        docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(query="@resource_id:{'"+resource_id+"'}").docs
-        return list(map(lambda d: json.loads(d.json), docs))
+    @staticmethod
+    def list_jobs(page: int = 0, page_size: int = 100) -> list:
+        return Processes.__retrieve_status_info_list__(page, page_size)
+
+    def __save_status_info__(status_info: StatusInfo):
+        Processes.__get_redis_client__().json().set(Processes.__REDIS_PREFIX__ + status_info.jobID, "$",
+                                                    {"job_id": status_info.jobID,
+                                                     "process_id": status_info.processID,
+                                                     "resource_id": status_info.resourceID,
+                                                     "modification_date": status_info.updated,
+                                                     "started_date": status_info.started,
+                                                     "finished_date": status_info.finished,
+                                                     "creation_date": status_info.created,
+                                                     "status": status_info.status.value,
+                                                     "message": status_info.message})
+
+    def __retrieve_status_info__(job_id) -> StatusInfo:
+        return Processes.__to_status_info__(Processes.__get_redis_client__().json().get(Processes.__REDIS_PREFIX__ + job_id))
+
+    def __retrieve_status_info_by_resource_id__(resource_id: str) -> list[StatusInfo]:
+        docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(query="@resource_id:{'" + resource_id.replace("-", "\\-") + "'}").docs
+        return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
+
+    def __retrieve_status_info_list__(page: int = 0, page_size: int = 100) -> list[StatusInfo]:
+        q = Query("*").paging(offset=page, num=page_size).sort_by("modification_date", asc=False)
+        docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(q).docs
+        return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
+
+    def __to_status_info__(o: dict) -> StatusInfo:
+        return StatusInfo(
+            processID=o.get("process_id", None),
+            type=JobType.process,
+            jobID=o.get("job_id", None),
+            status=StatusCode[o.get("status", StatusCode.accepted.value)],
+            message=o.get("message", None),
+            created=o.get("creation_date", None),
+            started=o.get("started_date", None),
+            finished=o.get("finished_date", None),
+            updated=o.get("modification_date", None),
+            progress=None,
+            resourceID=o.get("resource_id", None)
+        )
+
+    def __to_status_info_code__(code: states) -> StatusCode:
+        status_code = StatusCode.accepted
+        if code == states.EXCEPTION_STATES:
+            status_code = StatusCode.failed
+
+        if code == states.RECEIVED:
+            status_code = StatusCode.accepted
+
+        if code == states.PENDING:
+            status_code = StatusCode.accepted
+
+        if code == states.REVOKED:
+            status_code = StatusCode.dismissed
+
+        if code == states.REJECTED:
+            status_code = StatusCode.dismissed
+
+        if code == states.STARTED:
+            status_code = StatusCode.running
+
+        if code == states.RETRY:
+            status_code = StatusCode.accepted
+
+        if code == states.FAILURE:
+            status_code = StatusCode.failed
+
+        if code == states.SUCCESS:
+            status_code = StatusCode.successful
+        return status_code
+
 
     def __init_redis__():
+        # At startup we clear and recreate the index.
         try:
-            rs = Processes.__get_redis_client__().ft("idx:airs_jobs").info()
-        except ResponseError:
-            schema = (
-                TagField("$.process_id", as_name="process_id"),
-                TagField("$.job_id", as_name="job_id"),
-                TagField("$.resource_id", as_name="resource_id")
-            )
-            rs = Processes.__get_redis_client__().ft("idx:airs_jobs")
-            rs.create_index(schema,
-                            definition=IndexDefinition(
-                                prefix=[Processes.__REDIS_PREFIX__],
-                                index_type=IndexType.JSON
-                                )
-                            )
+            Processes.__get_redis_client__().ft("idx:airs_jobs").dropindex()
+        except :
+            ...
+        schema = (
+            TagField("$.process_id", as_name="process_id"),
+            TagField("$.job_id", as_name="job_id"),
+            TagField("$.resource_id", as_name="resource_id"),
+            NumericField("$.creation_date", as_name="creation_date"),
+            NumericField("$.started_date", as_name="started_date"),
+            NumericField("$.modification_date", as_name="modification_date"),
+            NumericField("$.finished_date", as_name="finished_date"),
+            TagField("$.status", as_name="status"),
+            TextField("$.message", as_name="message")
+        )
+        rs = Processes.__get_redis_client__().ft("idx:airs_jobs")
+        rs.create_index(schema,
+                        definition=IndexDefinition(
+                            prefix=[Processes.__REDIS_PREFIX__],
+                            index_type=IndexType.JSON
+                        )
+                        )
 
     def __get_redis_client__() -> Redis:
         if Processes.__REDIS_CONNECTION__ is None:

@@ -1,10 +1,44 @@
+# AIAS - ARLAS Item and Asset Services
+
+AIAS groups a set of microservices in order to offer functions for ingestion, access and download of archives, STAC Items and Assets. AIAS and ARLAS makes a fully functional catalog.
+
+Functions for ingestion:
+- Register a STAC item with its assets : ARLAS Item Registration Services (AIRS)
+- Asynchronously register one archive (`/processes/ingest`) or a directory containing archives (`/processes/directory_ingest`) : ARLAS Processing (APROC)
+- List files and archives from a directory: File and Archive Management (FAM)
+
+
+Functions for download:
+- Asynchronously download one or several archives (`/processes/download`) : ARLAS Processing (APROC)
+
+Functions for access:
+- Access control on the assets with ARLAS Gateway for Assets (AGATE)
+
+## Running the stack
+
+To start a standalone stack for testing:
+```shell
+./test/start.sh
+```
+At least 8Go of RAM is needed.
+
+This stack relies on the docker compose configuration files. The available endpoints are:
+- [AIRS](http://localhost:8000/docs)
+- [APROC](http://localhost:8001/docs)
+- [AGATE](http://localhost:8004/docs)
+- [FAM](http://localhost:8005/docs)
+- [minio](http://localhost:9001/browser)
+- [elasticsearch](http://localhost:8200)
+- [rabbitmq](http://localhost:15672/)
+- redis on port 6379
+- [SMTP4DEV](http://localhost:3000/) for email testing
+
+
 # ARLAS Item Registration Services
 
-ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.).
+ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
 
-ARLAS Processes (aproc) aim at offering asynchronous services, among them ingestion services.
-
-AIRS can run without ARLAS Processes, while the later relies on the first.
+By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists: the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`).
 
 ## AIRS Data model
 
@@ -24,86 +58,31 @@ Namespaces are prefixes in the key names of the JSON. The `:` is used for sepera
 
 For more details, see the [model documentation](docs/model/model.md)
 
-## ARLAS Item Registration Services
+## Prerequisites
 
-The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
+- minio
+- elasticsearch
+- docker
 
-STAC-T methods:
+See [here](https://hub.docker.com/r/gisaia/airs/tags) for the available versions of airs.
 
-| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
-| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `POST /arlas/airs/collections/{collectionID}/items`               | `application/json`  | partial Item or partial ItemCollection | 201, 202       | Adds a new item to a collection.                                  |
-| `PUT /arlas/airs/collections/{collectionId}/items/{featureId}`    | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a complete item description. |
-| `PATCH /arlas/airs/collections/{collectionId}/items/{featureId}`  | `application/json`  | partial Item                           | 200, 202, 204  | Updates an existing item by ID using a partial item description.  |
-| `DELETE /arlas/airs/collections/{collectionID}/items/{featureId}` | n/a                 | n/a                                    | 200, 202, 204  | Deletes an existing item by ID.                                   |
+### AIRS Configuration
 
-Also, a convenient method is provided to get the item:
-
-| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
-| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `GET /arlas/airs/collections/{collectionId}/items/{featureId}`    | `application/json`  |                            | 200, 404  | Returns the item if exists, 404 otherwise.                                         |
-
-Asset methods:
-
-| Path                                                   | Content-Type Header | Body                                   | Success Status | Description                                                       |
-| ------------------------------------------------------ | ------------------- | -------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `POST /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  | Asset file | 200       | Adds a new asset to the data store.                                         |
-| `HEAD /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |   | 200       | Returns 200 if exists                                                                |
-| `DELETE /arlas/airs/collections/{collectionID}/items/{featureId}/assets/{asset_name}`      | `application/json`  |  | 200       | Deletes the asset from the data store.                                              |
-
-By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists. This means that the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`)
-
-### Running AIRS
-
-AIRS requires
-- python 3.10
-- an elasticsearch
-- an object store (S3, GS or minio)
-- docker and docker compose to run a test stack
-
-#### With your own elasticsearch and minio
-
-To configure AIRS, edit `conf/airs.yaml`. An example is provided in `test/conf/airs.yaml`. Then start the service:
-
-```shell
-export PYTHONPATH=`pwd`
-python3 -m airs.cli.airs conf/airs.yaml &
-```
-
-For more details about the command line, run `python3 airs.py --help` :
-
-```shell                
-Usage: airs.py CONFIGURATION_FILE [HOST] [PORT]
-
-  Start the ARLAS Earth Observation Product Registration Service.
-
-Arguments:
-  CONFIGURATION_FILE  Configuration file  [required]
-  [HOST]              host  [default: 127.0.0.1]
-  [PORT]              port  [default: 8000]
-
-  --help                          Show this message and exit.
-```
-
-Once the service is up & running, you can browse the service documentation at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/)
-
-### With docker
-
-Instead of launching the service with python, you can launch it with docker:
-
-```shell                
-docker run -d --name airs -p 8000:8000 -e XXX:VVV ... -e XXX:VVV gisaia/airs:latest
-```
-
-with `XXX:VVV` the environment variable that you want to specify. The table below lists the variable that you can set:
+The following environment variables must be set to run AIRS:
 
 | Variable                                               |
 | ------------------------------------------------------ |
+| AIRS_HOST  |
+| AIRS_PORT  |
+| AIRS_CORS_ORIGINS  |
+| AIRS_CORS_METHODS  |
+| AIRS_CORS_HEADERS  |
 | AIRS_ARLAS_COLLECTION_NAME                             |
 | AIRS_ARLAS_URL                                         |
 | AIRS_INDEX_ENDPOINT_URL                                |
 | AIRS_INDEX_COLLECTION_PREFIX                           |
 | AIRS_INDEX_LOGIN                                       |
+| AIRS_INDEX_PWD                                       |
 | AIRS_S3_BUCKET                                         |
 | AIRS_S3_ACCESS_KEY_ID                                  |
 | AIRS_S3_SECRET_ACCESS_KEY                              |
@@ -117,13 +96,6 @@ with `XXX:VVV` the environment variable that you want to specify. The table belo
 | AIRS_PREFIX                                            |
 | AIRS_LOGGER_LEVEL                                      |
 
-
-#### Stack for tests
-
-If you do not have elasticsearch and minio running, you can start a test stack:
-```shell
-./test/start_stack.sh 
-```
 
 ### Using AIRS
 
@@ -219,15 +191,14 @@ curl -X DELETE \
     "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a"
 ```
 
+## ARLAS Processes (APROC)
 
-## ARLAS Processes (aproc)
-
-### How ARLAS Processes work
-
-ARLAS Processes (aproc) exposes an OGC API Processes compliant API (to be implemented).
+ARLAS Processes (APROC) exposes an OGC API Processes compliant API (to be implemented).
 
 List of processes:
 - `ingest` : it ingest an archive.
+- `directory_ingest` : it ingest archives found in a directory.
+- `download` : it ingest an archive.
 
 ### Ingest process
 
@@ -246,39 +217,35 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 - transform the assets
 - create an AIRS Item
 
-A [driver](aproc/ingest/drivers/driver.py) must implement the following methods:
-
-```python
-    @staticmethod
-    def init(configuration:dict) -> None:
-
-    @staticmethod
-    def supports(url:str)->bool:
-
-    def identify_assets(self, url:str)->list[Asset]:
-
-    def fetch_assets(self, url:str, resources:list[Asset])->list[Asset]:
-
-    def transform_assets(self, url:str, resources:list[Asset])->list[Asset]:
-
-    def to_item(self, url:str, resources:list[Asset])->Item:
-```
+A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest/drivers/driver.py).
 
 IMPORTANT: The name of the class within the module __must be__ `Driver`.
 
 The following drivers are available in the `extensions` directory:
-- [theia](extensions/aproc/ingest/drivers/impl/theia.py)
+- theia
+- ast_dem
+- digitalglobe
+- dimap
+- geoeye
+- rapideye
+- spot5
 
-### Running ARLAS Processes (aproc)
+The drivers are configured in [drivers.yaml](conf/drivers.yaml)
 
-ARLAS Processes requires
+
+## Prerequisites
+
 - python 3.10
 - AIRS
 - celery backend (redis)
 - celery brocker (rabbitmq)
-- docker and docker compose for running the tests
+- docker
 
-The following environment variables must be set to run the celery workers and the service:
+See [here](https://hub.docker.com/r/gisaia/aproc-service/tags) for the available versions of aproc-service and [here](https://hub.docker.com/r/gisaia/aproc-proc/tags) for the available versions of aproc-processes
+
+### APROC Configuration
+
+The following environment variables must be set to run aproc-service and aproc-proc:
 
 | Variable                                               |
 | ------------------------------------------------------ |
@@ -291,31 +258,218 @@ The following environment variables must be set to run the celery workers and th
 | AIRS_ENDPOINT                                          |
 | APROC_PREFIX                                           |
 | APROC_LOGGER_LEVEL                                     |
+| ARLAS_URL_SEARCH  |
+| APROC_CORS_ORIGINS  |
+| APROC_CORS_METHODS  |
+| APROC_CORS_HEADERS  |
+| AIRS_INDEX_COLLECTION_PREFIX  |
+| ARLAS_SMTP_ACTIVATED  |
+| ARLAS_SMTP_HOST  |
+| ARLAS_SMTP_PORT  |
+| ARLAS_SMTP_USERNAME  |
+| ARLAS_SMTP_PASSWORD  |
+| ARLAS_SMTP_FROM  |
+| APROC_DOWNLOAD_ADMIN_EMAILS  |
+| APROC_DOWNLOAD_OUTBOX_DIR  |
+| APROC_DOWNLOAD_CONTENT_USER  |
+| APROC_DOWNLOAD_SUBJECT_USER  |
+| APROC_DOWNLOAD_CONTENT_ERROR  |
+| APROC_DOWNLOAD_SUBJECT_ERROR  |
+| APROC_DOWNLOAD_CONTENT_ADMIN  |
+| APROC_DOWNLOAD_SUBJECT_ADMIN  |
+| APROC_EMAIL_PATH_PREFIX_ADD  |
+| APROC_PATH_TO_WINDOWS  |
+| APROC_DOWNLOAD_REQUEST_SUBJECT_USER  |
+| APROC_DOWNLOAD_REQUEST_CONTENT_USER  |
+| APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN  |
+| APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN  |
 
-For starting the service or a celery worker, you need to set two environment variables:
+### Using `ingest` and `directory_ingest`
 
-```sh
-export PYTHONPATH=pwd:pwd/extensions:pwd/test
-export APROC_CONFIGURATION_FILE=pwd/test/conf/aproc.yaml
-```
-
-For starting the celery worker:
-```sh
-celery -A aproc.ingest.proc:app worker --concurrency=2 -n worker@%h --loglevel INFO
-```
-
-For starting the service:
-```sh
-python3 -m aproc.cli.aproc
-```
-
-## Tests
-
-To run the tests:
+#### Add an archive
 
 ```shell
-./test/tests.sh 
+curl -X 'POST' \
+  'http://localhost:8001/arlas/aproc/processes/ingest/execution' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs": {"collection": "digitalearth.africa", "catalog": "spot6", "url": "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"}, "outputs": null, "response": "raw", "subscriber": null}'
 ```
+
+Result:
+```json
+{
+  "processID": "ingest",
+  "type": "process",
+  "jobID": "c3300fd2-aed6-4887-b2e9-d5db8ce02ced",
+  "status": "accepted",
+  "message": "",
+  "created": 1698153197,
+  "started": null,
+  "finished": null,
+  "updated": 1698153197,
+  "progress": null,
+  "links": null,
+  "resourceID": "inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A-"
+}
+```
+
+#### Add archives contained in a directory
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8001/arlas/aproc/processes/directory_ingest/execution' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs": {"collection": "digitalearth.africa", "catalog": "dimap", "directory": "DIMAP"}, "outputs": null, "response": "raw", "subscriber": null}'
+```
+Result:
+```json
+{
+  "processID": "directory_ingest",
+  "type": "process",
+  "jobID": "d288ff3e-e880-43d3-880e-f2725f5f55b2",
+  "status": "accepted",
+  "message": "",
+  "created": 1698153396,
+  "started": null,
+  "finished": null,
+  "updated": 1698153396,
+  "progress": null,
+  "links": null,
+  "resourceID": "DIMAP"
+}
+```
+
+### Download process
+
+The `download` and `directory_download` relies on a driver mecanism. A driver must implement the abstract class [Driver](extensions/aproc/proc/download/drivers/driver.py). Available drivers are
+- dimap
+- tif_file
+
+### Using `download`
+```shell
+
+curl -X 'POST' \
+  'http://localhost:8001/arlas/aproc/processes/download/execution' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs": {"requests": [{"collection": "digitalearth.africa", "item_id": "inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A"}], "crop_wkt": "", "target_projection": "epsg:4326", "target_format": "Geotiff"}}'
+```
+Result:
+```json
+{
+  "processID": "download",
+  "type": "process",
+  "jobID": "40154302-4ca7-468c-854d-c09b245e3e64",
+  "status": "accepted",
+  "message": "",
+  "created": 1698154319,
+  "started": null,
+  "finished": null,
+  "updated": 1698154319,
+  "progress": null,
+  "links": null,
+  "resourceID": "db6bd405d357b8f6420bfe6797bbbec1e6430afe"
+}
+```
+
+### Getting the status
+
+To get the status of one running process (job):
+```shell
+curl -X 'GET' \
+  'http://localhost:8001/arlas/aproc/jobs/40154302-4ca7-468c-854d-c09b245e3e64' \
+  -H 'accept: application/json'
+```
+Result:
+```json
+{
+  "processID": "download",
+  "type": "process",
+  "jobID": "40154302-4ca7-468c-854d-c09b245e3e64",
+  "status": "successful",
+  "message": "{'download_location': '/outbox/anonymous/inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A/inputs_DIMAP_PROD_SPOT6_001_VOL_SPOT6_001_A_IMG_SPOT6_MS_001_A.Geotiff'}",
+  "created": 1698154319,
+  "started": 1698154319,
+  "finished": 1698154440,
+  "updated": 1698154440,
+  "progress": null,
+  "links": null,
+  "resourceID": "db6bd405d357b8f6420bfe6797bbbec1e6430afe"
+}
+```
+
+
+To get the status of the process for one resource (item id for an ingest):
+```shell
+curl -X 'GET' \
+  'http://localhost:8001/arlas/aproc/jobs/resources/inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A' \
+  -H 'accept: application/json'
+```
+Result:
+```json
+[
+  {
+    "processID": "ingest",
+    "type": "process",
+    "jobID": "efd65a52-78c3-4fbd-9f2b-40bb726de1ca",
+    "status": "failed",
+    "message": "",
+    "created": 1698153257,
+    "started": 1698153257,
+    "finished": 1698153257,
+    "updated": 1698153257,
+    "progress": null,
+    "links": null,
+    "resourceID": "inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A"
+  },
+  ...
+  {
+    "processID": "ingest",
+    "type": "process",
+    "jobID": "d79ae63b-79dd-4a6c-a93a-ee2924575d1e",
+    "status": "successful",
+    "message": "{'item_location': 'http://airs-server:8000/arlas/airs/collections/digitalearth.africa/items/inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A'}",
+    "created": 1698153397,
+    "started": 1698153397,
+    "finished": 1698153397,
+    "updated": 1698153397,
+    "progress": null,
+    "links": null,
+    "resourceID": "inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A"
+  }
+]
+```
+
+To get the status of the most recent processes (the service offers pages):
+
+```shell
+curl -X 'GET' \
+  'http://localhost:8001/arlas/aproc/jobs?page=0&page_size=10' \
+  -H 'accept: application/json'
+```
+Result:
+```json
+[
+  {
+    "processID": "download",
+    "type": "process",
+    "jobID": "40154302-4ca7-468c-854d-c09b245e3e64",
+    "status": "successful",
+    "message": "{'download_location': '/outbox/anonymous/inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A/inputs_DIMAP_PROD_SPOT6_001_VOL_SPOT6_001_A_IMG_SPOT6_MS_001_A.Geotiff'}",
+    "created": 1698154319,
+    "started": 1698154319,
+    "finished": 1698154440,
+    "updated": 1698154440,
+    "progress": null,
+    "links": null,
+    "resourceID": "db6bd405d357b8f6420bfe6797bbbec1e6430afe"
+  }, ...
+]
+```
+
+
 
 ## AGATE
 
@@ -326,10 +480,14 @@ AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an obje
 |   ARLAS_URL_SEARCH                                     |
 |   AGATE_PREFIX                                         |
 |   AGATE_HOST                                           |
+|   AGATE_PORT                                   |
 |   AGATE_ENDPOINT                                       |
 |   AGATE_URL_HEADER                                     |
 |   AGATE_URL_HEADER_PREFIX                              |
 |   AGATE_LOGGER_LEVEL                                   |
+|   AGATE_CORS_ORIGINS                                   |
+|   AGATE_CORS_METHODS                                   |
+|   AGATE_CORS_HEADERS                                   |
 
 
 ## FAM
@@ -401,4 +559,12 @@ Returns
     "driver_name": "dimap"
   }
 ]
+```
+
+# Tests
+
+To run the tests (this will also start the stack):
+
+```shell
+./test/tests.sh 
 ```

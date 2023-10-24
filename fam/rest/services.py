@@ -38,6 +38,6 @@ async def archives(path_request: PathRequest):
     if not file_path:
         file_path = ""
     if os.path.exists(os.path.join(Configuration.settings.inputs_directory, file_path)):
-        return Fam.list_archives(Configuration.settings.inputs_directory, file_path)
+        return Fam.list_archives(Configuration.settings.inputs_directory, file_path, max_size=path_request.size)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File {} not found".format(file_path))

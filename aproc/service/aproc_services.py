@@ -6,4 +6,4 @@ class AprocServices:
 
     @staticmethod
     def init():
-        Processes.init()
+        Processes.init(True)

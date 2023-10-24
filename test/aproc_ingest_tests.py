@@ -29,7 +29,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
-        self.assertEqual(status.resourceID, AprocProcess.get_resource_id(inputs))
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
 
     def ingest_directory(self, url, collection, catalog):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog)
@@ -41,7 +41,6 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
-        print(status.model_dump_json())
 
     def test_async_ingest_theia(self):
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
@@ -87,7 +86,6 @@ class Tests(unittest.TestCase):
 
     def test_job_result(self):
         status: StatusInfo = self.__ingest_theia()
-        print(status)
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))

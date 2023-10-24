@@ -25,6 +25,7 @@ ASSET="data"
 ASSET_PATH="test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"
 ITEM_PATH="test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json"
 TOKEN="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMWU3ZDI3ZC05MWM4LTRjYTEtOGU4My04MWI1ODBkOTZkMDUiLCJodHRwOi8vYXJsYXMuaW8vbG9jYWxlIjoiZW4iLCJpc3MiOiJhcmxhcy5jcnRzLXN0YWZmLmxvY2FsIiwiZXhwIjoxNjk2ODYxMTU4LCJodHRwOi8vYXJsYXMuaW8vdGltZXpvbmUiOiJFdXJvcGUvUGFyaXMiLCJpYXQiOjE2OTY4NjEwOTgsImVtYWlsIjoidGVjaEBnaXNhaWEuY29tIn0.bonAysbuUeqU3gWVjA7H-WXGI-JXGAgbZNDyWfiq4VY"
+THEIA_DIR="inputs/theia"
 
 def get_client():
     from boto3 import Session

@@ -43,6 +43,9 @@ class StatusCode(str, enum.Enum):
     failed: str = "failed"
     dismissed: str = "dismissed"
 
+    def is_final(self) -> bool:
+        return self == StatusCode.successful or self == StatusCode.failed or self == StatusCode.dismissed
+
 
 class Response(str, enum.Enum):
     raw = "raw"

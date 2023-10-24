@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Header, Request, status
+from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
@@ -35,9 +35,8 @@ def get_conformance() -> Conforms:
 
 @ROUTER.get("/jobs",
             response_model_exclude_none=True)
-def get_jobs():
-    return Processes.list_jobs()
-
+def get_jobs(page: int = 0, page_size: int = 10):
+    return Processes.list_jobs(page=page, page_size=page_size)
 
 @ROUTER.get("/jobs/{jobId}",
             response_model_exclude_none=True,

@@ -72,8 +72,7 @@ class AprocProcess(Process):
         return summary
 
     def get_resource_id(inputs: BaseModel):
-        hash_object = hashlib.sha1(InputDirectoryIngestProcess(**inputs.model_dump()).directory.encode())
-        return hash_object.hexdigest()
+        return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str) -> dict:
@@ -89,7 +88,7 @@ class AprocProcess(Process):
             list: List of archives(urls) (OutputDirectoryIngestProcess)
         """
         archives: list[Archive] = AprocProcess.list_archives(Configuration.settings.inputs_directory, directory, max_size=Configuration.settings.max_number_of_archive_for_ingest)
-        LOGGER.info("{} archives to be ingested".format(len(archives)))
+        LOGGER.info("{} archives to be ingested from {}".format(len(archives), os.path.join(Configuration.settings.inputs_directory, directory)))
         for archive in archives:
             LOGGER.info(archive.model_dump_json())
             try:
@@ -108,6 +107,9 @@ class AprocProcess(Process):
 
     def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
         full_path = os.path.join(prefix, path)
+        if not os.path.exists(full_path):
+            LOGGER.error("{} does not exist, directory/file can no be scanned to find archives")
+            return []
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
         driver = Drivers.solve(full_path)
