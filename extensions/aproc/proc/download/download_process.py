@@ -115,8 +115,8 @@ class AprocProcess(Process):
                     send_to = token_content.get("email")
                 else:
                     LOGGER.error("email not found in token {}".format(token_content))
-                if not not token_content.get("subject"):
-                    user_id = token_content.get("subject")
+                if not not token_content.get("sub"):
+                    user_id = token_content.get("sub")
                 else:
                     LOGGER.error("subject not found in token {}".format(token_content))
             else:
