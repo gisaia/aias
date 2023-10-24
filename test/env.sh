@@ -79,4 +79,4 @@ export FAM_LOGGER_LEVEL=DEBUG
 export FAM_CORS_ORIGINS="*"
 export FAM_CORS_METHODS="*"
 export FAM_CORS_HEADERS="*"
-export PLATFORM='arm64'
+export PLATFORM='amd64'
