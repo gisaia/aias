@@ -2,3 +2,4 @@
 -r extensions/requirements.txt
 -r airs/requirements.txt
 -r agate/requirements.txt
+-r fam/requirements.txt
