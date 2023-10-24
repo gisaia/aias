@@ -8,6 +8,11 @@ processes:
     configuration:
       drivers: conf/drivers.yaml
   -
+    name: directory_ingest
+    class_name: extensions.aproc.proc.ingest.directory_ingest_process
+    configuration:
+      drivers: conf/drivers.yaml
+  -
     name: download
     class_name: extensions.aproc.proc.download.download_process
     configuration:

@@ -5,52 +5,46 @@ import unittest
 from time import sleep
 
 import requests
-from utils import AIRS_URL, APROC_ENDPOINT, setUpTest, COLLECTION
+from extensions.aproc.proc.ingest.directory_ingest_process import InputDirectoryIngestProcess
+from utils import AIRS_URL, APROC_ENDPOINT, setUpTest, COLLECTION, THEIA_DIR
 
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.processes.processes import Processes
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
 
-BATCH_SIZE = 10
+BATCH_ROOT_SIZE = 31
 
 class Tests(unittest.TestCase):
 
     def setUp(self):
         setUpTest()
-
-    def test_async_ingest_theia(self):
-
-        start = time.time()
-        r = requests.get("https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.ObservationContext.processusUsed.platform_fr%3Aeq%3ASENTINEL%202&f=metadata.core.description.processingLevel_fr%3Aeq%3ANIVEAU%202A&include=data.metadata.core.identity.identifier&righthand=false&pretty=false&flat=false&&&size={}&max-age-cache=120".format(BATCH_SIZE), verify=False)
-        self.assertTrue(r.ok)
-        hits = json.loads(r.content)["hits"]
-        status = None
-        print("submitting {} archives".format(BATCH_SIZE))
-        for hit in hits:
-            url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3A{}&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120".format(hit["md"]["id"])
-            inputs = InputIngestProcess(url=url, collection=COLLECTION, catalog="theia")
-            execute = Execute(inputs=inputs.model_dump())
-            r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
-            self.assertTrue(r.ok)
-            status: StatusInfo = StatusInfo(**json.loads(r.content))
-        end = time.time()
-        print("{} archives submitted in {} s".format(BATCH_SIZE, end - start))
-
-        start = time.time()
-        status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        while status.status not in [StatusCode.dismissed, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        if not os.path.exists(THEIA_DIR):
+            with open("test/inputs/template_theia.json") as json_file:
+                d = json.load(json_file)
+                id = d["hits"][0]["md"]["id"]
+                for i in range(0, BATCH_ROOT_SIZE):
+                    for j in range(0, BATCH_ROOT_SIZE):
+                        target = os.path.join("test", THEIA_DIR, str(i), str(j))
+                        os.makedirs(target)
+                        d["hits"][0]["md"]["id"] = "{}_{}_{}".format(id, i, j)
+                        with open(os.path.join(target, "item.json"), "w") as theia_file:
+                            json.dump(d, theia_file)
+                    
+    def test_ingest_directory(self):
+        inputs = InputDirectoryIngestProcess(directory="theia", collection=COLLECTION, catalog="theia")
+        execute = Execute(inputs=inputs.model_dump())
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
+        self.assertTrue(r.ok, str(r.status_code)+": "+str(r.content))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        end = time.time()
-        print("{} archives registered in {} s".format(BATCH_SIZE, end - start))
-        print("Checking that the {} archives are registered ...".format(BATCH_SIZE))
-        for hit in hits:
-            url = AIRS_URL+"/collections/"+COLLECTION+"/items/{}".format(hit["md"]["id"])
-            r = requests.get(url)
-            print(".", end="")
-            self.assertTrue(r.ok, url+" not found")
-
+            print(status.model_dump_json())
+        self.assertEqual(status.status, StatusCode.successful)
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
+        self.assertTrue(r.ok, str(r.status_code)+": "+str(r.content))
+        print(r.json())
 
 if __name__ == '__main__':
     unittest.main()

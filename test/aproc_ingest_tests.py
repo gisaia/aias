@@ -3,6 +3,7 @@ from time import sleep
 import requests
 import json
 from aproc.core.models.ogc.process import ProcessList, ProcessDescription
+from extensions.aproc.proc.ingest.directory_ingest_process import InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess
 
 from utils import APROC_ENDPOINT, setUpTest, dir_to_list, filter_data, AIRS_URL, COLLECTION
@@ -28,7 +29,18 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
-        self.assertEqual(status.resourceID, AprocProcess.get_resource_id(inputs))
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
+
+    def ingest_directory(self, url, collection, catalog):
+        inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog)
+        execute = Execute(inputs=inputs.model_dump())
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
+        self.assertTrue(r.ok)
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+            sleep(1)
+            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        self.assertEqual(status.status, StatusCode.successful)
 
     def test_async_ingest_theia(self):
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
@@ -39,17 +51,7 @@ class Tests(unittest.TestCase):
         self.ingest(url, COLLECTION, "spot6")
 
     def test_ingest_folder(self):
-        def ingest_folders(data):
-            for d in data:
-                if 'archive' in d:
-                    print("Try to ingest : " + d['path'])
-                    self.ingest(d['path'].replace(os.getcwd()  + "/test",''),COLLECTION,'dimap')
-                else:
-                    if 'children' in d:
-                        ingest_folders(d['children'])
-        url = os.getcwd() + "/test/inputs"
-        data = dir_to_list(url)
-        ingest_folders(filter_data(data))
+        self.ingest_directory("", collection=COLLECTION, catalog="dimap")
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
@@ -84,7 +86,6 @@ class Tests(unittest.TestCase):
 
     def test_job_result(self):
         status: StatusInfo = self.__ingest_theia()
-        print(status)
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))

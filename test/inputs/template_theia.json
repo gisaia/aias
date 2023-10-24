@@ -1,0 +1,361 @@
+{
+    "collection": "theia",
+    "hits": [
+        {
+            "md": {
+                "id": "SENTINEL2B_20170714-104147-938_L2A_T30QZE_D",
+                "timestamp": 1500028907000,
+                "geometry": {
+                    "type": "Polygon",
+                    "crs": {
+                        "type": "name",
+                        "properties": {
+                            "name": "EPSG:4326"
+                        }
+                    },
+                    "coordinates": [
+                        [
+                            [
+                                -0.16617457,
+                                18.06826221
+                            ],
+                            [
+                                0.86956979,
+                                18.0502747
+                            ],
+                            [
+                                0.84856595,
+                                17.06005
+                            ],
+                            [
+                                -0.18157799,
+                                17.07699025
+                            ],
+                            [
+                                -0.16617457,
+                                18.06826221
+                            ]
+                        ]
+                    ]
+                },
+                "centroid": {
+                    "type": "Point",
+                    "crs": {
+                        "type": "name",
+                        "properties": {
+                            "name": "EPSG:4326"
+                        }
+                    },
+                    "coordinates": [
+                        0.34252131,
+                        17.56434473
+                    ]
+                }
+            },
+            "data": {
+                "_isWMSEnabled": true,
+                "_sensorType_en": "OPTICAL",
+                "metadata": {
+                    "core": {
+                        "keywords": [
+                            {
+                                "origin": "embeded",
+                                "type": "continent",
+                                "value": "Africa"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "country",
+                                "value": "Mali"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "state",
+                                "value": "Gao"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "state",
+                                "value": "Kidal"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "location",
+                                "value": "Tropical"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "location",
+                                "value": "Northern"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "season",
+                                "value": "Summer"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "collection",
+                                "value": "SENTINEL2"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "productType",
+                                "value": "REFLECTANCE"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "processingLevel",
+                                "value": "LEVEL2A"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "platform",
+                                "value": "sentinel2b"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "instrument",
+                                "value": ""
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "sensorMode",
+                                "value": ""
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "year",
+                                "value": "2017"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "month",
+                                "value": "July"
+                            },
+                            {
+                                "origin": "embeded",
+                                "type": "day",
+                                "value": "14"
+                            }
+                        ],
+                        "temporalCoverage": {
+                            "end": "2017-07-14T10:41:47Z",
+                            "begin": "2017-07-14T10:41:47Z"
+                        },
+                        "identity": {
+                            "lifecycle": {
+                                "updateFrequency_en": "as needed",
+                                "created": "2017-07-14T10:41:47.000Z",
+                                "updated": "2019-04-11T21:36:04.000Z",
+                                "updateFrequency": "asNeeded",
+                                "updateFrequency_fr": "si besoin"
+                            },
+                            "collection_fr": "SENTINEL2",
+                            "identifier": "SENTINEL2B_20170714-104147-938_L2A_T30QZE_D",
+                            "collection_en": "SENTINEL2",
+                            "parentIdentifier": "urn:ogc:def:EOP:CNES::SENTINEL2:",
+                            "source": "https://theia.cnes.fr/atdistrib/resto2/api/collections/SENTINEL2/search.json?productIdentifier=SENTINEL2B_20170714-104147-938_L2A_T30QZE_D",
+                            "collection": "SENTINEL2"
+                        },
+                        "description": {
+                            "processingLevel_fr": "NIVEAU 2A",
+                            "processingLevel": "NIVEAU 2A",
+                            "processingLevel_en": "LEVEL 2A"
+                        },
+                        "locations": {
+                            "footprint": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            -0.166174574997,
+                                            18.0682622133
+                                        ],
+                                        [
+                                            0.869569787462,
+                                            18.0502747002
+                                        ],
+                                        [
+                                            0.848565945037,
+                                            17.0600500031
+                                        ],
+                                        [
+                                            -0.181577992109,
+                                            17.0769902547
+                                        ],
+                                        [
+                                            -0.166174574997,
+                                            18.0682622133
+                                        ]
+                                    ]
+                                ],
+                                "type": "Polygon"
+                            }
+                        },
+                        "availability": {
+                            "archiveid": "0",
+                            "status": "ONELINE"
+                        },
+                        "contacts": {
+                            "organisationName": "THEIA"
+                        }
+                    },
+                    "ObservationContext": {
+                        "observedProperty_fr": "Reflectance",
+                        "observedProperty_en": "Reflectance",
+                        "phenomenonTime": {
+                            "end": "2017-07-14T10:41:47Z",
+                            "begin": "2017-07-14T10:41:47Z"
+                        },
+                        "observedProperty": "Reflectance",
+                        "eo": {
+                            "opt": {
+                                "cloudCoverPercentage": 52,
+                                "snowCoverPercentage": 0,
+                                "waterCoverPercentage": 0
+                            },
+                            "acquisition": {
+                                "relativeOrbitNumber": 108,
+                                "orbitNumber": 1850
+                            }
+                        },
+                        "processusUsed": {
+                            "platform_fr": "SENTINEL 2",
+                            "platform_en": "SENTINEL 2",
+                            "sensor": {
+                                "resolution": {
+                                    "uom": "m",
+                                    "value": 10
+                                }
+                            },
+                            "platform": "SENTINEL 2"
+                        }
+                    },
+                    "services": [
+                        {
+                            "protocol": "download",
+                            "name": "download",
+                            "description": "download",
+                            "mimeType": "application/zip",
+                            "url": "https://theia.cnes.fr/atdistrib/resto2/collections/SENTINEL2/d59f6587-1887-5c40-9e43-9316b669db70/download"
+                        },
+                        {
+                            "protocol": "WMS",
+                            "name": "no_name",
+                            "description": "Display full resolution product on map",
+                            "url": "https://theia.cnes.fr/atdistrib/resto2/collections/SENTINEL2/d59f6587-1887-5c40-9e43-9316b669db70/wms?map=/nfs/muscate_data//muscate.map&idProduit=SENTINEL2B_20170714-104147-938_L2A_T30QZE_D&anneeProduit=ANNEEPRODUIT&moisProduit=MOISPRODUIT&jourProduit=JOURPRODUIT&versionProduit=2-0&idProjet=SENTINEL2&LAYERS=muscate&FORMAT=image%2Fpng&TRANSITIONEFFECT=resize&TRANSPARENT=true&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&STYLES=&SRS=EPSG%3A3857&bbox={bbox-epsg-3857}{:bbox3857:}&WIDTH=256&HEIGHT=256"
+                        }
+                    ]
+                },
+                "_geometry_wkt": "POLYGON ((-0.166174574997e0 0.180682622133e2,0.869569787462e0 0.180502747002e2,0.848565945037e0 0.170600500031e2,-0.181577992109e0 0.170769902547e2,-0.166174574997e0 0.180682622133e2))",
+                "_isWMTSEnabled": false,
+                "_services": {
+                    "download": [
+                        {
+                            "protocol": "download",
+                            "name": "download",
+                            "description": "download",
+                            "mimeType": "application/zip",
+                            "url": "https://theia.cnes.fr/atdistrib/resto2/collections/SENTINEL2/d59f6587-1887-5c40-9e43-9316b669db70/download"
+                        }
+                    ],
+                    "WMS": [
+                        {
+                            "protocol": "WMS",
+                            "name": "no_name",
+                            "description": "Display full resolution product on map",
+                            "url": "https://theia.cnes.fr/atdistrib/resto2/collections/SENTINEL2/d59f6587-1887-5c40-9e43-9316b669db70/wms?map=/nfs/muscate_data//muscate.map&idProduit=SENTINEL2B_20170714-104147-938_L2A_T30QZE_D&anneeProduit=ANNEEPRODUIT&moisProduit=MOISPRODUIT&jourProduit=JOURPRODUIT&versionProduit=2-0&idProjet=SENTINEL2&LAYERS=muscate&FORMAT=image%2Fpng&TRANSITIONEFFECT=resize&TRANSPARENT=true&VERSION=1.1.1&SERVICE=WMS&REQUEST=GetMap&STYLES=&SRS=EPSG%3A3857&bbox={bbox-epsg-3857}{:bbox3857:}&WIDTH=256&HEIGHT=256"
+                        }
+                    ]
+                },
+                "_isDataOnLine": true,
+                "harvestuuid": "ca6be0cd-35e5-4ecc-8c63-f65871022a88",
+                "harvestername": "opensearch-theia.cnes.fr-sentinel2-l2a",
+                "_sensorType_fr": "OPTIQUE",
+                "_attachments": [
+                    {
+                        "description_fr": "En savoir plus",
+                        "description_en": "Learn more",
+                        "description": "En savoir plus",
+                        "label": "EnSavoirPlus",
+                        "url": "https://www.theia-land.fr/donnees-satellitaires/reflectance-sentinelle-2/"
+                    }
+                ],
+                "_sensorType": "OPTIQUE",
+                "_isRadar": false,
+                "_centroid_wkt": "POINT(0.342521305317188 17.5643447274523)",
+                "catalogueType": "opensearch",
+                "_textLocation": "T30QZE",
+                "harvestdate": "2020-05-06T17:23:43.208Z",
+                "_isDownloadEnabled": true,
+                "_resolution": 10,
+                "_isVisuEnabled": true,
+                "_isOptique": true,
+                "_keywords": {
+                    "continent": [
+                        "Africa"
+                    ],
+                    "country": [
+                        "Mali"
+                    ],
+                    "year": [
+                        "2017"
+                    ],
+                    "theme_en": [
+                        "Reflectance"
+                    ],
+                    "instrument": [
+                        ""
+                    ],
+                    "collection": [
+                        "SENTINEL2"
+                    ],
+                    "platform": [
+                        "sentinel2b"
+                    ],
+                    "month": [
+                        "July"
+                    ],
+                    "processingLevel": [
+                        "LEVEL2A"
+                    ],
+                    "season": [
+                        "Summer"
+                    ],
+                    "location": [
+                        "Tropical",
+                        "Northern"
+                    ],
+                    "theme": [
+                        "Reflectance"
+                    ],
+                    "theme_fr": [
+                        "Reflectance"
+                    ],
+                    "state": [
+                        "Gao",
+                        "Kidal"
+                    ],
+                    "day": [
+                        "14"
+                    ],
+                    "sensorMode": [
+                        ""
+                    ],
+                    "productType": [
+                        "REFLECTANCE"
+                    ]
+                },
+                "id": "SENTINEL2B_20170714-104147-938_L2A_T30QZE_D"
+            }
+        }
+    ],
+    "nbhits": 1,
+    "totalnb": 681439,
+    "links": {
+        "self": {
+            "href": "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.ObservationContext.processusUsed.platform_fr%3Aeq%3ASENTINEL%202&f=metadata.core.description.processingLevel_fr%3Aeq%3ANIVEAU%202A&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120",
+            "method": "GET"
+        }
+    }
+}

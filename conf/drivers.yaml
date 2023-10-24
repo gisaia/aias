@@ -1,3 +1,7 @@
+inputs_directory: $INGESTED_FOLDER|/inputs
+max_number_of_archive_for_ingest: 1000000
+aproc_endpoint: $APROC_ENDPOINT_FROM_APROC|http://localhost:8001
+
 drivers:
   -
     name: dimap

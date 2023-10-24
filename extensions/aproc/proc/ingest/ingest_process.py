@@ -23,9 +23,10 @@ LOGGER = Logger.logger
 
 
 def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name+" "+state+" "+str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
+    else:
+        LOGGER.info(task.name + " " + state + " " + str(meta))
 
 
 class InputIngestProcess(BaseModel):
@@ -76,8 +77,11 @@ class AprocProcess(Process):
         return summary
 
     def get_resource_id(inputs: BaseModel):
-        hash_object = hashlib.sha1(InputIngestProcess(**inputs.model_dump()).url.encode())
-        return hash_object.hexdigest()
+        url = InputIngestProcess(**inputs.model_dump()).url
+        driver = Drivers.solve(url)
+        if driver is not None:
+            return driver.get_item_id(url)
+        raise DriverException("No driver found for  {}".format(url))
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str) -> dict:
@@ -92,7 +96,6 @@ class AprocProcess(Process):
 
         Args:
             url (str): archive url
-            driver_name (str): driver name
             collection (str): target collection
             catalog (str): target catalog
 

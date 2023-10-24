@@ -32,7 +32,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        ...
+        return Driver.__fetch_url__(url).get("hits")[0]["md"]["id"]
 
     # Implements drivers method
     def identify_assets(self, url:str)->list[Asset]:
@@ -40,16 +40,18 @@ class Driver(ProcDriver):
         if hits:
             if len(hits)>0:
                 if len(hits)<2:
-                    hit=hits[0]
-                    return [
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value),
-                        Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value),
-                        Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data, asset_format=AssetFormat.zip.value, asset_type=ResourceType.other.value)
-                    ]
-                else: 
+                    hit = hits[0]
+                    assets = [Asset(href=hit["data"]["_services"]["download"][0]["url"]+"?issuerId=theia", roles=[Role.data.value], name=Role.data.value, type="application/zip", description=Role.data.value, airs__managed=Driver.manage_data, asset_format=AssetFormat.zip.value, asset_type=ResourceType.other.value)]
+                    if (hit.get("data") and hit.get("data").get("metadata") and hit.get("data").get("metadata").get("core") and hit.get("data").get("metadata").get("core").get("graphics")):
+                        if hit.get("data").get("metadata").get("core").get("graphics").get("thumbnail"):
+                            assets.append(Asset(href=hit["data"]["metadata"]["core"]["graphics"]["thumbnail"], roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png", description=Role.thumbnail.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value))
+                        if hit.get("data").get("metadata").get("core").get("graphics").get("quicklook"):
+                            assets.append(Asset(href=hit["data"]["metadata"]["core"]["graphics"]["quicklook"], roles=[Role.overview.value], name=Role.overview.value, type="image/png", description=Role.overview.value, asset_format=AssetFormat.png.value, asset_type=ResourceType.gridded.value))
+                    return assets
+                else:
                     Driver.LOGGER.error("more than one hit found ({} found)".format(len(hits.get("hits"))))
                     return []
-            else: 
+            else:
                 Driver.LOGGER.error("no hits found")
                 return []
         else:
@@ -105,13 +107,13 @@ class Driver(ProcDriver):
                         Band(name="NOB", common_name="Number_Observations")]
             else:
                 Driver.LOGGER.error("No bands identified for {}".format(hit["data"]["metadata"]["core"]["identity"]["collection"]))
-        id=hit["md"]["id"]
-        acquisition_date=hit["md"]["timestamp"]/1000
-        item=Item(
+        id = hit["md"]["id"]
+        acquisition_date = hit["md"]["timestamp"]/1000
+        item = Item(
             id=id,
             geometry=hit["md"]["geometry"],
             centroid=hit["md"]["centroid"]["coordinates"],
-            bbox= [min(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),min(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0]))],
+            bbox=[min(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),min(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[0],hit["md"]["geometry"]["coordinates"][0])),max(map(lambda xy: xy[1],hit["md"]["geometry"]["coordinates"][0]))],
             properties=Properties(
                 datetime=acquisition_date,
                 begin_datetime=int(datetime.timestamp(parse_date(hit["data"]["metadata"]["core"]["temporalCoverage"]["begin"]))),
@@ -133,13 +135,19 @@ class Driver(ProcDriver):
         )
         return item
 
-    def __fetch_url__(url:str):
-        r = requests.get(url, verify=False)
-        if r.ok:
-            return json.loads(r.content)
-        else: return None
+    def __fetch_url__(url: str):
+        if url.startswith("http://") or url.startswith("https://"):
+            r = requests.get(url, verify=False)
+            if r.ok:
+                return json.loads(r.content)
+        if url.endswith("item.json"):
+            with open(url) as json_file:
+                content = json.load(json_file)
+                if content.get("hits") and len(content.get("hits")) > 0:
+                    return content
+        return None
 
-    def __getTheiaToken__(login:str, pwd:str, url):
+    def __getTheiaToken__(login: str, pwd: str, url):
         Driver.LOGGER.debug("Retrieving access token from theia for {}".format(login))
         get_token_cmd = 'curl -k -s -X POST --data-urlencode "ident={}" --data-urlencode "pass={}" {}>token.json'.format(login, pwd, url)
         os.system(get_token_cmd)
