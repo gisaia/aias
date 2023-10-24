@@ -38,7 +38,7 @@ This stack relies on the docker compose configuration files. The available endpo
 
 ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
 
-By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists: the asset must be added before the item. Deleting an item is cascaded on the managed assets. An assest can be unmanged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`).
+By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists: the asset must be added before the item. Deleting an item is cascaded on the managed assets. An asset can be unmanaged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`).
 
 ## AIRS Data model
 
