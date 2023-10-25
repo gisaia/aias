@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from airs.core.settings import Configuration
 from airs.rest.services import ROUTER
 from common.exception_handler import EXCEPTION_HANDLERS
+from common.healthcheck import ROUTER as HEALTHCHECK
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
@@ -31,6 +32,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
                                          allow_headers=AIRS_CORS_HEADERS.split(","))
                               ])
     api.include_router(ROUTER, prefix=AIRS_PREFIX)
+    api.include_router(HEALTHCHECK, prefix=AIRS_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         api.add_exception_handler(eh.exception, eh.handler)
     uvicorn.run(api, host=host, port=port)

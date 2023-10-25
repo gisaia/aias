@@ -8,11 +8,12 @@ import os
 from agate.rest.service import ROUTER
 from agate.settings import Configuration
 from common.exception_handler import EXCEPTION_HANDLERS
-
+from common.healthcheck import ROUTER as HEALTHCHECK
 cli = typer.Typer()
 AGATE_CORS_ORIGINS = os.getenv("AGATE_CORS_ORIGINS", "*")
 AGATE_CORS_METHODS = os.getenv("AGATE_CORS_METHODS", "*")
 AGATE_CORS_HEADERS = os.getenv("AGATE_CORS_HEADERS", "*")
+
 
 @cli.command(help="Start the ARLAS Asset Gateway.")
 def run(configuration_file: str = typer.Argument(..., help="Configuration file")):
@@ -24,6 +25,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
                               ])
     Configuration.init(configuration_file)
     api.include_router(ROUTER, prefix=Configuration.settings.agate_prefix)
+    api.include_router(HEALTHCHECK, prefix=Configuration.settings.agate_prefix)
     for eh in EXCEPTION_HANDLERS:
         api.add_exception_handler(eh.exception, eh.handler)
     uvicorn.run(api, host=Configuration.settings.host, port=Configuration.settings.port)

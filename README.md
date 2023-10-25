@@ -33,6 +33,12 @@ This stack relies on the docker compose configuration files. The available endpo
 - redis on port 6379
 - [SMTP4DEV](http://localhost:3000/) for email testing
 
+Health checks are available for all non-third party services:
+- [AIRS](http://localhost:8000/arlas/airs/healthcheck)
+- [APROC](http://localhost:8001/arlas/aproc/healthcheck)
+- [AGATE](http://localhost:8004/arlas/agate/healthcheck)
+- [FAM](http://localhost:8005/arlas/fam/healthcheck)
+
 
 # ARLAS Item Registration Services
 
