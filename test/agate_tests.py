@@ -4,7 +4,7 @@ import unittest
 
 import requests
 from utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
-                   ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH, setUpTest)
+                   ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH, setUpTest, index_collection_prefix)
 
 from airs.core.models import mapper
 from airs.core.models.model import Item
@@ -20,7 +20,7 @@ class Tests(unittest.TestCase):
             ...
         self.__add_item__()
         r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]),  headers={"Content-Type": "application/json"}, data=json.dumps({
-              "index_name": ARLAS_COLLECTION,
+              "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
               "id_path": "id",
               "geometry_path": "geometry",
               "centroid_path": "centroid",

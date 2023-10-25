@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
 
         # ITEM FOUND
         r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
-        self.assertTrue(r.ok,msg="Item must not found")
+        self.assertTrue(r.ok,msg="Item not found")
 
     def test_update_item(self):
         # ADD ITEM
@@ -63,7 +63,7 @@ class Tests(unittest.TestCase):
 
         # ITEM FOUND
         r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
-        self.assertTrue(r.ok,msg="Item must not found")
+        self.assertTrue(r.ok,msg="Item not found")
 
     def test_access_asset(self):
         # ADD ITEM

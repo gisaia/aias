@@ -178,7 +178,7 @@ class AprocProcess(Process):
 
     def __get_item__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
-            r = requests.get(url=Configuration.settings.arlas_url_search.format(collection=Configuration.settings.collection_prefix+"_"+collection, item=item_id), headers=headers)
+            r = requests.get(url=Configuration.settings.arlas_url_search.format(collection=collection, item=item_id), headers=headers)
             if r.ok:
                 result = r.json()
                 if result.get("hits") and len(result.get("hits")) > 0:
