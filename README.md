@@ -199,7 +199,7 @@ curl -X DELETE \
 
 ## ARLAS Processes (APROC)
 
-ARLAS Processes (APROC) exposes an OGC API Processes compliant API (to be implemented).
+ARLAS Processes (APROC) exposes an OGC API Processes compliant API.
 
 List of processes:
 - `ingest` : it ingest an archive.

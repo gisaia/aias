@@ -35,6 +35,7 @@ class Tests(unittest.TestCase):
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
+        print(execute.model_dump_json())
         self.assertTrue(r.ok)
         # WAIT FOR FAILURE
         status: StatusInfo = StatusInfo(**json.loads(r.content))
