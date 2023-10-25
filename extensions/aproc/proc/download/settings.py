@@ -19,7 +19,6 @@ class SMPTConfiguration(BaseModel, extra='allow'):
 
 class Settings(BaseModel, extra='allow'):
     arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
-    collection_prefix: str = Field(title="ARLAS collection name prefix")
     drivers: list[Driver] = Field(title="Configuration of the drivers")
     outbox_directory: str = Field(title="Directory where the downloads will be placed")
     notification_admin_emails: str = Field(title="List of admin emails for receiving download notifications, comma seperated.")

@@ -195,9 +195,9 @@ def asset_exists(collection:str, item_id:str, asset_name:str)->bool:
         return False
 
 def delete_item(collection:str, item_id:str):
-    if not __getES().indices.exists(index=__get_es_collection_name(collection)):
+    if not __getES().indices.exists(index=__get_es_index_name(collection)):
         raise exceptions.InvalidItemsException([item_id], reason="Collection does not exist")
-    r=__getES().delete(index=__get_es_collection_name(collection), id=item_id)
+    r=__getES().delete(index=__get_es_index_name(collection), id=item_id)
     prefix=get_assets_relative_path(collection, item_id)
     __delete_prefix(prefix)
     LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
@@ -247,14 +247,14 @@ def register_item(item:Item)->Item:
     __collect_bands(item)
     __add_generated_fields(item)
     upload_item(item)
-    if not __getES().indices.exists(index=__get_es_collection_name(item.collection)):
-        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_collection_name(item.collection), Configuration.settings.arlaseo_mapping_url))
+    if not __getES().indices.exists(index=__get_es_index_name(item.collection)):
+        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_index_name(item.collection), Configuration.settings.arlaseo_mapping_url))
         mapping = __fetch_mapping__()
-        __getES().indices.create(index=__get_es_collection_name(item.collection), mappings=mapping)
-        LOGGER.info("Index {} created.".format(__get_es_collection_name(item.collection)))
+        __getES().indices.create(index=__get_es_index_name(item.collection), mappings=mapping)
+        LOGGER.info("Index {} created.".format(__get_es_index_name(item.collection)))
     else:
-        LOGGER.info("Index {} found.".format(__get_es_collection_name(item.collection)))
-    resp = __getES().index(index=__get_es_collection_name(item.collection), id=item.id, document=to_airs_json(item))
+        LOGGER.info("Index {} found.".format(__get_es_index_name(item.collection)))
+    resp = __getES().index(index=__get_es_index_name(item.collection), id=item.id, document=to_airs_json(item))
     LOGGER.info("Indexing result:{}".format(resp['result']))
     return item
 
@@ -277,19 +277,19 @@ def reindex(collection:str):
     LOGGER.info("Done with reindexing collection {}".format(collection))
 
 def item_exists(collection:str, item_id:str)->bool:
-    if not __getES().indices.exists(index=__get_es_collection_name(collection)):
-        LOGGER.info("index {} does not exists".format(__get_es_collection_name(collection)))
+    if not __getES().indices.exists(index=__get_es_index_name(collection)):
+        LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
         return False
     try:
-        r=__getES().get(index=__get_es_collection_name(collection), id=item_id)
+        r=__getES().get(index=__get_es_index_name(collection), id=item_id)
     except elasticsearch.NotFoundError as e:
         return False
     return True
 
 def get_item(collection:str, item_id:str)->Item:
-    if not __getES().indices.exists(index=__get_es_collection_name(collection)):
+    if not __getES().indices.exists(index=__get_es_index_name(collection)):
         raise exceptions.InvalidItemsException([item_id], reason="Collection does not exist")
-    r=__getES().get(index=__get_es_collection_name(collection), id=item_id)
+    r=__getES().get(index=__get_es_index_name(collection), id=item_id)
     return item_from_dict(r["_source"])
 
 def __collect_bands(item:Item)->Item:
@@ -414,7 +414,7 @@ def __check_register_item_params(item:Item):
     if item.assets is None:
         item.assets={}
 
-def __get_es_collection_name(collection: str)->str:
+def __get_es_index_name(collection: str)->str:
     if Configuration.settings.index.collection_prefix:
         return Configuration.settings.index.collection_prefix+"_"+collection
     else:

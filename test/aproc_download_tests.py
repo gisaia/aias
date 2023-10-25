@@ -51,8 +51,8 @@ class Tests(unittest.TestCase):
         sleep(3)
         # Create collection
         print("create collection {}".format(ARLAS_COLLECTION))
-        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]),  headers={"Content-Type": "application/json"}, data=json.dumps({
-                            "index_name": ARLAS_COLLECTION,
+        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": "application/json"}, data=json.dumps({
+                            "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
                             "id_path": "id",
                             "geometry_path": "geometry",
                             "centroid_path": "centroid",
