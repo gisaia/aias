@@ -7,6 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
 from common.exception_handler import EXCEPTION_HANDLERS
+from common.healthcheck import ROUTER as HEALTHCHECK
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from fam.core.settings import Configuration
 from fam.rest.services import ROUTER
@@ -18,6 +19,7 @@ FAM_PREFIX = os.getenv("FAM_PREFIX", "/arlas/fam")
 FAM_CORS_ORIGINS = os.getenv("FAM_CORS_ORIGINS", "*")
 FAM_CORS_METHODS = os.getenv("FAM_CORS_METHODS", "*")
 FAM_CORS_HEADERS = os.getenv("FAM_CORS_HEADERS", "*")
+
 
 @cli.command(help="Start the File and Archive Management Service.")
 def run(configuration_file: str = typer.Argument(..., help="Configuration file"),
@@ -32,9 +34,11 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
                                          allow_headers=FAM_CORS_HEADERS.split(","))
                               ])
     api.include_router(ROUTER, prefix=FAM_PREFIX)
+    api.include_router(HEALTHCHECK, prefix=FAM_PREFIX)
 #    for eh in EXCEPTION_HANDLERS:
 #        api.add_exception_handler(eh.exception, eh.handler)
     uvicorn.run(api, host=host, port=port)
+
 
 if __name__ == "__main__":
     cli()
