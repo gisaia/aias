@@ -102,7 +102,9 @@ class AprocProcess(Process):
         Returns:
             object: an dict pointing towards the registered item (OutputIngestProcess)
         """
-
+        if not os.path.exists(url):
+            msg = "File or directory {} not found".format(url)
+            LOGGER.warning(msg)
         driver = Drivers.solve(url)
         if driver is not None:
             LOGGER.debug("ingestion: 1 - identify_assets")
