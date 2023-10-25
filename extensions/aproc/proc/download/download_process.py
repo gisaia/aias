@@ -105,22 +105,27 @@ class AprocProcess(Process):
     def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
         import jwt
         # self is a celery task because bind=True
+        authorization = headers.get("authorization")
+        send_to: str = "anonymous"
+        user_id: str = "anonymous"
+        try:
+            if not not authorization:
+                token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
+                if not not token_content.get("email"):
+                    send_to = token_content.get("email")
+                else:
+                    LOGGER.error("email not found in token {}".format(token_content))
+                if not not token_content.get("sub"):
+                    user_id = token_content.get("sub")
+                else:
+                    LOGGER.error("subject not found in token {}".format(token_content))
+            else:
+                LOGGER.error("no token in header")
+        except Exception as e:
+            LOGGER.exception(e)
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
-            authorization = headers.get("authorization")
-            send_to: str = "anonymous"
-            try:
-                if not not authorization:
-                    token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
-                    if not not token_content.get("email"):
-                        send_to = token_content.get("email")
-                    else:
-                        LOGGER.error("email not found in token {}".format(token_content))
-                else:
-                        LOGGER.error("no token in header")
-            except Exception as e:
-                LOGGER.exception(e)
             mail_context = {
                 "target_projection": target_projection,
                 "target_format": target_format,
@@ -140,6 +145,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
+                LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                 mail_context["error"] = error_msg
                 Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                 raise RegisterException(error_msg)
@@ -162,15 +168,18 @@ class AprocProcess(Process):
                         target_format=target_format)
                     Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
                     Notifications.try_send_to(Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                    LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
+                    LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)
                     mail_context["error"] = error_msg
                     raise Exception(error_msg)
             else:
                 error_msg = "No driver found for {}/{}".format(collection, item_id)
+                LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                 LOGGER.error(error_msg)
                 mail_context["error"] = error_msg
                 Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
