@@ -166,19 +166,22 @@ class Processes:
         return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
 
     def __to_status_info__(o: dict) -> StatusInfo:
-        return StatusInfo(
-            processID=o.get("process_id", None),
-            type=JobType.process,
-            jobID=o.get("job_id", None),
-            status=StatusCode[o.get("status", StatusCode.accepted.value)],
-            message=o.get("message", None),
-            created=o.get("creation_date", None),
-            started=o.get("started_date", None),
-            finished=o.get("finished_date", None),
-            updated=o.get("modification_date", None),
-            progress=None,
-            resourceID=o.get("resource_id", None)
-        )
+        if o:
+            return StatusInfo(
+                processID=o.get("process_id", None),
+                type=JobType.process,
+                jobID=o.get("job_id", None),
+                status=StatusCode[o.get("status", StatusCode.accepted.value)],
+                message=o.get("message", None),
+                created=o.get("creation_date", None),
+                started=o.get("started_date", None),
+                finished=o.get("finished_date", None),
+                updated=o.get("modification_date", None),
+                progress=None,
+                resourceID=o.get("resource_id", None)
+            )
+        else:
+            return None
 
     def __to_status_info_code__(code: states) -> StatusCode:
         status_code = StatusCode.accepted
