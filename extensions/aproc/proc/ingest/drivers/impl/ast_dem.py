@@ -47,7 +47,8 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return get_id(url)+'-'+get_id(os.path.splitext(os.path.basename(self.tif_path))[0])
+        return os.path.splitext(os.path.basename(self.tif_path))[0]
+
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:

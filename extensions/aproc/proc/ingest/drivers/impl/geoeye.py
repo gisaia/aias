@@ -54,7 +54,7 @@ class Driver(ProcDriver):
         return assets
 
     def get_item_id(self, url: str) -> str:
-        return get_id(url)
+        return os.path.splitext(os.path.basename(self.file_name))[0]
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
