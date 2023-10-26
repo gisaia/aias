@@ -23,7 +23,7 @@ class Tests(unittest.TestCase):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
@@ -35,7 +35,7 @@ class Tests(unittest.TestCase):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
@@ -55,18 +55,18 @@ class Tests(unittest.TestCase):
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         processes: ProcessList = ProcessList(**json.loads(r.content))
         self.assertGreater(len(processes.processes), 0)
         self.assertIn("ingest", list(map(lambda p: p.id, processes.processes)))
 
     def test_conformance(self):
         r = requests.get("/".join([APROC_ENDPOINT, "conformance"]))
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
     def test_jobs(self):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
     def __ingest_theia(self) -> StatusInfo:
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
@@ -75,7 +75,7 @@ class Tests(unittest.TestCase):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         return StatusInfo(**json.loads(r.content))
 
     def test_job_by_id(self):
