@@ -47,9 +47,14 @@ COPY ./setup.py $APP_HOME/setup.py
 
 RUN pip install -e $APP_HOME
 
-WORKDIR $APP_HOME
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.2/mapping.json" -o $APP_HOME//conf/mapping.json
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.2/downloads_mapping.json" -o $APP_HOME//conf/downloads_mapping.json
+
 ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
+ENV ARLASEO_MAPPING_URL=$APP_HOME//conf/mapping.json
+ENV DOWNLOAD_MAPPING_URL=$APP_HOME//conf/downloads_mapping.json
 ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
-#ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -c 2 -n worker@%h  --loglevel=INFO
+WORKDIR $APP_HOME
+
 #Force one worker to fix ES ingestion
 ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -E -c 1 -n worker@%h  --loglevel=INFO
