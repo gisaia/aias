@@ -74,7 +74,7 @@ class Processes:
             except Exception as e:
                 LOGGER.error("Failed to capture events for status tracking")
                 LOGGER.error(e)
-                sleep_time = sleep_time + 5
+                sleep_time = max(sleep_time + 5, 300)
                 LOGGER.error("Sleep {} seconds and try to connect again ...".format(sleep_time))
                 sleep(sleep_time)
 
