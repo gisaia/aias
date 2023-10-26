@@ -49,7 +49,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return get_id(url)+'-'+get_id(os.path.splitext(os.path.basename(self.tif_path))[0])
+        return os.path.splitext(os.path.basename(self.dim_path))[0].replace("DIM_","")
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:

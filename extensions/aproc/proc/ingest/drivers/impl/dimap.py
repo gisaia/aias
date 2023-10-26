@@ -2,14 +2,13 @@ import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal, get_id)
+    get_geom_bbox_centroid, setup_gdal)
 
 
 class Driver(ProcDriver):
@@ -54,7 +53,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return get_id(url)
+        return os.path.splitext(os.path.basename(self.dim_path))[0].replace("DIM_","")
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -83,7 +82,7 @@ class Driver(ProcDriver):
         component_feature = layer.GetNextFeature()
         geo_ref= component_feature.GetGeometryRef()
         in_spatial_ref_code = None
-        if geo_ref.GetSpatialReference() is not None:
+        if geo_ref is not None and geo_ref.GetSpatialReference() is not None:
             if geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS") is not None:
                 in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS")
             elif geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS") is not None:
@@ -128,13 +127,20 @@ class Driver(ProcDriver):
         src_ds = gdal.Open(self.dim_path, GA_ReadOnly)
         metadata = src_ds.GetMetadata()
         # We retrieve the time
-        date = metadata["IMAGING_DATE"]
-        time = metadata["IMAGING_TIME"]
-        if "Z" in time:
-            date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%fZ").timestamp())
+        if "IMAGING_DATE" in metadata and "IMAGING_TIME" in metadata:
+            date = metadata["IMAGING_DATE"]
+            time = metadata["IMAGING_TIME"]
+            if "Z" in time:
+                date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%fZ").timestamp())
+            elif "." in time:
+                date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%f").timestamp())
+            else:
+                date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
         else:
-            date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S.%f").timestamp())
-
+            #Take the date of the  center of the image
+            for lgv in root.iter('Located_Geometric_Values'):
+                if lgv.find('LOCATION_TYPE').text == "Center":
+                    date_time = int(datetime.strptime(lgv.find('TIME').text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
         # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
         cloud_cover=None
         if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
