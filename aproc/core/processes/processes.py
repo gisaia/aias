@@ -43,27 +43,40 @@ class Processes:
                     if status_info is None:
                         sleep(5) # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
                         status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
-                    status_info.status = Processes.__to_status_info_code__(event.get('state'))
-                    status_info.updated = round(datetime.now().timestamp())
-                    if status_info.status.is_final():
-                        status_info.finished = round(datetime.now().timestamp())
-                    if event.get('state') == states.STARTED:
-                        status_info.started = round(datetime.now().timestamp())
-                    status_info.message = event.get('result', status_info.message)
-                    Processes.__save_status_info__(status_info)
+                    if status_info is None:
+                        LOGGER.error("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
+                    else:
+                        status_info.status = Processes.__to_status_info_code__(event.get('state'))
+                        status_info.updated = round(datetime.now().timestamp())
+                        if status_info.status.is_final():
+                            status_info.finished = round(datetime.now().timestamp())
+                        if event.get('state') == states.STARTED:
+                            status_info.started = round(datetime.now().timestamp())
+                        status_info.message = event.get('result', status_info.message)
+                        Processes.__save_status_info__(status_info)
             except Exception as e:
                 LOGGER.exception(e)
 
-        with APROC_CELERY_APP.connection() as connection:
-            recv = APROC_CELERY_APP.events.Receiver(connection, handlers={
-                'task-failed': update_status_fct,
-                'task-succeeded': update_status_fct,
-                'task-sent': update_status_fct,
-                'task-received': update_status_fct,
-                'task-revoked': update_status_fct,
-                'task-started': update_status_fct,
-            }, app=APROC_CELERY_APP)
-            recv.capture(limit=None, timeout=None, wakeup=True)
+        sleep_time = 0
+        while True:
+            try:
+                with APROC_CELERY_APP.connection() as connection:
+                    recv = APROC_CELERY_APP.events.Receiver(connection, handlers={
+                        'task-failed': update_status_fct,
+                        'task-succeeded': update_status_fct,
+                        'task-sent': update_status_fct,
+                        'task-received': update_status_fct,
+                        'task-revoked': update_status_fct,
+                        'task-started': update_status_fct,
+                    }, app=APROC_CELERY_APP)
+                    LOGGER.info("Capturing events for status tracking ...")
+                    recv.capture(limit=None, timeout=None, wakeup=True)
+            except Exception as e:
+                LOGGER.error("Failed to capture events for status tracking")
+                LOGGER.error(e)
+                sleep_time = sleep_time + 5
+                LOGGER.error("Sleep {} seconds and try to connect again ...".format(sleep_time))
+                sleep(sleep_time)
 
     @staticmethod
     def init(is_service: bool = False):
