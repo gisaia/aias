@@ -19,7 +19,7 @@ class Tests(unittest.TestCase):
 
     def setUp(self):
         setUpTest()
-        if not os.path.exists(THEIA_DIR):
+        if not os.path.exists(os.path.join("test", THEIA_DIR)):
             with open("test/inputs/template_theia.json") as json_file:
                 d = json.load(json_file)
                 id = d["hits"][0]["md"]["id"]

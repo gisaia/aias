@@ -452,33 +452,34 @@ Result:
 ]
 ```
 
-To get the status of the most recent processes (the service offers pages):
+To get the status of the most recent processes for ingest and which are running:
 
 ```shell
 curl -X 'GET' \
-  'http://localhost:8001/arlas/aproc/jobs?page=0&page_size=10' \
+  'http://localhost:8001/arlas/aproc/jobs?offset=0&limit=10&process_id=ingest&status=running' \
   -H 'accept: application/json'
 ```
 Result:
 ```json
-[
-  {
-    "processID": "download",
-    "type": "process",
-    "jobID": "40154302-4ca7-468c-854d-c09b245e3e64",
-    "status": "successful",
-    "message": "{'download_location': '/outbox/anonymous/inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A/inputs_DIMAP_PROD_SPOT6_001_VOL_SPOT6_001_A_IMG_SPOT6_MS_001_A.Geotiff'}",
-    "created": 1698154319,
-    "started": 1698154319,
-    "finished": 1698154440,
-    "updated": 1698154440,
-    "progress": null,
-    "links": null,
-    "resourceID": "db6bd405d357b8f6420bfe6797bbbec1e6430afe"
-  }, ...
-]
+{
+    "status_list": [
+        {
+            "processID": "ingest",
+            "type": "process",
+            "jobID": "c8c79f8e-51c9-4a99-96e2-527cc365cb1d",
+            "status": "successful",
+            "message": "{'item_location': 'http://airs-server:8000/arlas/airs/collections/digitalearth.africa/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D'}",
+            "created": 1698400307,
+            "started": 1698400320,
+            "finished": 1698400327,
+            "updated": 1698400327,
+            "resourceID": "SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D"
+        },
+        ...
+    ],
+    "total": 41
+}
 ```
-
 
 
 ## AGATE

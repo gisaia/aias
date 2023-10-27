@@ -96,13 +96,16 @@ class AprocProcess(Process):
                 execute = Execute(inputs=inputs.model_dump())
                 r = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
-                    LOGGER.error("Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code)+":"+r.content))
+                    msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + r.content)
+                    LOGGER.error(msg)
+                    raise Exception(msg)
                 else:
-                    LOGGER.info("Send ingestion request for {} ({})".format(archive.path, archive.id))
+                    LOGGER.debug("Send ingestion request for {} ({}) ok".format(archive.path, archive.id))
             except Exception as e:
                 msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, e.__cause__)
                 LOGGER.error(msg)
                 LOGGER.exception(e)
+                raise Exception(msg)
         return list(map(lambda a: a.model_dump(), archives))
 
     def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:

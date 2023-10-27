@@ -15,7 +15,7 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
 from aproc.core.logger import Logger
-from aproc.core.models.ogc.job import JobType, StatusCode, StatusInfo
+from aproc.core.models.ogc.job import JobType, StatusCode, StatusInfo, StatusInfoList
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration
@@ -151,8 +151,8 @@ class Processes:
         return Processes.__retrieve_status_info__(task_id)
 
     @staticmethod
-    def list_jobs(page: int = 0, page_size: int = 100) -> list:
-        return Processes.__retrieve_status_info_list__(page, page_size)
+    def list_jobs(offset: int = 0, limit: int = 100, process_id: str = None, status: str = None) -> StatusInfoList:
+        return Processes.__retrieve_status_info_list__(offset, limit, process_id, status)
 
     def __save_status_info__(status_info: StatusInfo):
         Processes.__get_redis_client__().json().set(Processes.__REDIS_PREFIX__ + status_info.jobID, "$",
@@ -173,10 +173,17 @@ class Processes:
         docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(query="@resource_id:{'" + resource_id.replace("-", "\\-") + "'}").docs
         return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
 
-    def __retrieve_status_info_list__(page: int = 0, page_size: int = 100) -> list[StatusInfo]:
-        q = Query("*").paging(offset=page, num=page_size).sort_by("modification_date", asc=False)
-        docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(q).docs
-        return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
+    def __retrieve_status_info_list__(offset: int = 0, limit: int = 100, process_id: str = None, status: str = None) -> StatusInfoList:
+        query_str = ""
+        if process_id:
+            query_str = "@process_id:{'" + process_id + "'}"
+        if status:
+            query_str = query_str + " @status:{'" + status + "'}"
+        if (not process_id) and (not status):
+            query_str = "*"
+        q = Query(query_str).paging(offset=offset, num=limit).sort_by("modification_date", asc=False)
+        r = Processes.__get_redis_client__().ft("idx:airs_jobs").search(q)
+        return StatusInfoList(total=r.total, status_list=list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), r.docs)))
 
     def __to_status_info__(o: dict) -> StatusInfo:
         if o:
