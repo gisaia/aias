@@ -11,9 +11,50 @@
     tr.mat-header-row {
       height: 36px !important;
     }
+
+    tr.task-detail-row {
+      height: 0;
+    }
+
+    tr.task-row:not(.task-expanded-row):hover {
+      background: whitesmoke;
+    }
+
+    tr.task-row:not(.task-expanded-row):active {
+      background: #efefef;
+    }
+
+    .task-row td {
+      border-bottom-width: 0;
+    }
+
+    .task-detail {
+      overflow: hidden;
+      display: flex;
+
+      .task-detail-content {
+        padding: 16px;
+
+        .prop {
+          display: flex;
+          align-items: center;
+          gap: 0 5px;
+          padding: 3px 0;
+          .label {
+            min-width: 100px;
+            text-align: right;
+            color: $infoColor;
+          }
+          .value {
+            font-family: monospace;
+            font-size: 12px;
+          }
+        }
+      }
+    }
   }
 
-  .mat-chip{
+  .mat-chip {
     background-color: white;
   }
 
@@ -30,5 +71,10 @@
   .mat-chip-running {
     color: $progressColor;
     border: 1px solid $progressColor;
+  }
+
+  .mat-chip-failed {
+    color: $errorColor;
+    border: 1px solid $errorColor;
   }
 }

@@ -28,15 +28,15 @@ export interface Archive {
   creation_date: string;
   id: string;
   driver_name: string;
-  status?: 'accepted' | 'running' | 'successful' | 'failed'
+  status?: ProcessStatus;
 }
 
 export enum ProcessStatus {
-  ACCEPTED = 'accepted',
-  RUNNING = 'running',
-  SUCCESSFUL = 'successful',
-  FAILED = 'failed',
-  DISMISSED = 'dismissed'
+  accepted = 'accepted',
+  running = 'running',
+  successful = 'successful',
+  failed = 'failed',
+  dismissed = 'dismissed'
 }
 
 export interface Process {
@@ -52,4 +52,9 @@ export interface Process {
   progress: number,
   links: any,
   resourceID: string;
+}
+
+export interface ProcessResult {
+  total: number;
+  status_list: Process[];
 }

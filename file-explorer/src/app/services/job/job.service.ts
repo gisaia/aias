@@ -1,6 +1,6 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Archive, DynamicFileNode, IngestPayload } from '@tools/interface';
+import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
 import { ArlasSettingsService } from 'arlas-wui-toolkit';
 import { Observable, Subject } from 'rxjs';
 
@@ -42,7 +42,7 @@ export class JobService {
     return this.http.post(this.jobSettings?.url + '/processes/ingest/execution', payload, this.options);
   }
 
-  public ingestDirectory(node: DynamicFileNode){
+  public ingestDirectory(node: DynamicFileNode) {
     const payload: IngestPayload = {
       inputs: {
         catalog: '',
@@ -56,7 +56,11 @@ export class JobService {
     return this.http.post(this.jobSettings?.url + '/processes/directory_ingest/execution', payload, this.options);
   }
 
-  public getTasks(page: number = 0, pageSize: number = 10): Observable<any> {
-    return this.http.get(this.jobSettings?.url + '/jobs?page=' + page + '&page_size=' + pageSize, this.options);
+  public getTasks(page: number = 0, pageSize: number = 10): Observable<ProcessResult> {
+    return this.http.get(this.jobSettings?.url + '/jobs?page=' + page + '&page_size=' + pageSize + '&process_id=ingest', this.options) as Observable<ProcessResult>;
+  }
+
+  public getResourceStatus(archiveId: string): Observable<Process[]> {
+    return this.http.get(this.jobSettings?.url + '/jobs/resources/' + archiveId, this.options) as Observable<Process[]>;
   }
 }

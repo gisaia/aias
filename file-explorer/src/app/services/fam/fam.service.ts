@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DynamicFileNode } from '@tools/interface';
+import { Archive, DynamicFileNode } from '@tools/interface';
 import { ArlasSettingsService } from 'arlas-wui-toolkit';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -38,8 +38,8 @@ export class FamService {
     return this.http.post(this.famSettings?.url + '/files', { path, size: 50 }, this.options);
   }
 
-  public getArchive(path: string): Observable<any> {
-    return this.http.post(this.famSettings?.url + '/archives', { path, size: 20 }, this.options);
+  public getArchive(path: string): Observable<Archive[]> {
+    return this.http.post(this.famSettings?.url + '/archives', { path, size: 20 }, this.options) as Observable<Archive[]>;
   }
 
   public initializeFiles(path: string) {

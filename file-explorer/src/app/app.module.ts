@@ -37,6 +37,7 @@ import { ArchivesComponent } from './components/archives/archives.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -80,6 +81,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
+    NgxSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
     LoginModule,

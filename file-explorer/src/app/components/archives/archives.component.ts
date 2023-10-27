@@ -4,8 +4,9 @@ import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialo
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
-import { Archive } from '@tools/interface';
-import { map } from 'rxjs';
+import { Archive, Process, ProcessStatus } from '@tools/interface';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
 
 @Component({
   selector: 'app-archives',
@@ -23,7 +24,8 @@ export class ArchivesComponent implements OnInit, OnChanges {
     private famService: FamService,
     private jobService: JobService,
     private dialog: MatDialog,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private spinner: NgxSpinnerService
   ) { }
 
   public ngOnInit(): void {
@@ -32,10 +34,34 @@ export class ArchivesComponent implements OnInit, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['archivesPath'] && changes['archivesPath'].currentValue !== '') {
-      // TODO: use merge map to get status of each archive
-      this.famService.getArchive(changes['archivesPath'].currentValue).subscribe({
-        next: (data) => this.archives = data
-      })
+      this.spinner.show('archives');
+      this.famService.getArchive(changes['archivesPath'].currentValue)
+        .pipe(
+          mergeMap((archives) => {
+            if (archives.length > 0) {
+              return forkJoin(
+                archives.map((archive: Archive) => zip(
+                  of(archive),
+                  this.jobService.getResourceStatus(archive.id)
+                ))
+              )
+            } else {
+              return of([]);
+            }
+          }),
+          map(data => data.map(result => {
+            const archive: Archive = result[0];
+            const resourceInfo: Process[] = result[1];
+            if (resourceInfo.length > 0) {
+              archive.status = ProcessStatus[resourceInfo[0].status];
+            }
+            return archive;
+          })),
+          finalize(() => this.spinner.hide('archives'))
+        )
+        .subscribe({
+          next: (data) => this.archives = data
+        })
     }
   }
 

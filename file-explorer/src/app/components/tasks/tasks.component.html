@@ -1,6 +1,6 @@
 <div class="tasks-content">
 
-  <table mat-table [dataSource]="tasks" class="tasks-table">
+  <table mat-table [dataSource]="tasks" multiTemplateDataRows class="tasks-table">
 
     <!-- Type Column -->
     <ng-container matColumnDef="type">
@@ -13,9 +13,9 @@
       <th mat-header-cell *matHeaderCellDef>Status</th>
       <td mat-cell *matCellDef="let task">
         <mat-chip-list>
-          <mat-chip class="mat-chip-{{task.status}}">{{task.status}}</mat-chip>
+          <mat-chip class="mat-chip-{{task.status}}" [matTooltip]="task.message">{{task.status}}</mat-chip>
         </mat-chip-list>
-        
+
       </td>
     </ng-container>
 
@@ -49,8 +49,47 @@
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let task; columns: displayedColumns;"></tr>
+    <ng-container matColumnDef="expand">
+      <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+      <td mat-cell *matCellDef="let task">
+        <button mat-icon-button aria-label="expand row"
+          (click)="(expandedTask = expandedTask === task ? null : task); $event.stopPropagation()">
+          <mat-icon *ngIf="expandedTask !== task">keyboard_arrow_down</mat-icon>
+          <mat-icon *ngIf="expandedTask === task">keyboard_arrow_up</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let task" [attr.colspan]="columnsToDisplayWithExpand.length">
+        <div class="task-detail" [@detailExpand]="task.jobID== expandedTask?.jobID ? 'expanded' : 'collapsed'">
+          <div class="task-detail-content">
+            <div class="prop">
+              <div class="label">{{'message' | translate}}:</div>
+              <div class="value">{{task.message}}</div>
+            </div>
+            <div class="prop">
+              <div class="label">{{'resource Id' | translate}}:</div>
+              <div class="value">{{task.resourceID}}</div>
+            </div>
+            <div class="prop">
+              <div class="label">{{'job Id' | translate}}:</div>
+              <div class="value">{{task.jobID}}</div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let task; columns: displayedColumns;"></tr> -->
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand; sticky: true"></tr>
+    <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;" class="task-row"
+      [class.task-row]="expandedTask === element" (click)="expandedTask = expandedTask === element ? null : element">
+    </tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="task-detail-row"></tr>
   </table>
-  <mat-paginator [length]="100" [pageSize]="10" aria-label="Select page of GitHub search results"></mat-paginator>
+  <mat-paginator [length]="totalProcess" [pageSize]="20" aria-label="Select page of GitHub search results"></mat-paginator>
 </div>

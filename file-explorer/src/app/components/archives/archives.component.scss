@@ -4,6 +4,7 @@
 .archives-content {
   height: calc(100% - $sectionTitleHeight);
   overflow: auto;
+  position: relative;
   .archives-list {
     .archive {
       height: 48px;
@@ -35,17 +36,39 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 0 5px;
           .no-pointer {
             cursor: default;
           }
           .pointer {
             cursor: pointer;
           }
-        }
-        .driver-chip {
-          border: 1px solid rgba(0, 0, 0, 0.75);
-          background: white;
-          color: rgba(0, 0, 0, 0.75);
+
+          .driver-chip {
+            border: 1px solid rgba(0, 0, 0, 0.75);
+            background: white;
+            color: rgba(0, 0, 0, 0.75);
+          }
+
+          .successful {
+            color: $successColor;
+          }
+
+          .failed {
+            color: $errorColor;
+          }
+
+          .running {
+            color: $progressColor;
+          }
+
+          .accepted {
+            color: $infoColor;
+          }
+
+          .not-activated {
+            color: $disabledColor;
+          }
         }
       }
     }

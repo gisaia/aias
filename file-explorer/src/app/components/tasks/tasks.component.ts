@@ -1,13 +1,21 @@
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { JobService } from '@services/job/job.service';
-import { Process } from '@tools/interface';
+import { Process, ProcessResult } from '@tools/interface';
 import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
-  styleUrls: ['./tasks.component.scss']
+  styleUrls: ['./tasks.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -15,9 +23,12 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public tasks: Process[] = [];
   public displayedColumns: string[] = ['type', 'status', 'created', 'started', 'finished'];
+  public columnsToDisplayWithExpand: string[] = [...this.displayedColumns, 'expand'];
+  public expandedTask!: Process | null;
 
   public pageIndex = 0;
-  public pageSize = 10;
+  public pageSize = 20;
+  public totalProcess = 0;
 
 
   public executionObservable!: Observable<number>;
@@ -36,7 +47,11 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     this.jobService.refreshTasks.subscribe({
       next: refresh => {
         if (!!refresh) {
-          this.getTasks();
+          this.unsubscribeRefreshTasks.next(true);
+          this.pageIndex = 0;
+          this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
+            this.getTasks();
+          });
         }
       }
     })
@@ -60,7 +75,10 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public getTasks() {
     this.jobService.getTasks(this.pageIndex * this.pageSize, this.pageSize).subscribe({
-      next: (tasks: Process[]) => this.tasks = tasks
+      next: (pr: ProcessResult) => {
+        this.tasks = pr.status_list;
+        this.totalProcess = pr.total;
+      }
     });
   }
 
