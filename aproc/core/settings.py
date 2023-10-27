@@ -16,6 +16,7 @@ class Settings(BaseModel, extra='allow'):
     celery_result_backend: str | None = Field(title="Celery's backend")
     processes: list[ProcessSettings] = Field(title="List of processes available")
     airs_endpoint: str | None = Field(title="ARLAS Item Registration Service endpoint")
+    resource_id_hash_starts_at: int = Field(1, title="For some drivers, the resource id is the hash of the url path. Prefix can be ignored with this property.")
 
 
 class Configuration:

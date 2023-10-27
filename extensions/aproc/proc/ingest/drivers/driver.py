@@ -1,9 +1,10 @@
 import hashlib
 import os
 from abc import ABC, abstractmethod
-
+import hashlib
 from airs.core.models.model import Asset, Item
 from aproc.core.logger import Logger
+from aproc.core.settings import Configuration
 
 
 class Driver(ABC):
@@ -41,6 +42,13 @@ class Driver(ABC):
         """
         dir=self.get_assets_dir(url)
         return os.path.sep.join([dir, asset.name])
+
+    def get_hash_url(self, url: str) -> str:
+        tohash = url
+        components = url.split(os.path.sep)
+        if Configuration.settings.resource_id_hash_starts_at > 1 and len(components) > Configuration.settings.resource_id_hash_starts_at:
+            tohash = "/".join(url.split(os.path.sep)[Configuration.settings.resource_id_hash_starts_at:])
+        return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
     @staticmethod
     @abstractmethod

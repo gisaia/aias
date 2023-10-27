@@ -293,6 +293,7 @@ The following environment variables must be set to run aproc-service and aproc-p
 | APROC_INDEX_NAME  |
 | APROC_INDEX_LOGIN  |
 | APROC_INDEX_PWD  |
+| APROC_RESOURCE_ID_HASH_STARTS_AT  |
 
 ### Using `ingest` and `directory_ingest`
 

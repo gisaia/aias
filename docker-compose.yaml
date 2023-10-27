@@ -120,6 +120,7 @@ services:
       - APROC_INDEX_NAME=${APROC_INDEX_NAME}
       - APROC_INDEX_LOGIN=${APROC_INDEX_LOGIN:-None}
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
+      - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT:-3}
     volumes:
       - ./test/inputs:/inputs:ro
       - ./outbox/:/outbox
@@ -208,6 +209,7 @@ services:
       - APROC_INDEX_NAME=${APROC_INDEX_NAME}
       - APROC_INDEX_LOGIN=${APROC_INDEX_LOGIN:-None}
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
+      - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT}
     volumes:
       - ./test/inputs:/inputs:ro
     ports:

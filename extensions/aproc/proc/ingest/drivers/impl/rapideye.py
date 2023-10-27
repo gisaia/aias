@@ -52,8 +52,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return os.path.splitext(os.path.basename(self.tif_path))[0]
-
+        return self.get_hash_url(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
