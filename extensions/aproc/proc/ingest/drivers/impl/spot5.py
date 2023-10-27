@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid, get_id
+from extensions.aproc.proc.ingest.drivers.impl.utils import setup_gdal, get_geom_bbox_centroid, get_hash_url
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -49,7 +49,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return self.get_hash_url(url)
+        return get_hash_url(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:

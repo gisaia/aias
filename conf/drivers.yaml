@@ -1,6 +1,7 @@
 inputs_directory: $INGESTED_FOLDER|/inputs
 max_number_of_archive_for_ingest: 1000000
 aproc_endpoint: $APROC_ENDPOINT_FROM_APROC|http://localhost:8001
+resource_id_hash_starts_at: $APROC_RESOURCE_ID_HASH_STARTS_AT|1
 
 drivers:
   -

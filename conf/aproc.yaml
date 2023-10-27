@@ -1,7 +1,6 @@
 celery_broker_url: $CELERY_BROKER_URL|pyamqp://guest:guest@127.0.0.1:5672//
 celery_result_backend: $CELERY_RESULT_BACKEND|redis://127.0.0.1:6379/0
 airs_endpoint: $AIRS_ENDPOINT|http://127.0.0.1:8000/arlas/airs
-resource_id_hash_starts_at: $APROC_RESOURCE_ID_HASH_STARTS_AT|1
 processes:
   -
     name: ingest

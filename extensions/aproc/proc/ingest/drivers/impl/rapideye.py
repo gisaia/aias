@@ -6,7 +6,7 @@ from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Observa
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal, get_id)
+    get_geom_bbox_centroid, setup_gdal, get_hash_url)
 
 
 class Driver(ProcDriver):
@@ -52,7 +52,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return self.get_hash_url(url)
+        return get_hash_url(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:

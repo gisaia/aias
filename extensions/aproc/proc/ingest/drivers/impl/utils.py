@@ -1,3 +1,7 @@
+import hashlib
+import os
+
+from extensions.aproc.proc.ingest.settings import Configuration
 
 def setup_gdal():
     from osgeo import gdal
@@ -14,6 +18,7 @@ def get_id(url):
 
 def get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat):
     import json
+
     from osgeo import ogr
     coordinates = [[ul_lon, ul_lat],
                    [ur_lon, ur_lat],
@@ -35,3 +40,11 @@ def get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_l
     # Define centroid
     centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
     return geometry, bbox, centroid
+
+
+def get_hash_url(url: str) -> str:
+    tohash = url
+    components = url.split(os.path.sep)
+    if Configuration.settings.resource_id_hash_starts_at > 1 and len(components) > Configuration.settings.resource_id_hash_starts_at:
+        tohash = "/".join(url.split(os.path.sep)[Configuration.settings.resource_id_hash_starts_at:])
+    return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
