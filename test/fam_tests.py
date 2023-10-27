@@ -37,10 +37,11 @@ class Tests(unittest.TestCase):
         r = requests.post(url=os.path.join(FAM_URL, "archives"), data=PathRequest(path=root.path + "/DIMAP").model_dump_json(), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)
         archive = Archive(**(json.loads(r.content)[0]))
+        print(archive.model_dump_json())
         self.assertEquals(archive.name, "IMG_SPOT6_MS_001_A")
         self.assertEquals(archive.path, root.path + "/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A")
         self.assertEquals(archive.is_dir, True)
-        self.assertEquals(archive.id, "inputs-DIMAP-PROD_SPOT6_001-VOL_SPOT6_001_A-IMG_SPOT6_MS_001_A")
+        self.assertEquals(archive.id, "SPOT6_MS_202308241027346_SEN_SPOT6_20230904_0941551hqi8awn5jlpu_1")
         self.assertEquals(archive.driver_name, "dimap")
 
 

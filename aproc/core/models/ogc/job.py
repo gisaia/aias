@@ -24,3 +24,11 @@ class StatusInfo(BaseModel):
 
     # This field is specific to airs : it stores the resource id that is the input of a process
     resourceID: str | None = Field(default=None)
+
+
+class StatusInfoList(BaseModel):
+    class Config:
+        extra = Extra.allow
+
+    status_list: list[StatusInfo] | None = Field(default=None)
+    total: int | None = Field(default=None)

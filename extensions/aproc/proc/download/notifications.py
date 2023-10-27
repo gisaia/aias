@@ -62,7 +62,7 @@ class Notifications:
                     Notifications.__getES().indices.create(index=Configuration.settings.index_for_download.index_name, mappings=mapping)
                     LOGGER.info("Mapping {} updated.".format(Configuration.settings.index_for_download.index_name))
                 else:
-                    LOGGER.info("Index {} found.".format(Configuration.settings.index_for_download.index_name))
+                    LOGGER.debug("Index {} found.".format(Configuration.settings.index_for_download.index_name))
 
                 Notifications.__getES().index(
                     index=Configuration.settings.index_for_download.index_name,

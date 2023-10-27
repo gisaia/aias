@@ -7,6 +7,7 @@ from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    InlineOrRefData, LandingPage, Link,
                                    ProcessDescription, ProcessList,
                                    ProcessSummary, StatusInfo)
+from aproc.core.models.ogc.job import StatusInfoList
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
@@ -34,9 +35,10 @@ def get_conformance() -> Conforms:
 
 
 @ROUTER.get("/jobs",
-            response_model_exclude_none=True)
-def get_jobs(page: int = 0, page_size: int = 10):
-    return Processes.list_jobs(page=page, page_size=page_size)
+            response_model_exclude_none=True,
+            response_model=StatusInfoList)
+def get_jobs(offset: int = 0, limit: int = 10, process_id: str = None, status: str = None):
+    return Processes.list_jobs(offset=offset, limit=limit, process_id=process_id, status=status)
 
 @ROUTER.get("/jobs/{jobId}",
             response_model_exclude_none=True,
