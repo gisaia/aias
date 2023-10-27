@@ -29,19 +29,19 @@ class Tests(unittest.TestCase):
         r = requests.get(url=os.path.join(FAM_URL, "root"))
         root: File = File(**r.json())
         r = requests.post(url=os.path.join(FAM_URL, "files"), data=PathRequest(path=root.path + "/DIMAP").model_dump_json(), headers={"Content-Type": "application/json"})
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
     def test_archive(self):
         r = requests.get(url=os.path.join(FAM_URL, "root"))
         root: File = File(**r.json())
         r = requests.post(url=os.path.join(FAM_URL, "archives"), data=PathRequest(path=root.path + "/DIMAP").model_dump_json(), headers={"Content-Type": "application/json"})
-        self.assertTrue(r.ok)
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         archive = Archive(**(json.loads(r.content)[0]))
         print(archive.model_dump_json())
         self.assertEquals(archive.name, "IMG_SPOT6_MS_001_A")
         self.assertEquals(archive.path, root.path + "/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A")
         self.assertEquals(archive.is_dir, True)
-        self.assertEquals(archive.id, "SPOT6_MS_202308241027346_SEN_SPOT6_20230904_0941551hqi8awn5jlpu_1")
+        self.assertEquals(archive.id, "3c3207184afc7982192f8185bbbd78b98705c4b46307d786107ea3715d47c900")
         self.assertEquals(archive.driver_name, "dimap")
 
 

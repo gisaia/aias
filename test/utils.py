@@ -38,11 +38,9 @@ def get_client():
 
 def setUpTest():
     import airs.core.product_registration as rs
-    print("Set up test environment")
     es = elasticsearch.Elasticsearch(index_endpoint_url)
     try:
         # Clean the index
-        print("delete {}".format(index_collection_prefix+"_"+COLLECTION))
         es.indices.delete(index=index_collection_prefix+"_"+COLLECTION)
     except Exception:
         ...

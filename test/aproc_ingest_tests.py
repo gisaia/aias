@@ -1,17 +1,16 @@
+import json
 import unittest
 from time import sleep
+
 import requests
-import json
-from aproc.core.models.ogc.process import ProcessList, ProcessDescription
-from extensions.aproc.proc.ingest.directory_ingest_process import InputDirectoryIngestProcess
-from extensions.aproc.proc.ingest.ingest_process import AprocProcess
+from utils import APROC_ENDPOINT, COLLECTION, setUpTest
 
-from utils import APROC_ENDPOINT, setUpTest, dir_to_list, filter_data, AIRS_URL, COLLECTION
-import os
-
+from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
+from aproc.core.models.ogc.process import ProcessDescription, ProcessList
+from extensions.aproc.proc.ingest.directory_ingest_process import \
+    InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
-from aproc.core.models.ogc import (Execute)
 
 
 class Tests(unittest.TestCase):

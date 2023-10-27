@@ -1,7 +1,6 @@
 import hashlib
 import os
 from abc import ABC, abstractmethod
-
 from airs.core.models.model import Asset, Item
 from aproc.core.logger import Logger
 

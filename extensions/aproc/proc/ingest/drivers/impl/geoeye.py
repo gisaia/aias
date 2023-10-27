@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_id
+    get_geom_bbox_centroid, get_hash_url
 
 
 class Driver(ProcDriver):
@@ -53,8 +53,9 @@ class Driver(ProcDriver):
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
+    # Implements drivers method
     def get_item_id(self, url: str) -> str:
-        return os.path.splitext(os.path.basename(self.file_name))[0]
+        return get_hash_url(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
