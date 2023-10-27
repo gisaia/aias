@@ -1,24 +1,24 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { DynamicFileNode } from '@tools/interface';
+import { ArlasSettingsService } from 'arlas-wui-toolkit';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export class DynamicFileNode {
-  constructor(
-    public name: string,
-    public path: string,
-    public level = 1,
-    public is_dir = false,
-    public isLoading = false,
-  ) { }
-}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class FamService {
   private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
+  private famSettings: { url?: string; default_path?: string; collection?: string; } = {};
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private settingsService: ArlasSettingsService
+  ) {
+
+  }
 
   dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
 
@@ -26,16 +26,24 @@ export class FamService {
     this.options = options;
   }
 
+  public setSettings(settings: any) {
+    this.famSettings = settings;
+  }
+
+  public getRoot(): Observable<any> {
+    return this.http.get(this.famSettings?.url + '/root', this.options);
+  }
+
   public getFiles(path: string): Observable<any> {
-    return this.http.post('https://arlas.crts-staff.local/fam/files', { path }, this.options);
+    return this.http.post(this.famSettings?.url + '/files', { path, size: 50 }, this.options);
   }
 
   public getArchive(path: string): Observable<any> {
-    return this.http.post('https://arlas.crts-staff.local/fam/archives', { path, size: 5 }, this.options);
+    return this.http.post(this.famSettings?.url + '/archives', { path, size: 20 }, this.options);
   }
 
-  public initialize() {
-    this.getFiles('CRTS').subscribe({
+  public initializeFiles(path: string) {
+    this.getFiles(path).subscribe({
       next: (data: any) => {
         const nodes: DynamicFileNode[] = [];
         data.forEach((n: any) => {

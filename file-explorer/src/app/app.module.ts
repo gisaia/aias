@@ -35,6 +35,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { ExplorerComponent } from './components/explorer/explorer.component';
 import { ArchivesComponent } from './components/archives/archives.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TasksComponent } from './components/tasks/tasks.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -50,7 +52,9 @@ export function createTranslateLoader(http: HttpClient) {
     AppComponent,
     HomeComponent,
     ExplorerComponent,
-    ArchivesComponent
+    ArchivesComponent,
+    TasksComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,

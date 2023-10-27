@@ -32,7 +32,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/settings.yaml"
+              "src/settings.yaml",
+              "src/styles"
             ],
             "styles": [
               "src/file-explorer-theme.scss",
@@ -101,7 +102,9 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/settings.yaml",
+              "src/styles"
             ],
             "styles": [
               "src/file-explorer-theme.scss",

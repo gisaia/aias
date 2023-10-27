@@ -1,1 +1,57 @@
-<p>archives works!</p>
+<div class="archives-content">
+  <mat-list class="archives-list">
+    <mat-list-item *ngFor="let archive of archives" class="archive">
+      <span *ngIf="archive.is_dir; else file" class="material-symbols-outlined list-icon" mat-list-icon>
+        folder
+      </span>
+      <ng-template #file>
+        <span class="material-symbols-outlined list-icon">
+          note
+        </span>
+      </ng-template>
+      <div class="item-content">
+        <div class="info">
+          <div mat-line class="label">
+            {{archive.name}}
+          </div>
+          <div mat-line class="detail">{{'last update:' | translate}} {{archive.creation_date | date:'short'}}</div>
+        </div>
+        <div class="actions">
+          <mat-chip-list><mat-chip class="driver-chip">{{archive.driver_name}}</mat-chip></mat-chip-list>
+          <span class="material-symbols-outlined no-pointer" *ngIf="archive.status === 'successful'"
+            [matTooltip]="'Already activated' | translate">
+            check_circle
+          </span>
+          <span class="material-symbols-outlined no-pointer" *ngIf="archive.status === 'failed' || !archive.status"
+            [matTooltip]="'Not activated' | translate">
+            unpublished
+          </span>
+          <span class="material-symbols-outlined no-pointer" *ngIf="archive.status === 'accepted'"
+            [matTooltip]="'Accepted' | translate">
+            pause_circle
+          </span>
+          <span class="material-symbols-outlined no-pointer" *ngIf="archive.status === 'running'"
+            [matTooltip]="'Running' | translate">
+            change_circle
+          </span>
+          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'failed' || !archive.status"
+            (click)="activate(archive)" [matTooltip]="'Activate this file'| translate">
+            add_circle
+          </span>
+          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
+            (click)="delete(archive)" [matTooltip]="'Delete this archive'| translate">
+            delete
+          </span>
+        </div>
+      </div>
+
+    </mat-list-item>
+  </mat-list>
+
+  <div class="no-archive" *ngIf="!archives">
+    {{'Select a folder to display list of available archives' | translate}}
+  </div>
+  <div class="no-archive" *ngIf="!!archives && archives.length === 0">
+    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{this.archivesPath}}
+  </div>
+</div>

@@ -1,0 +1,34 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+.tasks-content {
+  max-height: calc($tasksHeight - $sectionTitleHeight);
+  overflow: auto;
+
+  .tasks-table {
+    width: 100%;
+
+    tr.mat-header-row {
+      height: 36px !important;
+    }
+  }
+
+  .mat-chip{
+    background-color: white;
+  }
+
+  .mat-chip-successful {
+    color: $successColor;
+    border: 1px solid $successColor;
+  }
+
+  .mat-chip-accepted {
+    color: $infoColor;
+    border: 1px solid $infoColor;
+  }
+
+  .mat-chip-running {
+    color: $progressColor;
+    border: 1px solid $progressColor;
+  }
+}

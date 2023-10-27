@@ -15,3 +15,4 @@ env_aias/
 
 file-explorer/node_modules
 file-explorer/.angular
+file-explorer/dist

@@ -1,13 +1,47 @@
+<div class="top-menu">
+  {{'File Explorer' | translate}}
+  <div *ngIf="!!userEmail" class="menu" [matMenuTriggerFor]="menu" [class.open]="isMenuOpen"
+    (menuOpened)="isMenuOpen = true" (menuClosed)="isMenuOpen = false">
+    <span class="label">{{userEmail}}</span>
+    <span class="material-symbols-outlined" [class.rotate]="isMenuOpen">
+      expand_circle_down
+    </span>
+  </div>
+  <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item (click)="logout()">
+      <span class="material-symbols-outlined" [matTooltip]="'Logout' | translate">
+        lock_open
+      </span>
+      <span>{{'Logout' | translate}}</span>
+    </button>
+  </mat-menu>
+</div>
+
 <div class="content">
-  <div class="files">
+  <div class="files" [class.reduce]="!showTasks">
     <div class="explorer">
-      <app-explorer></app-explorer>
+      <div class="section-title">
+        {{'Files' | translate}}
+        <span class="material-symbols-outlined" [matTooltip]="'Collapse all' | translate"
+          (click)="collapseEvent.next(true)">
+          collapse_all
+        </span>
+      </div>
+      <app-explorer [collapseAllSubject]="collapseEvent" (archivePath)="archivesPath = $event"></app-explorer>
     </div>
     <div class="archives">
-      <app-archives></app-archives>
+      <div class="section-title">{{'Archives' | translate}}</div>
+      <app-archives [archivesPath]="archivesPath"></app-archives>
     </div>
   </div>
-  <div class="jobs">
-
+  <div class="jobs" [class.reduce]="!showTasks">
+    <div class="section-title">
+      {{'Tasks' | translate}}
+      <span class="material-symbols-outlined" [class.rotate]="!showTasks" [matTooltip]="'Toggle task panel' | translate"
+        (click)="showTasks = !showTasks">
+        expand_more
+      </span>
+    </div>
+    <app-tasks *ngIf="showTasks"></app-tasks>
   </div>
 </div>

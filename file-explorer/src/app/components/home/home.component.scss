@@ -1,12 +1,90 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+@mixin section-title() {
+  font-size: 20px;
+  border-bottom: 1px solid $borderColor;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .material-symbols-outlined {
+    cursor: pointer;
+    &.rotate {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.top-menu {
+  height: $topMenuHeight;
+  background-color: $primaryColor;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 0 10px;
+  font-size: 1.5em;
+
+  .menu {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    gap: 0 5px;
+    cursor: pointer;
+    padding: 5px 8px;
+
+    &:hover,
+    &.open {
+      background-color: white;
+      color: $primaryColor;
+      border-radius: 5px;
+    }
+
+    .rotate {
+      transform: rotate(180deg);
+    }
+  }
+}
+
 .content {
   display: flex;
   flex-direction: column;
+  height: calc(100vh - $topMenuHeight);
 
   .files {
     display: flex;
+    height: calc(100% - $tasksHeight - 1px); // 1px => border bottom
+    border-bottom: 1px solid $borderColor;
 
-    .explorer, .archives{
+    &.reduce {
+      height: calc(100% - $sectionTitleHeight - 1px); // 1px => border bottom
+    }
+
+    .archives {
       flex: 1;
+      width: 100%;
+      .section-title {
+        @include section-title();
+      }
+    }
+    .explorer {
+      flex: 1;
+      border-right: 1px solid $borderColor;
+      .section-title {
+        @include section-title();
+      }
+    }
+  }
+
+  .jobs {
+    height: $tasksHeight;
+    .section-title {
+      @include section-title();
+    }
+    &.reduce {
+      height: $sectionTitleHeight;
     }
   }
 }

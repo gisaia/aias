@@ -1,7 +1,8 @@
 import { CollectionViewer, DataSource, SelectionChange } from "@angular/cdk/collections";
-import { DynamicFileNode, FamService } from "../services/fam/fam.service";
+import { FamService } from "../services/fam/fam.service";
 import { BehaviorSubject, Observable, finalize, map, merge } from "rxjs";
 import { FlatTreeControl } from "@angular/cdk/tree";
+import { DynamicFileNode } from "./interface";
 
 export class DynamicDataSource implements DataSource<DynamicFileNode> {
   dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
@@ -52,35 +53,34 @@ export class DynamicDataSource implements DataSource<DynamicFileNode> {
    */
   toggleNode(node: DynamicFileNode, expand: boolean) {
     node.isLoading = true;
-
-    this.famService.getFiles(node.path)
-      .subscribe({
-        next: (childrens: any[]) => {
-
-          const index = this.data.indexOf(node);
-          if (!childrens || index < 0) {
-            // If no children, or cannot find the node
-            return;
-          }
-
-          if (expand) {
+    const index = this.data.indexOf(node);
+    if (expand) {
+      this.famService.getFiles(node.path)
+        .subscribe({
+          next: (childrens: any[]) => {
+            if (!childrens || index < 0) {
+              // If no children, or cannot find the node
+              return;
+            }
             const nodes = childrens.map(
               child => this.famService.generateNode(child, node.level + 1)
             );
             this.data.splice(index + 1, 0, ...nodes);
-          } else {
-            let count = 0;
-            for (
-              let i = index + 1;
-              i < this.data.length && this.data[i].level > node.level;
-              i++, count++
-            ) { }
-            this.data.splice(index + 1, count);
+            this.dataChange.next(this.data);
+            node.isLoading = false
           }
-          this.dataChange.next(this.data);
-          node.isLoading = false
-        }
-      });
+        });
+    } else {
+      let count = 0;
+      for (
+        let i = index + 1;
+        i < this.data.length && this.data[i].level > node.level;
+        i++, count++
+      ) { }
+      this.data.splice(index + 1, count);
+      this.dataChange.next(this.data);
+      node.isLoading = false
+    }
 
   }
 }

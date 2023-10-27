@@ -1,0 +1,20 @@
+@import "~@angular/material/theming";
+
+$primary-palette: mat-palette($mat-blue, 800);
+$accent-palette: mat-palette($mat-blue, 800);
+$warn-palette: mat-palette($mat-red);
+
+
+$primaryColor: mat-color($primary-palette);
+$accentColor: mat-color($accent-palette);
+
+$infoColor: #0c5460;
+$infoBackgroundColor: #d1ecf1;
+$infoBorderColor: #bee5eb;
+
+$warnColor: #f0ad4e;
+$errorColor: #d43f3a;
+$successColor: #5cb85c;
+$progressColor: #337ab7;
+
+$borderColor: #dfdfdf;

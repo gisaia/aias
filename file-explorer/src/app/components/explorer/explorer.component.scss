@@ -1,0 +1,30 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+.files-tree {
+  overflow: auto;
+  height: calc(100% - $sectionTitleHeight);
+  .file {
+    .folder {
+      cursor: pointer;
+    }
+    .name {
+      padding: 10px 5px;
+    }
+    .active {
+      background-color: $primaryColor;
+      padding: 10px 5px;
+      color: white;
+    }
+    .activate-btn {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      padding-left: 10px;
+      cursor: pointer;
+    }
+    .loader {
+      margin-left: 10px;
+    }
+  }
+}

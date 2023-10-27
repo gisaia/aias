@@ -1,0 +1,61 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+.archives-content {
+  height: calc(100% - $sectionTitleHeight);
+  overflow: auto;
+  .archives-list {
+    .archive {
+      height: 48px;
+
+      &:nth-child(odd) {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .list-icon {
+        width: 24px;
+        height: 20px;
+        font-size: 20px;
+      }
+      .item-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        .info {
+          .label {
+            font-size: 14px;
+          }
+          .detail {
+            color: rgba(0, 0, 0, 0.58);
+            font-size: 12px;
+          }
+        }
+        .actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          .no-pointer {
+            cursor: default;
+          }
+          .pointer {
+            cursor: pointer;
+          }
+        }
+        .driver-chip {
+          border: 1px solid rgba(0, 0, 0, 0.75);
+          background: white;
+          color: rgba(0, 0, 0, 0.75);
+        }
+      }
+    }
+  }
+
+  .no-archive {
+    padding: 10px;
+    border: 1px solid $infoBorderColor;
+    color: $infoColor;
+    background-color: $infoBackgroundColor;
+    font-size: 14px;
+  }
+}
