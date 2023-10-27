@@ -27,14 +27,9 @@ LOGGER = Logger.logger
 
 
 def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name+" "+state+" "+str(meta))
+    LOGGER.info(task.name + " " + state + " "  + str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
-
-# TODO TO BE REMOVED
-class ItemDownloadProcess(BaseModel):
-    collection: str | None = Field(default=None, title="Collection name", description="Name of the collection where the item is registered", minOccurs=1, maxOccurs=1)
-    item_id: str | None = Field(default=None, title="Item's id to be downloaded")
 
 
 class InputDownloadProcess(BaseModel):
@@ -49,15 +44,15 @@ class OutputDownloadProcess(BaseModel):
 
 
 summary: ProcessSummary = ProcessSummary(
-            title="Download an item.",
-            description="Download an item from the catalog.",
-            keywords=["Download", "Export"],
-            id="download",
-            version="0.1",
-            jobControlOptions=[JobControlOptions.async_execute],
-            outputTransmission=[TransmissionMode.reference],
-            # TODO: provide the links if any => link could be the execute endpoint
-            links=[]
+    title="Download an item.",
+    description="Download an item from the catalog.",
+    keywords=["Download", "Export"],
+    id="download",
+    version="0.1",
+    jobControlOptions=[JobControlOptions.async_execute],
+    outputTransmission=[TransmissionMode.reference],
+    # TODO: provide the links if any => link could be the execute endpoint
+    links=[]
 )
 
 description: ProcessDescription = ProcessDescription(
@@ -86,7 +81,7 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
-    def __get_download_location__(item: Item, send_to: str, format:str) -> (str, str):
+    def __get_download_location__(item: Item, send_to: str, format: str) -> (str, str):
         if send_to is None: send_to = "anonymous"
         target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id)
         if not os.path.exists(target_directory):
@@ -122,6 +117,7 @@ class AprocProcess(Process):
             else:
                 LOGGER.error("no token in header")
         except Exception as e:
+            LOGGER.error("Can not open token from header")
             LOGGER.exception(e)
         for request in requests:
             collection: str = request.get("collection")
@@ -133,13 +129,14 @@ class AprocProcess(Process):
                 "collection": collection,
                 "target_directory": None,
                 "file_name": None,
-                "error": None
+                "error": None,
+                "arlas-user-email": send_to
             }
             # RGPD : log level is info
             LOGGER.debug("download request {}/{} for {}".format(collection, item_id, send_to))
 
-            Notifications.try_send_to(Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            Notifications.try_send_to(Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+            Notifications.report(None, Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+            Notifications.report(None, Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
 
             item: Item = AprocProcess.__get_item__(collection=collection, item_id=item_id, headers=headers)
             if item is None:
@@ -147,7 +144,7 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                 mail_context["error"] = error_msg
-                Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
 
             driver: Driver = Drivers.solve(item)
@@ -166,8 +163,8 @@ class AprocProcess(Process):
                         crop_wkt=crop_wkt,
                         target_projection=target_projection,
                         target_format=target_format)
-                    Notifications.try_send_to(Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context)
-                    Notifications.try_send_to(Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                    Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
+                    Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                     LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
                 except Exception as e:
@@ -175,6 +172,7 @@ class AprocProcess(Process):
                     LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)
+                    Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                     mail_context["error"] = error_msg
                     raise Exception(error_msg)
             else:
@@ -182,7 +180,7 @@ class AprocProcess(Process):
                 LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                 LOGGER.error(error_msg)
                 mail_context["error"] = error_msg
-                Notifications.try_send_to(Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
 
     def __get_item__(collection: str, item_id: str, headers: dict[str, str] = {}):

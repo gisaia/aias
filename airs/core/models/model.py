@@ -282,7 +282,7 @@ class Properties(BaseModel, extra=Extra.allow):
 class Item(BaseModel, extra=Extra.allow):
     collection                    :str              | None = Field(default=None, title="Name of the collection the item belongs to.", max_length=300)
     catalog                       :str              | None = Field(default=None, title="Name of the catalog the item belongs to.", max_length=300)
-    id                            :str              | None  = Field(default=None, title="Provider identifier. Must be unique within the STAC.", max_length=300)
+    id                            :str              | None  = Field(default=None, title="Unique item identifier. Must be unique within the collection.", max_length=300)
     geometry                      :Dict[str, Any]   | None = Field(default=None, title="Defines the full footprint of the asset represented by this item, formatted according to `RFC 7946, section 3.1 (GeoJSON) <https://tools.ietf.org/html/rfc7946>`_")
     bbox                          :List[float]      | None = Field(default=None, title="Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2*n where n is the number of dimensions. Could also be None in the case of a null geometry.")
     centroid                      :List[float]      | None = Field(default=None, title="Coordinates (lon/lat) of the geometry's centroid.")

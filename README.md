@@ -289,6 +289,10 @@ The following environment variables must be set to run aproc-service and aproc-p
 | APROC_DOWNLOAD_REQUEST_CONTENT_USER  |
 | APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN  |
 | APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN  |
+| APROC_INDEX_ENDPOINT_URL  |
+| APROC_INDEX_NAME  |
+| APROC_INDEX_LOGIN  |
+| APROC_INDEX_PWD  |
 
 ### Using `ingest` and `directory_ingest`
 

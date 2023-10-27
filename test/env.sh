@@ -61,6 +61,8 @@ export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
 export APROC_PATH_TO_WINDOWS=true
 export APROC_LOGGER_LEVEL=DEBUG
 export APROC_ENDPOINT_FROM_APROC=http://aproc-service:8001/arlas/aproc
+export APROC_INDEX_ENDPOINT_URL=http://elasticsearch:9200
+export APROC_INDEX_NAME=aproc_downloads
 
 # AGATE
 export AGATE_PREFIX=/arlas/agate
