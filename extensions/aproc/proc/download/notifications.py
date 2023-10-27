@@ -108,4 +108,4 @@ class Notifications:
         if Configuration.settings.index_for_download.login:
             return elasticsearch.Elasticsearch(Configuration.settings.index_for_download.endpoint_url, basic_auth=(Configuration.settings.index_for_download.login, Configuration.settings.index_for_download.pwd), verify_certs=False)
         else:
-            return elasticsearch.Elasticsearch(Configuration.settings.index_for_download.endpoint_url)
+            return elasticsearch.Elasticsearch(Configuration.settings.index_for_download.endpoint_url, verify_certs=False)

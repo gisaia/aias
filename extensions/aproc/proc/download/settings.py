@@ -42,7 +42,7 @@ class Settings(BaseModel, extra='allow'):
     email_request_content_admin: str = Field(title="Content of the email to be sent to the admins when download request submitted")
     index_for_download: Index = Field(title="Configuration of the elasticsearch index for reporting downloads")
     arlaseo_mapping_url: str = Field(title="Location of the arlas eo mapping")
-    download_mapping_url: str = Field(title="Location of the arlas eo mapping")
+    download_mapping_url: str = Field(title="Location of the download requests mapping")
 
 class Configuration:
     settings: Settings | None = Field(title="aproc Download service configuration")
