@@ -38,6 +38,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -61,6 +62,7 @@ export function createTranslateLoader(http: HttpClient) {
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
+    ArlasToolkitSharedModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
@@ -87,6 +89,12 @@ export function createTranslateLoader(http: HttpClient) {
     LoginModule,
     RouterModule,
     HttpClientModule,
+    ToastrModule.forRoot({
+      disableTimeOut: true,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+      closeButton: true
+    }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

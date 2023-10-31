@@ -4,9 +4,11 @@ import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialo
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
+import { StatusService } from '@services/status/status.service';
 import { Archive, Process, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
 
 @Component({
   selector: 'app-archives',
@@ -23,9 +25,11 @@ export class ArchivesComponent implements OnInit, OnChanges {
   public constructor(
     private famService: FamService,
     private jobService: JobService,
+    private statusService: StatusService,
     private dialog: MatDialog,
     private translate: TranslateService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private toastr: ToastrService
   ) { }
 
   public ngOnInit(): void {
@@ -42,7 +46,7 @@ export class ArchivesComponent implements OnInit, OnChanges {
               return forkJoin(
                 archives.map((archive: Archive) => zip(
                   of(archive),
-                  this.jobService.getResourceStatus(archive.id)
+                  this.statusService.getResourceStatus(archive.id).pipe(catchError(() => of([])))
                 ))
               )
             } else {
@@ -51,16 +55,25 @@ export class ArchivesComponent implements OnInit, OnChanges {
           }),
           map(data => data.map(result => {
             const archive: Archive = result[0];
-            const resourceInfo: Process[] = result[1];
-            if (resourceInfo.length > 0) {
-              archive.status = ProcessStatus[resourceInfo[0].status];
+            const resourceId: any = result[1].id;
+            if (!!resourceId) {
+              archive.status = ProcessStatus.successful;
             }
             return archive;
           })),
           finalize(() => this.spinner.hide('archives'))
         )
         .subscribe({
-          next: (data) => this.archives = data
+          next: (data) => this.archives = data,
+          error: (err: Response) => {
+            if( err.status === 404){
+              this.toastr.error(this.translate.instant('Unable to retrieve archives'))
+            }
+            if( err.status === 403){
+              this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+              // TODO: redirect to specific page
+            }
+          }
         })
     }
   }
@@ -73,8 +86,18 @@ export class ArchivesComponent implements OnInit, OnChanges {
       next: (confirm) => {
         if (!!confirm) {
           this.jobService.ingestArchive(archive).subscribe({
-            next: (data) => {
+            next: () => {
               this.jobService.refreshTasks.next(true);
+              this.toastr.success(this.translate.instant('Activation started'))
+            },
+            error: (err: Response) => {
+              if( err.status === 404){
+                this.toastr.error(this.translate.instant('Activation failed'))
+              }
+              if( err.status === 403){
+                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+                // TODO: redirect to specific page
+              }
             }
           });
         }

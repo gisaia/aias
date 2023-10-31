@@ -1,7 +1,9 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Archive, DynamicFileNode } from '@tools/interface';
 import { ArlasSettingsService } from 'arlas-wui-toolkit';
+import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 
@@ -10,15 +12,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class FamService {
-  private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
+  private options = {};
   private famSettings: { url?: string; default_path?: string; collection?: string; } = {};
 
   constructor(
     private http: HttpClient,
-    private settingsService: ArlasSettingsService
-  ) {
-
-  }
+    private toastr: ToastrService,
+    private translate: TranslateService
+  ) { }
 
   dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
 
@@ -50,6 +51,15 @@ export class FamService {
           nodes.push(this.generateNode(n, 0));
         })
         this.dataChange.next(nodes)
+      },
+      error: (err: Response) => {
+        if( err.status === 404){
+          this.toastr.error(this.translate.instant('Unable to retrieve files'))
+        }
+        if( err.status === 403){
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          // TODO: redirect to specific page
+        }
       }
     })
   }

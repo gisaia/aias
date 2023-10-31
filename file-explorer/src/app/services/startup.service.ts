@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ArlasConfigService, ArlasIamService, ArlasSettings, ArlasStartupService } from 'arlas-wui-toolkit';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from './job/job.service';
+import { StatusService } from './status/status.service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,9 @@ export class StartupService {
     private translateService: TranslateService,
     private arlasIamService: ArlasIamService,
     private famService: FamService,
-    private jobService: JobService) { }
+    private jobService: JobService,
+    private statusService: StatusService
+    ) { }
 
   public init(): Promise<string> {
     return this.arlasStartupService.applyAppSettings()
@@ -62,6 +65,12 @@ export class StartupService {
               });
               this.jobService.setSettings((s as any).jobs);
               this.jobService.setOptions({
+                headers: {
+                  Authorization: 'bearer ' + loginData.accessToken
+                }
+              });
+              this.statusService.setSettings((s as any).status);
+              this.statusService.setOptions({
                 headers: {
                   Authorization: 'bearer ' + loginData.accessToken
                 }

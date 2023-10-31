@@ -9,16 +9,13 @@ import { Observable, Subject } from 'rxjs';
 })
 export class JobService {
   private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
-  private jobSettings: { url?: string; collection?: string; } = {};
+  private jobSettings: { url?: string; collection?: string; catalog?: string; } = {};
 
   public refreshTasks: Subject<boolean> = new Subject();
 
   constructor(
-    private http: HttpClient,
-    private settingsService: ArlasSettingsService
-  ) {
-
-  }
+    private http: HttpClient
+  ) {}
 
   public setOptions(options: any) {
     this.options = options;
@@ -33,7 +30,7 @@ export class JobService {
       inputs: {
         url: archive.path,
         collection: this.jobSettings?.collection || '',
-        catalog: archive.driver_name
+        catalog: this.jobSettings?.catalog || 'catalog'
       },
       outputs: null,
       response: "raw",
@@ -45,7 +42,7 @@ export class JobService {
   public ingestDirectory(node: DynamicFileNode) {
     const payload: IngestPayload = {
       inputs: {
-        catalog: '',
+        catalog: this.jobSettings?.catalog || 'catalog',
         collection: this.jobSettings?.collection || '',
         directory: node.path
       },
@@ -57,7 +54,7 @@ export class JobService {
   }
 
   public getTasks(page: number = 0, pageSize: number = 10): Observable<ProcessResult> {
-    return this.http.get(this.jobSettings?.url + '/jobs?page=' + page + '&page_size=' + pageSize + '&process_id=ingest', this.options) as Observable<ProcessResult>;
+    return this.http.get(this.jobSettings?.url + '/jobs?offset=' + page + '&limit=' + pageSize + '&process_id=ingest', this.options) as Observable<ProcessResult>;
   }
 
   public getResourceStatus(archiveId: string): Observable<Process[]> {

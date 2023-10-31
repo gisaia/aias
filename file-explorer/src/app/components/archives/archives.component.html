@@ -22,33 +22,19 @@
             [matTooltip]="'Already activated' | translate">
             check_circle
           </span>
-          <span class="material-symbols-outlined no-pointer failed"
-            *ngIf="archive.status === 'failed'" [matTooltip]="'Activation failed' | translate">
-            unpublished
-          </span>
+          
           <span class="material-symbols-outlined no-pointer not-activated"
             *ngIf="!archive.status" [matTooltip]="'Not activated' | translate">
             unpublished
           </span>
-          <span class="material-symbols-outlined no-pointer accepted" *ngIf="archive.status === 'accepted'"
-            [matTooltip]="'Accepted' | translate">
-            pause_circle
-          </span>
-          <span class="material-symbols-outlined no-pointer running" *ngIf="archive.status === 'running'"
-            [matTooltip]="'Running' | translate">
-            change_circle
-          </span>
-          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'failed' || !archive.status"
+          
+          <span class="material-symbols-outlined pointer" *ngIf="!archive.status"
             (click)="activate(archive)" [matTooltip]="'Activate this file'| translate">
             add_circle
           </span>
           <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
-            (click)="delete(archive)" [matTooltip]="'Delete this archive'| translate">
-            delete
-          </span>
-          <span class="material-symbols-outlined no-pointer disabled" *ngIf="archive.status === 'running' || archive.status === 'accepted'"
-             [matTooltip]="'Delete this archive'| translate">
-            delete
+            (click)="activate(archive)" [matTooltip]="'Re-activate'| translate">
+            add_circle
           </span>
         </div>
       </div>

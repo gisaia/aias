@@ -12,3 +12,7 @@ file_manager:
 jobs:
   url: https://arlas.crts-staff.local/aproc
   collection: 'digitalearth.africa'
+  catalog: 'crts'
+status:
+  url: https://arlas.crts-staff.local/airs
+  collection: 'digitalearth.africa'

@@ -1,8 +1,10 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { TranslateService } from '@ngx-translate/core';
 import { JobService } from '@services/job/job.service';
-import { Process, ProcessResult } from '@tools/interface';
+import { Process, ProcessResult, ProcessStatus } from '@tools/interface';
+import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 
 @Component({
@@ -35,7 +37,11 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   public refreshSub!: Subscription;
   public unsubscribeRefreshTasks = new Subject<boolean>();
 
-  public constructor(private jobService: JobService) { }
+  public constructor(
+    private jobService: JobService,
+    private toastr: ToastrService,
+    private translate: TranslateService
+    ) { }
 
 
   public ngOnInit(): void {
@@ -78,6 +84,18 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (pr: ProcessResult) => {
         this.tasks = pr.status_list;
         this.totalProcess = pr.total;
+        if( this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed).length === 0){
+          this.unsubscribeRefreshTasks.next(true);
+        }
+      },
+      error: (err: Response) => {
+        if( err.status === 404){
+          this.toastr.error(this.translate.instant('Unable to retrieve status'))
+        }
+        if( err.status === 403){
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          // TODO: redirect to specific page
+        }
       }
     });
   }

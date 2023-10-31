@@ -1,4 +1,4 @@
-<div class="top-menu">
+<!-- <div class="top-menu">
   {{'File Explorer' | translate}}
   <div *ngIf="!!userEmail" class="menu" [matMenuTriggerFor]="menu" [class.open]="isMenuOpen"
     (menuOpened)="isMenuOpen = true" (menuClosed)="isMenuOpen = false">
@@ -8,14 +8,17 @@
     </span>
   </div>
   <mat-menu #menu="matMenu" xPosition="before">
-    <button mat-menu-item (click)="logout()">
+    <button mat-menu-item (click)="logout()" class="menu-btn">
       <span class="material-symbols-outlined" [matTooltip]="'Logout' | translate">
         lock_open
       </span>
       <span>{{'Logout' | translate}}</span>
     </button>
   </mat-menu>
-</div>
+</div> -->
+<arlas-top-menu>
+  <div left-menu>{{'File Explorer' | translate}}</div>
+</arlas-top-menu>
 
 <div class="content">
   <div class="files" [class.reduce]="!showTasks">

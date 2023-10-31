@@ -8,6 +8,8 @@ import { JobService } from '@services/job/job.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-explorer',
@@ -36,7 +38,8 @@ export class ExplorerComponent implements OnInit {
     private famService: FamService,
     private jobService: JobService,
     private dialog: MatDialog,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private toastr: ToastrService
   ) {
     this.treeControl = new FlatTreeControl<DynamicFileNode>(this.getLevel, this.isExpandable);
     this.dataSource = new DynamicDataSource(this.treeControl, this.famService);
@@ -47,8 +50,17 @@ export class ExplorerComponent implements OnInit {
       this.dataSource.data = data;
     });
     this.famService.getRoot().subscribe({
-      next: (root: any) => {
-        this.famService.initializeFiles(root.path);
+      next: (resp: any) => {
+        this.famService.initializeFiles(resp.path);
+      },
+      error: (err: Response) => {
+        if( err.status === 404){
+          this.toastr.error(this.translate.instant('Unable to retrieve files'))
+        }
+        if( err.status === 403){
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          // TODO: redirect to specific page
+        }
       }
     });
     this.collapseAllSubject.subscribe({
@@ -75,6 +87,15 @@ export class ExplorerComponent implements OnInit {
           this.jobService.ingestDirectory(node).subscribe({
             next: (data) => {
               this.jobService.refreshTasks.next(true);
+            },
+            error: (err: Response) => {
+              if( err.status === 404){
+                this.toastr.error(this.translate.instant('Activation failed'))
+              }
+              if( err.status === 403){
+                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+                // TODO: redirect to specific page
+              }
             }
           });
         }

@@ -38,7 +38,8 @@
             "styles": [
               "src/file-explorer-theme.scss",
               "src/styles.scss",
-              "node_modules/ngx-spinner/animations/line-scale.css"
+              "node_modules/ngx-spinner/animations/line-scale.css",
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
           },
@@ -109,7 +110,9 @@
             ],
             "styles": [
               "src/file-explorer-theme.scss",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/ngx-spinner/animations/line-scale.css",
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
           }
