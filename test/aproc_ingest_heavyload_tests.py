@@ -32,7 +32,7 @@ class Tests(unittest.TestCase):
                             json.dump(d, theia_file)
                     
     def test_ingest_directory(self):
-        inputs = InputDirectoryIngestProcess(directory="theia", collection=COLLECTION, catalog="theia")
+        inputs = InputDirectoryIngestProcess(directory="theia", collection=COLLECTION, catalog="theia", annotations="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code)+": "+str(r.content))

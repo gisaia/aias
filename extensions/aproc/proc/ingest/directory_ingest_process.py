@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 import json
 import os
 
@@ -15,9 +14,9 @@ from aproc.core.models.ogc.execute import Execute
 from aproc.core.processes.process import Process as Process
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
-from extensions.aproc.proc.ingest.drivers.exceptions import DriverException, RegisterException
+from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
-from extensions.aproc.proc.ingest.model import Archive, File
+from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -28,6 +27,7 @@ class InputDirectoryIngestProcess(BaseModel):
     collection: str = Field(title="Collection name", description="Name of the collection where the items will be registered", minOccurs=1, maxOccurs=1)
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered", minOccurs=1, maxOccurs=1)
     directory: str = Field(title="Directory URL", description="URL pointing at a directory containing one or more archives", minOccurs=1, maxOccurs=1)
+    annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
 
 
 class OutputDirectoryIngestProcess(BaseModel):
@@ -35,15 +35,15 @@ class OutputDirectoryIngestProcess(BaseModel):
 
 
 summary: ProcessSummary = ProcessSummary(
-            title="Ingest all archive contained in a directory in AIRS.",
-            description="Extract the items and assets information from the archives founbd in the directory and register the items and assets in ARLAS Item Registration Services.",
-            keywords=["AIRS", "ARLAS Item Registration Services"],
-            id="directory_ingest",
-            version="0.1",
-            jobControlOptions=[JobControlOptions.async_execute],
-            outputTransmission=[TransmissionMode.reference],
-            # TODO: provide the links if any => link could be the execute endpoint
-            links=[]
+    title="Ingest all archive contained in a directory in AIRS.",
+    description="Extract the items and assets information from the archives founbd in the directory and register the items and assets in ARLAS Item Registration Services.",
+    keywords=["AIRS", "ARLAS Item Registration Services"],
+    id="directory_ingest",
+    version="0.1",
+    jobControlOptions=[JobControlOptions.async_execute],
+    outputTransmission=[TransmissionMode.reference],
+    # TODO: provide the links if any => link could be the execute endpoint
+    links=[]
 )
 
 description: ProcessDescription = ProcessDescription(
@@ -75,7 +75,7 @@ class AprocProcess(Process):
         return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str) -> dict:
+    def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str, annotations: str) -> dict:
         # self is a celery task because bind=True
         """ ingest the archives contained in the directory url. Every archive ingestion becomes a new process
 
@@ -92,7 +92,7 @@ class AprocProcess(Process):
         for archive in archives:
             LOGGER.info(archive.model_dump_json())
             try:
-                inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog)
+                inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations)
                 execute = Execute(inputs=inputs.model_dump())
                 r = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:

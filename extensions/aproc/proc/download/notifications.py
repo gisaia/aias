@@ -20,6 +20,14 @@ class Notifications:
 
     def init():
         LOGGER.info("SMTP configuration: {}".format(Configuration.settings.smtp.model_dump_json()))
+        if not Notifications.__getES().indices.exists(index=Configuration.settings.index_for_download.index_name):
+            LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {} and {}".format(Configuration.settings.index_for_download.index_name, Configuration.settings.arlaseo_mapping_url, Configuration.settings.download_mapping_url))
+            mapping = Notifications.__fetch_mapping__(Configuration.settings.arlaseo_mapping_url)
+            mapping["properties"]["properties"]["properties"].update(Notifications.__fetch_mapping__(Configuration.settings.download_mapping_url)["properties"]["properties"]["properties"])
+            Notifications.__getES().indices.create(index=Configuration.settings.index_for_download.index_name, mappings=mapping)
+            LOGGER.info("Mapping {} updated.".format(Configuration.settings.index_for_download.index_name))
+        else:
+            LOGGER.debug("Index {} found.".format(Configuration.settings.index_for_download.index_name))
 
     def report(item: Item, subject: str, msg: str, to: list[str], context: dict[str, str], outcome: str = None):
         if outcome:
@@ -54,16 +62,7 @@ class Notifications:
                     doc.properties.__setattr__("reason", context.get("error", None))
                     doc.centroid = [0.0, 0.0]
                     doc.geometry = {"type": "Point", "coordinates": [0.0, 0.0]}
-
-                if not Notifications.__getES().indices.exists(index=Configuration.settings.index_for_download.index_name):
-                    LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {} and {}".format(Configuration.settings.index_for_download.index_name, Configuration.settings.arlaseo_mapping_url, Configuration.settings.download_mapping_url))
-                    mapping = Notifications.__fetch_mapping__(Configuration.settings.arlaseo_mapping_url)
-                    mapping["properties"]["properties"]["properties"].update(Notifications.__fetch_mapping__(Configuration.settings.download_mapping_url)["properties"]["properties"]["properties"])
-                    Notifications.__getES().indices.create(index=Configuration.settings.index_for_download.index_name, mappings=mapping)
-                    LOGGER.info("Mapping {} updated.".format(Configuration.settings.index_for_download.index_name))
-                else:
-                    LOGGER.debug("Index {} found.".format(Configuration.settings.index_for_download.index_name))
-
+                    
                 Notifications.__getES().index(
                     index=Configuration.settings.index_for_download.index_name,
                     document=mapper.to_airs_json(doc),
