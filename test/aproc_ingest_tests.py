@@ -19,7 +19,7 @@ class Tests(unittest.TestCase):
         setUpTest()
 
     def ingest(self, url, collection, catalog):
-        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
+        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
@@ -31,7 +31,7 @@ class Tests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
 
     def ingest_directory(self, url, collection, catalog):
-        inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog)
+        inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
@@ -71,7 +71,7 @@ class Tests(unittest.TestCase):
         url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
         collection = COLLECTION
         catalog = "theia"
-        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
+        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))

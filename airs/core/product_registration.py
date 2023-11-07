@@ -217,7 +217,19 @@ def __fetch_mapping__():
             return json.load(f)["mappings"]
 
 
-def register_item(item:Item)->Item:
+def init_collection(collection: str) -> bool:
+    if not __getES().indices.exists(index=__get_es_index_name(collection)):
+        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_index_name(collection), Configuration.settings.arlaseo_mapping_url))
+        mapping = __fetch_mapping__()
+        __getES().indices.create(index=__get_es_index_name(collection), mappings=mapping)
+        LOGGER.info("Index {} created.".format(__get_es_index_name(collection)))
+        return True
+    else:
+        LOGGER.debug("Index {} found.".format(__get_es_index_name(collection)))
+        return False
+
+
+def register_item(item: Item) -> Item:
     """ Register an item
 
     Args:
@@ -247,13 +259,7 @@ def register_item(item:Item)->Item:
     __collect_bands(item)
     __add_generated_fields(item)
     upload_item(item)
-    if not __getES().indices.exists(index=__get_es_index_name(item.collection)):
-        LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {}".format(__get_es_index_name(item.collection), Configuration.settings.arlaseo_mapping_url))
-        mapping = __fetch_mapping__()
-        __getES().indices.create(index=__get_es_index_name(item.collection), mappings=mapping)
-        LOGGER.info("Index {} created.".format(__get_es_index_name(item.collection)))
-    else:
-        LOGGER.info("Index {} found.".format(__get_es_index_name(item.collection)))
+    init_collection(item.collection)
     resp = __getES().index(index=__get_es_index_name(item.collection), id=item.id, document=to_airs_json(item))
     LOGGER.info("Indexing result:{}".format(resp['result']))
     return item

@@ -10,6 +10,15 @@ from common.exception import BadRequest, Conflict, NotFound, ServerError
 ROUTER = APIRouter()
 
 
+@ROUTER.post('/collections/{collection}/_init', description="Init a collection.")
+def init_collection(collection: str, request: Request) -> str:
+    if not collection:
+        raise BadRequest(detail="Invalid collection")
+    return JSONResponse(content={"created": rs.init_collection(collection)},
+                        status_code=status.HTTP_201_CREATED
+                        )
+
+
 @ROUTER.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)")
 def create_item(collection: str, item: Item, request: Request)->str:
     """ From https://github.com/stac-api-extensions/transaction:

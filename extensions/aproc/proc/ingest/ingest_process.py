@@ -1,16 +1,14 @@
-import hashlib
 import os
 
 import requests
-from celery import shared_task, Task
+from celery import Task, shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
-from airs.core.models.model import Asset
+from airs.core.models.model import Asset, Properties
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.models.ogc.job import StatusInfo
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
@@ -26,13 +24,14 @@ def __update_status__(task: Task, state: str, meta: dict = None):
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
     else:
-        LOGGER.info(task.name + " " + state + " " + str(meta))
+        LOGGER.debug(task.name + " " + state + " " + str(meta))
 
 
 class InputIngestProcess(BaseModel):
     collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
     url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
+    annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
 
 
 class OutputIngestProcess(BaseModel):
@@ -40,15 +39,15 @@ class OutputIngestProcess(BaseModel):
 
 
 summary: ProcessSummary = ProcessSummary(
-            title="Ingest an archive in AIRS.",
-            description="Extract the item and assets information from an archive and register the item and assets in ARLAS Item Registration Services.",
-            keywords=["AIRS", "ARLAS Item Registration Services"],
-            id="ingest",
-            version="0.1",
-            jobControlOptions=[JobControlOptions.async_execute],
-            outputTransmission=[TransmissionMode.reference],
-            # TODO: provide the links if any => link could be the execute endpoint
-            links=[]
+    title="Ingest an archive in AIRS.",
+    description="Extract the item and assets information from an archive and register the item and assets in ARLAS Item Registration Services.",
+    keywords=["AIRS", "ARLAS Item Registration Services"],
+    id="ingest",
+    version="0.1",
+    jobControlOptions=[JobControlOptions.async_execute],
+    outputTransmission=[TransmissionMode.reference],
+    # TODO: provide the links if any => link could be the execute endpoint
+    links=[]
 )
 
 description: ProcessDescription = ProcessDescription(
@@ -84,7 +83,7 @@ class AprocProcess(Process):
         raise DriverException("No driver found for  {}".format(url))
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str) -> dict:
+    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str, annotations: str) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
@@ -108,12 +107,12 @@ class AprocProcess(Process):
         driver = Drivers.solve(url)
         if driver is not None:
             LOGGER.debug("ingestion: 1 - identify_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'identify_assets', "ACTION": "INGEST", "TARGET": url})
+            __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
             assets: list[Asset] = driver.identify_assets(url)
             AprocProcess.__check_assets__(url, assets)
 
             LOGGER.debug("ingestion: 2 - fetch_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'fetch_assets', "ACTION": "INGEST", "TARGET": url})
+            __update_status__(self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
             try:
                 assets = driver.fetch_assets(url, assets)
             except requests.exceptions.ConnectionError as e:
@@ -123,15 +122,18 @@ class AprocProcess(Process):
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 3 - transform_assets")
-            __update_status__(self, state='PROGRESS', meta={'step':'transform_assets', "ACTION": "INGEST", "TARGET": url})
+            __update_status__(self, state='PROGRESS', meta={'step': 'transform_assets', "ACTION": "INGEST", "TARGET": url})
             assets = driver.transform_assets(url, assets)
             AprocProcess.__check_assets__(url, assets, file_exists=True)
 
             LOGGER.debug("ingestion: 4 - create_item")
-            __update_status__(self, state='PROGRESS', meta={'step':'create_item', "ACTION": "INGEST", "TARGET": url})
+            __update_status__(self, state='PROGRESS', meta={'step': 'create_item', "ACTION": "INGEST", "TARGET": url})
             item = driver.to_item(url, assets)
             item.collection = collection
             item.catalog = catalog
+            if not item.properties:
+                item.properties = Properties()
+            item.properties.annotations = annotations
             LOGGER.debug("ingestion: 5 - upload")
             i: int = 0
             for asset_name, asset in item.assets.items():
@@ -142,7 +144,7 @@ class AprocProcess(Process):
                     with open(asset.href, 'rb') as filedesc:
                         file = {'file': (asset.name, filedesc, asset.type)}
                         try:
-                            r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections",item.collection, "items", item.id, "assets", asset.name), files=file)
+                            r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
                             if r.ok:
                                 LOGGER.debug("asset uploaded successfully")                    
                             else:

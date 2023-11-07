@@ -202,6 +202,7 @@ class Properties(BaseModel, extra=Extra.allow):
     instrument                    :str              | None = Field(default=None, title="Name of the instrument")
     sensor                        :str              | None = Field(default=None, title="Name of the sensor")
     sensor_type                   :str              | None = Field(default=None, title="Type of sensor")
+    annotations                   :str              | None = Field(default=None, title="Human annotations for the item")
     gsd                           :float            | None = Field(default=None, title="Ground Sampling Distance (resolution)")
     data_type                     :str              | None = Field(default=None, title="Type of data")
     item_type                     :str              | None = Field(default=None, title="Type of data (ResourceType)")
