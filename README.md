@@ -304,7 +304,7 @@ curl -X 'POST' \
   'http://localhost:8001/arlas/aproc/processes/ingest/execution' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{"inputs": {"collection": "digitalearth.africa", "catalog": "spot6", "url": "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"}, "outputs": null, "response": "raw", "subscriber": null}'
+  -d '{"inputs": {"collection": "digitalearth.africa", "catalog": "spot6", "url": "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/", "annotations":""}, "outputs": null, "response": "raw", "subscriber": null}'
 ```
 
 Result:

@@ -43,8 +43,8 @@ drivers:
     configuration:
     priority: 3
   -
-    name: dimap
-    class_name: extensions.aproc.proc.download.drivers.impl.dimap
+    name: met_file
+    class_name: extensions.aproc.proc.download.drivers.impl.met_file
     configuration:
     priority: 1
   -
