@@ -20,7 +20,7 @@ airs_model
 | :------------------------ | :----- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [collection](#collection) | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "airs_model#/properties/collection")                                                                                                                                                             |
 | [catalog](#catalog)       | Merged | Optional | cannot be null | [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "airs_model#/properties/catalog")                                                                                                                                                                   |
-| [id](#id)                 | Merged | Optional | cannot be null | [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "airs_model#/properties/id")                                                                                                                                                             |
+| [id](#id)                 | Merged | Optional | cannot be null | [Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md "airs_model#/properties/id")                                                                                                                                                    |
 | [geometry](#geometry)     | Merged | Optional | cannot be null | [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")                                                        |
 | [bbox](#bbox)             | Merged | Optional | cannot be null | [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox") |
 | [centroid](#centroid)     | Merged | Optional | cannot be null | [Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md "airs_model#/properties/centroid")                                                                                                                                                             |
@@ -84,21 +84,21 @@ any of
 
 *   is optional
 
-*   Type: merged type ([Provider identifier. Must be unique within the STAC.](model-properties-provider-identifier-must-be-unique-within-the-stac.md))
+*   Type: merged type ([Unique item identifier. Must be unique within the collection.](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md))
 
 *   cannot be null
 
-*   defined in: [Item](model-properties-provider-identifier-must-be-unique-within-the-stac.md "airs_model#/properties/id")
+*   defined in: [Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md "airs_model#/properties/id")
 
 ### id Type
 
-merged type ([Provider identifier. Must be unique within the STAC.](model-properties-provider-identifier-must-be-unique-within-the-stac.md))
+merged type ([Unique item identifier. Must be unique within the collection.](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md))
 
 any of
 
-*   [Untitled string in Item](model-properties-provider-identifier-must-be-unique-within-the-stac-anyof-0.md "check type definition")
+*   [Untitled string in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-provider-identifier-must-be-unique-within-the-stac-anyof-1.md "check type definition")
+*   [Untitled null in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-1.md "check type definition")
 
 ## geometry
 
@@ -1615,6 +1615,7 @@ Reference this group by using
 | [instrument](#instrument)                                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")                                                                                                                                                                                                  |
 | [sensor](#sensor)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")                                                                                                                                                                                                          |
 | [sensor\_type](#sensor_type)                                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                         |
+| [annotations](#annotations)                                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")                                                                                                                                                                                         |
 | [gsd](#gsd-1)                                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                            |
 | [data\_type](#data_type)                                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")                                                                                                                                                                                                             |
 | [item\_type](#item_type)                                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")                                                                                                                                                                                                |
@@ -1884,6 +1885,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-type-of-sensor-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-type-of-sensor-anyof-1.md "check type definition")
+
+### annotations
+
+
+
+`annotations`
+
+*   is optional
+
+*   Type: merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")
+
+#### annotations Type
+
+merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-1.md "check type definition")
 
 ### gsd
 

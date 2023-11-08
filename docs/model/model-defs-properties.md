@@ -26,6 +26,7 @@ airs_model#/properties/properties/anyOf/0
 | [instrument](#instrument)                                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")                                                                                                                                                                                                  |
 | [sensor](#sensor)                                                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")                                                                                                                                                                                                          |
 | [sensor\_type](#sensor_type)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                         |
+| [annotations](#annotations)                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")                                                                                                                                                                                         |
 | [gsd](#gsd)                                                       | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                            |
 | [data\_type](#data_type)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")                                                                                                                                                                                                             |
 | [item\_type](#item_type)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")                                                                                                                                                                                                |
@@ -295,6 +296,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-type-of-sensor-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-type-of-sensor-anyof-1.md "check type definition")
+
+## annotations
+
+
+
+`annotations`
+
+*   is optional
+
+*   Type: merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")
+
+### annotations Type
+
+merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-1.md "check type definition")
 
 ## gsd
 
