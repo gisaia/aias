@@ -5,11 +5,13 @@ from datetime import datetime
 
 import requests
 from dateutil.parser import parse as parse_date
+from aproc.core.logger import Logger
 
 from airs.core.models.model import Asset, Band, Item, ObservationType, Properties, Role, ItemFormat, AssetFormat, ResourceType
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import ConnectionException
+LOGGER = Logger.logger
 
 
 class Driver(ProcDriver):
@@ -140,6 +142,8 @@ class Driver(ProcDriver):
             r = requests.get(url, verify=False)
             if r.ok:
                 return json.loads(r.content)
+            else:
+                LOGGER.warning("can not fetch {}: code {} message {}".format(url, r.status_code, r.content))
         if url.endswith("item.json"):
             with open(url) as json_file:
                 content = json.load(json_file)

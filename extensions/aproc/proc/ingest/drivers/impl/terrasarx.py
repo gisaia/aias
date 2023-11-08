@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg
+    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size
 import xml.etree.ElementTree as ET
 
 
@@ -51,7 +51,7 @@ class Driver(ProcDriver):
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
                                 description=Role.overview.value))
-        assets.append(Asset(href=self.met_path,
+        assets.append(Asset(href=self.met_path, size=get_file_size(self.tif_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
                             description=Role.metadata.value, airs__managed=False))
 

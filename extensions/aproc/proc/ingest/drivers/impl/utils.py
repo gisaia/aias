@@ -64,3 +64,11 @@ def geotiff_to_jpg(input_path,widthPct,heightPct, output_path=None):
     # Translate to PNG
     if output_path is not None:
         gdal.Translate(output_path, dataset, options=options)
+
+def get_file_size(file: str):
+    try:
+        if file and os.path.exists(file) and os.path.isfile(file):
+            return os.stat(file).st_size
+    except:
+        ...
+    return None

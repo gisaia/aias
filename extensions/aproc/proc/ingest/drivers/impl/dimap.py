@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid, setup_gdal, get_hash_url)
+    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url)
 
 
 class Driver(ProcDriver):
@@ -41,7 +41,7 @@ class Driver(ProcDriver):
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
                                 description=Role.overview.value))
-        assets.append(Asset(href=self.dim_path,
+        assets.append(Asset(href=self.dim_path, # DOES NOT MAKE SENSE HERE size=get_file_size(self.dim_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
                             description=Role.metadata.value, airs__managed=False))
         return assets
@@ -172,6 +172,7 @@ class Driver(ProcDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
                 main_asset_format=self.get_main_asset_format(root),
+                main_asset_name=Role.metadata.value,
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
