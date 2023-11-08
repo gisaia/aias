@@ -121,6 +121,7 @@ services:
       - APROC_INDEX_LOGIN=${APROC_INDEX_LOGIN:-None}
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
       - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT:-3}
+      - TMP_FOLDER=${TMP_FOLDER:-/outbox}
     volumes:
       - ./test/inputs:/inputs:ro
       - ./outbox/:/outbox

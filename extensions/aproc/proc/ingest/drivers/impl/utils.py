@@ -48,3 +48,19 @@ def get_hash_url(url: str) -> str:
     if Configuration.settings.resource_id_hash_starts_at > 1 and len(components) > Configuration.settings.resource_id_hash_starts_at:
         tohash = "/".join(url.split(os.path.sep)[Configuration.settings.resource_id_hash_starts_at:])
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
+
+def geotiff_to_jpg(input_path,widthPct,heightPct, output_path=None):
+    from osgeo import gdal
+    # Open input file
+    dataset = gdal.Open(input_path)
+    output_types = [gdal.GDT_Byte, gdal.GDT_UInt16, gdal.GDT_Float32]
+    bands_list = [1]
+    if dataset.RasterCount == 3:
+        bands_list = [3,2,1]
+    # Define output format and options
+    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=widthPct,heightPct=heightPct, creationOptions=['WORLDFILE=YES'],
+                                    outputType=output_types[0])
+
+    # Translate to PNG
+    if output_path is not None:
+        gdal.Translate(output_path, dataset, options=options)

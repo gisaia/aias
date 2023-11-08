@@ -37,6 +37,8 @@ class ItemFormat(Enum):
     spot5="SPOT5"
     spot6_7="SPOT6_7"
     other="OTHER"
+    terrasar="TerraSAR-X"
+    csk="COSMO-SkyMed"
 
 class AssetFormat(Enum):
     shape="SHAPE"
