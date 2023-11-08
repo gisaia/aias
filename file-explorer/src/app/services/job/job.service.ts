@@ -25,12 +25,13 @@ export class JobService {
     this.jobSettings = settings;
   }
 
-  public ingestArchive(archive: Archive): Observable<any> {
+  public ingestArchive(archive: Archive, annotations: string): Observable<any> {
     const payload: IngestPayload = {
       inputs: {
         url: archive.path,
         collection: this.jobSettings?.collection || '',
-        catalog: this.jobSettings?.catalog || 'catalog'
+        catalog: this.jobSettings?.catalog || 'catalog',
+        annotations
       },
       outputs: null,
       response: "raw",
@@ -39,12 +40,13 @@ export class JobService {
     return this.http.post(this.jobSettings?.url + '/processes/ingest/execution', payload, this.options);
   }
 
-  public ingestDirectory(node: DynamicFileNode) {
+  public ingestDirectory(node: DynamicFileNode, annotations: string) {
     const payload: IngestPayload = {
       inputs: {
         catalog: this.jobSettings?.catalog || 'catalog',
         collection: this.jobSettings?.collection || '',
-        directory: node.path
+        directory: node.path,
+        annotations
       },
       outputs: null,
       response: "raw",

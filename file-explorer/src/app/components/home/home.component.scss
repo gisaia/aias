@@ -20,33 +20,15 @@
 ::ng-deep .top-menu {
   // height: $topMenuHeight;
   background-color: $primaryColor !important;
-  // display: flex;
-  // justify-content: space-between;
-  // align-items: center;
   color: white;
   font-weight: 400;
   padding: 0 10px !important;
   font-size: 1.5em;
-
-  // .menu {
-  //   display: flex;
-  //   align-items: center;
-  //   font-size: 16px;
-  //   gap: 0 5px;
-  //   cursor: pointer;
-  //   padding: 5px 8px;
-
-  //   &:hover,
-  //   &.open {
-  //     background-color: white;
-  //     color: $primaryColor;
-  //     border-radius: 5px;
-  //   }
-
-  //   .rotate {
-  //     transform: rotate(180deg);
-  //   }
-  // }
+  button {
+    mat-icon {
+      color: white !important;
+    }
+  }
 }
 
 .content {

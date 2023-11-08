@@ -48,6 +48,9 @@
             border: 1px solid rgba(0, 0, 0, 0.75);
             background: white;
             color: rgba(0, 0, 0, 0.75);
+            &:after {
+              background: white !important;
+            }
           }
 
           .successful {

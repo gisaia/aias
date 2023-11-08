@@ -66,10 +66,10 @@ export class ArchivesComponent implements OnInit, OnChanges {
         .subscribe({
           next: (data) => this.archives = data,
           error: (err: Response) => {
-            if( err.status === 404){
+            if (err.status === 404) {
               this.toastr.error(this.translate.instant('Unable to retrieve archives'))
             }
-            if( err.status === 403){
+            if (err.status === 403) {
               this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
               // TODO: redirect to specific page
             }
@@ -79,22 +79,21 @@ export class ArchivesComponent implements OnInit, OnChanges {
   }
 
   public activate(archive: Archive) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent);
-    dialogRef.componentInstance.message = this.translate.instant('Do you want to activate this archive ?');
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate') + ' : ' + archive.name;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm) {
-          this.jobService.ingestArchive(archive).subscribe({
+        if (!!confirm.status) {
+          this.jobService.ingestArchive(archive, confirm.annotations).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: Response) => {
-              if( err.status === 404){
+              if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
               }
-              if( err.status === 403){
+              if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
                 // TODO: redirect to specific page
               }

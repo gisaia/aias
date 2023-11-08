@@ -1,23 +1,5 @@
-<!-- <div class="top-menu">
-  {{'File Explorer' | translate}}
-  <div *ngIf="!!userEmail" class="menu" [matMenuTriggerFor]="menu" [class.open]="isMenuOpen"
-    (menuOpened)="isMenuOpen = true" (menuClosed)="isMenuOpen = false">
-    <span class="label">{{userEmail}}</span>
-    <span class="material-symbols-outlined" [class.rotate]="isMenuOpen">
-      expand_circle_down
-    </span>
-  </div>
-  <mat-menu #menu="matMenu" xPosition="before">
-    <button mat-menu-item (click)="logout()" class="menu-btn">
-      <span class="material-symbols-outlined" [matTooltip]="'Logout' | translate">
-        lock_open
-      </span>
-      <span>{{'Logout' | translate}}</span>
-    </button>
-  </mat-menu>
-</div> -->
 <arlas-top-menu>
-  <div left-menu>{{'File Explorer' | translate}}</div>
+  <div left-menu>{{'Archive explorer' | translate}}</div>
 </arlas-top-menu>
 
 <div class="content">

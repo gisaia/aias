@@ -4,6 +4,7 @@ export interface IngestPayload {
     catalog: string;
     url?: string;
     directory?: string;
+    annotations: string;
   },
   outputs: any,
   response: "raw",

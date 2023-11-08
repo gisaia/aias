@@ -4,10 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production --base-href='$FAM_WUI_BASE_HREF/'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "postinstall": "patch-package --patch-dir node_modules/arlas-web-core/patches"
+    "postinstall": "patch-package --patch-dir node_modules/arlas-web-core/patches",
+    "i18n:init": "ngx-translate-extract --input ./src --output ./src/assets/i18n/template.json --key-as-default-value --replace --format json",
+    "i18n:extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/{en,fr}.json --format json"
   },
   "private": true,
   "peerDependencies": {
@@ -27,7 +29,7 @@
   "dependencies": {
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
-    "arlas-wui-toolkit": "24.3.0-beta.2",
+    "arlas-wui-toolkit": "24.3.0-beta.5",
     "ngx-spinner": "14.0.0",
     "ngx-toastr": "15.2.2",
     "patch-package": "^6.4.7",
@@ -37,6 +39,8 @@
     "@angular-devkit/build-angular": "^14.2.12",
     "@angular/cli": "^14.2.10",
     "@angular/compiler-cli": "^14.2.12",
+    "@biesbjerg/ngx-translate-extract-marker": "^1.0.0",
+    "@gisaia/ngx-translate-extract": "^8.2.0",
     "@types/jasmine": "~4.0.0",
     "jasmine-core": "~4.3.0",
     "karma": "~6.4.0",
@@ -44,7 +48,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "node": "^16.3.0",
     "ts-node": "~10.4.0",
     "typescript": "~4.6.0"
   },

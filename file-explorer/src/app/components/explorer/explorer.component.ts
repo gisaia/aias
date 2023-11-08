@@ -54,10 +54,10 @@ export class ExplorerComponent implements OnInit {
         this.famService.initializeFiles(resp.path);
       },
       error: (err: Response) => {
-        if( err.status === 404){
+        if (err.status === 404) {
           this.toastr.error(this.translate.instant('Unable to retrieve files'))
         }
-        if( err.status === 403){
+        if (err.status === 403) {
           this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
           // TODO: redirect to specific page
         }
@@ -78,21 +78,21 @@ export class ExplorerComponent implements OnInit {
   }
 
   public activate(node: DynamicFileNode) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent);
-    dialogRef.componentInstance.message = this.translate.instant('Do you want to activate this folder ?');
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate folder') + ' : ' + node.name;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm) {
-          this.jobService.ingestDirectory(node).subscribe({
-            next: (data) => {
+        if (!!confirm.status) {
+          this.jobService.ingestDirectory(node, confirm.annotations).subscribe({
+            next: () => {
               this.jobService.refreshTasks.next(true);
+              this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: Response) => {
-              if( err.status === 404){
+              if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
               }
-              if( err.status === 403){
+              if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
                 // TODO: redirect to specific page
               }
