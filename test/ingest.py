@@ -12,7 +12,7 @@ DRY_RUN = os.getenv("DRY_RUN", True)
 Drivers.init(os.getenv("DRIVERS_CONFIGURATION_FILE"))
 
 def ingest(url, collection, catalog):
-    inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog)
+    inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
     execute = Execute(inputs=inputs.model_dump())
     r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()),
                       headers={"Content-Type": "application/json"})
