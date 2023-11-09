@@ -80,7 +80,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(result.ok, result.status_code)
         result: OutputDownloadProcess = OutputDownloadProcess(**json.loads(result.content))
         # FILE MUST EXISTS
-        os.path.exists("./"+result.download_location)
+        os.path.exists("./"+result.download_locations[0])
 
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
