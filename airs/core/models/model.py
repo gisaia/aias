@@ -157,6 +157,7 @@ class Band(BaseModel, extra=Extra.allow):
 
 class Asset(BaseModel, extra=Extra.allow):
     name                          :str              | None = Field(default=None, title="Asset's name. But be the same as the key in the `assets` dictionary.", max_length=300)
+    size                          :int              | None = Field(default=None, title="Asset's size in Bytes.")
     href                          :str              | None = Field(default=None, title="Absolute link to the asset object.")
     asset_type                    :str              | None = Field(default=None, title="Type of data (ResourceType)")
     asset_format                  :str              | None = Field(default=None, title="Data format (AssetFormat)")
@@ -210,6 +211,7 @@ class Properties(BaseModel, extra=Extra.allow):
     item_type                     :str              | None = Field(default=None, title="Type of data (ResourceType)")
     item_format                   :str              | None = Field(default=None, title="Data format (ItemFormat)")
     main_asset_format             :str              | None = Field(default=None, title="Data format of the main asset (AssetFormat)")
+    main_asset_name               :str              | None = Field(default=None, title="Name of the main asset (AssetFormat)")
     observation_type              :str              | None = Field(default=None, title="Type of observation (ObservationType)")
     data_coverage                 :float            | None = Field(default=None, title="Estimate of data cover")
     water_coverage                :float            | None = Field(default=None, title="Estimate of water cover")
