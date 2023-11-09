@@ -106,84 +106,90 @@ class AprocProcess(Process):
             LOGGER.warning(msg)
         driver = Drivers.solve(url)
         if driver is not None:
-            LOGGER.debug("ingestion: 1 - identify_assets")
-            __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
-            assets: list[Asset] = driver.identify_assets(url)
-            AprocProcess.__check_assets__(url, assets)
-
-            LOGGER.debug("ingestion: 2 - fetch_assets")
-            __update_status__(self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
             try:
-                assets = driver.fetch_assets(url, assets)
-            except requests.exceptions.ConnectionError as e:
-                msg = "Fetching assets failed for connection reasons ({})".format(e.response)
-                LOGGER.error(msg)
-                raise ConnectionException(msg)
-            AprocProcess.__check_assets__(url, assets, file_exists=True)
+                LOGGER.debug("ingestion: 1 - identify_assets")
+                __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
+                assets: list[Asset] = driver.identify_assets(url)
+                AprocProcess.__check_assets__(url, assets)
 
-            LOGGER.debug("ingestion: 3 - transform_assets")
-            __update_status__(self, state='PROGRESS', meta={'step': 'transform_assets', "ACTION": "INGEST", "TARGET": url})
-            assets = driver.transform_assets(url, assets)
-            AprocProcess.__check_assets__(url, assets, file_exists=True)
+                LOGGER.debug("ingestion: 2 - fetch_assets")
+                __update_status__(self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
+                try:
+                    assets = driver.fetch_assets(url, assets)
+                except requests.exceptions.ConnectionError as e:
+                    msg = "Fetching assets failed for connection reasons ({})".format(e.response)
+                    LOGGER.error(msg)
+                    raise ConnectionException(msg)
+                AprocProcess.__check_assets__(url, assets, file_exists=True)
 
-            LOGGER.debug("ingestion: 4 - create_item")
-            __update_status__(self, state='PROGRESS', meta={'step': 'create_item', "ACTION": "INGEST", "TARGET": url})
-            item = driver.to_item(url, assets)
-            item.collection = collection
-            item.catalog = catalog
-            if not item.properties:
-                item.properties = Properties()
-            item.properties.annotations = annotations
-            LOGGER.debug("ingestion: 5 - upload")
-            i: int = 0
-            for asset_name, asset in item.assets.items():
-                __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
-                i += 1
-                asset: Asset = asset
-                if asset.airs__managed is True:
-                    with open(asset.href, 'rb') as filedesc:
-                        file = {'file': (asset.name, filedesc, asset.type)}
-                        try:
-                            r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
-                            if r.ok:
-                                LOGGER.debug("asset uploaded successfully")                    
-                            else:
-                                msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, Configuration.settings.airs_endpoint)
+                LOGGER.debug("ingestion: 3 - transform_assets")
+                __update_status__(self, state='PROGRESS', meta={'step': 'transform_assets', "ACTION": "INGEST", "TARGET": url})
+                assets = driver.transform_assets(url, assets)
+                AprocProcess.__check_assets__(url, assets, file_exists=True)
+
+                LOGGER.debug("ingestion: 4 - create_item")
+                __update_status__(self, state='PROGRESS', meta={'step': 'create_item', "ACTION": "INGEST", "TARGET": url})
+                item = driver.to_item(url, assets)
+                item.collection = collection
+                item.catalog = catalog
+                if not item.properties:
+                    item.properties = Properties()
+                item.properties.annotations = annotations
+                LOGGER.debug("ingestion: 5 - upload")
+                i: int = 0
+                for asset_name, asset in item.assets.items():
+                    __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
+                    i += 1
+                    asset: Asset = asset
+                    if asset.airs__managed is True:
+                        with open(asset.href, 'rb') as filedesc:
+                            file = {'file': (asset.name, filedesc, asset.type)}
+                            try:
+                                r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
+                                if r.ok:
+                                    LOGGER.debug("asset uploaded successfully")                    
+                                else:
+                                    msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, Configuration.settings.airs_endpoint)
+                                    LOGGER.error(msg)
+                                    raise RegisterException(msg)
+                            except requests.exceptions.ConnectionError:
+                                msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
                                 LOGGER.error(msg)
-                                raise RegisterException(msg)
-                        except requests.exceptions.ConnectionError:
-                            msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
-                            LOGGER.error(msg)
-                            raise ConnectionException(msg)
-                else:
-                    LOGGER.info("{} not managed".format(asset.name))
-            LOGGER.debug("ingestion: 6 - register")
-            __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
-            item_already_exists = False
-            try:
-                r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
-                if r.ok:
-                    item_already_exists = True
-            except requests.exceptions.ConnectionError:
-                msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
+                                raise ConnectionException(msg)
+                    else:
+                        LOGGER.info("{} not managed".format(asset.name))
+                LOGGER.debug("ingestion: 6 - register")
+                __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
+                item_already_exists = False
+                try:
+                    r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+                    if r.ok:
+                        item_already_exists = True
+                except requests.exceptions.ConnectionError:
+                    msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
+                    LOGGER.error(msg)
+                    raise ConnectionException(msg)
+                try:
+                    if item_already_exists:
+                        r = requests.put(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
+                    else:
+                        r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
+                    if r.ok:
+                        item_from_json(r.content).model_dump()
+                        return OutputIngestProcess(item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
+                    else:
+                        LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
+                        LOGGER.error(to_json(item))
+                        raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
+                except requests.exceptions.ConnectionError:
+                    msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
+                    LOGGER.error(msg)
+                    raise ConnectionException(msg)
+            except Exception as err:
+                msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)
-                raise ConnectionException(msg)
-            try:
-                if item_already_exists:
-                    r = requests.put(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
-                else:
-                    r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
-                if r.ok:
-                    item_from_json(r.content).model_dump()
-                    return OutputIngestProcess(item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
-                else:
-                    LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
-                    LOGGER.error(to_json(item))
-                    raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
-            except requests.exceptions.ConnectionError:
-                msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
-                LOGGER.error(msg)
-                raise ConnectionException(msg)
+                LOGGER.exception(err)
+                raise DriverException(msg)
         else:
             LOGGER.error("No driver found for {}".format(url))
             raise DriverException("No driver found for  {}".format(url))
