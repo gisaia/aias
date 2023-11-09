@@ -40,7 +40,7 @@ class InputDownloadProcess(BaseModel):
 
 
 class OutputDownloadProcess(BaseModel):
-    download_location: str = Field(title="Downloaded file location", description="Location of the downloaded file")
+    download_locations: list[str] = Field(title="Downloaded file location", description="Location of the downloaded file")
 
 
 summary: ProcessSummary = ProcessSummary(
@@ -119,6 +119,7 @@ class AprocProcess(Process):
         except Exception as e:
             LOGGER.error("Can not open token from header")
             LOGGER.exception(e)
+        download_locations = []
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
@@ -166,7 +167,7 @@ class AprocProcess(Process):
                     Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
                     Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                     LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
-                    return OutputDownloadProcess(download_location=os.path.join(target_directory, file_name)).model_dump()
+                    download_locations.append(os.path.join(target_directory, file_name))
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
                     LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
@@ -182,6 +183,7 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
+        return OutputDownloadProcess(download_locations=download_locations).model_dump()
 
     def __get_item__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
