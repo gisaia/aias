@@ -32,6 +32,7 @@ airs_model#/properties/properties/anyOf/0
 | [item\_type](#item_type)                                          | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")                                                                                                                                                                                                |
 | [item\_format](#item_format)                                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-data-format-itemformat.md "airs_model#/$defs/Properties/properties/item_format")                                                                                                                                                                                                 |
 | [main\_asset\_format](#main_asset_format)                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_format")                                                                                                                                                                        |
+| [main\_asset\_name](#main_asset_name)                             | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_name")                                                                                                                                                                                 |
 | [observation\_type](#observation_type)                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-observation-observationtype.md "airs_model#/$defs/Properties/properties/observation_type")                                                                                                                                                                               |
 | [data\_coverage](#data_coverage)                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")                                                                                                                                                                                               |
 | [water\_coverage](#water_coverage)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")                                                                                                                                                                                             |
@@ -440,6 +441,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-1.md "check type definition")
+
+## main\_asset\_name
+
+
+
+`main_asset_name`
+
+*   is optional
+
+*   Type: merged type ([Name of the main asset (AssetFormat)](model-defs-properties-properties-name-of-the-main-asset-assetformat.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-name-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_name")
+
+### main\_asset\_name Type
+
+merged type ([Name of the main asset (AssetFormat)](model-defs-properties-properties-name-of-the-main-asset-assetformat.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-1.md "check type definition")
 
 ## observation\_type
 

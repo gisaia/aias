@@ -19,6 +19,7 @@ airs_model#/properties/assets/anyOf/0/additionalProperties
 | Property                                                          | Type   | Required | Nullable       | Defined by                                                                                                                                                                                                                                                                            |
 | :---------------------------------------------------------------- | :----- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [name](#name)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")                                                                                                                                      |
+| [size](#size)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-assets-size-in-bytes.md "airs_model#/$defs/Asset/properties/size")                                                                                                                                                                                 |
 | [href](#href)                                                     | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")                                                                                                                                                                    |
 | [asset\_type](#asset_type)                                        | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-type-of-data-resourcetype.md "airs_model#/$defs/Asset/properties/asset_type")                                                                                                                                                                      |
 | [asset\_format](#asset_format)                                    | Merged | Optional | cannot be null | [Item](model-defs-asset-properties-data-format-assetformat.md "airs_model#/$defs/Asset/properties/asset_format")                                                                                                                                                                      |
@@ -81,6 +82,30 @@ any of
 *   [Untitled string in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-1.md "check type definition")
+
+## size
+
+
+
+`size`
+
+*   is optional
+
+*   Type: merged type ([Asset's size in Bytes.](model-defs-asset-properties-assets-size-in-bytes.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-asset-properties-assets-size-in-bytes.md "airs_model#/$defs/Asset/properties/size")
+
+### size Type
+
+merged type ([Asset's size in Bytes.](model-defs-asset-properties-assets-size-in-bytes.md))
+
+any of
+
+*   [Untitled integer in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-1.md "check type definition")
 
 ## href
 
