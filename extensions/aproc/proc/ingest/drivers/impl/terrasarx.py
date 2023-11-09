@@ -73,17 +73,30 @@ class Driver(ProcDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         tree = ET.parse(self.met_path)
         root = tree.getroot()
-        ul_lat = self.__get_coord__(root, "upperLeftLatitude")
-        ul_lon = self.__get_coord__(root, "upperLeftLongitude")
-        ur_lat = self.__get_coord__(root, "upperRightLatitude")
-        ur_lon = self.__get_coord__(root, "upperRightLongitude")
-        lr_lat = self.__get_coord__(root, "lowerRightLatitude")
-        lr_lon = self.__get_coord__(root, "lowerRightLongitude")
-        ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
-        ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
-        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
-        x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
-        y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
+        # Some data dont have this balise in xml metadata
+        if root.find("productSpecific/geocodedImageInfo") is not None:
+            ul_lat = self.__get_coord__(root, "upperLeftLatitude")
+            ul_lon = self.__get_coord__(root, "upperLeftLongitude")
+            ur_lat = self.__get_coord__(root, "upperRightLatitude")
+            ur_lon = self.__get_coord__(root, "upperRightLongitude")
+            lr_lat = self.__get_coord__(root, "lowerRightLatitude")
+            lr_lon = self.__get_coord__(root, "lowerRightLongitude")
+            ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
+            ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
+            geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
+            x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
+            y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
+        else:
+            coords = []
+            #order lower left; lower right: upper left ; upper right
+            for vertex in root.findall('productInfo/sceneInfo/sceneCornerCoord'):
+                coord = [float(vertex.find('lon').text), float(vertex.find('lat').text)]
+                coords.append(coord)
+            geometry, bbox, centroid = get_geom_bbox_centroid(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
+                                                      coords[1][0], coords[1][1], coords[0][0], coords[0][1])
+            x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
+            y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
+
         gsd = (x_pixel_size+y_pixel_size)/2
         processing__level = root.find("setup/orderInfo/orderType").text
         constellation = root.find("productInfo/missionInfo/mission").text
