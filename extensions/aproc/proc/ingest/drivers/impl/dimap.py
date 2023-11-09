@@ -162,9 +162,6 @@ class Driver(ProcDriver):
                 processing__level=metadata["PROCESSING_LEVEL"],
                 eo__cloud_cover=cloud_cover,
                 gsd=gsd,
-                constellation=metadata["MISSION"],
-                sensor=metadata["MISSION"],
-                sensor_type=metadata["MISSION_INDEX"],
                 view__incidence_angle=metadata["INCIDENCE_ANGLE"],
                 view__azimuth=metadata["AZIMUTH_ANGLE"],
                 view__sun_azimuth=metadata["SUN_AZIMUTH"],
@@ -179,6 +176,14 @@ class Driver(ProcDriver):
         # To fit the case of PNEO 30 cm with no instrument metadata
         if "INSTRUMENT" in metadata:
             item.properties.instrument = metadata["INSTRUMENT"]
+        if "MISSION" in metadata:
+            item.properties.constellation = metadata["MISSION"]
+            item.properties.sensor = metadata["MISSION"]
+        elif "DATASET_PRODUCER_NAME" in metadata:
+            item.properties.constellation = metadata["DATASET_PRODUCER_NAME"]
+            item.properties.sensor = metadata["DATASET_PRODUCER_NAME"]
+        if "MISSION_INDEX" in metadata:
+            item.properties.sensor_type = metadata["MISSION_INDEX"]
         return item
 
     def __check_path__(path: str):
