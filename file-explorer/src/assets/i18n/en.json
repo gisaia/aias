@@ -31,5 +31,10 @@
 	"Activation failed": "Activation failed",
 	"Unable to retrieve files": "Unable to retrieve files",
 	"Activate folder": "Activate folder",
-	"Unable to retrieve status": "Unable to retrieve status"
+	"Unable to retrieve status": "Unable to retrieve status",
+  "accepted": "accepted",
+  "running": "running",
+  "successful": "successful",
+  "failed": "failed",
+  "dissmissed": "dissmissed"
 }

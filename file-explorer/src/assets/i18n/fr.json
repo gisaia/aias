@@ -31,5 +31,10 @@
 	"Activation failed": "Activation echouée",
 	"Unable to retrieve files": "Impossible d'accéder aux fichiers",
 	"Activate folder": "Activer un dossier",
-	"Unable to retrieve status": "Impossible d'afficher les tâches"
+	"Unable to retrieve status": "Impossible d'afficher les tâches",
+  "accepted": "soumis",
+  "running": "en cours",
+  "successful": "terminé",
+  "failed": "en erreur",
+  "dissmissed": "annulé"
 }
