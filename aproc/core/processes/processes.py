@@ -124,6 +124,7 @@ class Processes:
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump()
         kwargs["headers"] = headers
+        kwargs.update(process.before_execute(**kwargs))
         job_id = Processes.send_task(task_name=process.__task_name__, kwargs=kwargs)
         status_info: StatusInfo = StatusInfo(
             processID=process_name,

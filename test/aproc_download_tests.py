@@ -36,13 +36,7 @@ class Tests(unittest.TestCase):
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         print(execute.model_dump_json())
-        self.assertTrue(r.ok)
-        # WAIT FOR FAILURE
-        status: StatusInfo = StatusInfo(**json.loads(r.content))
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
-            sleep(1)
-            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, StatusCode.failed)
+        self.assertFalse(r.ok, str(r.status_code) + ": " + str(r.content))
         # REQUEST MAILS AND ERROR MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
