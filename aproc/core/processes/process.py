@@ -27,6 +27,10 @@ class Process(ABC):
         ...
 
     @staticmethod
+    def before_execute(context: dict[str, str], **kwargs) -> dict[str, str]:
+        return {}
+
+    @staticmethod
     @abstractmethod
     def get_process_description() -> ProcessDescription:
         ...
