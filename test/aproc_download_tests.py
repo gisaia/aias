@@ -62,7 +62,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
 
         # SEND DOWNLOAD REQUEST
-        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
+        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}, {"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         self.assertTrue(r.ok)
@@ -85,7 +85,7 @@ class Tests(unittest.TestCase):
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
-        self.assertEqual(len(r.json()["results"]), 7)
+        self.assertEqual(len(r.json()["results"]), 11)
 
     def __add_item__(self) -> Item:
         print("create item")

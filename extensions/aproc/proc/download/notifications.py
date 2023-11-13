@@ -78,7 +78,7 @@ class Notifications:
                 msg = msg.format(**context)
                 subject = subject.format(**context)
             email = EmailMessage()
-            email.set_content(msg)
+            email.set_content(msg, subtype='html')
             email['Subject'] = subject
             email['From'] = Configuration.settings.smtp.from_addr
             email['To'] = ",".join(to)
