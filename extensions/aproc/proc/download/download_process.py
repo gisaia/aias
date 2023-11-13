@@ -119,7 +119,8 @@ class AprocProcess(Process):
         except Exception as e:
             LOGGER.error("Can not open token from header")
             LOGGER.exception(e)
-        download_locations = []
+
+        items: list[Item] = []
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
@@ -147,6 +148,25 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
+            else:
+                items.append(item)
+
+        download_locations = []
+
+        for i, item in enumerate(items):
+            request = requests[i]
+            collection: str = request.get("collection")
+            item_id: str = request.get("item_id")
+            mail_context = {
+                "target_projection": target_projection,
+                "target_format": target_format,
+                "item_id": item_id,
+                "collection": collection,
+                "target_directory": None,
+                "file_name": None,
+                "error": None,
+                "arlas-user-email": send_to
+            }
 
             driver: Driver = Drivers.solve(item)
             if driver is not None:
