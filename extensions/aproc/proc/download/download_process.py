@@ -87,28 +87,13 @@ class AprocProcess(Process):
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
-            mail_context = {
-                "target_projection": target_projection,
-                "target_format": target_format,
-                "item_id": item_id,
-                "collection": collection,
-                "target_directory": None,
-                "file_name": None,
-                "error": None,
-                "arlas-user-email": send_to
-            }
             # RGPD : log level is info
-            LOGGER.debug("notification and checking for download request {}/{} for {}".format(collection, item_id, send_to))
-
-            Notifications.report(None, Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            Notifications.report(None, Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+            LOGGER.debug("checking for download request {}/{} for {}".format(collection, item_id, send_to))
             item: Item = AprocProcess.__get_item_from_arlas__(collection=collection, item_id=item_id, headers=headers)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
                 LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
-                mail_context["error"] = error_msg
-                Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
             else:
                 LOGGER.debug("{} can access {}/{}".format(send_to, collection, item_id))
@@ -169,6 +154,8 @@ class AprocProcess(Process):
                 "error": None,
                 "arlas-user-email": send_to
             }
+            Notifications.report(None, Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+            Notifications.report(None, Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
             item: Item = AprocProcess.__get_item_from_airs__(collection=collection, item_id=item_id)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
@@ -217,10 +204,13 @@ class AprocProcess(Process):
 
     def __get_item_from_arlas__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
+            LOGGER.debug("send arlas request on {}/{}".format(collection, item_id))
             r = requests.get(url=Configuration.settings.arlas_url_search.format(collection=collection, item=item_id), headers=headers)
+            LOGGER.debug("arlas response:")
             if r.ok:
                 result = r.json()
                 if result.get("hits") and len(result.get("hits")) > 0:
+                    LOGGER.debug("ok")
                     return mapper.item_from_dict(result.get("hits")[0]["data"])
                 else:
                     LOGGER.warn("No result found for {}/{}".format(collection, item_id))
