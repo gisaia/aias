@@ -33,7 +33,7 @@ async def path(request: Request):
             if match.start() == 0:
                 LOGGER.debug("{} matches {}".format(requested_path, pattern))
                 try:
-                    r = requests.get(Configuration.settings.arlas_url_search.format(collection=match.group("collection"), item=match.group("item")), headers=request.headers)
+                    r = requests.get(Configuration.settings.arlas_url_search.format(collection=match.group("collection"), item=match.group("item")), headers={"authorization": request.headers.get("authorization"), "arlas-org-filter": request.headers.get("arlas-org-filter")})
                     if r.ok:
                         response = r.json()
                         if response["hits"] is not None and len(response["hits"]) > 0:
