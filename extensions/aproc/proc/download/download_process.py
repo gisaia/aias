@@ -83,7 +83,6 @@ class AprocProcess(Process):
 
     @staticmethod
     def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict[str, str]:
-        # self is a celery task because bind=True
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")
@@ -99,11 +98,10 @@ class AprocProcess(Process):
                 "arlas-user-email": send_to
             }
             # RGPD : log level is info
-            LOGGER.debug("download request {}/{} for {}".format(collection, item_id, send_to))
+            LOGGER.debug("notification and checking for download request {}/{} for {}".format(collection, item_id, send_to))
 
             Notifications.report(None, Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
             Notifications.report(None, Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
-
             item: Item = AprocProcess.__get_item_from_arlas__(collection=collection, item_id=item_id, headers=headers)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
@@ -112,6 +110,8 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
+            else:
+                LOGGER.debug("{} can access {}/{}".format(send_to, collection, item_id))
         return {}
 
     def __get_user_email__(authorization: str):
@@ -154,6 +154,7 @@ class AprocProcess(Process):
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
+        LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
         for request in requests:
             collection: str = request.get("collection")

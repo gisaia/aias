@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
         setUpTest()
         requests.delete(SMTP_SERVER+"/*")
 
-    def test_download(self):
+    def test_download_exists(self):
         # CHECK THE DOWNLOAD PROCESS EXISTS
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
         self.assertTrue(r.ok)
@@ -31,6 +31,7 @@ class Tests(unittest.TestCase):
         self.assertGreater(len(processes.processes), 0)
         self.assertIn("download", list(map(lambda p: p.id, processes.processes)))
 
+    def test_incorrect_download(self):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
         execute = Execute(inputs=inputs.model_dump())
@@ -42,6 +43,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 3)
 
+    def test_download(self):
         self.__add_item__()
         sleep(3)
         # Create collection
@@ -79,7 +81,7 @@ class Tests(unittest.TestCase):
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
-        self.assertEqual(len(r.json()["results"]), 11)
+        self.assertEqual(len(r.json()["results"]), 8)
 
     def __add_item__(self) -> Item:
         print("create item")
