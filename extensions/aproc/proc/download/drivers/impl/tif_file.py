@@ -16,7 +16,7 @@ class Driver(DownloadDriver):
         if item.assets.get(Role.data.value) is not None:
             asset = item.assets.get(Role.data.value)
             file_name = os.path.basename(asset.href)
-            return file_name.endswith(".tif")
+            return file_name.lower().endswith(".tif")
         else:
             return False
     
