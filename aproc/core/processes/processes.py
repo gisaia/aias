@@ -121,11 +121,16 @@ class Processes:
         
     @staticmethod
     def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
+        LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump()
         kwargs["headers"] = headers
-        kwargs.update(process.before_execute(**kwargs))
+        LOGGER.debug("before_execute {}".format(process_name))
+        extra = process.before_execute(**kwargs)
+        kwargs.update(extra)
+        LOGGER.debug("send task {}".format(process.__task_name__))
         job_id = Processes.send_task(task_name=process.__task_name__, kwargs=kwargs)
+        LOGGER.debug("create and save status info")
         status_info: StatusInfo = StatusInfo(
             processID=process_name,
             type=JobType.process,
