@@ -1,18 +1,17 @@
 authentication:
   use_authent: true
   auth_mode: 'iam'
-  force_connect: false
-  use_discovery: false
+  force_connect: true
   threshold: 60000
   url: https://arlas.crts-staff.local/arlas_iam_server
 file_manager:
   url: https://arlas.crts-staff.local/fam
   default_path: ''
-  collection: 'digitalearth.africa'
+  collection: 'catalogue_crts'
 jobs:
   url: https://arlas.crts-staff.local/aproc
-  collection: 'digitalearth.africa'
+  collection: 'catalogue_crts'
   catalog: 'crts'
 status:
   url: https://arlas.crts-staff.local/airs
-  collection: 'digitalearth.africa'
+  collection: 'catalogue_crts'

@@ -26,4 +26,10 @@ export class StatusService {
       this.statusSettings?.url + '/collections/' + this.statusSettings.collection + '/items/' + archiveId,
       this.options) as Observable<any>;
   }
+
+  public dereferenceArchive(archiveId: string): Observable<any> {
+    return this.http.delete(
+      this.statusSettings?.url + '/collections/' + this.statusSettings.collection + '/items/' + archiveId,
+      this.options) as Observable<any>;
+  }
 }

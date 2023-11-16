@@ -39,7 +39,12 @@ export class ArchivesComponent implements OnInit, OnChanges {
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['archivesPath'] && changes['archivesPath'].currentValue !== '') {
       this.spinner.show('archives');
-      this.famService.getArchive(changes['archivesPath'].currentValue)
+      this.getArchives(changes['archivesPath'].currentValue);
+    }
+  }
+
+  public getArchives(path: string){
+    this.famService.getArchive(path)
         .pipe(
           mergeMap((archives) => {
             if (archives.length > 0) {
@@ -75,12 +80,12 @@ export class ArchivesComponent implements OnInit, OnChanges {
             }
           }
         })
-    }
   }
 
   public activate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate') + ' : ' + archive.name;
+    dialogRef.componentInstance.action = 'Activate';
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
@@ -92,6 +97,35 @@ export class ArchivesComponent implements OnInit, OnChanges {
             error: (err: Response) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
+              }
+              if (err.status === 403) {
+                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+                // TODO: redirect to specific page
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  public desactivate(archive: Archive){
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
+    dialogRef.componentInstance.title = this.translate.instant('Dereferencing') + ' : ' + archive.name;
+    dialogRef.componentInstance.action = 'Dereference';
+    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.afterClosed().subscribe({
+      next: (confirm) => {
+        if (!!confirm.status) {
+          this.statusService.dereferenceArchive(archive.id).subscribe({
+            next: () => {
+              this.spinner.show('archives');
+              this.getArchives(this.archivesPath);
+              this.toastr.success(this.translate.instant('Archive dereferenced'))
+            },
+            error: (err: Response) => {
+              if (err.status === 404) {
+                this.toastr.error(this.translate.instant('Dereferencing failed'))
               }
               if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))

@@ -18,6 +18,11 @@
         </div>
         <div class="actions">
           <mat-chip-list ><mat-chip [disableRipple]="true" class="driver-chip">{{archive.driver_name}}</mat-chip></mat-chip-list>
+          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
+            (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
+            remove_circle
+          </span>
+          <span class="icon-spacer" *ngIf="archive.status !== 'successful'"></span>
           <span class="material-symbols-outlined no-pointer successful" *ngIf="archive.status === 'successful'"
             [matTooltip]="'Already activated' | translate">
             check_circle

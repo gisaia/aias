@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -7,8 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConfirmDialogComponent implements OnInit {
 
+  @ViewChild('anno') public anno: MatInput | undefined;
+
   public title = '';
   public message = '';
+  public action = '';
+  public showAnnotations = true
 
   constructor() { }
 
