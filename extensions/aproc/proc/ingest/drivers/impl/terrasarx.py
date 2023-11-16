@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size
+    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
 import xml.etree.ElementTree as ET
 
 
@@ -105,6 +105,9 @@ class Driver(ProcDriver):
         sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
         view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
         date_time =  int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -114,6 +117,7 @@ class Driver(ProcDriver):
                 datetime=date_time,
                 processing__level=processing__level,
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 instrument=instrument,
                 constellation=constellation,
                 sensor=sensor,

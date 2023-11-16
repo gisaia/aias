@@ -6,7 +6,7 @@ from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Observa
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url)
+    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url, get_epsg)
 
 
 class Driver(ProcDriver):
@@ -93,7 +93,9 @@ class Driver(ProcDriver):
         gsdCol = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd",ns).text)
         gsdRow = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd",ns).text)
         gsd = (gsdCol + gsdRow)/2
-
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -104,6 +106,7 @@ class Driver(ProcDriver):
                 eo__cloud_cover=eo__cloud_cover,
                 processing__level=processing__level,
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 instrument=instrument,
                 constellation=constellation,
                 sensor=sensor,

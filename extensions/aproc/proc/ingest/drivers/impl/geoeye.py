@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_file_size, get_geom_bbox_centroid, get_hash_url
+    get_file_size, get_geom_bbox_centroid, get_hash_url, get_epsg
 
 
 class Driver(ProcDriver):
@@ -125,7 +125,9 @@ class Driver(ProcDriver):
         view__azimuth=float(d['Scan Azimuth'].split(' ')[0])
         view__sun_azimuth=float(d['Sun Angle Azimuth'].split(' ')[0])
         view__sun_elevation=float(d['Sun Angle Elevation'].split(' ')[0])
-
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -136,6 +138,7 @@ class Driver(ProcDriver):
                 processing__level=processing__level,
                 eo__cloud_cover=eo__cloud_cover,
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 instrument=instrument,
                 constellation=constellation,
                 sensor=sensor,
