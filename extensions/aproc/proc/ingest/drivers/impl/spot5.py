@@ -3,7 +3,8 @@ import xml.etree.ElementTree as ET
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, setup_gdal, get_geom_bbox_centroid, get_hash_url
+from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, setup_gdal, get_geom_bbox_centroid, \
+    get_hash_url, get_epsg
 from datetime import datetime
 
 class Driver(ProcDriver):
@@ -85,6 +86,7 @@ class Driver(ProcDriver):
                 datetime=date_time,
                 processing__level=metadata["PROCESSING_LEVEL"],
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 instrument= metadata["INSTRUMENT"],
                 constellation = metadata["MISSION"],
                 sensor = metadata["MISSION"],

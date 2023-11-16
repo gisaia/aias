@@ -72,3 +72,12 @@ def get_file_size(file: str):
     except:
         ...
     return None
+
+def get_epsg(src):
+    try:
+        from osgeo import osr
+        proj = osr.SpatialReference(wkt=src.GetProjection())
+        return int(proj.GetAttrValue('AUTHORITY',1))
+    except:
+        ...
+    return None

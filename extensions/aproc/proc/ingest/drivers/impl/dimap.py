@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url)
+    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url, get_epsg)
 
 
 class Driver(ProcDriver):
@@ -162,6 +162,7 @@ class Driver(ProcDriver):
                 processing__level=metadata["PROCESSING_LEVEL"],
                 eo__cloud_cover=cloud_cover,
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 view__incidence_angle=metadata["INCIDENCE_ANGLE"],
                 view__azimuth=metadata["AZIMUTH_ANGLE"],
                 view__sun_azimuth=metadata["SUN_AZIMUTH"],

@@ -1,13 +1,14 @@
 import os
 from datetime import datetime
 
+
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, get_file_size
+    get_geom_bbox_centroid, get_hash_url, get_file_size, get_epsg
 
 
 class Driver(ProcDriver):
@@ -75,7 +76,9 @@ class Driver(ProcDriver):
         sensor = data['INVENTORYMETADATA']['PLATFORMINSTRUMENTSENSOR']['PLATFORMSHORTNAME']['VALUE']
         view__sun_azimuth = float(data['INVENTORYMETADATA']['PRODUCTSPECIFICMETADATA']['SOLAR_AZIMUTH_ANGLE']['VALUE'])
         view__sun_elevation = float(data['INVENTORYMETADATA']['PRODUCTSPECIFICMETADATA']['SOLAR_ELEVATION_ANGLE']['VALUE'])
-
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -86,6 +89,7 @@ class Driver(ProcDriver):
                 eo__cloud_cover=eo__cloud_cover,
                 processing__level=processing__level,
                 gsd=gsd,
+                proj__epsg=get_epsg(src_ds),
                 instrument=instrument,
                 constellation=constellation,
                 sensor=sensor,
