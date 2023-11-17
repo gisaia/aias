@@ -3,7 +3,7 @@
   <div>
     {{message}}
   </div>
-  <mat-form-field *ngIf="showAnnotations" class="annotations" appearance="fill">
+  <mat-form-field [class.hide]="!showAnnotations" class="annotations" appearance="fill">
     <mat-label>{{'Annotations' | translate}}</mat-label>
     <textarea #anno matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
       cdkAutosizeMaxRows="6"></textarea>

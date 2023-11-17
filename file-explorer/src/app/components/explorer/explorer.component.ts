@@ -80,6 +80,7 @@ export class ExplorerComponent implements OnInit {
   public activate(node: DynamicFileNode) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate folder') + ' : ' + node.name;
+    dialogRef.componentInstance.action = 'Activate';
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {

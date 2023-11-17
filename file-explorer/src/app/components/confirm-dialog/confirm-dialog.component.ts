@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 
 @Component({
@@ -8,7 +9,7 @@ import { MatInput } from '@angular/material/input';
 })
 export class ConfirmDialogComponent implements OnInit {
 
-  @ViewChild('anno') public anno: MatInput | undefined;
+  
 
   public title = '';
   public message = '';
@@ -18,6 +19,7 @@ export class ConfirmDialogComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+  
   }
 
 }
