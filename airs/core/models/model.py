@@ -269,7 +269,7 @@ class Properties(BaseModel, extra=Extra.allow):
     acq__download_orbit: float | None = Field(default=None, title="Download orbit")
     acq__request_id: str | None = Field(default=None, title="Original request identifier")
     acq__quality_average: float | None = Field(default=None, title="Quality average")
-    acq__quality_computation: float | None = Field(default=None, title="Quality computation")
+    acq__quality_computation: str | None = Field(default=None, title="Quality computation")
     acq__receiving_station: str | None = Field(default=None, title="Receiving station")
     acq__reception_date: Datetime | None = Field(default=None, title="Reception date")
     acq__spectral_mode: str | None = Field(default=None, title="Spectral mode")
