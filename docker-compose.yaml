@@ -156,8 +156,8 @@ services:
       - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
       - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
       - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}
-      - AIRS_MAPPING_URL=${AIRS_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/mapping.json}
-      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.1/collection.json}
+      - AIRS_MAPPING_URL=${AIRS_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.5/mapping.json}
+      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.5/collection.json}
       - AIRS_LOGGER_LEVEL=${AIRS_LOGGER_LEVEL:-INFO}
     ports:
       - "8000:8000"
