@@ -1,11 +1,11 @@
-import { Component, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
-import { Archive, Process, ProcessStatus } from '@tools/interface';
+import { Archive, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
@@ -15,7 +15,7 @@ import { catchError, finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
   templateUrl: './archives.component.html',
   styleUrls: ['./archives.component.scss']
 })
-export class ArchivesComponent implements OnInit, OnChanges {
+export class ArchivesComponent implements OnChanges {
 
   @Input() public archivesPath: string = '';
   @Output()
@@ -31,10 +31,6 @@ export class ArchivesComponent implements OnInit, OnChanges {
     private spinner: NgxSpinnerService,
     private toastr: ToastrService
   ) { }
-
-  public ngOnInit(): void {
-
-  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['archivesPath'] && changes['archivesPath'].currentValue !== '') {

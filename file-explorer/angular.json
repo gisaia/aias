@@ -5,7 +5,10 @@
     "analytics": false,
     "cache": {
       "enabled": false
-    }
+    },
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -124,6 +127,15 @@
               "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }

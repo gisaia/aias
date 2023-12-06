@@ -60,19 +60,22 @@ export class StartupService {
               this.famService.setSettings((s as any).file_manager);
               this.famService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken
+                  Authorization: 'bearer ' + loginData.accessToken,
+                  'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });
               this.jobService.setSettings((s as any).jobs);
               this.jobService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken
+                  Authorization: 'bearer ' + loginData.accessToken,
+                  'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });
               this.statusService.setSettings((s as any).status);
               this.statusService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken
+                  Authorization: 'bearer ' + loginData.accessToken,
+                  'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });
             }

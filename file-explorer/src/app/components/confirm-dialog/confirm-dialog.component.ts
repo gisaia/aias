@@ -1,15 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { MatInput } from '@angular/material/input';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss']
 })
-export class ConfirmDialogComponent implements OnInit {
+export class ConfirmDialogComponent {
 
-  
+
 
   public title = '';
   public message = '';
@@ -17,9 +15,5 @@ export class ConfirmDialogComponent implements OnInit {
   public showAnnotations = true
 
   constructor() { }
-
-  ngOnInit(): void {
-  
-  }
 
 }
