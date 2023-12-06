@@ -53,12 +53,10 @@ export class FamService {
         this.dataChange.next(nodes)
       },
       error: (err: Response) => {
-        if( err.status === 404){
+        if (err.status === 404) {
           this.toastr.error(this.translate.instant('Unable to retrieve files'))
-        }
-        if( err.status === 403){
+        } else if (err.status === 403) {
           this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-          // TODO: redirect to specific page
         }
       }
     })

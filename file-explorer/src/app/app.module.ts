@@ -118,7 +118,7 @@ export function startupServiceFactory(startupService: StartupService) {
     {
       provide: GET_OPTIONS,
       useFactory: getOptionsFactory,
-      deps: [AuthentificationService, ArlasIamService]
+      deps: [ArlasSettingsService, AuthentificationService, ArlasIamService]
     },
     {
       provide: CONFIG_UPDATER,

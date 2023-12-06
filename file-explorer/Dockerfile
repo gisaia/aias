@@ -24,7 +24,7 @@ ARG version="latest"
 
 LABEL io.arlas.wui-fam.version=${version}
 LABEL vendor="Gisaïa"
-LABEL description="This container build and serve the FAM-wui app"
+LABEL description="This container builds and serves the FAM-wui app"
 
 RUN apk add --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
 

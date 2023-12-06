@@ -91,10 +91,8 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err: Response) => {
         if( err.status === 404){
           this.toastr.error(this.translate.instant('Unable to retrieve status'))
-        }
-        if( err.status === 403){
+        } else if( err.status === 403){
           this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-          // TODO: redirect to specific page
         }
       }
     });

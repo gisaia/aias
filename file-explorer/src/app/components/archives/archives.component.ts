@@ -39,43 +39,41 @@ export class ArchivesComponent implements OnChanges {
     }
   }
 
-  public getArchives(path: string){
+  public getArchives(path: string) {
     this.famService.getArchive(path)
-        .pipe(
-          mergeMap((archives) => {
-            if (archives.length > 0) {
-              return forkJoin(
-                archives.map((archive: Archive) => zip(
-                  of(archive),
-                  this.statusService.getResourceStatus(archive.id).pipe(catchError(() => of([])))
-                ))
-              )
-            } else {
-              return of([]);
-            }
-          }),
-          map(data => data.map(result => {
-            const archive: Archive = result[0];
-            const resourceId: any = result[1].id;
-            if (!!resourceId) {
-              archive.status = ProcessStatus.successful;
-            }
-            return archive;
-          })),
-          finalize(() => this.spinner.hide('archives'))
-        )
-        .subscribe({
-          next: (data) => this.archives = data,
-          error: (err: Response) => {
-            if (err.status === 404) {
-              this.toastr.error(this.translate.instant('Unable to retrieve archives'))
-            }
-            if (err.status === 403) {
-              this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-              // TODO: redirect to specific page
-            }
+      .pipe(
+        mergeMap((archives) => {
+          if (archives.length > 0) {
+            return forkJoin(
+              archives.map((archive: Archive) => zip(
+                of(archive),
+                this.statusService.getResourceStatus(archive.id).pipe(catchError(() => of([])))
+              ))
+            )
+          } else {
+            return of([]);
           }
-        })
+        }),
+        map(data => data.map(result => {
+          const archive: Archive = result[0];
+          const resourceId: any = result[1].id;
+          if (!!resourceId) {
+            archive.status = ProcessStatus.successful;
+          }
+          return archive;
+        })),
+        finalize(() => this.spinner.hide('archives'))
+      )
+      .subscribe({
+        next: (data) => this.archives = data,
+        error: (err: Response) => {
+          if (err.status === 404) {
+            this.toastr.error(this.translate.instant('Unable to retrieve archives'))
+          } else if (err.status === 403) {
+            this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          }
+        }
+      })
   }
 
   public activate(archive: Archive) {
@@ -93,10 +91,8 @@ export class ArchivesComponent implements OnChanges {
             error: (err: Response) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
-              }
-              if (err.status === 403) {
+              } else if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-                // TODO: redirect to specific page
               }
             }
           });
@@ -105,7 +101,7 @@ export class ArchivesComponent implements OnChanges {
     });
   }
 
-  public desactivate(archive: Archive){
+  public desactivate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Dereferencing') + ' : ' + archive.name;
     dialogRef.componentInstance.action = 'Dereference';
@@ -122,19 +118,13 @@ export class ArchivesComponent implements OnChanges {
             error: (err: Response) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Dereferencing failed'))
-              }
-              if (err.status === 403) {
+              } else if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-                // TODO: redirect to specific page
               }
             }
           });
         }
       }
     });
-  }
-
-  public delete(archive: Archive) {
-
   }
 }
