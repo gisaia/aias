@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>{{title}} </h2>
+<mat-dialog-content>
+  <div>
+    {{message}}
+  </div>
+  <mat-form-field [class.hide]="!showAnnotations" class="annotations" appearance="fill">
+    <mat-label>{{'Annotations' | translate}}</mat-label>
+    <textarea #anno matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
+      cdkAutosizeMaxRows="6"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" [color]="'primary'"
+    [mat-dialog-close]="{status: true, annotations: anno?.value}">
+    {{action | translate}}
+  </button>
+  <button mat-stroked-button [mat-dialog-close]="{status: false}">
+    {{'Cancel' | translate}}
+  </button>
+
+</mat-dialog-actions>

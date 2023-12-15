@@ -1,0 +1,79 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+@mixin section-title() {
+  font-size: 20px;
+  border-bottom: 1px solid $borderColor;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .material-symbols-outlined {
+    cursor: pointer;
+    &.rotate {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+::ng-deep .top-menu {
+  // height: $topMenuHeight;
+  background-color: $primaryColor !important;
+  color: white;
+  font-weight: 400;
+  padding: 0 10px !important;
+  font-size: 1.5em;
+  button {
+    mat-icon {
+      color: white !important;
+    }
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - $topMenuHeight);
+
+  .files {
+    display: flex;
+    height: calc(100% - $tasksHeight - 1px); // 1px => border bottom
+    border-bottom: 1px solid $borderColor;
+
+    &.reduce {
+      height: calc(100% - $sectionTitleHeight - 1px); // 1px => border bottom
+    }
+
+    .archives {
+      flex: 1;
+      width: 100%;
+      .section-title {
+        @include section-title();
+      }
+    }
+    .explorer {
+      flex: 1;
+      border-right: 1px solid $borderColor;
+      .section-title {
+        @include section-title();
+      }
+    }
+  }
+
+  .jobs {
+    height: $tasksHeight;
+    .section-title {
+      @include section-title();
+    }
+    &.reduce {
+      height: $sectionTitleHeight;
+    }
+  }
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

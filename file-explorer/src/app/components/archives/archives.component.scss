@@ -1,0 +1,91 @@
+@import "styles/colors.scss";
+@import "styles/sizes.scss";
+
+.archives-content {
+  height: calc(100% - $sectionTitleHeight);
+  overflow: auto;
+  position: relative;
+  .archives-list {
+    .archive {
+      height: 48px;
+
+      &:nth-child(odd) {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .list-icon {
+        width: 24px;
+        height: 20px;
+        font-size: 20px;
+      }
+      .item-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        .info {
+          .label {
+            font-size: 14px;
+          }
+          .detail {
+            color: rgba(0, 0, 0, 0.58);
+            font-size: 12px;
+          }
+        }
+        .actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0 5px;
+          .no-pointer {
+            cursor: default;
+          }
+          .pointer {
+            cursor: pointer;
+          }
+          .icon-spacer {
+            width: 24px;
+            height: 24px;
+          }
+
+          .driver-chip {
+            border: 1px solid rgba(0, 0, 0, 0.75);
+            background: white;
+            color: rgba(0, 0, 0, 0.75);
+            &:after {
+              background: white !important;
+            }
+          }
+
+          .successful {
+            color: $successColor;
+          }
+
+          .failed {
+            color: $errorColor;
+          }
+
+          .running {
+            color: $progressColor;
+          }
+
+          .accepted {
+            color: $infoColor;
+          }
+
+          .not-activated {
+            color: $disabledColor;
+          }
+        }
+      }
+    }
+  }
+
+  .no-archive {
+    padding: 10px;
+    border: 1px solid $infoBorderColor;
+    color: $infoColor;
+    background-color: $infoBackgroundColor;
+    font-size: 14px;
+  }
+}
