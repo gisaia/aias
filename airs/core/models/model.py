@@ -219,6 +219,7 @@ class Properties(BaseModel, extra=Extra.allow):
     end_datetime: Datetime | None = Field(default=None, title="Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
     programme: str | None = Field(default=None, title="Name of the programme")
     constellation: str | None = Field(default=None, title="Name of the constellation")
+    satellite: str | None = Field(default=None, title="Name of the satellite")
     instrument: str | None = Field(default=None, title="Name of the instrument")
     sensor: str | None = Field(default=None, title="Name of the sensor")
     sensor_type: str | None = Field(default=None, title="Type of sensor")
