@@ -11,8 +11,8 @@ COPY ./common /app/common
 COPY ./conf /app/conf
 COPY ./scripts/airs/start.sh /app/
 
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.5/mapping.json" -o ./conf/mapping.json
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.5/collection.json" -o ./conf/collection.json
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json" -o ./conf/mapping.json
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json" -o ./conf/collection.json
 
 EXPOSE 8000
 ENTRYPOINT ["./start.sh"]
