@@ -1,5 +1,10 @@
-if  [ -z "$PIP_LOGIN"  ] ; then echo "Please set PIP_LOGIN environment variable"; exit -1; fi
-if  [ -z "$PIP_PASSWORD"  ] ; then echo "Please set PIP_PASSWORD environment variable"; exit -1; fi
+if test -f "$HOME/.pypirc"; then
+    echo "$HOME/.pypirc found."
+else
+    echo "$HOME/.pypirc does not exists. Please create it and set the username/password".
+    exit 1
+fi
+
 rm -r target
 mkdir -p target/src/airs/core/models
 cp -r airs/core/models/* target/src/airs/core/models
@@ -21,5 +26,6 @@ docker run \
 docker run --rm \
     -w /opt/python \
     -v $PWD:/opt/python \
+    -v $HOME/.pypirc:/root/.pypirc \
     python:3 \
-    /bin/bash -c  "pip install twine ; twine upload dist/* -u ${PIP_LOGIN} -p ${PIP_PASSWORD}"
+    /bin/bash -c  "pip install twine ; twine upload dist/*"
