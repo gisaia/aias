@@ -6,3 +6,4 @@ fastapi==0.100.0
 python-multipart==0.0.6
 envyaml==1.10.211231
 requests==2.31.0
+ecs-logging==2.1.0
