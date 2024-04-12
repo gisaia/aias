@@ -575,6 +575,12 @@ Returns
 
 # Tests
 
+First install the tests requirements:
+
+```shell
+pip install -r test/requirements.txt
+```
+
 To run the tests (this will also start the stack):
 
 ```shell
