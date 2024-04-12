@@ -18,7 +18,7 @@ Functions for access:
 
 To start a standalone stack for testing:
 ```shell
-./test/start.sh
+./test/start_stack.sh
 ```
 At least 8Go of RAM is needed.
 
@@ -42,13 +42,13 @@ Health checks are available for all non-third party services:
 
 # ARLAS Item Registration Services
 
-ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The services exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
+ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The service exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
 
 By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists: the asset must be added before the item. Deleting an item is cascaded on the managed assets. An asset can be unmanaged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`).
 
 ## AIRS Data model
 
-The AIRS Model is based on the STAC specifications. It supports the folling extensions:
+The AIRS Model is based on the STAC specifications. It supports the following extensions:
 - view
 - storage
 - eo
@@ -202,9 +202,9 @@ curl -X DELETE \
 ARLAS Processes (APROC) exposes an OGC API Processes compliant API.
 
 List of processes:
-- `ingest` : it ingest an archive.
-- `directory_ingest` : it ingest archives found in a directory.
-- `download` : it ingest an archive.
+- `ingest` : it ingests an archive.
+- `directory_ingest` : it ingests archives found in a directory.
+- `download` : it ingests an archive.
 
 ### Ingest process
 
@@ -225,7 +225,7 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 
 A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest/drivers/driver.py).
 
-IMPORTANT: The name of the class within the module __must be__ `Driver`.
+>>> IMPORTANT: The name of the class within the module __must be__ `Driver`.
 
 The following drivers are available in the `extensions` directory:
 - theia
