@@ -1,7 +1,6 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
-import { ArlasSettingsService } from 'arlas-wui-toolkit';
+import { Archive, DynamicFileNode, IngestPayload, ProcessResult } from '@tools/interface';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable({

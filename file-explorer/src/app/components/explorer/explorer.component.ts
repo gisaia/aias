@@ -8,7 +8,6 @@ import { JobService } from '@services/job/job.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
