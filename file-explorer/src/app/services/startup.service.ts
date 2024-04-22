@@ -1,7 +1,7 @@
 import { LOCATION_INITIALIZED } from '@angular/common';
 import { Injectable, Injector } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ArlasConfigService, ArlasIamService, ArlasSettings, ArlasStartupService } from 'arlas-wui-toolkit';
+import { ArlasIamService, ArlasSettings, ArlasStartupService } from 'arlas-wui-toolkit';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from './job/job.service';
 import { StatusService } from './status/status.service';
@@ -60,21 +60,21 @@ export class StartupService {
               this.famService.setSettings((s as any).file_manager);
               this.famService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken,
+                  Authorization: 'bearer ' + loginData.access_token,
                   'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });
               this.jobService.setSettings((s as any).jobs);
               this.jobService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken,
+                  Authorization: 'bearer ' + loginData.access_token,
                   'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });
               this.statusService.setSettings((s as any).status);
               this.statusService.setOptions({
                 headers: {
-                  Authorization: 'bearer ' + loginData.accessToken,
+                  Authorization: 'bearer ' + loginData.access_token,
                   'arlas-org-filter': this.arlasIamService.getOrganisation()
                 }
               });

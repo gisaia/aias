@@ -20,21 +20,23 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateLoader } from '@ngx-translate/core';
 import enComponents from 'arlas-web-components/assets/i18n/en.json';
 import frComponents from 'arlas-web-components/assets/i18n/fr.json';
-import { ArlasSettingsService, CONFIG_ID_QUERY_PARAM, NOT_CONFIGURED, PersistenceService } from 'arlas-wui-toolkit';
+import esComponents from 'arlas-web-components/assets/i18n/es.json';
+import { ArlasConfigService, ArlasSettingsService, CONFIG_ID_QUERY_PARAM, NOT_CONFIGURED, PersistenceService } from 'arlas-wui-toolkit';
 import enToolkit from 'arlas-wui-toolkit/assets/i18n/en.json';
 import frToolkit from 'arlas-wui-toolkit/assets/i18n/fr.json';
+import esToolkit from 'arlas-wui-toolkit/assets/i18n/es.json';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { map } from 'rxjs/internal/operators/map';
 import { mergeMap } from 'rxjs/internal/operators/mergeMap';
-
 
 export class ArlasTranslateLoader implements TranslateLoader {
 
   public constructor(
     private http: HttpClient,
     private arlasSettings: ArlasSettingsService,
-    private persistenceService: PersistenceService
+    private persistenceService: PersistenceService,
+    private configService: ArlasConfigService
   ) { }
 
   public getTranslation(lang: string): Observable<any> {
@@ -47,11 +49,7 @@ export class ArlasTranslateLoader implements TranslateLoader {
     if (usePersistence && configurationId) {
       const localI18nObs = this.http.get(localI18nAdress);
       const externalI18nObs = this.persistenceService.get(configurationId)
-        .pipe(mergeMap(configDoc => this.persistenceService
-          .existByZoneKey('i18n', configDoc.doc_key.concat('_').concat(lang))
-          .pipe(mergeMap(exist => exist.exists ? this.persistenceService
-            .getByZoneKey('i18n', configDoc.doc_key.concat('_').concat(lang))
-            .pipe(map(i18nDoc => i18nDoc.doc_value)) : of('{}')), catchError(e => of('{}')))));
+        .pipe(mergeMap(configDoc => this.getI18n(lang, configDoc, of('{}'))));
       return Observable.create((observer: any) => {
         forkJoin([localI18nObs, externalI18nObs]).subscribe(
           results => {
@@ -63,6 +61,8 @@ export class ArlasTranslateLoader implements TranslateLoader {
               merged = { ...frComponents, ...frToolkit, ...localI18n, ...externalI18n as Object };
             } else if (lang === 'en') {
               merged = { ...enComponents, ...enToolkit, ...localI18n, ...externalI18n as Object };
+            } else if (lang === 'es') {
+              merged = { ...esComponents, ...esToolkit, ...localI18n, ...externalI18n as Object };
             }
             observer.next(merged);
             observer.complete();
@@ -88,6 +88,8 @@ export class ArlasTranslateLoader implements TranslateLoader {
           merged = { ...frComponents, ...frToolkit, ...res };
         } else if (lang === 'en') {
           merged = { ...enComponents, ...enToolkit, ...res };
+        } else if (lang === 'es') {
+          merged = { ...esComponents, ...esToolkit, ...res };
         }
         observer.next(merged);
         observer.complete();
@@ -97,5 +99,21 @@ export class ArlasTranslateLoader implements TranslateLoader {
         observer.complete(); // => Default language is already loaded
       }
     );
+  }
+
+  private getI18n(lang: string, config: any, localTour: Observable<any>): Observable<string> {
+    const arlasConfig = this.configService.parse(config.doc_value);
+    if (this.configService.hasI18n(arlasConfig) && this.configService.getI18n(arlasConfig)[lang]) {
+      const i18nId = this.configService.getI18n(arlasConfig)[lang];
+      return this.persistenceService.exists(i18nId).pipe(mergeMap((exist) => {
+        if (exist.exists) {
+          return this.persistenceService.get(i18nId)
+            .pipe(map((i18nDoc) => i18nDoc.doc_value))
+            .pipe(catchError((err) => localTour));
+        }
+        return localTour;
+      }));
+    }
+    return localTour;
   }
 }
