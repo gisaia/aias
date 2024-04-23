@@ -19,7 +19,7 @@ RUN npm run build
 
 ### STAGE 2: Setup ###
 
-FROM nginx:1.23.3-alpine
+FROM nginx:1.25.3-alpine3.18-slim
 ARG version="latest"
 
 LABEL io.arlas.wui-fam.version=${version}
