@@ -1,5 +1,7 @@
+#!/usr/bin/env sh
+set -o errexit
 # Set env variable
-source ./test/env.sh
+. ./test/env.sh
 # Copy heavy data for test from gcp bucket
 if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
     echo "${ROOT_DIRECTORY}/DIMAP exists, files are not downloaded."
@@ -37,4 +39,3 @@ while [[ "$code" != *$code_OK* ]];do
     code="$(curl -IL --silent http://localhost:9999 | grep "^HTTP\/")"
     eval "sleep 5"
 done
-
