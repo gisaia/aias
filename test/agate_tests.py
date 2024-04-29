@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+from time import sleep
 
 import requests
 from utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
@@ -55,6 +56,7 @@ class Tests(unittest.TestCase):
         print("item created")
         r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID))
         self.assertTrue(r.ok, msg=r.content)
+        sleep(3)
         return mapper.item_from_json(r.content)
 
 
