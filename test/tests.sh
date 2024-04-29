@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
-#set -o errexit
+set -o errexit
 
 ./test/start_stack.sh
+
 # Set env variable
 . ./test/env.sh
 python3 test/airs_tests.py
