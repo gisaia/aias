@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -o errexit
 # Set env variable
-. ./test/env.sh
+source ./test/env.sh
 # Copy heavy data for test from gcp bucket
 if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
     echo "${ROOT_DIRECTORY}/DIMAP exists, files are not downloaded."
