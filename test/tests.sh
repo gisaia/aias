@@ -1,3 +1,6 @@
+#!/usr/bin/env sh
+set -o errexit -o pipefail
+
 ./test/start_stack.sh
 # Set env variable
 source ./test/env.sh
