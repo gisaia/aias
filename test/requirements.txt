@@ -9,3 +9,4 @@ requests==2.31.0
 ecs-logging==2.1.0
 uvicorn==0.23.1
 pygeohash==1.2.0
+pytz==2023.3
