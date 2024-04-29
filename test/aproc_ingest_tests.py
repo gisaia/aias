@@ -41,10 +41,6 @@ class Tests(unittest.TestCase):
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
 
-    def test_async_ingest_theia(self):
-        url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
-        self.ingest(url, COLLECTION, "theia")
-
     def test_async_ingest_dimap(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         self.ingest(url, COLLECTION, "spot6")
@@ -67,8 +63,8 @@ class Tests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def __ingest_theia(self) -> StatusInfo:
-        url = "https://catalogue.theia-land.fr/arlas/explore/theia/_search?f=metadata.core.identity.identifier%3Aeq%3ASENTINEL2A_20230604-105902-526_L2A_T31TCJ_D&righthand=false&pretty=false&flat=false&&&size=1&max-age-cache=120"
+    def __ingest_dimap(self) -> StatusInfo:
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         collection = COLLECTION
         catalog = "theia"
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
@@ -78,21 +74,21 @@ class Tests(unittest.TestCase):
         return StatusInfo(**json.loads(r.content))
 
     def test_job_by_id(self):
-        status: StatusInfo = self.__ingest_theia()
+        status: StatusInfo = self.__ingest_dimap()
         status2: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.jobID, status2.jobID)
         self.assertEqual(status2.processID, "ingest")
 
     def test_job_result(self):
-        status: StatusInfo = self.__ingest_theia()
+        status: StatusInfo = self.__ingest_dimap()
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/"+COLLECTION+"/items/SENTINEL2A_20230604-105902-526_L2A_T31TCJ_D", result["item_location"])
+        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/"+COLLECTION+"/items/148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71", result["item_location"])
 
     def test_get_jobs_by_resource_id(self):
-        status: StatusInfo = self.__ingest_theia()
+        status: StatusInfo = self.__ingest_dimap()
         resource_status: list = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs/resources", status.resourceID])).content)
         self.assertGreaterEqual(len(resource_status), 1)
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)

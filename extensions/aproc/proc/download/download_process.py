@@ -141,6 +141,7 @@ class AprocProcess(Process):
         if send_to is None: send_to = "anonymous"
         target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id)
         if not os.path.exists(target_directory):
+            LOGGER.info("create {}".format(target_directory))
             os.makedirs(target_directory)
         file_name = os.path.basename(item.id.replace("-", "_").replace(" ", "_").replace("/", "_").replace("\\", "_").replace("@", "_"))+"."+format
         if os.path.exists(file_name):

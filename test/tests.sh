@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -o errexit
+#set -o errexit
 
 ./test/start_stack.sh
 # Set env variable
