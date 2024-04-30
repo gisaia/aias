@@ -16,9 +16,12 @@ services:
       - ServerOptions__HostName=smtp4dev
 
   arlas-server:
-    image: gisaia/arlas-server:${ARLAS_SERVER_VERSION:-23.0.7}
+    image: gisaia/arlas-server:${ARLAS_SERVER_VERSION:-24.1.2}
     platform: linux/amd64
     container_name: arlas-server
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     networks:
       - aias
     ports:
@@ -35,7 +38,12 @@ services:
       - ARLAS_ELASTIC_INDEX=.arlas
       - ARLAS_APP_PATH=/
       - ARLAS_BASE_URI=http://localhost:9999/server/
-
+    healthcheck:
+          test: ["CMD","java","HttpHealthcheck.java","http://localhost:9999/admin/healthcheck"]
+          interval: 10s
+          timeout: 10s
+          retries: 6
+  
   agate:
     networks:
       - aias
@@ -44,6 +52,9 @@ services:
       dockerfile: Dockerfile-agate
     image: agate:latest
     container_name: 'agate'
+    depends_on:
+      arlas-server:
+        condition: service_healthy
     environment:
       - AGATE_CORS_ORIGINS=${AGATE_CORS_ORIGINS:-*}
       - AGATE_CORS_METHODS=${AGATE_CORS_METHODS:-*}
@@ -59,7 +70,3 @@ services:
 #      - ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
     ports:
       - $AGATE_PORT:$AGATE_PORT
-    depends_on:
-      - arlas-server
-
-

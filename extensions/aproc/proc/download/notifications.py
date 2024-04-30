@@ -24,8 +24,11 @@ class Notifications:
             LOGGER.info("Index {} does not exists. Attempt to create it with mapping from {} and {}".format(Configuration.settings.index_for_download.index_name, Configuration.settings.arlaseo_mapping_url, Configuration.settings.download_mapping_url))
             mapping = Notifications.__fetch_mapping__(Configuration.settings.arlaseo_mapping_url)
             mapping["properties"]["properties"]["properties"].update(Notifications.__fetch_mapping__(Configuration.settings.download_mapping_url)["properties"]["properties"]["properties"])
-            Notifications.__getES().indices.create(index=Configuration.settings.index_for_download.index_name, mappings=mapping)
-            LOGGER.info("Mapping {} updated.".format(Configuration.settings.index_for_download.index_name))
+            try:
+                Notifications.__getES().indices.create(index=Configuration.settings.index_for_download.index_name, mappings=mapping)
+                LOGGER.info("Mapping {} updated.".format(Configuration.settings.index_for_download.index_name))
+            except Exception as e:
+                LOGGER.error("Can not create {} ({})".format(Configuration.settings.index_for_download.index_name, e))
         else:
             LOGGER.debug("Index {} found.".format(Configuration.settings.index_for_download.index_name))
 

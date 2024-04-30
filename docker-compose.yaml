@@ -14,11 +14,17 @@ services:
       - "MINIO_ACCESS_KEY=airs"
       - "MINIO_SECRET_KEY=airssecret"
     command: server /export --console-address ":9001"
+    healthcheck:
+      test: "mc alias set myminio http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; mc ping -x myminio"
+      interval: 5s
+      timeout: 10s
+      retries: 3
 
   createbuckets:
     image: minio/mc
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
     environment:
       - BUCKET_NAME=${BUCKET_NAME:-airstest}
       - LOGIN=${LOGIN:-airs}
@@ -47,6 +53,11 @@ services:
       - xpack.security.transport.ssl.enabled=false
     ports:
       - 9200:9200
+    healthcheck:
+      test: "curl -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
+      interval: 10s
+      timeout: 10s
+      retries: 24
 
   rabbitmq:
     image: rabbitmq:${RABBITMQ_VERSION:-3-management}
@@ -56,6 +67,11 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 30s
+      retries: 10
 
   smtp4dev:
     image: rnwood/smtp4dev:linux-${PLATFORM}-3.2.0-ci20221023104
@@ -76,6 +92,50 @@ services:
     container_name: redis
     ports:
       - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+
+  airs-server:
+    networks:
+      - aias
+    build:
+      context: '.'
+      dockerfile: Dockerfile-airs
+    image: airs-server:latest
+    container_name: 'airs-server'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      - AIRS_HOST=0.0.0.0
+      - AIRS_PORT=8000
+      - AIRS_CORS_ORIGINS=${AIRS_CORS_ORIGINS:-*}
+      - AIRS_CORS_METHODS=${AIRS_CORS_METHODS:-*}
+      - AIRS_CORS_HEADERS=${AIRS_CORS_HEADERS:-*}
+      - AIRS_INDEX_ENDPOINT_URL=${AIRS_INDEX_ENDPOINT_URL:-http://localhost:9200}
+      - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
+      - AIRS_INDEX_LOGIN=${AIRS_INDEX_LOGIN:-None}
+      - AIRS_INDEX_PWD=${AIRS_INDEX_PWD:-None}
+      - AIRS_S3_BUCKET=${AIRS_S3_BUCKET:-airstest}
+      - AIRS_S3_ACCESS_KEY_ID=${AIRS_S3_ACCESS_KEY_ID}
+      - AIRS_S3_SECRET_ACCESS_KEY=${AIRS_S3_SECRET_ACCESS_KEY}
+      - AIRS_S3_REGION=${AIRS_S3_REGION:-None}
+      - AIRS_S3_TIER=${AIRS_S3_TIER:-Standard}
+      - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
+      - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
+      - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}
+      - AIRS_MAPPING_URL=${AIRS_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json}
+      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json}
+      - AIRS_LOGGER_LEVEL=${AIRS_LOGGER_LEVEL:-INFO}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: "curl -f http://localhost:8000/arlas/airs/healthcheck"
+      interval: 5s
+      timeout: 3s
+      retries: 30
 
   aproc-processes:
     networks:
@@ -125,46 +185,12 @@ services:
       - ./test/inputs:/inputs:ro
       - ./outbox/:/outbox
     depends_on:
-      - redis
-      - rabbitmq
-      - smtp4dev
+      redis:
+          condition: service_healthy
+      rabbitmq:
+          condition: service_healthy
 
-  airs-server:
-    networks:
-      - aias
-    build:
-      context: '.'
-      dockerfile: Dockerfile-airs
-    image: airs-server:latest
-    container_name: 'airs-server'
-    environment:
-      - AIRS_HOST=0.0.0.0
-      - AIRS_PORT=8000
-      - AIRS_CORS_ORIGINS=${AIRS_CORS_ORIGINS:-*}
-      - AIRS_CORS_METHODS=${AIRS_CORS_METHODS:-*}
-      - AIRS_CORS_HEADERS=${AIRS_CORS_HEADERS:-*}
-      - AIRS_INDEX_ENDPOINT_URL=${AIRS_INDEX_ENDPOINT_URL:-http://localhost:9200}
-      - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
-      - AIRS_INDEX_LOGIN=${AIRS_INDEX_LOGIN:-None}
-      - AIRS_INDEX_PWD=${AIRS_INDEX_PWD:-None}
-      - AIRS_S3_BUCKET=${AIRS_S3_BUCKET:-airstest}
-      - AIRS_S3_ACCESS_KEY_ID=${AIRS_S3_ACCESS_KEY_ID}
-      - AIRS_S3_SECRET_ACCESS_KEY=${AIRS_S3_SECRET_ACCESS_KEY}
-      - AIRS_S3_REGION=${AIRS_S3_REGION:-None}
-      - AIRS_S3_TIER=${AIRS_S3_TIER:-Standard}
-      - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
-      - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
-      - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}
-      - AIRS_MAPPING_URL=${AIRS_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json}
-      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json}
-      - AIRS_LOGGER_LEVEL=${AIRS_LOGGER_LEVEL:-INFO}
-    ports:
-      - "8000:8000"
-    depends_on:
-      - elasticsearch
-      - minio
-
-  aproc-server:
+  aproc-service:
     networks:
       - aias
     build:
@@ -172,6 +198,13 @@ services:
       dockerfile: Dockerfile-aproc-service
     image: aproc-service:latest
     container_name: 'aproc-service'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      redis:
+          condition: service_healthy
+      rabbitmq:
+          condition: service_healthy
     environment:
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_HOST=0.0.0.0
@@ -214,9 +247,11 @@ services:
       - ./test/inputs:/inputs:ro
     ports:
       - "8001:8001"
-    depends_on:
-      - redis
-      - rabbitmq
+    healthcheck:
+      test: "curl -f http://localhost:8001/arlas/aproc/healthcheck"
+      interval: 5s
+      timeout: 3s
+      retries: 30
 
   aproc-ingest:
     networks:
@@ -226,8 +261,11 @@ services:
       dockerfile: Dockerfile-aproc-ingest
     image: aproc-ingest:latest
     container_name: 'aproc-ingest'
+    depends_on:
+      aproc-service:
+        condition: service_healthy
     environment:
-      - APROC_ENDPOINT=http://aproc-server:8001/arlas/aproc
+      - APROC_ENDPOINT=http://aproc-service:8001/arlas/aproc
       - DRIVERS_CONFIGURATION_FILE=/app/conf/drivers.yaml
       - INGESTED_FOLDER=/inputs
       - OUTPUT_FILE=/tmp/results.csv
