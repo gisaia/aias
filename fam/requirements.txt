@@ -9,3 +9,4 @@ attrs==23.1.0
 requests==2.31.0
 jsonref==1.1.0
 ecs-logging==2.1.0
+pillow==10.3.0
