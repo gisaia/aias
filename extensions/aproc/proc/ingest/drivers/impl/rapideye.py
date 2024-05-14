@@ -34,28 +34,30 @@ class Driver(ProcDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.thumbnail_path is not None:
+            asset = Asset(href=self.thumbnail_path,
+                          roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                          description=Role.thumbnail.value)
             try:
-                asset = Asset(href=self.get_asset_filepath(self.thumbnail_path),
-                              roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                              description=Role.thumbnail.value)
+                asset.href = self.get_asset_filepath(self.thumbnail_path, asset)
                 im = Image.open(self.thumbnail_path)
                 im.thumbnail(im.size)
                 im.convert("RGB")
                 im.save(asset.href, "JPEG", quality=100)
-                assets.append(asset)
             except Exception as e:
                 Driver.LOGGER.error("couldn't create thumbnail from {} : {}".format(self.thumbnail_path, e))
+            assets.append(asset)
         if self.quicklook_path is not None:
+            asset = Asset(href=self.quicklook_path,
+                          roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                          description=Role.overview.value)
             try:
-                asset = Asset(href=self.get_asset_filepath(self.quicklook_path),
-                              roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                              description=Role.overview.value)
+                asset.href = self.get_asset_filepath(self.quicklook_path, asset)
                 im = Image.open(self.quicklook_path)
                 im.convert("RGB")
                 im.save(asset.href, "JPEG", quality=100)
-                assets.append(asset)
             except Exception as e:
-                Driver.LOGGER.error("couldn't create overview from {} : {}".format(self.thumbnail_path, e))
+                Driver.LOGGER.error("couldn't create overview from {} : {}".format(self.quicklook_path, e))
+            assets.append(asset)
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
