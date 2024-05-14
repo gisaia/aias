@@ -35,6 +35,18 @@ fi
 envsubst '$FAM_WUI_BASE_HREF' < /usr/share/nginx/html/index.html > /usr/share/nginx/html/index.html.tmp
 mv /usr/share/nginx/html/index.html.tmp /usr/share/nginx/html/index.html
 
+### Array of statics links
+if [ -z "${ARLAS_STATIC_LINKS}" ]; then
+  ARLAS_STATIC_LINKS="[]"
+  export ARLAS_STATIC_LINKS
+  echo "None static link is defined"
+else
+  echo ${ARLAS_STATIC_LINKS} "is used for 'links' in settings.yaml file"
+fi
+envsubst '$ARLAS_STATIC_LINKS' < /usr/share/nginx/html/settings.yaml > /usr/share/nginx/html/settings.yaml.tmp
+mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
+
+
 ## AUTHENTICATION
 ### ARLAS_USE_AUTHENT
 if [ -z "${ARLAS_USE_AUTHENT}" ]; then

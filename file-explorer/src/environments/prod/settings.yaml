@@ -5,6 +5,7 @@ authentication:
   use_discovery: false
   threshold: ${ARLAS_AUTHENT_THRESHOLD}
   url: ${ARLAS_IAM_SERVER_URL}
+links: ${ARLAS_STATIC_LINKS}
 file_manager:
   url: ${FAM_SERVER_URL}
   default_path: ${FAM_DEFAULT_PATH}
