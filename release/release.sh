@@ -3,6 +3,12 @@
 VERSION=$1
 echo "Build and releas the image with version ${VERSION}"
 
+prepare_arlas_fam_wui (){
+    cd file-explorer
+    npm --no-git-tag-version version ${VERSION}
+    cd ../
+}
+
 build_and_publish_docker (){
     IMAGE=$1
     echo "Building the image $IMAGE"
@@ -17,6 +23,10 @@ build_and_publish_docker (){
 #---------------    FAM    ----------------
 
 build_and_publish_docker fam
+
+#---------------    FAM WUI   ----------------
+prepare_arlas_fam_wui
+build_and_publish_docker arlas-fam-wui
 
 #---------------    APROC    ----------------
 build_and_publish_docker aproc-proc
@@ -40,6 +50,9 @@ python3 airs/core/models/utils.py > docs/model/model.schema.json
 jsonschema2md -d docs/model/ -o docs/model/
 ./release/publish.sh $VERSION
 
+# FILE EXPLORER
+git add file-explorer/package.json
+git add file-explorer/package-lock.json
 # DOCUMENTATION
 git add docs/
 git commit -m "update docs for version "$VERSION
