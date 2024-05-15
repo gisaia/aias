@@ -14,7 +14,8 @@
           <div mat-line class="label">
             {{archive.name}}
           </div>
-          <div mat-line class="detail">{{'last update:' | translate}} {{archive.creation_date | date:'short'}}</div>
+          <div mat-line class="detail">{{'last update:' | translate}} {{archive.last_modification_date | date:'short'}}</div>
+          <div mat-line class="detail">{{'id:' | translate}} {{archive.id}}</div>
         </div>
         <div class="actions">
           <mat-chip-list ><mat-chip [disableRipple]="true" class="driver-chip">{{archive.driver_name}}</mat-chip></mat-chip-list>
