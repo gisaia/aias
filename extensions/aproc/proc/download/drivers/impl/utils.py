@@ -31,6 +31,8 @@ def extract(crop_wkt, file, driver_target, epsg_target, target_directory, target
         srs.ImportFromEPSG(int(str(src.crs).split(":")[1]))
         out_image, out_transform = rasterio.mask.mask(src, [geom], crop=crop_wkt is not None)
         out_meta = src.meta.copy()
+        if driver_target == 'JP2OpenJPEG' and isinstance(out_meta['dtype'], str) and not out_meta['dtype'].startswith('uint'):
+            out_meta['dtype'] = 'uint8'
         default_transform, width, height = calculate_default_transform(epsg_src.crs, epsg_target.crs,
                                                                        out_image.shape[2], out_image.shape[1],
                                                                        *geom.bounds)

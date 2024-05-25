@@ -1,5 +1,5 @@
 import os
-from airs.core.models.model import Item, Role
+from airs.core.models.model import Item, Role, Asset
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import Driver as DownloadDriver
 from datetime import datetime
@@ -16,7 +16,7 @@ class Driver(DownloadDriver):
         if item.assets.get(Role.data.value) is not None:
             asset = item.assets.get(Role.data.value)
             file_name = os.path.basename(asset.href)
-            return file_name.lower().endswith(".tif")
+            return file_name.lower().endswith(".tif") or file_name.lower().endswith(".tiff")
         else:
             return False
     
@@ -38,6 +38,3 @@ class Driver(DownloadDriver):
             target_file_name = os.path.splitext(tif_file_name)[0]  + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")+'.JP2'
         extract(crop_wkt, tif_file, driver_target, epsg_target, target_directory, target_file_name,
                       target_projection)
-
-
-
