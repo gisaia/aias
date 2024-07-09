@@ -1,8 +1,14 @@
 import os
+import shutil
+
 from airs.core.models.model import Item, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import Driver as DownloadDriver
 from datetime import datetime
+
+from extensions.aproc.proc.download.drivers.impl.utils import make_raw_archive_zip
+
+
 class Driver(DownloadDriver):
 
     # Implements drivers method
@@ -21,12 +27,19 @@ class Driver(DownloadDriver):
             return False
     
     # Implements drivers method
-    def fetch_and_transform(self, item: Item, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str):
-        from extensions.aproc.proc.download.drivers.impl.utils import extract
-        import pyproj
+    def fetch_and_transform(self, item: Item, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         asset = item.assets.get(Role.data.value)
         tif_file = asset.href
         tif_file_name = os.path.basename(tif_file)
+        if raw_archive:
+            make_raw_archive_zip(tif_file, target_directory)
+            return
+        if target_projection == target_format == 'native':
+            # If the projetion and the format are natives, just copy the file
+            shutil.copyfile(tif_file, os.path.join(target_directory, tif_file_name))
+            return
+        from extensions.aproc.proc.download.drivers.impl.utils import extract
+        import pyproj
         epsg_target = pyproj.Proj(target_projection)
         # Default driver is GTiff
         driver_target = "GTiff"

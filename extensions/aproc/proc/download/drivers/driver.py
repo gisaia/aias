@@ -35,7 +35,7 @@ class Driver(ABC):
         ...
 
     @abstractmethod
-    def fetch_and_transform(self, item: Item, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str):
+    def fetch_and_transform(self, item: Item, target_directory: str, file_name: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         """ Fetch and transform the item, given the wanted projection, format and crop. The file must be placed in the provided target directory.
 
         Args:
@@ -45,5 +45,6 @@ class Driver(ABC):
             crop_wkt (str): geometry to crop the raster with
             target_projection (str): target projection
             target_format (str): target format
+            raw_archive (bool): if true fetch raw archive
         """
         ...
