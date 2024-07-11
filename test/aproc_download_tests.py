@@ -46,6 +46,9 @@ class Tests(unittest.TestCase):
         self.__add_item__()
         sleep(3)
         # Create collection
+        #ARLAS_COLLECTION="main_collection"
+        #COLLECTION="main_collection"
+        #ID="b44801a18538ec5ccae133e7becf392b0126551d022f0553a9e5380bc848d42d"
         print("create collection {}".format(ARLAS_COLLECTION))
         r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": "application/json"}, data=json.dumps({
                             "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
@@ -57,7 +60,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
 
         # SEND DOWNLOAD REQUEST
-        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}, {"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="")
+        inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id":ID}, {"collection": COLLECTION, "item_id":ID}], crop_wkt="", target_format="", target_projection="", raw_archive=False)
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         self.assertTrue(r.ok)

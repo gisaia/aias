@@ -1,48 +1,95 @@
+from contextlib import contextmanager
 from datetime import datetime
 import shutil
 import os
-import xml.etree.ElementTree as ET
-from zipfile import ZipFile
+
+from aproc.core.logger import Logger
+
+LOGGER = Logger.logger
+
 
 def setup_gdal():
     from osgeo import gdal
     gdal.SetConfigOption('GDAL_DISABLE_READDIR_ON_OPEN', 'YES')
+    gdal.SetConfigOption('OSR_USE_ETMERC', 'YES')
     gdal.UseExceptions()
     gdal.PushErrorHandler('CPLQuietErrorHandler')
     gdal.VSICurlClearCache()
 
-def extract(crop_wkt, file, driver_target, epsg_target, target_directory, target_file_name,
-             target_projection):
+def extract(images,crop_wkt, file, driver_target, target_projection, target_directory, target_file_name):
     import pyproj
     import rasterio.mask
-    import shapely.wkt
-    from osgeo import osr
-    from rasterio.warp import calculate_default_transform
-    from shapely.ops import transform
-    with rasterio.open(file) as src:
-        epsg_4326 = pyproj.Proj('EPSG:4326')
-        epsg_src = pyproj.Proj(src.crs)
-        if not not crop_wkt:
+    if crop_wkt:
+        with rasterio.open(file) as src:
+            epsg_4326 = pyproj.Proj('EPSG:4326')
+            epsg_src = pyproj.Proj(src.crs)
+            from shapely.ops import transform
+            import shapely.wkt
             raw = shapely.wkt.loads(crop_wkt)
             project = pyproj.Transformer.from_proj(epsg_4326, epsg_src, always_xy=True)
             geom = transform(project.transform, raw)
+            out_image, out_transform = rasterio.mask.mask(src, [geom], crop=True)
+            out_meta = src.meta.copy()
+            update_params = {"height": out_image.shape[1],
+                             "width": out_image.shape[2],
+                             "transform": out_transform,
+                             "driver":driver_target
+                             }
+            out_meta.update(update_params)
+            writeWorldWide(out_image,target_directory + "/" + target_file_name)
+            with rasterio.open(target_directory + "/" + target_file_name, "w", **out_meta, quality=100, reversible=True) as dest:
+                dest.write(out_image)
+    else:
+        epsg_target = pyproj.Proj(target_projection)
+        if images and len(images) > 1 :
+            for image in images:
+                with reproject_raster(image[0], epsg_target.crs, driver_target) as in_mem_ds:
+                    kwargs = in_mem_ds.meta.copy()
+                    writeWorldWide(in_mem_ds,target_directory + "/" + image[1])
+                    with rasterio.open(target_directory + "/" + image[1], "w", **kwargs, quality=100, reversible=True) as dest:
+                        dest.write(in_mem_ds.read())
         else:
-            from shapely.geometry import box
-            raw = shapely.wkt.loads(box(*src.bounds).wkt)
-            project = pyproj.Transformer.from_proj(epsg_src, epsg_src, always_xy=True)
-            geom = transform(project.transform, raw)
-        srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(str(src.crs).split(":")[1]))
-        out_image, out_transform = rasterio.mask.mask(src, [geom], crop=crop_wkt is not None)
-        out_meta = src.meta.copy()
-        default_transform, width, height = calculate_default_transform(epsg_src.crs, epsg_target.crs,
-                                                                       out_image.shape[2], out_image.shape[1],
-                                                                       *geom.bounds)
-        out_meta.update(
-            {"driver": driver_target, "nodata": 0, "height": height, "width": width, "transform": default_transform,
-             "crs": {'init': target_projection}})
-        with rasterio.open(target_directory + "/" + target_file_name, "w", **out_meta) as dest:
-            dest.write(out_image)
+            with reproject_raster(file, epsg_target.crs, driver_target) as in_mem_ds:
+                kwargs = in_mem_ds.meta.copy()
+                writeWorldWide(in_mem_ds,target_directory + "/" + target_file_name)
+                with rasterio.open(target_directory + "/" + target_file_name, "w", **kwargs, quality=100, reversible=True) as dest:
+                    dest.write(in_mem_ds.read())
+
+
+@contextmanager
+def reproject_raster(in_path, crs, driver_target):
+    import rasterio.mask
+    from rasterio.io import MemoryFile
+    from rasterio.warp import calculate_default_transform, reproject, Resampling
+    # reproject raster to project crs
+    with rasterio.open(in_path) as src:
+        src_crs = src.crs
+        transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
+        kwargs = src.meta.copy()
+
+        kwargs.update({
+            "driver": driver_target,
+            'crs': crs,
+            'transform': transform,
+            'width': width,
+            'height': height})
+
+        with MemoryFile() as memfile:
+            with memfile.open(**kwargs) as dst:
+                for i in range(1, src.count + 1):
+                    reproject(
+                        source=rasterio.band(src, i),
+                        destination=rasterio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=transform,
+                        dst_crs=crs,
+                        resampling=Resampling.nearest)
+            with memfile.open() as dataset:  # Reopen as DatasetReader
+                yield dataset  # Note yield not return as we're a contextmanager
+
+
+
 
 def make_raw_archive_zip(href: str, target_directory: str):
     file_name = os.path.basename(href)
@@ -51,3 +98,27 @@ def make_raw_archive_zip(href: str, target_directory: str):
     target_file_name = os.path.splitext(file_name)[0]  + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
     shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
     return
+
+def writeWorldWide(dataset,input):
+    geotransform = dataset.transform
+    (fpath, fname) = os.path.split(input)
+    (shortname, ext) = os.path.splitext(fname)
+    wext = '.' + ext[1] + ext[-1] + 'w'
+    output = os.path.join(fpath, shortname) + wext
+    if geotransform is not None:
+        world_file = open (output, 'w')
+        x = geotransform[2]
+        x_size = geotransform[0]
+        x_rot = geotransform[1]
+        y = geotransform[5]
+        y_rot = geotransform[3]
+        y_size = geotransform[4]
+        x = x_size/2+x
+        y = y_size/2+y
+        world_file.write('%s\n' % x_size)
+        world_file.write('%s\n' % x_rot)
+        world_file.write('%s\n' % y_rot)
+        world_file.write('%s\n' % y_size)
+        world_file.write('%s\n' % x)
+        world_file.write('%s\n' % y)
+        world_file.close()
