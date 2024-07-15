@@ -1,19 +1,15 @@
 import hashlib
-import json
 import os
-import time
 import requests
 from celery import Task, shared_task
 from pydantic import BaseModel, Field
-import logging
-import http.client
+from datetime import datetime
 
 from airs.core.models import mapper
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.models.ogc.job import StatusInfo
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
@@ -39,6 +35,7 @@ class InputDownloadProcess(BaseModel):
     crop_wkt: str = Field(default=None, title="WKT geometry for cropping the data")
     target_projection: str = Field(default=None, title="epsg target projection")
     target_format: str = Field(default=None, title="target format")
+    raw_archive: bool = Field(default=True, title="raw archive")
 
 
 class OutputDownloadProcess(BaseModel):
@@ -84,12 +81,13 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict[str, str]:
+    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True) -> dict[str, str]:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
             mail_context = {
+                "raw_archive": raw_archive,
                 "target_projection": target_projection,
                 "target_format": target_format,
                 "item_id": item_id,
@@ -137,16 +135,13 @@ class AprocProcess(Process):
             LOGGER.exception(e)
         return (send_to, user_id)
 
-    def __get_download_location__(item: Item, send_to: str, format: str) -> (str, str):
+    def __get_download_location__(item: Item, send_to: str) -> str:
         if send_to is None: send_to = "anonymous"
-        target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id)
+        target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
         if not os.path.exists(target_directory):
             LOGGER.info("create {}".format(target_directory))
             os.makedirs(target_directory)
-        file_name = os.path.basename(item.id.replace("-", "_").replace(" ", "_").replace("/", "_").replace("\\", "_").replace("@", "_"))+"."+format
-        if os.path.exists(file_name):
-            file_name = hashlib.md5(str(time.time_ns()).encode("utf-8")).hexdigest()+file_name
-        return (target_directory, file_name)
+        return target_directory
 
     def get_resource_id(inputs: BaseModel):
         inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())        
@@ -154,7 +149,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str, target_format: str = "Geotiff") -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive:bool = True) -> dict:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
@@ -184,22 +179,21 @@ class AprocProcess(Process):
             if driver is not None:
                 try:
                     __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
-                    (target_directory, file_name) = AprocProcess.__get_download_location__(item, send_to, target_format)
-                    LOGGER.info("Download will be placed in {}/{}".format(target_directory, file_name))
+                    target_directory = AprocProcess.__get_download_location__(item, send_to)
+                    LOGGER.info("Download will be placed in {}".format(target_directory))
                     mail_context["target_directory"] = target_directory
-                    mail_context["file_name"] = file_name
                     mail_context = AprocProcess.__update_paths__(mail_context)
                     driver.fetch_and_transform(
                         item=item,
                         target_directory=target_directory,
-                        file_name=file_name,
                         crop_wkt=crop_wkt,
                         target_projection=target_projection,
-                        target_format=target_format)
+                        target_format=target_format,
+                        raw_archive=raw_archive)
                     Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
                     Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                     LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
-                    download_locations.append(os.path.join(target_directory, file_name))
+                    download_locations.append(target_directory)
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
                     LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
