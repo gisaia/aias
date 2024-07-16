@@ -67,3 +67,11 @@ drivers:
       pwd: $THEIA_PWD
       manage_data: false
     priority: 7
+
+  -
+    name: tiff
+    class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
+    assets_dir: /tmp/aproc/tiff
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 9

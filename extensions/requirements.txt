@@ -2,7 +2,7 @@ gdal==3.6.3
 rpcm==1.4.9
 pvl==1.3.2
 rasterio==1.3.8
-shapely==1.8.0
+shapely==2.0.5
 pyproj==3.3.0
 PyJWT==2.8.0
 pillow==10.3.0

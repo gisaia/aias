@@ -3,7 +3,7 @@ import unittest
 from time import sleep
 
 import requests
-from utils import APROC_ENDPOINT, COLLECTION, setUpTest
+from test.utils import APROC_ENDPOINT, COLLECTION, setUpTest
 
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
@@ -44,6 +44,10 @@ class Tests(unittest.TestCase):
     def test_async_ingest_dimap(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         self.ingest(url, COLLECTION, "spot6")
+
+    def test_async_ingest_tif(self):
+        url = "/inputs/cog.tiff"
+        self.ingest(url, COLLECTION, "cog")
 
     def test_ingest_folder(self):
         self.ingest_directory("", collection=COLLECTION, catalog="dimap")

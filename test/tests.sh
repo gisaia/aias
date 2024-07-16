@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 set -o errexit
-
+docker build -f Dockerfile-tests . -t pythontests
 ./test/start_stack.sh
 
 # Set env variable
 . ./test/env.sh
-python3 test/airs_tests.py
-python3 test/aproc_ingest_tests.py
-python3 test/aproc_download_tests.py
-python3 test/agate_tests.py
-python3 test/fam_tests.py
-#python3 test/aproc_ingest_heavyload_tests.py
-#./test/stop_stack.sh
+docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.airs_tests
+docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_ingest_tests
+docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_download_tests
+docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.agate_tests
+docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.fam_tests
+#docker run -v `pwd`:/app/  --network aias_aias pythontests python3 -m  test.aproc_ingest_heavyload_tests
+./test/stop_stack.sh

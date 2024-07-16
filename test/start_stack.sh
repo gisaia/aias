@@ -12,6 +12,6 @@ rm -rf ./outbox
 mkdir outbox
 
 # Start  minio
-docker compose -f docker-compose.yaml up -d --remove-orphans --build --wait || true
+docker compose -f docker-compose.yaml -f docker-compose-create-bucket.yaml up -d --remove-orphans --build --wait || true
 
 docker compose -f docker-compose.yaml -f docker-compose-tests.yaml up --build --wait || true
