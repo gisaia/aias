@@ -1,0 +1,22 @@
+version: "3"
+networks:
+  aias:
+services:
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      - BUCKET_NAME=${BUCKET_NAME:-airstest}
+      - LOGIN=${LOGIN:-airs}
+      - PASSWORD=${PASSWORD:-airssecret}
+    networks:
+      - aias
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
+      /usr/bin/mc mb myminio/$$BUCKET_NAME;
+      /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
+      exit 0;
+      "

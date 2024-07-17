@@ -2,16 +2,16 @@ import json
 import os
 import time
 import unittest
+from test.utils import (APROC_ENDPOINT, COLLECTION, THEIA_DIR,
+                        setUpTest)
 from time import sleep
 
 import requests
-from extensions.aproc.proc.ingest.directory_ingest_process import InputDirectoryIngestProcess
-from utils import AIRS_URL, APROC_ENDPOINT, setUpTest, COLLECTION, THEIA_DIR
 
+from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
-from aproc.core.processes.processes import Processes
-from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
-from aproc.core.models.ogc import (Conforms, ExceptionType, Execute)
+from extensions.aproc.proc.ingest.directory_ingest_process import \
+    InputDirectoryIngestProcess
 
 BATCH_ROOT_SIZE = 31
 

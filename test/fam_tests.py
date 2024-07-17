@@ -1,10 +1,10 @@
 import json
 import os
 import unittest
+from test.utils import FAM_URL
 
 import requests
 from fastapi import status
-from utils import FAM_URL
 
 from fam.core.model import Archive, File, PathRequest
 

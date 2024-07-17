@@ -10,8 +10,10 @@ class Driver(ABC):
     name: str = None
     __assets_dir__: str = None
     LOGGER = Logger.logger
+    thumbnail_size = 256
+    overview_size = 1024
 
-    def get_assets_dir(self, url:str)->str:
+    def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
 
         Args:
@@ -20,15 +22,15 @@ class Driver(ABC):
         Returns:
             str: the directory for storing the assets
         """
-        unique=hashlib.md5(url.encode("utf-8")).hexdigest()
-        dir=os.path.sep.join([self.__assets_dir__, unique])
+        unique = hashlib.md5(url.encode("utf-8")).hexdigest()
+        dir = os.path.sep.join([self.__assets_dir__, unique])
         if not os.path.exists(self.__assets_dir__):
             os.makedirs(self.__assets_dir__)
         if not os.path.exists(dir):
             os.makedirs(dir)
         return dir
 
-    def get_asset_filepath(self, url: str, asset:Asset)->str:
+    def get_asset_filepath(self, url: str, asset: Asset) -> str:
         """Provides the name of the file for storing the asset
 
         Args:
@@ -38,12 +40,12 @@ class Driver(ABC):
         Returns:
             str: the path to the file for storing the asset's file
         """
-        dir=self.get_assets_dir(url)
+        dir = self.get_assets_dir(url)
         return os.path.sep.join([dir, asset.name])
 
     @staticmethod
     @abstractmethod
-    def init(configuration:dict) -> None:
+    def init(configuration: dict) -> None:
         """Method called at init time by the service.
 
         Args:
@@ -53,7 +55,7 @@ class Driver(ABC):
 
     @staticmethod
     @abstractmethod
-    def supports(url:str)->bool:
+    def supports(url: str) -> bool:
         """Return True if the provided url points to an archive supported by this driver.
 
         Args:
@@ -64,7 +66,7 @@ class Driver(ABC):
         """
         ...
     @abstractmethod
-    def get_item_id(self, url:str)->str:
+    def get_item_id(self, url: str) -> str:
         """Return the id of the item currently process by the driver.
 
         Args:
@@ -76,7 +78,7 @@ class Driver(ABC):
         ...
 
     @abstractmethod
-    def identify_assets(self, url:str)->list[Asset]:
+    def identify_assets(self, url: str) -> list[Asset]:
         """Analyse the archive pointed by the url and returns the list of assets of the archive
 
         Args:
@@ -88,7 +90,7 @@ class Driver(ABC):
         ...
 
     @abstractmethod
-    def fetch_assets(self, url:str, resources:list[Asset])->list[Asset]:
+    def fetch_assets(self, url: str, resources: list[Asset]) -> list[Asset]:
         """Copy or download the assets locally
 
         Args:
@@ -101,7 +103,7 @@ class Driver(ABC):
         ...
 
     @abstractmethod
-    def transform_assets(self, url:str, resources:list[Asset])->list[Asset]:
+    def transform_assets(self, url: str, resources: list[Asset]) -> list[Asset]:
         """Transform the assets, if necessary
 
         Args:
@@ -114,7 +116,7 @@ class Driver(ABC):
         ...
 
     @abstractmethod
-    def to_item(self, url:str, resources:list[Asset])->Item:
+    def to_item(self, url: str, resources: list[Asset]) -> Item:
         """Analyse an archive assets to create an item
 
         Args:

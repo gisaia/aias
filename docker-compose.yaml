@@ -20,24 +20,6 @@ services:
       timeout: 10s
       retries: 3
 
-  createbuckets:
-    image: minio/mc
-    depends_on:
-      minio:
-        condition: service_healthy
-    environment:
-      - BUCKET_NAME=${BUCKET_NAME:-airstest}
-      - LOGIN=${LOGIN:-airs}
-      - PASSWORD=${PASSWORD:-airssecret}
-    networks:
-      - aias
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
-      /usr/bin/mc mb myminio/$$BUCKET_NAME;
-      /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
-      exit 0;
-      "
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.9.2}
     container_name: elasticsearch
@@ -252,30 +234,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
-
-  aproc-ingest:
-    networks:
-      - aias
-    build:
-      context: '.'
-      dockerfile: Dockerfile-aproc-ingest
-    image: aproc-ingest:latest
-    container_name: 'aproc-ingest'
-    depends_on:
-      aproc-service:
-        condition: service_healthy
-    environment:
-      - APROC_ENDPOINT=http://aproc-service:8001/arlas/aproc
-      - DRIVERS_CONFIGURATION_FILE=/app/conf/drivers.yaml
-      - INGESTED_FOLDER=/inputs
-      - OUTPUT_FILE=/tmp/results.csv
-      - COLLECTION=main_collection
-      - CATALOG=main_catalog
-      - DRY_RUN=False
-      - APROC_LOGGER_LEVEL=${APROC_LOGGER_LEVEL:-INFO}
-    volumes:
-      - ./test/inputs:/inputs:ro
-      - /tmp:/tmp
 
   fam-service:
     networks:
