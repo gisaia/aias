@@ -150,7 +150,7 @@ class Driver(ProcDriver):
         return item
 
     def __check_path__(path: str):
-        return (path.lower().endswith("tif") or path.lower().endswith("tiff")) and os.path.isfile(path) and os.path.exists(path)
+        return (path.lower().endswith(".tif") or path.lower().endswith(".tiff")) and os.path.isfile(path) and os.path.exists(path)
 
     @staticmethod
     def get_main_asset_format(root):
