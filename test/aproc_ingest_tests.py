@@ -1,9 +1,9 @@
 import json
 import unittest
+from test.utils import APROC_ENDPOINT, COLLECTION, setUpTest
 from time import sleep
 
 import requests
-from test.utils import APROC_ENDPOINT, COLLECTION, setUpTest
 
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo

@@ -1,26 +1,27 @@
-import unittest
-import os
-from time import sleep
-import requests
 import json
+import os
+import unittest
+from test.utils import (AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL,
+                        ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH,
+                        SMTP_SERVER, TOKEN, index_collection_prefix, setUpTest)
+from time import sleep
+
+import requests
+
 from airs.core.models import mapper
-from airs.core.models.model import Item, Asset, Role
-from aproc.core.models.ogc.process import ProcessList, ProcessDescription
-from extensions.aproc.proc.download.download_process import InputDownloadProcess, OutputDownloadProcess
-
-from utils import AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, TOKEN, setUpTest
-
+from airs.core.models.model import Item
+from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
-from aproc.core.models.ogc import (Execute)
-from utils import setUpTest, index_endpoint_url, ITEM_PATH, AIRS_URL, COLLECTION, ID, ASSET, ASSET_PATH, SMTP_SERVER, \
-    index_collection_prefix
+from aproc.core.models.ogc.process import ProcessList
+from extensions.aproc.proc.download.download_process import (
+    InputDownloadProcess, OutputDownloadProcess)
 
 
 class Tests(unittest.TestCase):
 
     def setUp(self):
         setUpTest()
-        requests.delete(SMTP_SERVER+"/*")
+        requests.delete(SMTP_SERVER + "/*")
 
     def test_download_exists(self):
         # CHECK THE DOWNLOAD PROCESS EXISTS

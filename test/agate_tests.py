@@ -1,11 +1,12 @@
 import json
 import os
 import unittest
+from test.utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
+                        ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH,
+                        index_collection_prefix, setUpTest)
 from time import sleep
 
 import requests
-from utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
-                   ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH, setUpTest, index_collection_prefix)
 
 from airs.core.models import mapper
 from airs.core.models.model import Item
