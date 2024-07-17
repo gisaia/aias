@@ -87,16 +87,21 @@ class Driver(ProcDriver):
 
         gdalOptions = gdal.InfoOptions(format='json')
         gdalInfo = gdal.Info(url, options=gdalOptions)
-
-        try:
-            creation_time = dateutil.parser.parse(gdalInfo.get("metadata", {}).get("", {}).get("creation_time", ""))
-        except dateutil.parser.ParserError:
+        metadata_keys = list(gdalInfo.get("metadata", {}))
+        if metadata_keys:
+            description = gdalInfo.get("metadata", {}).get(metadata_keys[0], {}).get("title", "TIFF file")
+            try:
+                creation_time = dateutil.parser.parse(gdalInfo.get("metadata", {}).get(metadata_keys[0], {}).get("creation_time", ""))
+            except dateutil.parser.ParserError:
+                creation_time = None
+        else:
+            description = "TIFF file"
             creation_time = None
-        description = gdalInfo.get("metadata", {}).get("", {}).get("title", "TIFF file")
-        with rasterio.open(url) as dataset:            
+
+        with rasterio.open(url) as dataset:
             for v in zip(dataset.indexes, dataset.descriptions):
                 bands.append(Band(name="Band " + str(v[0]), common_name="Band " + str(v[0]), description=v[1] if v[1] else "Band " + str(v[0])))
-            # GET THE GEO EXTEND
+            # GET THE GEO EXTENT
             # Read the dataset's valid data mask as a ndarray.
             mask = dataset.dataset_mask()
             # Extract feature shapes and values from the array.
