@@ -38,6 +38,7 @@ class Tests(unittest.TestCase):
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
         self.assertFalse(r.ok, str(r.status_code) + ": " + str(r.content))
+        print(r.content)
         # REQUEST MAILS AND ERROR MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER+"?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
         self.assertTrue(r.ok, r.status_code)
