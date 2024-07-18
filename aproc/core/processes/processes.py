@@ -38,13 +38,16 @@ class Processes:
             try:
                 state.event(event)
                 task_id = event.get('uuid', None)
+                LOGGER.debug("event received: {}".format(event))
+                print("exception from event: {}".format(event.get('exception', None)))
+                print("class exception from event: {}".format(type(event.get('exception', None))))
                 if task_id:
                     status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:
-                        sleep(5) # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
+                        sleep(5)  # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
                         status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:
-                        LOGGER.error("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
+                        LOGGER.warn("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
                     else:
                         status_info.status = Processes.__to_status_info_code__(event.get('state'))
                         status_info.updated = round(datetime.now().timestamp())
@@ -52,8 +55,15 @@ class Processes:
                             status_info.finished = round(datetime.now().timestamp())
                         if event.get('state') == states.STARTED:
                             status_info.started = round(datetime.now().timestamp())
-                        status_info.message = event.get('result', status_info.message)
+                        next_msg = event.get('result', event.get('exception', None))
+                        if next_msg:
+                            if status_info.message:
+                                status_info.message = status_info.message + "\n" + next_msg
+                            else:
+                                status_info.message = next_msg
                         Processes.__save_status_info__(status_info)
+                else:
+                    LOGGER.warn("Task id not found in event {}".format(event))
             except Exception as e:
                 LOGGER.exception(e)
 

@@ -86,7 +86,10 @@ class Driver(ProcDriver):
         bands = []
 
         gdalOptions = gdal.InfoOptions(format='json')
-        gdalInfo = gdal.Info(url, options=gdalOptions)
+        try:
+            gdalInfo = gdal.Info(url, options=gdalOptions)
+        except Exception as e:
+            raise DriverException("Can not read tiff metadata from {}: {}".format(url, e))
         metadata_keys = list(gdalInfo.get("metadata", {}))
         if metadata_keys:
             description = gdalInfo.get("metadata", {}).get(metadata_keys[0], {}).get("title", "TIFF file")
@@ -112,9 +115,9 @@ class Driver(ProcDriver):
                     geom = rasterio.warp.transform_geom(
                         dataset.crs, 'EPSG:4326', geom, precision=6)
                     geoms.append(geometry.shape(geom))
-            except rasterio.errors.CRSError:
+            except rasterio.errors.CRSError as e:
                 # It is mandatory to get a crs to get the geometry of the extent
-                raise DriverException("Invalid CRS for {}".format(url))
+                raise DriverException("Invalid CRS for {}: {}".format(url, e))
             geom = ops.unary_union(geoms)
             a, b, c, d = geom.bounds
             bbox = [a, b, c, d]

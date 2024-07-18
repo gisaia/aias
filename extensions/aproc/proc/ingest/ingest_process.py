@@ -36,6 +36,9 @@ class InputIngestProcess(BaseModel):
 
 class OutputIngestProcess(BaseModel):
     item_location: str = Field(title="Item location", description="Location of the Item on the ARLAS Item Registration Service")
+    archive_url: str = Field(title="Archive location", description="Initial location of the ingested archive")
+    collection: str = Field(title="Target collection", description="Collection that contains the item")
+    catalog: str = Field(title="Target catalog", description="Catalog that contains the item")
 
 
 summary: ProcessSummary = ProcessSummary(
@@ -116,7 +119,7 @@ class AprocProcess(Process):
                 __update_status__(self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
                 try:
                     assets = driver.fetch_assets(url, assets)
-                except requests.exceptions.ConnectionError as e:
+                except Exception as e:
                     msg = "Fetching assets failed for connection reasons ({})".format(e.response)
                     LOGGER.error(msg)
                     raise ConnectionException(msg)
@@ -176,7 +179,7 @@ class AprocProcess(Process):
                         r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
                     if r.ok:
                         item_from_json(r.content).model_dump()
-                        return OutputIngestProcess(item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
+                        return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
                     else:
                         LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
                         LOGGER.error(to_json(item))

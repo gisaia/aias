@@ -18,7 +18,7 @@ class Tests(unittest.TestCase):
     def setUp(self):
         setUpTest()
 
-    def ingest(self, url, collection, catalog):
+    def ingest(self, url, collection, catalog, expected=StatusCode.successful):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
@@ -27,8 +27,9 @@ class Tests(unittest.TestCase):
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, StatusCode.successful)
+        self.assertEqual(status.status, expected)
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
+        return status
 
     def ingest_directory(self, url, collection, catalog):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
@@ -43,14 +44,22 @@ class Tests(unittest.TestCase):
 
     def test_async_ingest_dimap(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-        self.ingest(url, COLLECTION, "spot6")
+        print(self.ingest(url, COLLECTION, "spot6"))
 
     def test_async_ingest_tif(self):
         url = "/inputs/cog.tiff"
-        self.ingest(url, COLLECTION, "cog")
+        print(self.ingest(url, COLLECTION, "cog"))
+
+    def test_async_ingest_invalid_tif(self):
+        url = "/inputs/empty.tiff"
+        print(self.ingest(url, COLLECTION, "cog", StatusCode.failed))
+
+    def test_async_ingest_nogeo_tif(self):
+        url = "/inputs/nogeo.tiff"
+        print(self.ingest(url, COLLECTION, "cog", StatusCode.failed))
 
     def test_ingest_folder(self):
-        self.ingest_directory("", collection=COLLECTION, catalog="dimap")
+        print(self.ingest_directory("", collection=COLLECTION, catalog="dimap"))
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
