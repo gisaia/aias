@@ -38,9 +38,6 @@ class Processes:
             try:
                 state.event(event)
                 task_id = event.get('uuid', None)
-                LOGGER.debug("event received: {}".format(event))
-                print("exception from event: {}".format(event.get('exception', None)))
-                print("class exception from event: {}".format(type(event.get('exception', None))))
                 if task_id:
                     status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:
