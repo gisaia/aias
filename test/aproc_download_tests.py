@@ -68,13 +68,25 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 8)
 
-    def test_download_project_3857_format_jpeg2000_crop(self):
-        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt=BBOX, target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
+    def test_download_project_native_format_native_crop(self):
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt=BBOX, target_format="native", target_projection="native", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        os.path.exists("./" + result.download_locations[0])
+        # FILE MUST EXISTS
+        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif")
+        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw")
+
+    def test_download_project_3857_format_jp2_crop(self):
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        status = self.wait_for_success(status)
+        result = self.get_result(status)
+        # FILE MUST EXISTS
+        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w")
+        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2")
+        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml")
 
     def send_download_request(self, inputs: InputDownloadProcess):
         execute = Execute(inputs=inputs.model_dump())
