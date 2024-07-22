@@ -55,7 +55,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(r.json()["results"]), 3)
 
     def test_download_project_native_format_native_nocrop(self):
-        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=False))
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID},{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
         result = self.get_result(status)
@@ -65,6 +65,7 @@ class Tests(unittest.TestCase):
 
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER + "?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
+        sleep(5)
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 8)
 
