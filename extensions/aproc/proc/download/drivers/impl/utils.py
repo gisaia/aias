@@ -36,7 +36,7 @@ def extract(images,crop_wkt, file, driver_target, target_projection, target_dire
                              "driver":driver_target
                              }
             out_meta.update(update_params)
-            writeWorldWide(out_image,target_directory + "/" + target_file_name)
+            writeWorldWidefrom_transform(out_transform, target_directory + "/" + target_file_name)
             with rasterio.open(target_directory + "/" + target_file_name, "w", **out_meta, quality=100, reversible=True) as dest:
                 dest.write(out_image)
     else:
@@ -45,13 +45,13 @@ def extract(images,crop_wkt, file, driver_target, target_projection, target_dire
             for image in images:
                 with reproject_raster(image[0], epsg_target.crs, driver_target) as in_mem_ds:
                     kwargs = in_mem_ds.meta.copy()
-                    writeWorldWide(in_mem_ds,target_directory + "/" + image[1])
+                    writeWorldWidefrom_transform(in_mem_ds.transform,target_directory + "/" + image[1])
                     with rasterio.open(target_directory + "/" + image[1], "w", **kwargs, quality=100, reversible=True) as dest:
                         dest.write(in_mem_ds.read())
         else:
             with reproject_raster(file, epsg_target.crs, driver_target) as in_mem_ds:
                 kwargs = in_mem_ds.meta.copy()
-                writeWorldWide(in_mem_ds,target_directory + "/" + target_file_name)
+                writeWorldWidefrom_transform(in_mem_ds.transform,target_directory + "/" + target_file_name)
                 with rasterio.open(target_directory + "/" + target_file_name, "w", **kwargs, quality=100, reversible=True) as dest:
                     dest.write(in_mem_ds.read())
 
@@ -99,8 +99,9 @@ def make_raw_archive_zip(href: str, target_directory: str):
     shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
     return
 
-def writeWorldWide(dataset,input):
-    geotransform = dataset.transform
+
+def writeWorldWidefrom_transform(affine, input):
+    geotransform = affine
     (fpath, fname) = os.path.split(input)
     (shortname, ext) = os.path.splitext(fname)
     wext = '.' + ext[1] + ext[-1] + 'w'

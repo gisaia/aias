@@ -48,7 +48,7 @@ class Driver(DownloadDriver):
         if raw_archive:
             make_raw_archive_zip(asset.href, target_directory)
             return
-        if (target_projection == target_format == 'native') and (not crop_wkt):
+        if ((not target_projection or target_projection == 'native') and (not target_format or target_format == 'native')) and (not crop_wkt):
             # If the projetion and the format are natives, just copy the file and the georef file
             georef_file_extensions = ['.tfw', ".TFW", ".J2W", ".j2w", ".aux.xml", ".AUX.XML"]
             for ext in georef_file_extensions:
