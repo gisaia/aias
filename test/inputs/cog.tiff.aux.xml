@@ -1,0 +1,32 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="OVR_RESAMPLING_ALG">AVERAGE</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">255</MDI>
+      <MDI key="STATISTICS_MEAN">113.09792556348</MDI>
+      <MDI key="STATISTICS_MINIMUM">1</MDI>
+      <MDI key="STATISTICS_STDDEV">106.92995039419</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">72.49</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">255</MDI>
+      <MDI key="STATISTICS_MEAN">116.38534185673</MDI>
+      <MDI key="STATISTICS_MINIMUM">1</MDI>
+      <MDI key="STATISTICS_STDDEV">106.47726153996</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">72.49</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">255</MDI>
+      <MDI key="STATISTICS_MEAN">123.16489388133</MDI>
+      <MDI key="STATISTICS_MINIMUM">1</MDI>
+      <MDI key="STATISTICS_STDDEV">104.30105581854</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">72.49</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>

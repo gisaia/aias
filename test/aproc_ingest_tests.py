@@ -50,6 +50,10 @@ class Tests(unittest.TestCase):
         url = "/inputs/cog.tiff"
         print(self.ingest(url, COLLECTION, "cog"))
 
+    def test_async_ingest_jpg2000(self):
+        url = "/inputs/jpeg2000.jpg2"
+        print(self.ingest(url, COLLECTION, "cog"))
+
     def test_async_ingest_invalid_tif(self):
         url = "/inputs/empty.tiff"
         print(self.ingest(url, COLLECTION, "cog", StatusCode.failed))

@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import requests
 from celery import Task, shared_task
@@ -153,6 +154,7 @@ class AprocProcess(Process):
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
+        LOGGER.info("requests:{}".format(json.dumps(requests)))
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
@@ -178,6 +180,7 @@ class AprocProcess(Process):
             driver: Driver = Drivers.solve(item)
             if driver is not None:
                 try:
+                    LOGGER.info("Download will be done by {}".format(driver.name))
                     __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
                     target_directory = AprocProcess.__get_download_location__(item, send_to)
                     LOGGER.info("Download will be placed in {}".format(target_directory))
