@@ -1,151 +1,150 @@
 from datetime import datetime as Datetime
 from enum import Enum
-from typing import (TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar,
-                    Union, cast)
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Extra, Field
-from pydantic.fields import FieldInfo
 
 
 class ProcessingLevel(Enum):
-    RAW="RAW"
-    L1="L1"
-    L2="L2"
-    L3="L3"
-    L4="L4"
+    RAW = "RAW"
+    L1 = "L1"
+    L2 = "L2"
+    L3 = "L3"
+    L4 = "L4"
 
 
 class ObservationType(Enum):
-    image="IMAGE"
-    radar="RADAR"
-    dem="DEM"
+    image = "IMAGE"
+    radar = "RADAR"
+    dem = "DEM"
 
 
 class ResourceType(Enum):
-    cube="CUBE"
-    gridded="GRIDDED"
-    vector="VECTOR"
-    other="OTHER"
+    cube = "CUBE"
+    gridded = "GRIDDED"
+    vector = "VECTOR"
+    other = "OTHER"
 
 
 class ItemFormat(Enum):
-    shape="SHAPE"
-    dimap="DIMAP"
-    geotiff="GEOTIFF"
-    safe="SAFE"
-    theia="THEIA"
-    ast_dem="AST_DEM"
-    digitalglobe="DIGITALGLOBE"
-    geoeye="GEOEYE"
-    rapideye="RAPIDEYE"
-    spot5="SPOT5"
-    spot6_7="SPOT6_7"
-    other="OTHER"
-    terrasar="TerraSAR-X"
-    csk="COSMO-SkyMed"
+    shape = "SHAPE"
+    dimap = "DIMAP"
+    geotiff = "GEOTIFF"
+    jpeg2000 = "JPEG2000"
+    safe = "SAFE"
+    theia = "THEIA"
+    ast_dem = "AST_DEM"
+    digitalglobe = "DIGITALGLOBE"
+    geoeye = "GEOEYE"
+    rapideye = "RAPIDEYE"
+    spot5 = "SPOT5"
+    spot6_7 = "SPOT6_7"
+    other = "OTHER"
+    terrasar = "TerraSAR-X"
+    csk = "COSMO-SkyMed"
 
 
 class AssetFormat(Enum):
-    shape="SHAPE"
-    geotiff="GEOTIFF"
-    jpg="JPG"
-    jpg2000="JPG2000"
-    png="PNG"
-    csv="CSV"
-    json="JSON"
-    zip="ZIP"
-    tar="TAR"
-    targz="TARGZ"
-    other="OTHER"
+    shape = "SHAPE"
+    geotiff = "GEOTIFF"
+    jpg = "JPG"
+    jpg2000 = "JPG2000"
+    png = "PNG"
+    csv = "CSV"
+    json = "JSON"
+    zip = "ZIP"
+    tar = "TAR"
+    targz = "TARGZ"
+    other = "OTHER"
 
 
 class Role(Enum):
-    airs_item="airs_item"
-    thumbnail="thumbnail"
-    overview="overview"
-    data="data"
-    metadata="metadata"
-    cog="cog"
-    zarr="zarr"
-    datacube="datacube"
-    visual="visual"
-    date="date"
-    graphic="graphic"
-    data_mask="data-mask"
-    snow_ice="snow-ice"
-    land_water="land-water"
-    water_mask="water-mask"
-    iso_19115="iso-19115"
-    reflectance="reflectance"
-    temperature="temperature"
-    saturation="saturation"
-    cloud="cloud"
-    cloud_shadow="cloud-shadow"
-    incidence_angle="incidence-angle"
-    azimuth="azimuth"
-    sun_azimuth="sun-azimuth"
-    sun_elevation="sun-elevation"
-    terrain_shadow="terrain-shadow"
-    terrain_occlusion="terrain-occlusion"
-    terrain_illumination="terrain-illumination"
-    local_incidence_angle="local-incidence-angle"
-    noise_power="noise-power"
-    amplitude="amplitude"
-    magnitude="magnitude"
-    sigma0="sigma0"
-    beta0="beta0"
-    gamma0="gamma0"
-    date_offset="date-offset"
-    covmat="covmat"
-    prd="prd"
+    airs_item = "airs_item"
+    thumbnail = "thumbnail"
+    overview = "overview"
+    data = "data"
+    metadata = "metadata"
+    cog = "cog"
+    zarr = "zarr"
+    datacube = "datacube"
+    visual = "visual"
+    date = "date"
+    graphic = "graphic"
+    data_mask = "data-mask"
+    snow_ice = "snow-ice"
+    land_water = "land-water"
+    water_mask = "water-mask"
+    iso_19115 = "iso-19115"
+    reflectance = "reflectance"
+    temperature = "temperature"
+    saturation = "saturation"
+    cloud = "cloud"
+    cloud_shadow = "cloud-shadow"
+    incidence_angle = "incidence-angle"
+    azimuth = "azimuth"
+    sun_azimuth = "sun-azimuth"
+    sun_elevation = "sun-elevation"
+    terrain_shadow = "terrain-shadow"
+    terrain_occlusion = "terrain-occlusion"
+    terrain_illumination = "terrain-illumination"
+    local_incidence_angle = "local-incidence-angle"
+    noise_power = "noise-power"
+    amplitude = "amplitude"
+    magnitude = "magnitude"
+    sigma0 = "sigma0"
+    beta0 = "beta0"
+    gamma0 = "gamma0"
+    date_offset = "date-offset"
+    covmat = "covmat"
+    prd = "prd"
 
 
 class CommonBandName(Enum):
-    coastal="coastal"
-    blue="blue"
-    green="green"
-    red="red"
-    yellow="yellow"
-    pan="pan"
-    rededge="rededge"
-    nir="nir"
-    nir08="nir08"
-    nir09="nir09"
-    cirrus="cirrus"
-    swir16="swir16"
-    swir22="swir22"
-    lwir="lwir"
-    lwir11="lwir11"
-    lwir12="lwir12"
+    coastal = "coastal"
+    blue = "blue"
+    green = "green"
+    red = "red"
+    yellow = "yellow"
+    pan = "pan"
+    rededge = "rededge"
+    nir = "nir"
+    nir08 = "nir08"
+    nir09 = "nir09"
+    cirrus = "cirrus"
+    swir16 = "swir16"
+    swir22 = "swir22"
+    lwir = "lwir"
+    lwir11 = "lwir11"
+    lwir12 = "lwir12"
     
 
 class VariableType(Enum):
-    data="data"
-    auxiliary="auxiliary"
+    data = "data"
+    auxiliary = "auxiliary"
 
 
 class DimensionType(Enum):
-    spatial="spatial"
-    temporal="temporal"
-    geometry="geometry"
+    spatial = "spatial"
+    temporal = "temporal"
+    geometry = "geometry"
     
 
 class RasterType(BaseModel):
-    source:str
-    format:str
+    source: str
+    format: str
 
 
 class Raster(BaseModel):
-    type:RasterType
-    path:str
-    id:str
+    type: RasterType
+    path: str
+    id: str
 
 
 class Axis(Enum):
-    x="x"
-    y="y"
-    z="z"
-    t="t"
+    x = "x"
+    y = "y"
+    z = "z"
+    t = "t"
 
 
 class Indicators(BaseModel):
@@ -203,7 +202,7 @@ class Asset(BaseModel, extra=Extra.allow):
     sar__looks_range: float | None = Field(default=None, title="Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.")
     sar__looks_azimuth: float | None = Field(default=None, title="Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.")
     sar__looks_equivalent_number: float | None = Field(default=None, title="The equivalent number of looks (ENL).")
-    sar__observation_direction    : str | None = Field(default=None, title="Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.")
+    sar__observation_direction: str | None = Field(default=None, title="Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.")
     proj__epsg: int | None = Field(default=None, title="EPSG code of the datasource.")
     proj__wkt2: str | None = Field(default=None, title="PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.")
     proj__geometry: Any | None = Field(default=None, title="Defines the footprint of this Item.")
@@ -293,7 +292,7 @@ class Properties(BaseModel, extra=Extra.allow):
     proj__bbox: List[float] | None = Field(default=None, title="Bounding box of the Item in the asset CRS in 2 or 3 dimensions.")
     proj__centroid: Any | None = Field(default=None, title="Coordinates representing the centroid of the Item (in lat/long).")
     proj__shape: List[float] | None = Field(default=None, title="Number of pixels in Y and X directions for the default grid.")
-    proj__transform: List[float]      | None = Field(default=None, title="The affine transformation coefficients for the default grid.")
+    proj__transform: List[float] | None = Field(default=None, title="The affine transformation coefficients for the default grid.")
     generated__has_overview: bool | None = Field(default=False, title="Whether the item has an overview or not.")
     generated__has_thumbnail: bool | None = Field(default=False, title="Whether the item has a thumbnail or not.")
     generated__has_metadata: bool | None = Field(default=False, title="Whether the item has a metadata file or not.")

@@ -48,7 +48,7 @@ drivers:
     configuration:
     priority: 1
   -
-    name: tif_file
-    class_name: extensions.aproc.proc.download.drivers.impl.tif_file
+    name: image_file
+    class_name: extensions.aproc.proc.download.drivers.impl.image_file
     configuration:
     priority: 2

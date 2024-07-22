@@ -75,3 +75,11 @@ drivers:
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 9
+
+  -
+    name: jpeg2000
+    class_name: extensions.aproc.proc.ingest.drivers.impl.jpeg2000
+    assets_dir: /tmp/aproc/jpeg2000
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 10
