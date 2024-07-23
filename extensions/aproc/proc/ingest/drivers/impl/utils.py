@@ -61,7 +61,7 @@ def geotiff_to_jpg(input_path,widthPct,heightPct, output_path=None):
     options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=widthPct,heightPct=heightPct, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0])
 
-    # Translate to PNG
+    # Translate to JPEG
     if output_path is not None:
         gdal.Translate(output_path, dataset, options=options)
 
