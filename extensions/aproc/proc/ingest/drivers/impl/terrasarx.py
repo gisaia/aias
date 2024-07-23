@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
@@ -16,8 +17,10 @@ class Driver(ProcDriver):
     quicklook_path = None
     thumbnail_path = None
     tif_path = None
+    tfw_path = None
     met_path = None
     output_folder = None
+    
     # Implements drivers method
     def init(configuration: Configuration):
         Driver.output_folder = configuration['tmp_directory']
@@ -37,24 +40,30 @@ class Driver(ProcDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
-            thumbnail_path = self.output_folder +'/terrasarx/'+ self.get_item_id(url) +'/thumbnail'
+            thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
             os.makedirs(thumbnail_path, exist_ok=True)
-            self.thumbnail_path = thumbnail_path +'/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path,50,50,self.thumbnail_path)
+            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                                description=Role.thumbnail.value))
-            quicklook_path = self.output_folder+'/terrasarx/'+  self.get_item_id(url) +'/quicklook'
+                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+            quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
-            self.quicklook_path = quicklook_path +'/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path,250,250,self.quicklook_path)
+            self.quicklook_path = quicklook_path + '/quicklook.jpg'
+            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                                description=Role.overview.value))
-        assets.append(Asset(href=self.met_path, size=get_file_size(self.tif_path),
+                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
-                            description=Role.metadata.value, airs__managed=False))
-
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            description=Role.data.value, airs__managed=False))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.metadata.value], name="tfw", type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -83,7 +92,7 @@ class Driver(ProcDriver):
             lr_lon = self.__get_coord__(root, "lowerRightLongitude")
             ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
             ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
-            geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
+            geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
             x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
             y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
@@ -93,18 +102,18 @@ class Driver(ProcDriver):
                 coord = [float(vertex.find('lon').text), float(vertex.find('lat').text)]
                 coords.append(coord)
             geometry, bbox, centroid = get_geom_bbox_centroid(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
-                                                      coords[1][0], coords[1][1], coords[0][0], coords[0][1])
+                                                              coords[1][0], coords[1][1], coords[0][0], coords[0][1])
             x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
             y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
 
-        gsd = (x_pixel_size+y_pixel_size)/2
+        gsd = (x_pixel_size + y_pixel_size) / 2
         processing__level = root.find("setup/orderInfo/orderType").text
         constellation = root.find("productInfo/missionInfo/mission").text
         instrument = root.find("productInfo/missionInfo/mission").text
         sensor = root.find("productInfo/missionInfo/mission").text
         sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
         view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
-        date_time =  int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
+        date_time = int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
         src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
@@ -150,13 +159,14 @@ class Driver(ProcDriver):
                         for file in os.listdir(os.path.join(path, folder)):
                             if file.endswith(".tif"):
                                 Driver.tif_path = os.path.join(path, folder, file)
-            return Driver.met_path is not None and \
-                   Driver.tif_path is not None and \
-                   Driver.browse_path is not None
+                                tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                                if tfw_path.exists():
+                                    Driver.tfw_path = str(tfw_path)
+            return Driver.met_path is not None and Driver.tif_path is not None and Driver.browse_path is not None
         else:
             Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
             return False
 
     @staticmethod
-    def __get_coord__(root,field):
-        return float(root.find("productSpecific/geocodedImageInfo/geoParameter/sceneCoordsGeographic/"+field).text)
+    def __get_coord__(root, field):
+        return float(root.find("productSpecific/geocodedImageInfo/geoParameter/sceneCoordsGeographic/" + field).text)

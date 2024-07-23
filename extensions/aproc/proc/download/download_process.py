@@ -154,7 +154,6 @@ class AprocProcess(Process):
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
-        LOGGER.info("requests:{}".format(json.dumps(requests)))
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")

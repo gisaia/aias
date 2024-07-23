@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
@@ -16,7 +17,9 @@ class Driver(ProcDriver):
     quicklook_path = None
     thumbnail_path = None
     tif_path = None
+    tfw_path = None
     h5_path = None
+    h5pdf_path = None
     met_path = None
     attr_path = None
     prefix_key = None
@@ -40,24 +43,40 @@ class Driver(ProcDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
-            thumbnail_path = self.output_folder +'/'+ self.get_item_id(url) +'/thumbnail'
+            thumbnail_path = self.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
             os.makedirs(thumbnail_path, exist_ok=True)
-            self.thumbnail_path = thumbnail_path +'/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path,50,50,self.thumbnail_path)
+            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                                description=Role.thumbnail.value))
-            quicklook_path = self.output_folder +'/'+ self.get_item_id(url) +'/quicklook'
+                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+            quicklook_path = self.output_folder + '/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
-            self.quicklook_path = quicklook_path +'/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path,250,250,self.quicklook_path)
+            self.quicklook_path = quicklook_path + '/quicklook.jpg'
+            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                                description=Role.overview.value))
+                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-
+        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
+                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.attr_path, size=get_file_size(self.attr_path),
+                            roles=[Role.metadata.value], name="attributes", type="text/xml",
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.h5_path, size=get_file_size(self.h5_path),
+                            roles=[Role.metadata.value], name="h5", type="text/xml",
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+        if Driver.h5pdf_path:
+            assets.append(Asset(href=self.h5pdf_path, size=get_file_size(self.h5pdf_path),
+                                roles=[Role.metadata.value], name="tfw", type="application/pdf",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pdf.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -131,26 +150,33 @@ class Driver(ProcDriver):
         Driver.browse_path = None
         Driver.prefix_key = None
         Driver.h5_path = None
+        Driver.h5pdf_path = None
         Driver.quicklook_path = None
         Driver.thumbnail_path = None
         valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
         file_name = os.path.basename(file_path)
         path = os.path.dirname(file_path)
-        if valid_and_exist is True and file_name.endswith(".tif") and file_name.find(".QLK.")<0:
+        if valid_and_exist is True and file_name.endswith(".tif") and file_name.find(".QLK.") < 0:
             Driver.tif_path = file_path
-            if os.path.isfile(file_path+'.aux.xml') and os.path.exists(file_path+'.aux.xml'):
-                Driver.met_path = file_path+'.aux.xml'
-            attr_path = path + '/' + file_name.split(".")[0]+".attribs.xml"
+            if os.path.isfile(file_path + '.aux.xml') and os.path.exists(file_path + '.aux.xml'):
+                Driver.met_path = file_path + '.aux.xml'
+            attr_path = path + '/' + file_name.split(".")[0] + ".attribs.xml"
             if os.path.isfile(attr_path) and os.path.exists(attr_path):
-                Driver.attr_path= attr_path
-            browse_path = path + '/' +  file_name.split(".")[0] + "." + file_name.split(".")[1] + '.QLK.tif'
+                Driver.attr_path = attr_path
+            browse_path = path + '/' + file_name.split(".")[0] + "." + file_name.split(".")[1] + '.QLK.tif'
             if os.path.isfile(browse_path) and os.path.exists(browse_path):
-                Driver.browse_path= browse_path
+                Driver.browse_path = browse_path
             if len(file_name.split(".")) > 2:
-                 Driver.prefix_key = file_name.split(".")[1] + "_" + file_name.split(".")[2] + "_"
-            h5_path =  path + '/' + "DFDN_" + file_name.split(".")[0] +".h5.xml"
+                Driver.prefix_key = file_name.split(".")[1] + "_" + file_name.split(".")[2] + "_"
+            h5_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.xml"
             if os.path.isfile(h5_path) and os.path.exists(h5_path):
-                Driver.h5_path =h5_path
+                Driver.h5_path = h5_path
+            h5pdf_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.pdf"
+            if os.path.isfile(h5pdf_path) and os.path.exists(h5pdf_path):
+                Driver.h5pdf_path = h5pdf_path
+            tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+            if tfw_path.exists():
+                Driver.tfw_path = str(tfw_path)
             return Driver.met_path is not None and \
                    Driver.tif_path is not None and \
                    Driver.attr_path is not None and \
