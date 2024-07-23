@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -9,12 +10,14 @@ from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
     get_geom_bbox_centroid, get_hash_url, get_file_size, get_epsg
+from .image_driver_helper import ImageDriverHelper
 
 
 class Driver(ProcDriver):
 
     met_path = None
     tif_path = None
+    tfw_path = None
 
     # Implements drivers method
 
@@ -32,14 +35,25 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return [
+        assets = []
+        assets.append(
             Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                   roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value)
-        ]
+                  description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+        assets.append(
+            Asset(href=self.met_path, size=get_file_size(self.met_path),
+                  roles=[Role.metadata.value], name=Role.metadata.value, type="text/pvl",
+                  description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        ImageDriverHelper.add_overview_if_you_can(self, url, Role.thumbnail, self.thumbnail_size, assets)
+        ImageDriverHelper.add_overview_if_you_can(self, url, Role.overview, self.overview_size, assets)
         return assets
 
     # Implements drivers method
@@ -114,13 +128,16 @@ class Driver(ProcDriver):
                 if os.path.isfile(os.path.join(path, file)):
                     if file.endswith(".tif"):
                         Driver.tif_path = os.path.join(path, file)
+                        tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                        if tfw_path.exists():
+                            Driver.tfw_path = str(tfw_path)
                     if file.endswith(".tif.met"):
                         Driver.met_path = os.path.join(path, file)
             return Driver.tif_path is not None and Driver.met_path is not None
-
         else:
             Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
             return False
+        
     @staticmethod
-    def __get_corner_coord__( data,corner):
+    def __get_corner_coord__(data, corner):
         return data['INVENTORYMETADATA']['SPATIALDOMAINCONTAINER']['HORIZONTALSPATIALDOMAINCONTAINER']['BOUNDINGBOX'][corner]['VALUE']

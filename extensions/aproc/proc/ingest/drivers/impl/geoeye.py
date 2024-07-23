@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
@@ -14,6 +15,7 @@ class Driver(ProcDriver):
     quicklook_path = None
     thumbnail_path = None
     tif_path = None
+    tfw_path = None
     file_name = None
     met_path = None
     component_id = None
@@ -38,15 +40,21 @@ class Driver(ProcDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                                description=Role.thumbnail.value))
+                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                                description=Role.overview.value))
+                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-
+        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
+                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/plain",
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.txt.value, asset_type=ResourceType.other.value))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -73,58 +81,58 @@ class Driver(ProcDriver):
         with open(self.met_path) as f:
             for line_1 in f:
                 if inside_component_section:
-                    self.__set_lat_lon(d,line_1,inside_coord_1,1)
-                    self.__set_lat_lon(d,line_1,inside_coord_2,2)
-                    self.__set_lat_lon(d,line_1,inside_coord_3,3)
-                    self.__set_lat_lon(d,line_1,inside_coord_4,4)
-                    self.__get_field__(d,line_1,'Product Image ID')
-                    self.__get_field__(d,line_1,'Pixel Size X')
-                    self.__get_field__(d,line_1,'Pixel Size Y')
-                    self.__get_field__(d,line_1,'Percent Component Cloud Cover',True)
-                    if line_1.find('Coordinate: 1') >=0:
+                    self.__set_lat_lon(d, line_1, inside_coord_1, 1)
+                    self.__set_lat_lon(d, line_1, inside_coord_2, 2)
+                    self.__set_lat_lon(d, line_1, inside_coord_3, 3)
+                    self.__set_lat_lon(d, line_1, inside_coord_4, 4)
+                    self.__get_field__(d, line_1, 'Product Image ID')
+                    self.__get_field__(d, line_1, 'Pixel Size X')
+                    self.__get_field__(d, line_1, 'Pixel Size Y')
+                    self.__get_field__(d, line_1, 'Percent Component Cloud Cover', True)
+                    if line_1.find('Coordinate: 1') >= 0:
                         inside_coord_1 = True
                         inside_coord_4 = False
-                    if line_1.find('Coordinate: 2') >=0:
+                    if line_1.find('Coordinate: 2') >= 0:
                         inside_coord_2 = True
                         inside_coord_1 = False
-                    if line_1.find('Coordinate: 3') >=0:
+                    if line_1.find('Coordinate: 3') >= 0:
                         inside_coord_3 = True
                         inside_coord_2 = False
-                    if line_1.find('Coordinate: 4') >=0:
+                    if line_1.find('Coordinate: 4') >= 0:
                         inside_coord_4 = True
                         inside_coord_3 = False
-                    if line_1.find('Percent Component Cloud Cover') >=0:
+                    if line_1.find('Percent Component Cloud Cover') >= 0:
                         break
-                if line_1.find('Component ID: '+ self.component_id) >=0:
+                if line_1.find('Component ID: ' + self.component_id) >= 0:
                     inside_component_section = True
 
 
         with open(self.met_path) as f_2:
             for line_2 in f_2:
-                self.__get_field__(d,line_2,'Sensor Type')
-                self.__get_field__(d,line_2,'Processing Level')
+                self.__get_field__(d, line_2, 'Sensor Type')
+                self.__get_field__(d, line_2, 'Processing Level')
                 if inside_product_image_section:
-                        self.__get_field__(d,line_2,'Sensor')
-                        self.__get_field__(d,line_2,'Scan Azimuth')
-                        self.__get_field__(d,line_2,'Sun Angle Azimuth')
-                        self.__get_field__(d,line_2,'Sun Angle Elevation')
-                        self.__get_date_field__(d,line_2)
-                if line_2.find('Product Image ID: '+ d['Product Image ID']) >=0:
-                     inside_product_image_section =True
-        geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'],d['lat_1'],d['lon_2'],d['lat_2'],d['lon_3'], d['lat_3'],d['lon_4'], d['lat_4'])
+                    self.__get_field__(d, line_2, 'Sensor')
+                    self.__get_field__(d, line_2, 'Scan Azimuth')
+                    self.__get_field__(d, line_2, 'Sun Angle Azimuth')
+                    self.__get_field__(d, line_2, 'Sun Angle Elevation')
+                    self.__get_date_field__(d, line_2)
+                if line_2.find('Product Image ID: ' + d['Product Image ID']) >= 0:
+                    inside_product_image_section = True
+        geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'], d['lat_1'], d['lon_2'], d['lat_2'], d['lon_3'], d['lat_3'], d['lon_4'], d['lat_4'])
         x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
         y_pixel_size = float(d['Pixel Size Y'].split(' ')[0])
-        gsd = (x_pixel_size+y_pixel_size)/2
+        gsd = (x_pixel_size + y_pixel_size) / 2
         eo__cloud_cover = d['Percent Component Cloud Cover']
         processing__level = d['Processing Level']
         constellation = d['Sensor']
         instrument = d['Sensor']
         sensor = d['Sensor']
         sensor_type = d['Sensor Type']
-        date_time =  int(datetime.strptime(d['Acquisition Date/Time'], "%Y-%m-%d %H:%M %Z").timestamp())
-        view__azimuth=float(d['Scan Azimuth'].split(' ')[0])
-        view__sun_azimuth=float(d['Sun Angle Azimuth'].split(' ')[0])
-        view__sun_elevation=float(d['Sun Angle Elevation'].split(' ')[0])
+        date_time = int(datetime.strptime(d['Acquisition Date/Time'], "%Y-%m-%d %H:%M %Z").timestamp())
+        view__azimuth = float(d['Scan Azimuth'].split(' ')[0])
+        view__sun_azimuth = float(d['Sun Angle Azimuth'].split(' ')[0])
+        view__sun_elevation = float(d['Sun Angle Elevation'].split(' ')[0])
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
         src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
@@ -167,8 +175,11 @@ class Driver(ProcDriver):
         path = os.path.dirname(file_path)
         if valid_and_exist is True and file_name.endswith(".tif"):
             Driver.tif_path = file_path
+            tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+            if tfw_path.exists():
+                Driver.tfw_path = str(tfw_path)
             Driver.file_name = file_name
-            parts_of_file_name = file_name.replace('.tif','').split("_")
+            parts_of_file_name = file_name.replace('.tif', '').split("_")
             Driver.component_id = parts_of_file_name[3]
             for file in os.listdir(path):
                 # check if current file is a file
@@ -179,39 +190,38 @@ class Driver(ProcDriver):
                             Driver.quicklook_path = os.path.join(path, file)
                     if file.endswith('_metadata.txt'):
                         Driver.met_path = os.path.join(path, file)
-            return Driver.met_path is not None and \
-                   Driver.tif_path is not None
+            return Driver.met_path is not None and Driver.tif_path is not None
         else:
             Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
             return False
 
     @staticmethod
-    def __get_date_field__(data,line):
-        field ='Acquisition Date/Time'
-        if line.find(field) >=0:
-            data[field]=line.split(':')[1].strip() + ':'+line.split(':')[2].strip()
+    def __get_date_field__(data, line):
+        field = 'Acquisition Date/Time'
+        if line.find(field) >= 0:
+            data[field] = line.split(':')[1].strip() + ':' + line.split(':')[2].strip()
 
     @staticmethod
-    def __get_field__(data,line,field,isFloat=False):
-        if line.find(field) >=0:
+    def __get_field__(data, line, field, isFloat=False):
+        if line.find(field) >= 0:
             if isFloat:
-                data[field]=float(line.split(':')[1].strip())
+                data[field] = float(line.split(':')[1].strip())
             else:
-                data[field]=line.split(':')[1].strip()
+                data[field] = line.split(':')[1].strip()
 
     @staticmethod
-    def __get_latitude__(data,line, coord_number):
-        if line.find('Latitude') >=0:
-            data['lat_' + str(coord_number)]= float((line.split(':')[1].strip()).split(' ')[0])
+    def __get_latitude__(data, line, coord_number):
+        if line.find('Latitude') >= 0:
+            data['lat_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
 
     @staticmethod
-    def __get_longitude__(data,line, coord_number):
-        if line.find('Longitude') >=0:
-            data['lon_' + str(coord_number)]= float((line.split(':')[1].strip()).split(' ')[0])
+    def __get_longitude__(data, line, coord_number):
+        if line.find('Longitude') >= 0:
+            data['lon_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
 
     @staticmethod
-    def __set_lat_lon(data,line,inside_coord,coord_number):
+    def __set_lat_lon(data, line, inside_coord, coord_number):
         if inside_coord:
-            Driver.__get_latitude__(data,line,coord_number)
-            Driver.__get_longitude__(data,line,coord_number)
+            Driver.__get_latitude__(data, line, coord_number)
+            Driver.__get_longitude__(data, line, coord_number)
 

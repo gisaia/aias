@@ -46,17 +46,25 @@ class ItemFormat(Enum):
 
 class AssetFormat(Enum):
     shape = "SHAPE"
+    gml = "GML"
     geotiff = "GEOTIFF"
+    tfw = "TFW"
+    j2w = "J2W"
     jpg = "JPG"
     jpg2000 = "JPG2000"
     png = "PNG"
+    pdf = "PDF"
     csv = "CSV"
     json = "JSON"
     zip = "ZIP"
     tar = "TAR"
     targz = "TARGZ"
     other = "OTHER"
-
+    xml = "XML"
+    txt = "TEXT"
+    pvl = "PVL"
+    yaml = "YAML"
+    geojson = "GEOJSON"
 
 class Role(Enum):
     airs_item = "airs_item"
@@ -97,7 +105,8 @@ class Role(Enum):
     date_offset = "date-offset"
     covmat = "covmat"
     prd = "prd"
-
+    extent = "extent"
+    
 
 class CommonBandName(Enum):
     coastal = "coastal"

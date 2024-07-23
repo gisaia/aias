@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -18,6 +19,7 @@ class Driver(ProcDriver):
     til_path = None
     tif_path = None
     imd_path = None
+    twf_path = None
 
     # Implements drivers method
 
@@ -38,16 +40,28 @@ class Driver(ProcDriver):
         assets = []
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
-                                            roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                                            description=Role.thumbnail.value))
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
-                                            roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                                            description=Role.overview.value))
+                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                  roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                  description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-
+                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+        assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
+                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                      description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.til_path, size=get_file_size(self.til_path),
+                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/pvl",
+                      description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.imd_path, size=get_file_size(self.imd_path),
+                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/pvl",
+                      description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -167,6 +181,9 @@ class Driver(ProcDriver):
                         Driver.til_path = os.path.join(path, file)
                     if file.endswith('.IMD'):
                         Driver.imd_path = os.path.join(path, file)
+            tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+            if tfw_path.exists():
+                Driver.tfw_path = str(tfw_path)
             return Driver.tif_path is not None and \
                    Driver.xml_path is not None and \
                    Driver.til_path is not None and \

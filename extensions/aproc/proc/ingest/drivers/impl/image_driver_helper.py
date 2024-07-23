@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import dateutil.parser
 
@@ -7,44 +8,42 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     Properties, ResourceType, Role)
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
+from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, get_hash_url
 
 
 class ImageDriverHelper:
     def identify_assets(driver: ProcDriver, format: str, url: str) -> list[Asset]:
-        return [Asset(href=url,
+        assets = []
+        assets.append(Asset(href=url,
                       roles=[Role.data.value], name=Role.data.value, type=format,
-                      description=Role.data.value, airs__managed=False)]
+                      description=Role.data.value, airs__managed=False))
+        tfw_path = Path(url.removesuffix(".tif")).with_suffix(".tfw")
+        if tfw_path.exists():
+            assets.append(Asset(href=str(tfw_path), size=get_file_size(str(tfw_path)),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+        return assets
 
-    # Implements drivers method
-    def fetch_assets(driver: ProcDriver, url: str, assets: list[Asset]) -> list[Asset]:
-        from PIL import Image
-
-        # we try to build a thumbnail and an overview. A failure should not stop the registration.
+    def add_overview_if_you_can(driver: ProcDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
         try:
-            thumbnail = Asset(href=None,
-                              roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/png",
-                              description=Role.thumbnail.value)
-            thumbnail.href = driver.get_asset_filepath(url, thumbnail)
+            from PIL import Image
+            asset = Asset(href=None,
+                          roles=[role.value], name=role.value, type="image/png",
+                          description=role.value, asset_format=AssetFormat.png.value)
+            asset.href = driver.get_asset_filepath(url, asset)
             image = Image.open(url)
-            image.thumbnail([driver.thumbnail_size, driver.thumbnail_size])
-            image.save(thumbnail.href, 'PNG')
-            assets.append(thumbnail)
+            image.thumbnail([size, size])
+            image.save(asset.href, 'PNG')
+            asset.size = get_file_size(asset.href)
+            to_assets(asset)
         except Exception as e:
             driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
             driver.LOGGER.error(e)
-        try:
-            overview = Asset(href=None,
-                             roles=[Role.overview.value], name=Role.overview.value, type="image/png",
-                             description=Role.overview.value)
-            overview.href = driver.get_asset_filepath(url, overview)
-            image = Image.open(url)
-            image.thumbnail([driver.overview_size, driver.overview_size])
-            image.save(overview.href, 'PNG')
-            assets.append(overview)
-        except Exception as e:
-            ProcDriver.LOGGER.error(e)
-        return assets
+
+    # Implements drivers method
+    def fetch_assets(driver: ProcDriver, url: str, assets: list[Asset]) -> list[Asset]:
+        ImageDriverHelper.add_overview_if_you_can(driver, url, Role.thumbnail, driver.thumbnail_size, assets)
+        ImageDriverHelper.add_overview_if_you_can(driver, url, Role.overview, driver.overview_size, assets)
 
     # Implements drivers method
     def get_item_id(driver: ProcDriver, url: str) -> str:

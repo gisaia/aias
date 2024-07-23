@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import xml.etree.ElementTree as ET
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
@@ -12,6 +13,7 @@ class Driver(ProcDriver):
     thumbnail_path = None
     dim_path = None
     tif_path = None
+    tfw_path = None
 
     # Implements drivers method
 
@@ -33,15 +35,22 @@ class Driver(ProcDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
-                                description=Role.thumbnail.value))
+                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
-                                description=Role.overview.value))
+                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-
+        assets.append(
+            Asset(href=self.dim_path, size=get_file_size(self.dim_path),
+                  roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                  description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        if Driver.tfw_path:
+            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+                                roles=[Role.metadata.value], name="tfw", type="text/plain",
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -115,6 +124,9 @@ class Driver(ProcDriver):
                 if os.path.isfile(os.path.join(path, file)):
                     if file == "imagery.tif":
                         Driver.tif_path = os.path.join(path, file)
+                        tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                        if tfw_path.exists():
+                            Driver.tfw_path = str(tfw_path)
                     if file == "metadata.dim":
                         Driver.dim_path = os.path.join(path, file)
                     if file == "preview.jpg":
