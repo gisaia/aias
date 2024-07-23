@@ -160,7 +160,7 @@ class AprocProcess(Process):
                                 LOGGER.error(msg)
                                 raise ConnectionException(msg)
                     else:
-                        LOGGER.info("{} not managed".format(asset.name))
+                        LOGGER.info("{} not managed".format(asset.name))
                 LOGGER.debug("ingestion: 6 - register")
                 __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
                 item_already_exists = False
