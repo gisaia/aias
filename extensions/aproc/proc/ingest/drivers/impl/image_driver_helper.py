@@ -44,6 +44,7 @@ class ImageDriverHelper:
     def fetch_assets(driver: ProcDriver, url: str, assets: list[Asset]) -> list[Asset]:
         ImageDriverHelper.add_overview_if_you_can(driver, url, Role.thumbnail, driver.thumbnail_size, assets)
         ImageDriverHelper.add_overview_if_you_can(driver, url, Role.overview, driver.overview_size, assets)
+        return assets
 
     # Implements drivers method
     def get_item_id(driver: ProcDriver, url: str) -> str:
