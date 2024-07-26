@@ -120,9 +120,9 @@ class ImageDriverHelper:
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
-        item.properties.instrument = "Unknown"
-        item.properties.constellation = "Unknown"
-        item.properties.sensor = "Unknown"
+        item.properties.instrument = None
+        item.properties.constellation = None
+        item.properties.sensor = None
         tif_asset: Asset = Asset()
         if os.path.exists(url):
             tif_asset.size = os.stat(url).st_size
