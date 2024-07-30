@@ -31,7 +31,7 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -54,7 +54,7 @@ class Driver(ProcDriver):
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -175,7 +175,7 @@ class Driver(ProcDriver):
         path = os.path.dirname(file_path)
         if valid_and_exist is True and file_name.endswith(".tif"):
             Driver.tif_path = file_path
-            tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+            tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
             if tfw_path.exists():
                 Driver.tfw_path = str(tfw_path)
             Driver.file_name = file_name

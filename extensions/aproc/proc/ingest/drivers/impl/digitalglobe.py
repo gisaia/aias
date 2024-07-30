@@ -19,7 +19,7 @@ class Driver(ProcDriver):
     til_path = None
     tif_path = None
     imd_path = None
-    twf_path = None
+    tfw_path = None
 
     # Implements drivers method
 
@@ -32,7 +32,7 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -61,7 +61,7 @@ class Driver(ProcDriver):
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -181,13 +181,14 @@ class Driver(ProcDriver):
                         Driver.til_path = os.path.join(path, file)
                     if file.endswith('.IMD'):
                         Driver.imd_path = os.path.join(path, file)
-            tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
-            if tfw_path.exists():
-                Driver.tfw_path = str(tfw_path)
+            if Driver.tif_path:
+                tfw_path = Path(Driver.tif_path).with_suffix(".TFW")
+                if tfw_path.exists():
+                    Driver.tfw_path = str(tfw_path)
             return Driver.tif_path is not None and \
                    Driver.xml_path is not None and \
                    Driver.til_path is not None and \
                    Driver.imd_path is not None
         else:
-            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
+            Driver.LOGGER.info("The reference {} is not a folder or does not exist.".format(path))
             return False

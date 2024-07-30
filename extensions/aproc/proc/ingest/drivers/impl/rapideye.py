@@ -32,21 +32,25 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        ImageDriverHelper.add_overview_if_you_can(self, self.thumbnail_path, Role.thumbnail, Driver.thumbnail_size, assets)
-        ImageDriverHelper.add_overview_if_you_can(self, self.quicklook_path, Role.overview, Driver.overview_size, assets)
+        if Driver.quicklook_path is None:
+            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, Driver.thumbnail_size, assets)
+            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, Driver.overview_size, assets)
+        assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
+                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.metadata.value], name="tfw", type="text/plain",
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -141,7 +145,7 @@ class Driver(ProcDriver):
                         Driver.thumbnail_path = os.path.join(path, file)
                     if file.endswith(".tif") and file.find("browse") < 0 and file.find("_udm") < 0:
                         Driver.tif_path = os.path.join(path, file)
-                        tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                        tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
                         if tfw_path.exists():
                             Driver.tfw_path = str(tfw_path)
                     if file.endswith("_metadata.xml"):

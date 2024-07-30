@@ -17,11 +17,17 @@ class ImageDriverHelper:
         assets.append(Asset(href=url,
                       roles=[Role.data.value], name=Role.data.value, type=format,
                       description=Role.data.value, airs__managed=False))
-        tfw_path = Path(url.removesuffix(".tif")).with_suffix(".tfw")
+        tfw_path = Path(url).with_suffix(".tfw")
         if tfw_path.exists():
             assets.append(Asset(href=str(tfw_path), size=get_file_size(str(tfw_path)),
                                 roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+
+        j2w_path = Path(url).with_suffix(".j2w")
+        if j2w_path.exists():
+            assets.append(Asset(href=str(j2w_path), size=get_file_size(str(j2w_path)),
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
     def add_overview_if_you_can(driver: ProcDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
@@ -35,7 +41,7 @@ class ImageDriverHelper:
             image.thumbnail([size, size])
             image.save(asset.href, 'PNG')
             asset.size = get_file_size(asset.href)
-            to_assets(asset)
+            to_assets.append(asset)
         except Exception as e:
             driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
             driver.LOGGER.error(e)
@@ -123,11 +129,13 @@ class ImageDriverHelper:
         item.properties.instrument = None
         item.properties.constellation = None
         item.properties.sensor = None
-        tif_asset: Asset = Asset()
+        image_asset: Asset = item.assets.get(Role.data.value)
         if os.path.exists(url):
-            tif_asset.size = os.stat(url).st_size
-        tif_asset.airs__managed = False
-        tif_asset.asset_format = assetFormat.value
-        tif_asset.asset_type = ResourceType.gridded.value
+            image_asset.size = os.stat(url).st_size
+        else:
+            driver.LOGGER.warn("{} does not exist, size not found".format(url))
+        image_asset.airs__managed = False
+        image_asset.asset_format = assetFormat.value
+        image_asset.asset_type = ResourceType.gridded.value
         item.properties.eo__bands = bands
         return item
