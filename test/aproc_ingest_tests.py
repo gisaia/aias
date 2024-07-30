@@ -42,52 +42,53 @@ class Tests(unittest.TestCase):
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
 
-    def test_async_ingest(self, url, id, assets: list[str], archive=True):
+    def async_ingest(self, url, id, assets: list[str], archive=True):
         status = self.ingest(url, COLLECTION, CATALOG)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
         self.check_result(item, id, assets, archive)
+        return status
 
     def test_async_ingest_dimap(self):  # Driver DIMAP
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
-        self.test_async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_ikonos(self):  # Driver GEOEYE
         url = "/inputs/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
         id = "0e73667ac0bd10b5f18bcb5ee40518db973b2946fe8b40d2b4cb988724ac9507"
-        self.test_async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_wv(self):  # Driver DIGITALGLOBE
         url = "/inputs/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
         id = "4bd829d461af55d10d3cf98ae2f5014e1945b8d42c60fa36b76245e167fc35ba"
-        self.test_async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast(self):  # Driver AST
         url = "/inputs/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tif"
         id = "ae0f91d2865b53188eb11158723f192b72dae3ad13ecaf5f5af9d28785c88aeb"
-        self.test_async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx(self):  # Driver TERRASRX
         url = "/inputs/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401.xml"
         id = "76871773d00a00aead7e7ab7e6b59182b3da8b0ab8679a2c5d15457fccdd24ce"
-        self.test_async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = "/inputs/3159120_2020-03-11_RE1_3A"
         id = "f07bc337f2c904f7d23007b0d9c868872036162dc48f954ccd46f55198de530e"
-        self.test_async_ingest(url, id, ["data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_tif(self):  # Driver TIF
         url = "/inputs/cog.tiff"
         id = "36f978ad9fe1e9b4ea8064c893140012a967e1a7a5d1ac65a589a16566f03ccd"
-        self.test_async_ingest(url, id, ["data", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["data", "airs_item"], archive=False)
 
     def test_async_ingest_jpg2000(self):  # Driver JPEG2000
         url = "/inputs/jpeg2000.jpg2"
         id = "e2614a12233e3f859a4083b54d2b7e4e4615055013af13c73b6c7e427548785c"
-        self.test_async_ingest(url, id, ["data", "airs_item"], archive=False)
+        self.async_ingest(url, id, ["data", "airs_item"], archive=False)
 
     def test_async_ingest_invalid_tif(self):  # Test Driver error handling
         url = "/inputs/empty.tiff"
@@ -100,7 +101,7 @@ class Tests(unittest.TestCase):
         self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
 
     def test_ingest_folder(self):  # Test Folder ingestion
-        print(self.ingest_directory("", collection=COLLECTION, catalog=CATALOG))
+        self.ingest_directory("", collection=COLLECTION, catalog=CATALOG)
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
@@ -148,13 +149,17 @@ class Tests(unittest.TestCase):
             self.assertIsNotNone(item.properties.proj__epsg)
 
     def test_job_by_id(self):
-        status: StatusInfo = self.__ingest_dimap()
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
+        status: StatusInfo = self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         status2: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.jobID, status2.jobID)
         self.assertEqual(status2.processID, "ingest")
 
     def test_get_jobs_by_resource_id(self):
-        status: StatusInfo = self.__ingest_dimap()
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
+        status: StatusInfo = self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         resource_status: list = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs/resources", status.resourceID])).content)
         self.assertGreaterEqual(len(resource_status), 1)
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)
