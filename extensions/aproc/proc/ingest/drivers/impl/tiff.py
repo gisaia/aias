@@ -17,7 +17,7 @@ class Driver(ProcDriver):
         try:
             return (url.lower().endswith(".tif") or url.lower().endswith(".tiff")) and os.path.isfile(url) and os.path.exists(url)
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method

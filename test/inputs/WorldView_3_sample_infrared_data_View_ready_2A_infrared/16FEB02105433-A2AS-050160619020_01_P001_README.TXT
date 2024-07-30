@@ -1,0 +1,10 @@
+copyrightText = "(C) COPYRIGHT 2023 DigitalGlobe, Inc., Longmont CO USA 80503.  DigitalGlobe and the DigitalGlobe logos are trademarks of DigitalGlobe, Inc. The use and/or dissemination of this data and/or of any product in any way derived there from are restricted. Unauthorized use and/or dissemination is prohibited.";
+version = "29.2";
+BEGIN_GROUP = PRODUCT_1
+	XMLFilename = "16FEB02105433-A2AS-050160619020_01_P001.XML";
+	licenseTxtFilename = "license.txt";
+	IMFFilename = "16FEB02105433-A2AS-050160619020_01_P001.IMD";
+	tilFilename = "16FEB02105433-A2AS-050160619020_01_P001.TIL";
+	RPC00BFilename = "16FEB02105433-A2AS-050160619020_01_P001.RPB";
+END_GROUP = PRODUCT_1
+END;

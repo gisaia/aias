@@ -33,7 +33,7 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -59,11 +59,11 @@ class Driver(ProcDriver):
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type="image/tif",
-                            description=Role.data.value, airs__managed=False))
+                            description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.metadata.value], name="tfw", type="text/plain",
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -135,6 +135,7 @@ class Driver(ProcDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.terrasar.value,
                 main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
@@ -159,7 +160,7 @@ class Driver(ProcDriver):
                         for file in os.listdir(os.path.join(path, folder)):
                             if file.endswith(".tif"):
                                 Driver.tif_path = os.path.join(path, folder, file)
-                                tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                                tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
                                 if tfw_path.exists():
                                     Driver.tfw_path = str(tfw_path)
             return Driver.met_path is not None and Driver.tif_path is not None and Driver.browse_path is not None

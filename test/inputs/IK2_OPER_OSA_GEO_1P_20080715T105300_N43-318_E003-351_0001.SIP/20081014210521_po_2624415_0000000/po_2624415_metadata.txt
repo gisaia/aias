@@ -1,0 +1,200 @@
+==============================================================
+Version Number: 2.0
+==============================================================
+Company Information
+     Address
+           European Space Imaging, GmbH
+           Arnulfstrasse 197
+           D-80634 Munich, Germany
+     Contact Information
+           On the Web: http://www.EUSpaceImaging.com
+           Phone: +49(0)89 130 142 0
+           Fax  : +49(0)89 130 142 22
+==============================================================
+
+Product Order Metadata
+
+Creation Date: 10/14/08
+Product Work Order Number: 08EUSI-1214-08
+Product Order Number: 2624415
+Customer Project Name: test3
+Ground Station ID: RGS10
+License Type: EUSI_ESA_CAT1_User_License
+Product Order Area (Geographic Coordinates)
+   Number of Coordinates: 10
+      Coordinate: 1
+      Latitude: 43.2559230000 degrees
+      Longitude: 3.2742320000 degrees
+      Coordinate: 2
+      Latitude: 43.3148010000 degrees
+      Longitude: 3.2743560000 degrees
+      Coordinate: 3
+      Latitude: 43.3736350000 degrees
+      Longitude: 3.2744640000 degrees
+      Coordinate: 4
+      Latitude: 43.3763130000 degrees
+      Longitude: 3.3267550000 degrees
+      Coordinate: 5
+      Latitude: 43.3789870000 degrees
+      Longitude: 3.3764370000 degrees
+      Coordinate: 6
+      Latitude: 43.3819410000 degrees
+      Longitude: 3.4288980000 degrees
+      Coordinate: 7
+      Latitude: 43.3232570000 degrees
+      Longitude: 3.4288140000 degrees
+      Coordinate: 8
+      Latitude: 43.2645280000 degrees
+      Longitude: 3.4287150000 degrees
+      Coordinate: 9
+      Latitude: 43.2614720000 degrees
+      Longitude: 3.3762330000 degrees
+      Coordinate: 10
+      Latitude: 43.2587020000 degrees
+      Longitude: 3.3265360000 degrees
+Product Order Area (Map Coordinates in Map Units)
+      Coordinate: 1
+      Map X (Easting): 522235.08 meters
+      Map Y (Northing): 4802344.26 meters
+      Coordinate: 2
+      Map X (Easting): 526470.16 meters
+      Map Y (Northing): 4802656.93 meters
+      Coordinate: 3
+      Map X (Easting): 530493.52 meters
+      Map Y (Northing): 4802970.86 meters
+      Coordinate: 4
+      Map X (Easting): 534741.48 meters
+      Map Y (Northing): 4803319.43 meters
+      Coordinate: 5
+      Map X (Easting): 534768.16 meters
+      Map Y (Northing): 4796802.22 meters
+      Coordinate: 6
+      Map X (Easting): 534793.60 meters
+      Map Y (Northing): 4790280.08 meters
+      Coordinate: 7
+      Map X (Easting): 530535.79 meters
+      Map Y (Northing): 4789920.19 meters
+      Coordinate: 8
+      Map X (Easting): 526503.49 meters
+      Map Y (Northing): 4789595.62 meters
+      Coordinate: 9
+      Map X (Easting): 522259.21 meters
+      Map Y (Northing): 4789271.75 meters
+      Coordinate: 10
+      Map X (Easting): 522247.81 meters
+      Map Y (Northing): 4795810.42 meters
+Sensor Type: Satellite
+Sensor Name: IKONOS-2
+Processing Level: Standard Geometrically Corrected
+Image Type: PAN/MSI
+Interpolation Method: Cubic Convolution
+Multispectral Algorithm: None
+Stereo: Mono
+Mosaic: No
+Map Projection: Universal Transverse Mercator
+      UTM Specific Parameters
+      Hemisphere: N
+      Zone Number: 31
+Datum: WGS84
+Product Order Pixel Size: 1.0000000000 meters
+Product Order Map Units:  meters
+MTFC Applied: Yes
+DRA Applied: No
+Media: Electronic
+Product Media Format: Electronic
+File Format: GeoTIFF
+   TIFF Tiled: No
+   Bits per Pixel per Band: 11 bits per pixel
+Multispectral Files: Four Files
+
+==============================================================
+
+Source Image Metadata
+
+Number of Source Images: 1
+
+Source Image ID: 2008071510530080000011304028
+Product Image ID: 000
+Sensor: IKONOS-2
+Acquired Nominal GSD
+   Pan Cross Scan: 0.91 meters
+   Pan Along Scan: 0.97 meters
+   MS Cross Scan: 3.64 meters
+   MS Along Scan: 3.88 meters
+Scan Azimuth: 180.05 degrees
+Scan Direction: Reverse
+Panchromatic TDI Mode: 13
+Nominal Collection Azimuth: 203.7267 degrees
+Nominal Collection Elevation: 65.36681 degrees
+Sun Angle Azimuth: 145.1600 degrees
+Sun Angle Elevation: 64.88896 degrees
+Acquisition Date/Time: 2008-07-15 10:53 GMT
+Percent Cloud Cover: 0
+
+==============================================================
+
+Product Space Metadata
+
+Number of Image Components: 1
+   X Components: 1
+   Y Components: 1
+Product MBR Geographic Coordinates
+   Number of Coordinates: 4
+      Coordinate: 1
+      Latitude: 43.2558938054 degrees
+      Longitude: 3.2739346213 degrees
+      Coordinate: 2
+      Latitude: 43.3824157975 degrees
+      Longitude: 3.2745036083 degrees
+      Coordinate: 3
+      Latitude: 43.3819385626 degrees
+      Longitude: 3.4295474500 degrees
+      Coordinate: 4
+      Latitude: 43.2554186630 degrees
+      Longitude: 3.4286571102 degrees
+Product Map Coordinates (in Map Units)
+   UL Map X (Easting): 522235.08 meters
+   UL Map Y (Northing): 4803319.43 meters
+Pixel Size X: 1.0000000000 meters
+Pixel Size Y: 1.0000000000 meters
+Product Order Map Units:  meters
+Columns: 12560 pixels
+Rows: 14052 pixels
+Reference Height: 61.6240539551 meters
+
+==============================================================
+
+Product Component Metadata
+
+Number of Components: 1
+
+Component ID: 0000000
+Product Image ID: 000
+Component File Name: po_2624415_pan_0000000.tif po_2624415_red_0000000.tif po_2624415_grn_0000000.tif po_2624415_blu_0000000.tif po_2624415_nir_0000000.tif 
+Thumbnail File Name: po_2624415_rgb_0000000_ovr.jpg
+Country Code: FR
+Component Geographic Corner Coordinates
+   Number of Coordinates: 4
+      Coordinate: 1
+      Latitude: 43.2558938054 degrees
+      Longitude: 3.2739346213 degrees
+      Coordinate: 2
+      Latitude: 43.3824157975 degrees
+      Longitude: 3.2745036083 degrees
+      Coordinate: 3
+      Latitude: 43.3819385626 degrees
+      Longitude: 3.4295474500 degrees
+      Coordinate: 4
+      Latitude: 43.2554186630 degrees
+      Longitude: 3.4286571102 degrees
+Component Map Coordinates (in Map Units)
+   UL Map X (Easting): 522235.08 meters
+   UL Map Y (Northing): 4803319.43 meters
+Pixel Size X: 1.0000000000 meters
+Pixel Size Y: 1.0000000000 meters
+Product Order Map Units:  meters
+Columns: 12560 pixels
+Rows: 14052 pixels
+Percent Component Cloud Cover: 0
+
+==============================================================

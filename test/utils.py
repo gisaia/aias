@@ -19,6 +19,7 @@ APROC_ENDPOINT = os.getenv("APROC_ENDPOINT", "http://aproc-service:8001/arlas/ap
 AGATE_ENDPOINT = os.getenv("AGATE_ENDPOINT", "http://agate:8004/arlas/agate/authorization")
 SMTP_SERVER="http://smtp4dev:80/api/Messages"
 COLLECTION="digitalearth.africa"
+CATALOG = "tests"
 ARLAS_COLLECTION="digitalearth.africa"
 ID="077cb463-1f68-5532-aa8b-8df0b510231a"
 ID_MANAGED="077cb463-1f68-5532-aa8b-8df0b510231a_managed"

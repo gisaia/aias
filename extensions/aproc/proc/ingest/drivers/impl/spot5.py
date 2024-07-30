@@ -26,7 +26,7 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -124,7 +124,7 @@ class Driver(ProcDriver):
                 if os.path.isfile(os.path.join(path, file)):
                     if file == "imagery.tif":
                         Driver.tif_path = os.path.join(path, file)
-                        tfw_path = Path(Driver.tif_path.removesuffix(".tif")).with_suffix(".tfw")
+                        tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
                         if tfw_path.exists():
                             Driver.tfw_path = str(tfw_path)
                     if file == "metadata.dim":

@@ -1,0 +1,125 @@
+<opt:EarthObservation xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:opt="http://www.opengis.net/opt/2.1" xmlns:eop="http://www.opengis.net/eop/2.1" xmlns:om="http://www.opengis.net/om/2.0" xmlns:ows="http://www.opengis.net/ows/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_1">
+  <om:phenomenonTime>
+    <gml:TimePeriod gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_2">
+      <gml:beginPosition>2008-07-15T10:53:00Z</gml:beginPosition>
+      <gml:endPosition>2008-07-15T10:53:00Z</gml:endPosition>
+    </gml:TimePeriod>
+  </om:phenomenonTime>
+  <om:resultTime>
+    <gml:TimeInstant gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_3">
+      <gml:timePosition>2008-07-15T10:53:00Z</gml:timePosition>
+    </gml:TimeInstant>
+  </om:resultTime>
+  <om:procedure>
+    <opt:EarthObservationEquipment gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_4">
+      <eop:platform>
+        <eop:Platform>
+          <eop:shortName>IKONOS</eop:shortName>
+          <eop:serialIdentifier>2</eop:serialIdentifier>
+        </eop:Platform>
+      </eop:platform>
+      <eop:instrument>
+        <eop:Instrument>
+          <eop:shortName>OSA</eop:shortName>
+        </eop:Instrument>
+      </eop:instrument>
+      <eop:sensor>
+        <eop:Sensor>
+          <eop:sensorType>OPTICAL</eop:sensorType>
+          <eop:operationalMode codeSpace="urn:esa:eop:IKONOS:operationalMode">IM</eop:operationalMode>
+        </eop:Sensor>
+      </eop:sensor>
+      <eop:acquisitionParameters>
+        <eop:Acquisition>
+          <eop:orbitNumber>00000</eop:orbitNumber>
+          <eop:orbitDirection>DESCENDING</eop:orbitDirection>
+          <eop:illuminationAzimuthAngle uom="deg">145.1600</eop:illuminationAzimuthAngle>
+          <eop:illuminationElevationAngle uom="deg">64.88896</eop:illuminationElevationAngle>
+          <eop:acrossTrackIncidenceAngle uom="deg">65.36681</eop:acrossTrackIncidenceAngle>
+          <eop:alongTrackIncidenceAngle uom="deg">203.7267</eop:alongTrackIncidenceAngle>
+        </eop:Acquisition>
+      </eop:acquisitionParameters>
+    </opt:EarthObservationEquipment>
+  </om:procedure>
+  <om:observedProperty xsi:nil="true" nilReason="inapplicable"/>
+  <om:featureOfInterest>
+    <eop:Footprint gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_5">
+      <eop:multiExtentOf>
+        <gml:MultiSurface gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_6">
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_7">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>43.3824157975 3.2745036083 43.2558938054 3.2739346213 43.2554186630 3.4286571102 43.3819385626 3.4295474500 43.3824157975 3.2745036083</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+        </gml:MultiSurface>
+      </eop:multiExtentOf>
+      <eop:centerOf>
+        <gml:Point gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_8">
+          <gml:pos>43.3189428304 3.35166062107</gml:pos>
+        </gml:Point>
+      </eop:centerOf>
+    </eop:Footprint>
+  </om:featureOfInterest>
+  <om:result>
+    <opt:EarthObservationResult gml:id="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001_9">
+      <eop:browse>
+        <eop:BrowseInformation>
+          <eop:type>QUICKLOOK</eop:type>
+          <eop:referenceSystemIdentifier codeSpace="urn:esa:eop:crs">UTM_31N</eop:referenceSystemIdentifier>
+          <eop:fileName>
+            <ows:ServiceReference xlink:href="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.BI.PNG">
+              <ows:RequestMessage/>
+            </ows:ServiceReference>
+          </eop:fileName>
+        </eop:BrowseInformation>
+      </eop:browse>
+      <eop:product>
+        <eop:ProductInformation>
+          <eop:fileName>
+            <ows:ServiceReference xlink:href="IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP.ZIP">
+              <ows:RequestMessage/>
+            </ows:ServiceReference>
+          </eop:fileName>
+          <eop:version>0001</eop:version>
+          <eop:size uom="bytes">441506933</eop:size>
+        </eop:ProductInformation>
+      </eop:product>
+      <opt:cloudCoverPercentage uom="%">0</opt:cloudCoverPercentage>
+    </opt:EarthObservationResult>
+  </om:result>
+  <eop:metaDataProperty>
+    <eop:EarthObservationMetaData>
+      <eop:identifier>IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001</eop:identifier>
+      <eop:acquisitionType>NOMINAL</eop:acquisitionType>
+      <eop:productType>OSA_GEO_1P</eop:productType>
+      <eop:status>ARCHIVED</eop:status>
+      <eop:processing>
+        <eop:ProcessingInformation>
+          <eop:processingDate>2010-08-14T00:00:00Z</eop:processingDate>
+        </eop:ProcessingInformation>
+      </eop:processing>
+      <eop:vendorSpecific>
+        <eop:SpecificInformation>
+          <eop:localAttribute>boundingBox</eop:localAttribute>
+          <eop:localValue>43.3824157975 3.2739346213 43.255418663 3.2739346213 43.255418663 3.42954745 43.3824157975 3.42954745</eop:localValue>
+        </eop:SpecificInformation>
+      </eop:vendorSpecific>
+      <eop:vendorSpecific>
+        <eop:SpecificInformation>
+          <eop:localAttribute>countryCode</eop:localAttribute>
+          <eop:localValue>FR</eop:localValue>
+        </eop:SpecificInformation>
+      </eop:vendorSpecific>
+      <eop:vendorSpecific>
+        <eop:SpecificInformation>
+          <eop:localAttribute>originalName</eop:localAttribute>
+          <eop:localValue>IK2_OPER_OSA_GEO_1P_20080715T105300_20080715T105300_FR00.ZIP</eop:localValue>
+        </eop:SpecificInformation>
+      </eop:vendorSpecific>
+    </eop:EarthObservationMetaData>
+  </eop:metaDataProperty>
+</opt:EarthObservation>

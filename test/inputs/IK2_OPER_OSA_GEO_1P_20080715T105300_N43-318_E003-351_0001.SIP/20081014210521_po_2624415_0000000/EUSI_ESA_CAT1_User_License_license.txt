@@ -1,0 +1,148 @@
+European Space Imaging GmbH
+
+ESA Cat-1 License Agreement
+
+
+
+This End User License Agreement is the basis upon which European Space
+Imaging GmbH ("European Space Imaging") makes available to the
+"Customer" the space-based, remote sensed earth image data product (the
+"Product").
+
+
+
+These license conditions are understood to be accepted by the data user
+by signing the 'ESA Terms and Conditions for Category-1 use' applicable
+document version and are only for reference. No additional signature or
+confirmation is required.
+
+
+
+"Product" means TPM data provided by European Space Imaging as defined
+by the Terms and Conditions for the Utilisation of Data under the ESA
+Category-1 scheme (V15/01/08).
+
+
+
+"Customer" means Category-1 Principal Investigator (Cat-1 PI) certified
+by the European Space Agency under the ESA Category-1 scheme and as
+defined by the Terms and Conditions for the Utilisation of Data under
+the ESA Category-1 scheme (V15/01/08)
+
+
+
+
+
+Customer accepts and agrees to the terms of this Agreement by doing any
+one of the following:  (a) accepting, in whole or in part, a quotation
+describing the Product by any means (including the use of Customer's
+purchase order, whether or not that purchase order contains inconsistent
+terms and conditions); (b) breaking the seal on the package containing
+the Product; (c) installing or manipulating the Product on any computer
+hardware; (d) making any commercial use of the Product or any material
+derived from the Product; (e) damaging or destroying the Product; (e)
+retaining the Product for more than 15 days following receipt thereof.
+
+
+
+Customer agrees to acquire the Product, as licensee, upon the terms and
+conditions of this Agreement, which shall govern all licenses of Product
+between European Space Imaging and Customer.
+
+
+
+European Space Imaging retains all ownership rights in the Product, and
+Customer does not receive any such rights.  European Space Imaging
+grants Customer a non-transferable, non-exclusive, pre-paid license to
+use the Products as specified below ("the Permitted Use"), and for no
+other use.  Under this license, Customer may do the following:
+
+
+
+1. GRANT OF LICENSE, PERMITTED USE
+
+Under this license, the Customer may do the following:
+
+
+
+a. Distribute works derived from the Product ("Derived Works"). Derived
+Works that contain the source image data (pixels) or reasonable
+facsimile of the source image data, inherit the copyright and license
+restrictions of the source data. Other Derived Works (vector extraction,
+classification, etc...) have no restrictions on use and distribution.
+Reduced resolution data sets (RRDS) with ratios of 16:1 or higher shall
+have no restrictions on use and distribution, but shall contain the
+copyright markings.
+
+
+
+b. Make the Product available to its consultants, agents and
+subcontractors for purposes otherwise consistent with the Permitted Use
+and subject to the restrictions herein, and without the right to
+transfer, modify, copy or sublicense.
+
+
+
+c. Post the Product and Derived Works, with copyright markings, in a
+non-downloadable fashion, on an Internet site with the following credit
+conspicuously displayed, "Includes material (c) European Space Imaging
+GmbH".
+
+
+
+2.  COPYRIGHT 
+
+European Space Imaging owns all copyrights on the Product.
+
+The Cat-1 PI agrees that any embodiment of the Products permitted under
+this Agreement will contain a notice similar to the following: "Includes
+material (c) [production year], European Space Imaging GmbH, all rights
+reserved."
+
+
+
+3.  MISCELLANEOUS 
+
+This Agreement shall be governed by the internal laws of Germany for
+products.
+
+The Product can not be provided to any of the following persons or
+organisations provided by the following semi annually updated lists:
+
+
+
+NOAA License Compliance
+
+Lists of entities with which transactions involving IKONOS imagery are
+prohibited:
+
+
+
+U.S. Treasury SDN & Blocked Persons:
+
+http://www.ustreas.gov/offices/enforcement/ofac/sdn/index.shtml
+
+U.S. Treasury Terrorist Organizations:
+
+http://www.ustreas.gov/offices/enforcement/ofac/programs/index.shtml
+
+U.S. Treasury Narcotics Drug Traffickers List
+
+http://www.ustreas.gov/offices/enforcement/ofac/programs/narco/drugs.pdf
+
+U.S. Commerce Denied Persons List:
+
+http://www.bis.doc.gov/ComplianceAndEnforcement/ListsToCheck.htm
+
+U.S. Commerce Entities: http://www.bis.doc.gov/Entities/Default.htm
+
+U.S. State Debarred Parties: http://pmddtc.state.gov/country.htm
+
+DENIED PARTIES:
+
+http://www.bis.doc.gov/ComplianceAndEnforcement/ListsToCheck.htm
+
+DENIED COUNTRIES:
+
+http://www.treas.gov/offices/enforcement/ofac/sdn/
+

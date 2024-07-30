@@ -29,7 +29,7 @@ class Driver(ProcDriver):
             result = Driver.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.debug(e)
+            Driver.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -71,7 +71,7 @@ class Driver(ProcDriver):
                 format = AssetFormat.tfw.value
             assets.append(Asset(href=self.georef_path, size=get_file_size(self.georef_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
-                                description=Role.metadata.value, airs__managed=False, asset_format=format, asset_type=ResourceType.other.value))
+                                description=Role.extent.value, airs__managed=False, asset_format=format, asset_type=ResourceType.other.value))
         return assets
 
     # Implements drivers method
@@ -189,7 +189,7 @@ class Driver(ProcDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
                 main_asset_format=self.get_main_asset_format(root),
-                main_asset_name=Role.metadata.value,
+                main_asset_name=Role.data.value,
                 observation_type=ObservationType.image.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))

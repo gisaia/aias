@@ -12,6 +12,7 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
+from extensions.aproc.proc.ingest.drivers.driver import Driver
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from extensions.aproc.proc.ingest.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
@@ -107,9 +108,10 @@ class AprocProcess(Process):
         if not os.path.exists(url):
             msg = "File or directory {} not found".format(url)
             LOGGER.warning(msg)
-        driver = Drivers.solve(url)
+        driver: Driver = Drivers.solve(url)
         if driver is not None:
             try:
+                LOGGER.info("Driver {} will be used".format(driver.name))
                 LOGGER.debug("ingestion: 1 - identify_assets")
                 __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
                 assets: list[Asset] = driver.identify_assets(url)
