@@ -30,7 +30,7 @@
   "dependencies": {
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
-    "arlas-wui-toolkit": "25.0.0",
+    "arlas-wui-toolkit": "26.0.0",
     "ngx-spinner": "14.0.0",
     "ngx-toastr": "15.2.2",
     "patch-package": "^6.4.7",
