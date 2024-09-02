@@ -46,7 +46,7 @@ build_and_publish_docker airs
 
 # PYTHON PIP
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
-python3 airs/core/models/utils.py > docs/model/model.schema.json
+docker run -v `pwd`:/app  python:3 /bin/bash -c  "cd /app/; pip3 install pydantic ; python3 -m airs.core.models.utils > /app/docs/model/model.schema.json"
 jsonschema2md -d docs/model/ -o docs/model/
 ./release/publish.sh $VERSION
 
