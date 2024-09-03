@@ -55,12 +55,14 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!!refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
+          this.paginator.firstPage();
           this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
             this.getTasks();
           });
         }
       }
     })
+
   }
 
   public ngAfterViewInit(): void {

@@ -36,5 +36,6 @@
   "running": "running",
   "successful": "successful",
   "failed": "failed",
-  "dissmissed": "dissmissed"
+  "dissmissed": "dissmissed",
+	"Refresh": "Refresh"
 }

@@ -1,5 +1,8 @@
 <arlas-top-menu [showAboutButton]="false">
   <div left-menu>{{'Archive explorer' | translate}}</div>
+  <div right-menu>
+    <mat-icon class="refresh-btn" (click)="refresh()" [matTooltip]="'Refresh' | translate">refresh</mat-icon>
+  </div>
 </arlas-top-menu>
 
 <div class="content">

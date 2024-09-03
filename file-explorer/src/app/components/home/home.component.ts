@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FamService } from '@services/fam/fam.service';
+import { JobService } from '@services/job/job.service';
 import { ArlasIamService } from 'arlas-wui-toolkit';
 import { Subject } from 'rxjs';
 
@@ -18,7 +20,9 @@ export class HomeComponent implements OnInit {
   public isMenuOpen = false;
 
   constructor(
-    private arlasIamService: ArlasIamService
+    private arlasIamService: ArlasIamService,
+    private famService: FamService,
+    private jobsService: JobService
   ) { }
 
   ngOnInit(): void {
@@ -26,6 +30,11 @@ export class HomeComponent implements OnInit {
   }
 
   public logout() {
-    this; this.arlasIamService.logout();
+    this.arlasIamService.logout();
+  }
+
+  public refresh() {
+    this.famService.refreshArchives$.next(true);
+    this.jobsService.refreshTasks.next(true);
   }
 }

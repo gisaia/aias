@@ -14,7 +14,7 @@ export class JobService {
 
   constructor(
     private http: HttpClient
-  ) {}
+  ) { }
 
   public setOptions(options: any) {
     this.options = options;
@@ -55,6 +55,6 @@ export class JobService {
   }
 
   public getTasks(page: number = 0, pageSize: number = 10): Observable<ProcessResult> {
-    return this.http.get(this.jobSettings?.url + '/jobs?offset=' + page + '&limit=' + pageSize + '&process_id=ingest', this.options) as Observable<ProcessResult>;
+    return this.http.get(this.jobSettings?.url + '/jobs?offset=' + page + '&limit=' + pageSize, this.options) as Observable<ProcessResult>;
   }
 }

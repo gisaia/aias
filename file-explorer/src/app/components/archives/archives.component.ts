@@ -1,4 +1,5 @@
-import { Component, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -8,19 +9,19 @@ import { StatusService } from '@services/status/status.service';
 import { Archive, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
+import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, zip } from 'rxjs';
 
 @Component({
   selector: 'app-archives',
   templateUrl: './archives.component.html',
   styleUrls: ['./archives.component.scss']
 })
-export class ArchivesComponent implements OnChanges {
+export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
+
+  protected onDestroy = new Subject<void>();
 
   @Input() public archivesPath: string = '';
-  @Output()
-
-  public archives: Archive[] | undefined = undefined;
+  @Output() public archives: Archive[] | undefined = undefined;
 
   public constructor(
     private famService: FamService,
@@ -32,11 +33,28 @@ export class ArchivesComponent implements OnChanges {
     private toastr: ToastrService
   ) { }
 
+
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['archivesPath'] && changes['archivesPath'].currentValue !== '') {
       this.spinner.show('archives');
       this.getArchives(changes['archivesPath'].currentValue);
     }
+  }
+
+  public ngOnInit(): void {
+    this.famService.refreshArchives$.pipe(takeUntil(this.onDestroy)).subscribe({
+      next: refresh => {
+        if (!!refresh && !!this.archivesPath && this.archivesPath !== '') {
+          this.spinner.show('archives');
+          this.getArchives(this.archivesPath);
+        }
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.onDestroy.next();
+    this.onDestroy.complete();
   }
 
   public getArchives(path: string) {
@@ -66,11 +84,17 @@ export class ArchivesComponent implements OnChanges {
       )
       .subscribe({
         next: (data) => this.archives = data,
-        error: (err: Response) => {
+        error: (err: HttpErrorResponse) => {
           if (err.status === 404) {
             this.toastr.error(this.translate.instant('Unable to retrieve archives'))
           } else if (err.status === 403) {
             this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          } else if (err.status === 500) {
+            if (!!err.error && !!err.error.detail) {
+              this.toastr.error(err.error.detail);
+            } else {
+              this.toastr.error(this.translate.instant('Unable to retrieve archives'))
+            }
           }
         }
       })
@@ -88,11 +112,17 @@ export class ArchivesComponent implements OnChanges {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
-            error: (err: Response) => {
+            error: (err: HttpErrorResponse) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
               } else if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+              } else if (err.status === 500) {
+                if (!!err.error && !!err.error.detail) {
+                  this.toastr.error(err.error.detail);
+                } else {
+                  this.toastr.error(this.translate.instant('Activation failed'))
+                }
               }
             }
           });
@@ -115,11 +145,18 @@ export class ArchivesComponent implements OnChanges {
               this.getArchives(this.archivesPath);
               this.toastr.success(this.translate.instant('Archive dereferenced'))
             },
-            error: (err: Response) => {
+            error: (err: HttpErrorResponse) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Dereferencing failed'))
               } else if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+              } else if (err.status === 500) {
+                if (!!err.error && !!err.error.detail) {
+                  this.toastr.error(err.error.detail);
+                } else {
+                  this.toastr.error(this.translate.instant('Dereferencing failed'))
+                }
+
               }
             }
           });

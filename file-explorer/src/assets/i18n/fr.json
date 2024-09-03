@@ -36,5 +36,6 @@
   "running": "en cours",
   "successful": "terminé",
   "failed": "en erreur",
-  "dissmissed": "annulé"
+  "dissmissed": "annulé",
+	"Refresh": "Actualiser"
 }
