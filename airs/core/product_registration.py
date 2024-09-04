@@ -310,11 +310,11 @@ def __collect_bands(item:Item)->Item:
     return item
 
 def __dates_to_times(item:Item)->Item:
-    item.properties.datetime=item.properties.datetime.timestamp()
+    item.properties.datetime=int(item.properties.datetime.timestamp())
     if item.properties.start_datetime is not None:
-        item.properties.start_datetime=item.properties.start_datetime.timestamp()
+        item.properties.start_datetime=int(item.properties.start_datetime.timestamp())
     if item.properties.end_datetime is not None:
-        item.properties.end_datetime=item.properties.end_datetime.timestamp()
+        item.properties.end_datetime=int(item.properties.end_datetime.timestamp())
     return item
 
 def __add_generated_fields(item:Item)->Item:

@@ -191,9 +191,7 @@ class Driver(ProcDriver):
                     if file.endswith('_metadata.txt'):
                         Driver.met_path = os.path.join(path, file)
             return Driver.met_path is not None and Driver.tif_path is not None
-        else:
-            Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
-            return False
+        return False
 
     @staticmethod
     def __get_date_field__(data, line):

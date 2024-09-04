@@ -33,6 +33,7 @@ class ImageDriverHelper:
     def add_overview_if_you_can(driver: ProcDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
         try:
             from PIL import Image
+            Image.MAX_IMAGE_PIXELS = 2000000000
             asset = Asset(href=None,
                           roles=[role.value], name=role.value, type="image/png",
                           description=role.value, asset_format=AssetFormat.png.value)

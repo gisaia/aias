@@ -183,9 +183,7 @@ class Driver(ProcDriver):
                    Driver.prefix_key is not None and \
                    Driver.browse_path is not None and \
                    Driver.h5_path is not None
-        else:
-            Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
-            return False
+        return False
 
     @staticmethod
     def __get_coord__(root,prefix,value,index):
