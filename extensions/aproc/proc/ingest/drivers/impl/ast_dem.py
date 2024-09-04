@@ -103,10 +103,10 @@ class Driver(ProcDriver):
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         ImageDriverHelper.add_overview_if_you_can(
-            self, url, Role.thumbnail, self.thumbnail_size, assets
+            self, Driver.tif_path, Role.thumbnail, self.thumbnail_size, assets
         )
         ImageDriverHelper.add_overview_if_you_can(
-            self, url, Role.overview, self.overview_size, assets
+            self, Driver.tif_path, Role.overview, self.overview_size, assets
         )
         return assets
 
@@ -241,21 +241,19 @@ class Driver(ProcDriver):
     def __check_path__(path: str):
         Driver.tif_path = None
         Driver.met_path = None
-        valid_and_exist = os.path.isfile(path) and os.path.exists(path)
-        if valid_and_exist is True:
-            Driver.tif_path = path
-            tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
-            if tfw_path.exists():
-                Driver.tfw_path = str(tfw_path)
-            met_path = Path(Driver.tif_path).with_suffix(".tif.met")
-            if met_path.exists():
-                Driver.met_path = str(met_path)
-            return Driver.tif_path is not None and Driver.met_path is not None
-        else:
-            Driver.LOGGER.debug(
-                "The reference {} is not a file or does not exist.".format(path)
-            )
-            return False
+        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
+        if valid_and_exist:
+            for f in os.listdir(path):
+                Driver.tif_path = os.path.join(path, f)
+                if Path(Driver.tif_path).is_file() and Driver.tif_path.lower().endswith((".tif", ".tiff")):
+                    tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+                    if tfw_path.exists():
+                        Driver.tfw_path = str(tfw_path)
+                    met_path = Path(Driver.tif_path).with_suffix(".tif.met")
+                    if met_path.exists():
+                        Driver.met_path = str(met_path)
+                    return Driver.tif_path is not None and Driver.met_path is not None
+        return False
 
     @staticmethod
     def __get_corner_coord__(data, corner):

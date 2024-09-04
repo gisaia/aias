@@ -142,31 +142,29 @@ class Driver(ProcDriver):
         )
         return item
 
-    def __check_path__(file_path: str):
+    def __check_path__(path: str):
         Driver.tif_path = None
         Driver.met_path = None
         Driver.browse_path = None
-        valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
-        file_name = os.path.basename(file_path)
-        path = os.path.dirname(file_path)
-        if valid_and_exist is True and file_name.endswith(".xml"):
-            Driver.met_path = file_path
-            for folder in os.listdir(path):
-                # check if current folder is a folder
-                if os.path.isdir(os.path.join(path, folder)):
-                    if folder == "PREVIEW":
-                        Driver.browse_path = os.path.join(path, folder, "BROWSE.tif")
-                    if folder == "IMAGEDATA":
-                        for file in os.listdir(os.path.join(path, folder)):
-                            if file.endswith(".tif"):
-                                Driver.tif_path = os.path.join(path, folder, file)
-                                tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
-                                if tfw_path.exists():
-                                    Driver.tfw_path = str(tfw_path)
-            return Driver.met_path is not None and Driver.tif_path is not None and Driver.browse_path is not None
-        else:
-            Driver.LOGGER.debug("The reference {} is not a file or does not exist.".format(path))
-            return False
+        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
+        if valid_and_exist:
+            for f in os.listdir(path):
+                if f.endswith(".xml"):
+                    Driver.met_path = os.path.join(path, f)
+                    for folder in os.listdir(path):
+                        # check if current folder is a folder
+                        if os.path.isdir(os.path.join(path, folder)):
+                            if folder == "PREVIEW":
+                                Driver.browse_path = os.path.join(path, folder, "BROWSE.tif")
+                            if folder == "IMAGEDATA":
+                                for file in os.listdir(os.path.join(path, folder)):
+                                    if file.endswith(".tif"):
+                                        Driver.tif_path = os.path.join(path, folder, file)
+                                        tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+                                        if tfw_path.exists():
+                                            Driver.tfw_path = str(tfw_path)
+                    return Driver.met_path is not None and Driver.tif_path is not None and Driver.browse_path is not None
+        return False
 
     @staticmethod
     def __get_coord__(root, field):
