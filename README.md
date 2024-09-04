@@ -149,7 +149,7 @@ Result:
 ```json
 {
    "collection":"digitalearth.africa",
-   "catalog":"theia-snow",
+   "catalog":"snow",
    "id":"077cb463-1f68-5532-aa8b-8df0b510231a",
    "geometry":{...},
    "bbox": ...,
@@ -228,13 +228,14 @@ A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest
 >>> IMPORTANT: The name of the class within the module __must be__ `Driver`.
 
 The following drivers are available in the `extensions` directory:
-- theia
 - ast_dem
 - digitalglobe
 - dimap
 - geoeye
 - rapideye
 - spot5
+- terrasarx
+- geotif and jpeg2000
 
 The drivers are configured in [drivers.yaml](conf/drivers.yaml)
 
