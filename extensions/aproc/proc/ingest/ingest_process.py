@@ -111,7 +111,7 @@ class AprocProcess(Process):
         driver: Driver = Drivers.solve(url)
         if driver is not None:
             try:
-                LOGGER.info("Driver {} will be used".format(driver.name))
+                LOGGER.info("Driver {} will be used".format(driver.name))
                 LOGGER.debug("ingestion: 1 - identify_assets")
                 __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
                 assets: list[Asset] = driver.identify_assets(url)

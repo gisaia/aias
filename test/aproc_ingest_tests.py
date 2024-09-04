@@ -66,13 +66,13 @@ class Tests(unittest.TestCase):
         self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast(self):  # Driver AST
-        url = "/inputs/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tif"
-        id = "ae0f91d2865b53188eb11158723f192b72dae3ad13ecaf5f5af9d28785c88aeb"
+        url = "/inputs/ast"
+        id = "7edf8f5a9df6fff49398ae628eb4b158eea85c9cab65dc5e34fc3b8481261892"
         self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx(self):  # Driver TERRASRX
-        url = "/inputs/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401.xml"
-        id = "76871773d00a00aead7e7ab7e6b59182b3da8b0ab8679a2c5d15457fccdd24ce"
+        url = "/inputs/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
+        id = "5502f3e969a505f45143da8a6a7da6a96dcf6a46800afbe75f845eb0a7e90438"
         self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
