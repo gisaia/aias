@@ -56,18 +56,6 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 8
 
-
-  -
-    name: theia
-    class_name: extensions.aproc.proc.ingest.drivers.impl.theia
-    assets_dir: /tmp/aproc/theia
-    configuration:
-      token_url: https://theia.cnes.fr/atdistrib/services/authenticate/
-      login: $THEIA_LOGIN
-      pwd: $THEIA_PWD
-      manage_data: false
-    priority: 7
-
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
