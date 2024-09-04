@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Archive, DynamicFileNode } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 
 
@@ -12,7 +12,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class FamService {
   private options = {};
-  private famSettings: { url?: string; default_path?: string; collection?: string; } = {};
+  private famSettings: { url?: string; default_path?: string; collection?: string; archives_page_size?: number, files_page_size?: number; } = {};
+  public refreshArchives$: Subject<boolean> = new Subject();
 
   constructor(
     private http: HttpClient,
@@ -35,11 +36,11 @@ export class FamService {
   }
 
   public getFiles(path: string): Observable<any> {
-    return this.http.post(this.famSettings?.url + '/files', { path, size: 50 }, this.options);
+    return this.http.post(this.famSettings?.url + '/files', { path, size: this.famSettings?.files_page_size }, this.options);
   }
 
   public getArchive(path: string): Observable<Archive[]> {
-    return this.http.post(this.famSettings?.url + '/archives', { path, size: 20 }, this.options) as Observable<Archive[]>;
+    return this.http.post(this.famSettings?.url + '/archives', { path, size: this.famSettings?.archives_page_size }, this.options) as Observable<Archive[]>;
   }
 
   public initializeFiles(path: string) {

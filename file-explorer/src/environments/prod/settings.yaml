@@ -10,6 +10,8 @@ file_manager:
   url: ${FAM_SERVER_URL}
   default_path: ${FAM_DEFAULT_PATH}
   collection: ${FAM_COLLECTION}
+  archives_page_size: ${FAM_ARCHIVES_PAGES_SIZE}
+  files_page_size: ${FAM_FILES_PAGES_SIZE}
 jobs:
   url: ${APROC_SERVER_URL}
   collection: ${APROC_COLLECTION}

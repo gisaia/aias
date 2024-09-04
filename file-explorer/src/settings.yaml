@@ -8,6 +8,8 @@ file_manager:
   url: https://arlas.crts-staff.local/fam
   default_path: ''
   collection: 'catalogue_crts'
+  archives_page_size: 20
+  files_page_size: 50
 jobs:
   url: https://arlas.crts-staff.local/aproc
   collection: 'catalogue_crts'

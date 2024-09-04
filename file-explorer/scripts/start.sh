@@ -126,6 +126,26 @@ fi
 envsubst '$FAM_COLLECTION' < /usr/share/nginx/html/settings.yaml > /usr/share/nginx/html/settings.yaml.tmp
 mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
 
+### FAM_ARCHIVES_PAGES_SIZE
+if [ -z "${FAM_ARCHIVES_PAGES_SIZE}" ]; then
+  export FAM_ARCHIVES_PAGES_SIZE=20
+  echo "Default archives pages size: 20"
+else
+  echo ${FAM_ARCHIVES_PAGES_SIZE} "is used for 'file_manager.archives_page_size'."
+fi
+envsubst '$FAM_ARCHIVES_PAGES_SIZE' < /usr/share/nginx/html/settings.yaml > /usr/share/nginx/html/settings.yaml.tmp
+mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
+
+### FAM_FILES_PAGES_SIZE
+if [ -z "${FAM_FILES_PAGES_SIZE}" ]; then
+  export FAM_FILES_PAGES_SIZE=50
+  echo "Default archives pages size: 50"
+else
+  echo ${FAM_FILES_PAGES_SIZE} "is used for 'file_manager.files_page_size'."
+fi
+envsubst '$FAM_FILES_PAGES_SIZE' < /usr/share/nginx/html/settings.yaml > /usr/share/nginx/html/settings.yaml.tmp
+mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
+
 ## APROC ##
 ### APROC_SERVER_URL
 if [ -z "${APROC_SERVER_URL}" ]; then
