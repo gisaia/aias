@@ -189,6 +189,4 @@ class Driver(ProcDriver):
                    Driver.xml_path is not None and \
                    Driver.til_path is not None and \
                    Driver.imd_path is not None
-        else:
-            Driver.LOGGER.info("The reference {} is not a folder or does not exist.".format(path))
-            return False
+        return False

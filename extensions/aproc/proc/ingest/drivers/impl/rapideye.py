@@ -151,6 +151,4 @@ class Driver(ProcDriver):
                     if file.endswith("_metadata.xml"):
                         Driver.xml_path = os.path.join(path, file)
             return Driver.tif_path is not None and Driver.xml_path is not None
-        else:
-            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
-            return False
+        return False
