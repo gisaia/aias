@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-explorer',
@@ -83,14 +84,20 @@ export class ExplorerComponent implements OnInit {
         if (!!confirm.status) {
           this.jobService.ingestDirectory(node, confirm.annotations).subscribe({
             next: () => {
-              this.jobService.refreshTasks.next(true);
+              this.jobService.refreshTasksAndArchives.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
-            error: (err: Response) => {
+            error: (err: HttpErrorResponse) => {
               if (err.status === 404) {
                 this.toastr.error(this.translate.instant('Activation failed'))
               } else if (err.status === 403) {
                 this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+              } else if (err.status === 500) {
+                if (!!err.error && !!err.error.detail) {
+                  this.toastr.error(err.error.detail);
+                } else {
+                  this.toastr.error(this.translate.instant('Activation failed'))
+                }
               }
             }
           });

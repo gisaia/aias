@@ -11,6 +11,7 @@ export class JobService {
   private jobSettings: { url?: string; collection?: string; catalog?: string; } = {};
 
   public refreshTasks: Subject<boolean> = new Subject();
+  public refreshTasksAndArchives: Subject<boolean> = new Subject();
 
   constructor(
     private http: HttpClient

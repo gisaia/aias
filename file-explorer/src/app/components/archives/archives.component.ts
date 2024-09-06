@@ -9,7 +9,7 @@ import { StatusService } from '@services/status/status.service';
 import { Archive, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, zip } from 'rxjs';
+import { catchError, finalize, forkJoin, map, mergeMap, Observable, of, Subject, Subscription, takeUntil, timer, zip } from 'rxjs';
 
 @Component({
   selector: 'app-archives',
@@ -21,7 +21,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   protected onDestroy = new Subject<void>();
 
   @Input() public archivesPath: string = '';
-  @Output() public archives: Archive[] | undefined = undefined;
+  public archives: Archive[] | undefined = undefined;
 
   public constructor(
     private famService: FamService,
@@ -46,6 +46,13 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
       next: refresh => {
         if (!!refresh && !!this.archivesPath && this.archivesPath !== '') {
           this.spinner.show('archives');
+          this.getArchives(this.archivesPath);
+        }
+      }
+    });
+    this.famService.refreshArchivesFromTasks$.pipe(takeUntil(this.onDestroy)).subscribe({
+      next: refresh => {
+        if (!!refresh && !!this.archivesPath && this.archivesPath !== '') {
           this.getArchives(this.archivesPath);
         }
       }
@@ -109,7 +116,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
         if (!!confirm.status) {
           this.jobService.ingestArchive(archive, confirm.annotations).subscribe({
             next: () => {
-              this.jobService.refreshTasks.next(true);
+              this.jobService.refreshTasksAndArchives.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: HttpErrorResponse) => {

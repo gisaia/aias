@@ -14,6 +14,7 @@ export class FamService {
   private options = {};
   private famSettings: { url?: string; default_path?: string; collection?: string; archives_page_size?: number, files_page_size?: number; } = {};
   public refreshArchives$: Subject<boolean> = new Subject();
+  public refreshArchivesFromTasks$: Subject<boolean> = new Subject();
 
   constructor(
     private http: HttpClient,
