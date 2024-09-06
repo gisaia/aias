@@ -257,9 +257,7 @@ class Driver(ProcDriver):
             else:
                 Driver.quicklook_path = raw_all_quick_path
             return Driver.roi_path is not None and Driver.dim_path is not None
-        else:
-            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
-            return False
+        return False
 
     @staticmethod
     def get_main_asset_format(root):

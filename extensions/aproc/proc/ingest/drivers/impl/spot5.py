@@ -122,21 +122,18 @@ class Driver(ProcDriver):
         if valid_and_exist is True:
             for file in os.listdir(path):
                 if os.path.isfile(os.path.join(path, file)):
-                    if file == "imagery.tif":
+                    if file.lower() == "imagery.tif":
                         Driver.tif_path = os.path.join(path, file)
                         tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
                         if tfw_path.exists():
                             Driver.tfw_path = str(tfw_path)
-                    if file == "metadata.dim":
+                    if file.lower() == "metadata.dim":
                         Driver.dim_path = os.path.join(path, file)
-                    if file == "preview.jpg":
+                    if file.lower() == "preview.jpg":
                         Driver.quicklook_path = os.path.join(path, file)
-                    if file == "icon.jpg":
+                    if file.lower() == "icon.jpg":
                         Driver.thumbnail_path = os.path.join(path, file)
 
             return Driver.tif_path is not None and \
                    Driver.dim_path is not None
-
-        else:
-            Driver.LOGGER.debug("The reference {} is not a folder or does not exist.".format(path))
-            return False
+        return False
