@@ -2,6 +2,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
+import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { Process, ProcessResult, ProcessStatus } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
@@ -40,12 +41,13 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   public constructor(
     private jobService: JobService,
     private toastr: ToastrService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private famService: FamService,
     ) { }
 
 
   public ngOnInit(): void {
-    this.executionObservable = timer(0, 10000);
+    this.executionObservable = timer(0, 5000);
     this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
       this.getTasks();
     });
@@ -58,6 +60,20 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
           this.paginator.firstPage();
           this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
             this.getTasks();
+          });
+        }
+      }
+    })
+
+    this.jobService.refreshTasksAndArchives.subscribe({
+      next: refresh => {
+        if (!!refresh) {
+          this.unsubscribeRefreshTasks.next(true);
+          this.pageIndex = 0;
+          this.paginator.firstPage();
+          this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
+            this.getTasks();
+            this.famService.refreshArchivesFromTasks$.next(true);
           });
         }
       }
