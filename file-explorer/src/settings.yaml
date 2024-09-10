@@ -4,6 +4,7 @@ authentication:
   force_connect: true
   threshold: 60000
   url: https://arlas.crts-staff.local/arlas_iam_server
+  sign_up_enabled: false
 file_manager:
   url: https://arlas.crts-staff.local/fam
   default_path: ''
