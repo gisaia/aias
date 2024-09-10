@@ -32,14 +32,6 @@ class Driver(DownloadDriver):
         if raw_archive:
             make_raw_archive_zip(met_file, target_directory)
             return
-        # If the projetion and the format are natives, just copy the file
-        if (target_projection == target_format == 'native') and (not crop_wkt):
-            if item.properties.item_format == ItemFormat.dimap.value:
-                self.copy_from_dimap(met_file,target_directory)
-            elif item.properties.item_format == ItemFormat.terrasar.value:
-                self.copy_from_terrasarx(met_file,target_directory)
-            return
-        from extensions.aproc.proc.download.drivers.impl.utils import extract
         met_file_name = os.path.basename(met_file)
         # Default driver is GTiff
         driver_target = "GTiff"
@@ -53,8 +45,16 @@ class Driver(DownloadDriver):
             driver_target = "JP2OpenJPEG"
         if driver_target == "JP2OpenJPEG":
             extension='.JP2'
+        # If the projetion and the format are natives, just copy the file
+        if (target_projection == target_format == 'native') and (not crop_wkt):
+            if item.properties.item_format == ItemFormat.dimap.value:
+                self.copy_from_dimap(met_file,target_directory,extension)
+            elif item.properties.item_format == ItemFormat.terrasar.value:
+                self.copy_from_terrasarx(met_file,target_directory)
+            return
         target_file_name = os.path.splitext(met_file_name)[0] + extension
         images = []
+        from extensions.aproc.proc.download.drivers.impl.utils import extract
         if item.properties.item_format == ItemFormat.dimap.value:
             images =list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension],self.get_dimap_images(met_file, extension)))
         elif item.properties.item_format == ItemFormat.terrasar.value:
@@ -92,8 +92,8 @@ class Driver(DownloadDriver):
                           os.path.splitext(f[1])[0]+georef_file_extension])
         return files
 
-    def copy_from_dimap(self,href: str, target_directory: str):
-        files = self.get_dimap_images(href)
+    def copy_from_dimap(self,href: str, target_directory: str,extension: str):
+        files = self.get_dimap_images(href, extension)
         self.copy_from_met(files,target_directory)
 
     def copy_from_terrasarx(self,href: str, target_directory: str):
