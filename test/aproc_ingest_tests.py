@@ -6,7 +6,7 @@ from time import sleep
 import requests
 
 from airs.core.models import mapper
-from airs.core.models.model import Item
+from airs.core.models.model import Item, Asset, Role
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
@@ -126,6 +126,7 @@ class Tests(unittest.TestCase):
         self.assertIsNotNone(item.geometry.get("coordinates"))
         self.assertEquals(len(item.bbox), 4)
         self.assertEquals(len(item.centroid), 2)
+        self.assertIn(Role.data.value, item.assets.keys())
         for asset in assets:
             self.assertIsNotNone(item.assets.get(asset), asset)
             self.assertIsNotNone(item.assets.get(asset).name, asset)
@@ -147,6 +148,7 @@ class Tests(unittest.TestCase):
         self.assertIsNotNone(item.properties.main_asset_format)
         self.assertIsNotNone(item.properties.main_asset_name)
         self.assertIsNotNone(item.properties.proj__epsg)
+        print(mapper.to_json(item))
 
     def test_job_by_id(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
