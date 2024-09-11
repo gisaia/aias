@@ -197,7 +197,7 @@ class AprocProcess(Process):
                     LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     download_locations.append(target_directory)
                 except Exception as e:
-                    error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, e.__cause__)
+                    error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))
                     LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)

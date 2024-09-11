@@ -102,7 +102,7 @@ class AprocProcess(Process):
                 else:
                     LOGGER.debug("Send ingestion request for {} ({}) ok".format(archive.path, archive.id))
             except Exception as e:
-                msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, e.__cause__)
+                msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(e))
                 LOGGER.error(msg)
                 LOGGER.exception(e)
                 raise Exception(msg)
