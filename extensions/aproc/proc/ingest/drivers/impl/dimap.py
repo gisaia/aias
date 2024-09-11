@@ -234,14 +234,17 @@ class Driver(ProcDriver):
                         Driver.dim_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('PREVIEW'):
                         raw_all_quick_path = os.path.join(path, file)
-                    if file.lower().endswith('.jpg') and file.startswith('IMG_'):
+
+                    # Data and georef
+                    if file.lower().endswith(('.jpg', 'jp2')) and file.startswith('IMG_'):
                         Driver.image_path = os.path.join(path, file)
                     if file.lower().endswith('.tfw') and file.startswith('IMG_'):
                         Driver.georef_path = os.path.join(path, file)
                     if file.lower().endswith('.j2w') and file.startswith('IMG_'):
                         Driver.georef_path = os.path.join(path, file)
-                    if (file.lower().endswith('.tiff') or file.lower().endswith('.tif')) and file.startswith('IMG_'):
+                    if file.lower().endswith(('.tiff', '.tif')) and file.startswith('IMG_'):
                         Driver.image_path = os.path.join(path, file)
+
                     if file.endswith('.JPG') and file.startswith('ICON'):
                         raw_all_thumb_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('CAT_QL'):
