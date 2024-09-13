@@ -34,9 +34,9 @@ class Driver(DownloadDriver):
         if raw_archive:
             if item.properties.item_format and (item.properties.item_format == ItemFormat.geotiff.value or item.properties.item_format == ItemFormat.jpeg2000.value):
                 shutil.copy(asset.href, target_directory)
-                if item.assets and item.assets.get(Role.extent.value) and Path().exists(item.assets.get(Role.extent.value).href):
+                if item.assets and item.assets.get(Role.extent.value) and Path(item.assets.get(Role.extent.value).href).exists():
                     shutil.copy(item.assets.get(Role.extent.value).href, target_directory)
-                if item.assets and item.assets.get(Role.metadata.value) and Path().exists(item.assets.get(Role.metadata.value).href):
+                if item.assets and item.assets.get(Role.metadata.value) and Path(item.assets.get(Role.metadata.value).href).exists():
                     shutil.copy(item.assets.get(Role.metadata.value).href, target_directory)
             else:
                 make_raw_archive_zip(asset.href, target_directory)
