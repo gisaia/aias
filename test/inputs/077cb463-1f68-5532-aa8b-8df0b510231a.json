@@ -12,7 +12,8 @@
       "end_datetime": "2021-12-31T00:00:00Z",
       "start_datetime": "2021-01-01T00:00:00Z",
       "datetime": "2021-12-31T00:00:00Z",
-      "cubedash:region_code": "E000_N15"
+      "cubedash:region_code": "E000_N15",
+      "item_format": "GEOTIFF"
     },
     "centroid":[0.0,15.0],
     "geometry": {

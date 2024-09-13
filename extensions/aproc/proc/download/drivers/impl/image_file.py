@@ -2,7 +2,7 @@ import os
 import shutil
 from pathlib import Path
 
-from airs.core.models.model import AssetFormat, Item, Role
+from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
@@ -31,6 +31,16 @@ class Driver(DownloadDriver):
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         asset = item.assets.get(Role.data.value)
+        if raw_archive:
+            if item.properties.item_format and (item.properties.item_format == ItemFormat.geotiff.value or item.properties.item_format == ItemFormat.jpeg2000.value):
+                shutil.copy(asset.href, target_directory)
+                if item.assets and item.assets.get(Role.extent.value) and Path().exists(item.assets.get(Role.extent.value).href):
+                    shutil.copy(item.assets.get(Role.extent.value).href, target_directory)
+                if item.assets and item.assets.get(Role.metadata.value) and Path().exists(item.assets.get(Role.metadata.value).href):
+                    shutil.copy(item.assets.get(Role.metadata.value).href, target_directory)
+            else:
+                make_raw_archive_zip(asset.href, target_directory)
+                return
         # Default driver is GTiff
         driver_target = "GTiff"
         if (not target_format) or (target_format == 'native'):
@@ -45,9 +55,6 @@ class Driver(DownloadDriver):
         if driver_target == "JP2OpenJPEG":
             extension = '.JP2'
 
-        if raw_archive:
-            make_raw_archive_zip(asset.href, target_directory)
-            return
         if ((not target_projection or target_projection == 'native') and (not target_format or target_format == 'native')) and (not crop_wkt):
             # If the projetion and the format are natives, just copy the file and the georef file
             georef_file_extensions = ['.tfw', ".TFW", ".J2W", ".j2w", ".aux.xml", ".AUX.XML"]
