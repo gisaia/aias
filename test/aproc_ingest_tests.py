@@ -127,6 +127,7 @@ class Tests(unittest.TestCase):
         self.assertEquals(len(item.bbox), 4)
         self.assertEquals(len(item.centroid), 2)
         self.assertIn(Role.data.value, item.assets.keys())
+        self.assertIsNotNone(item.properties.item_format)
         for asset in assets:
             self.assertIsNotNone(item.assets.get(asset), asset)
             self.assertIsNotNone(item.assets.get(asset).name, asset)

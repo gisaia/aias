@@ -1,6 +1,8 @@
 import json
 import os
 import unittest
+import zipfile
+import glob
 from test.utils import (AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL,
                         COLLECTION, ID, ITEM_PATH, BBOX,
                         SMTP_SERVER, TOKEN, index_collection_prefix, setUpTest)
@@ -75,6 +77,14 @@ class Tests(unittest.TestCase):
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
+        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"))
+        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw"))
+
+    def test_download_archive_geotiff(self):
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=True))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        status = self.wait_for_success(status)
+        result = self.get_result(status)
         # FILE MUST EXISTS
         os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif")
         os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw")
@@ -85,9 +95,9 @@ class Tests(unittest.TestCase):
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w")
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2")
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml")
+        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w"))
+        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2"))
+        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
 
     def send_download_request(self, inputs: InputDownloadProcess):
         execute = Execute(inputs=inputs.model_dump())
