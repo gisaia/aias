@@ -55,7 +55,7 @@ def get_job(jobId: str):
     return Processes.status(jobId)
 
 
-@ROUTER.post("/jobs/{jobId}/cancel",
+@ROUTER.get("/jobs/{jobId}/cancel",
                response_model_exclude_none=True,
                responses={
                         status.HTTP_200_OK: {
