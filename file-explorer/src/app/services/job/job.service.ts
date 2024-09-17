@@ -60,6 +60,6 @@ export class JobService {
   }
 
   public cancelJob(jobId: string): Observable<Process>{
-    return this.http.delete(this.jobSettings.url + '/jobs/' + jobId, this.options) as Observable<Process>;
+    return this.http.post(this.jobSettings.url + '/jobs/' + jobId + '/cancel', null, this.options) as Observable<Process>;
   }
 }

@@ -103,7 +103,7 @@ class Tests(unittest.TestCase):
         # test 1 : cancell before it's running
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        status: StatusInfo = StatusInfo(**json.loads(requests.delete("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        status: StatusInfo = StatusInfo(**json.loads(requests.post("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
         tries = 0
         while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
             sleep(1)
@@ -119,7 +119,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             tries = tries + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        status: StatusInfo = StatusInfo(**json.loads(requests.delete("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        status: StatusInfo = StatusInfo(**json.loads(requests.post("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
         tries = 0
         while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
             sleep(1)
