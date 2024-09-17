@@ -127,6 +127,12 @@ class Processes:
             return None
         
     @staticmethod
+    def inerrupt(task_id: str):
+        res = AsyncResult(task_id, app=APROC_CELERY_APP)
+        res.revoke(terminate=True, signal='SIGKILL')
+        return Processes.__retrieve_status_info__(task_id)
+
+    @staticmethod
     def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)

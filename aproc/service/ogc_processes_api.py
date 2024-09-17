@@ -58,16 +58,15 @@ def get_job(jobId: str):
 @ROUTER.delete("/jobs/{jobId}",
                response_model_exclude_none=True,
                responses={
-                status.HTTP_200_OK: {
-                    "model": StatusInfo
-                    },
-                status.HTTP_422_UNPROCESSABLE_ENTITY: {
-                    "model": RESTException
-                }
+                        status.HTTP_200_OK: {
+                            "model": StatusInfo
+                        },
+                        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+                            "model": RESTException
+                        }
                })
 def delete_job(jobId: str):
-    raise OGCException(type=ExceptionType.NOT_IMPLEMENTED.value,
-                       status=status.HTTP_501_NOT_IMPLEMENTED)
+    return Processes.inerrupt(jobId)
 
 
 @ROUTER.get("/jobs/{jobId}/results",
