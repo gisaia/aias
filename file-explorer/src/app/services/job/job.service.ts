@@ -1,6 +1,6 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Archive, DynamicFileNode, IngestPayload, ProcessResult } from '@tools/interface';
+import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable({
@@ -57,5 +57,9 @@ export class JobService {
 
   public getTasks(page: number = 0, pageSize: number = 10): Observable<ProcessResult> {
     return this.http.get(this.jobSettings?.url + '/jobs?offset=' + page + '&limit=' + pageSize, this.options) as Observable<ProcessResult>;
+  }
+
+  public cancelJob(jobId: string): Observable<Process>{
+    return this.http.delete(this.jobSettings.url + '/jobs/' + jobId, this.options) as Observable<Process>;
   }
 }

@@ -1,6 +1,9 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
@@ -43,7 +46,8 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     private toastr: ToastrService,
     private translate: TranslateService,
     private famService: FamService,
-    ) { }
+    private dialog: MatDialog
+  ) { }
 
 
   public ngOnInit(): void {
@@ -102,16 +106,46 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (pr: ProcessResult) => {
         this.tasks = pr.status_list;
         this.totalProcess = pr.total;
-        if( this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed).length === 0){
+        if (this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed).length === 0) {
           this.unsubscribeRefreshTasks.next(true);
         }
       },
       error: (err: Response) => {
-        if( err.status === 404){
+        if (err.status === 404) {
           this.toastr.error(this.translate.instant('Unable to retrieve status'))
-        } else if( err.status === 403){
+        } else if (err.status === 403) {
           this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
         }
+      }
+    });
+  }
+
+  public cancelJob(task, jobId: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
+    dialogRef.componentInstance.title = this.translate.instant('Confirmation');
+    dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?')
+    dialogRef.componentInstance.action = this.translate.instant('Confirm');
+    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.afterClosed().subscribe({
+      next: (confirm) => {
+        this.jobService.cancelJob(jobId).subscribe({
+          next: (p: Process) => {
+            this.jobService.refreshTasks.next(true);
+          },
+          error: (err: HttpErrorResponse) => {
+            if (err.status === 404) {
+              this.toastr.error(this.translate.instant('Unable to delete this job'))
+            } else if (err.status === 403) {
+              this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+            } else if (err.status === 500) {
+              if (!!err.error && !!err.error.detail) {
+                this.toastr.error(err.error.detail);
+              } else {
+                this.toastr.error(this.translate.instant('Unable to delete this job'))
+              }
+            }
+          }
+        })
       }
     });
   }
