@@ -105,7 +105,7 @@ class Tests(unittest.TestCase):
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status: StatusInfo = StatusInfo(**json.loads(requests.delete("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         tries = 0
-        while tries < 100 and (status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
             sleep(1)
             tries = tries + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
