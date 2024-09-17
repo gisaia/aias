@@ -52,6 +52,15 @@
         }
       }
     }
+
+    .status-content {
+      display: flex;
+      align-items: center;
+      gap: 0 5px;
+      .cancel-job {
+        cursor: pointer;
+      }
+    }
   }
 
   .mat-chip {

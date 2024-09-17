@@ -99,6 +99,34 @@ class Tests(unittest.TestCase):
         self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2"))
         self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
 
+    def test_download_cancelled(self):
+        # test 1 : cancell before it's running
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        status: StatusInfo = StatusInfo(**json.loads(requests.delete("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        tries = 0
+        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+            sleep(1)
+            tries = tries + 1
+            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        self.assertEqual(status.status, StatusCode.dismissed, status.message)
+
+        # test 2 : cancell while it's running
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        tries = 0
+        while tries < 100 and (status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+            sleep(1)
+            tries = tries + 1
+            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        status: StatusInfo = StatusInfo(**json.loads(requests.delete("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        tries = 0
+        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+            sleep(1)
+            tries = tries + 1
+            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        self.assertEqual(status.status, StatusCode.dismissed, status.message)
+
     def send_download_request(self, inputs: InputDownloadProcess):
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json", "Authorization": TOKEN})
