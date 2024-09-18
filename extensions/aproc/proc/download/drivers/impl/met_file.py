@@ -18,12 +18,11 @@ class Driver(DownloadDriver):
     # Implements drivers method
     @staticmethod
     def supports(item: Item) -> bool:
-        if item.assets.get(Role.metadata.value) is not None:
-            asset = item.assets.get(Role.metadata.value)
-            file_name = os.path.basename(asset.href)
-            return file_name.lower().endswith(".xml")
-        else:
-            return False
+        item_format = item.properties.item_format
+        return item_format == ItemFormat.dimap.value or \
+               item_format == ItemFormat.terrasar.value or \
+               item_format == ItemFormat.spot5.value
+
     
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
@@ -47,15 +46,17 @@ class Driver(DownloadDriver):
             extension='.JP2'
         # If the projetion and the format are natives, just copy the file
         if (target_projection == target_format == 'native') and (not crop_wkt):
-            if item.properties.item_format == ItemFormat.dimap.value:
+            if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
                 self.copy_from_dimap(met_file,target_directory,extension)
             elif item.properties.item_format == ItemFormat.terrasar.value:
                 self.copy_from_terrasarx(met_file,target_directory)
             return
+        if target_projection == 'native':
+            target_projection = item.properties.proj__epsg
         target_file_name = os.path.splitext(met_file_name)[0] + extension
         images = []
         from extensions.aproc.proc.download.drivers.impl.utils import extract
-        if item.properties.item_format == ItemFormat.dimap.value:
+        if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
             images =list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension],self.get_dimap_images(met_file, extension)))
         elif item.properties.item_format == ItemFormat.terrasar.value:
             images =list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension],self.get_terrasarx_images(met_file, extension)))
