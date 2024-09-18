@@ -18,7 +18,7 @@
               translate}}</mat-chip>
           </mat-chip-list>
           <span class="material-symbols-outlined cancel-job"
-            *ngIf="task.status === 'accepted' || task.status === 'running'" [matTooltip]="'Cancel' | translate"
+            *ngIf="task.status === 'running'" [matTooltip]="'Cancel' | translate"
             (click)="cancelJob(task, task.jobID); $event.stopPropagation()">
             cancel
           </span>

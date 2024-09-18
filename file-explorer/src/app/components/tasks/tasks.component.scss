@@ -86,4 +86,9 @@
     color: $errorColor;
     border: 1px solid $errorColor;
   }
+
+  .mat-chip-dismissed {
+    color: $dismissedColor;
+    border: 1px solid $dismissedColor;
+  }
 }
