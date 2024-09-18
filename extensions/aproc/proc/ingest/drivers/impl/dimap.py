@@ -170,7 +170,10 @@ class Driver(ProcDriver):
                     cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
 
         # We calculate the GSD as the mean of  GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
-        gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
+        if metadata.get("GSD_ACROSS_TRACK") and metadata.get("GSD_ALONG_TRACK"):
+            gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
+        else:
+            gsd = None
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -178,14 +181,14 @@ class Driver(ProcDriver):
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=metadata["PROCESSING_LEVEL"],
+                processing__level=metadata.get("PROCESSING_LEVEL"),
                 eo__cloud_cover=cloud_cover,
                 gsd=gsd,
                 proj__epsg=get_epsg(src_ds),
-                view__incidence_angle=metadata["INCIDENCE_ANGLE"],
-                view__azimuth=metadata["AZIMUTH_ANGLE"],
-                view__sun_azimuth=metadata["SUN_AZIMUTH"],
-                view__sun_elevation=metadata["SUN_ELEVATION"],
+                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
+                view__azimuth=metadata.get("AZIMUTH_ANGLE"),
+                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
+                view__sun_elevation=metadata.get("SUN_ELEVATION"),
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
                 main_asset_format=self.get_main_asset_format(root),

@@ -43,6 +43,7 @@ class ImageDriverHelper:
             image.save(asset.href, 'PNG')
             asset.size = get_file_size(asset.href)
             to_assets.append(asset)
+            image.close()
         except Exception as e:
             driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
             driver.LOGGER.error(e)

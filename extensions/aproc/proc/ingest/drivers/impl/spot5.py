@@ -79,7 +79,10 @@ class Driver(ProcDriver):
             coords.append(coord)
         geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
                                                           coords[2][0], coords[2][1], coords[3][0], coords[3][1])
-        gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
+        if root.find('./Geoposition/Geoposition_Insert/XDIM') and root.find('./Geoposition/Geoposition_Insert/YDIM'):
+            gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
+        else:
+            gsd = None
         src_ds = gdal.Open(self.dim_path, GA_ReadOnly)
         metadata = src_ds.GetMetadata()
         # We retrieve the time
@@ -93,16 +96,16 @@ class Driver(ProcDriver):
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=metadata["PROCESSING_LEVEL"],
+                processing__level=metadata.get("PROCESSING_LEVEL"),
                 gsd=gsd,
                 proj__epsg=get_epsg(src_ds),
-                instrument= metadata["INSTRUMENT"],
-                constellation = metadata["MISSION"],
-                sensor = metadata["MISSION"],
-                sensor_type = metadata["MISSION_INDEX"],
-                view__incidence_angle=metadata["INCIDENCE_ANGLE"],
-                view__sun_azimuth= metadata["SUN_AZIMUTH"],
-                view__sun_elevation= metadata["SUN_ELEVATION"],
+                instrument=metadata.get("INSTRUMENT"),
+                constellation=metadata.get("MISSION"),
+                sensor=metadata.get("MISSION"),
+                sensor_type=metadata.get("MISSION_INDEX"),
+                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
+                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
+                view__sun_elevation=metadata.get("SUN_ELEVATION"),
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.spot5.value,
                 main_asset_format=AssetFormat.geotiff.value,
