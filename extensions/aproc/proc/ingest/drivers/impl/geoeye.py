@@ -180,17 +180,20 @@ class Driver(ProcDriver):
                 Driver.tfw_path = str(tfw_path)
             Driver.file_name = file_name
             parts_of_file_name = file_name.replace('.tif', '').split("_")
-            Driver.component_id = parts_of_file_name[3]
-            for file in os.listdir(path):
-                # check if current file is a file
-                if os.path.isfile(os.path.join(path, file)):
-                    if file.endswith('.jpg'):
-                        if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
-                            Driver.thumbnail_path = os.path.join(path, file)
-                            Driver.quicklook_path = os.path.join(path, file)
-                    if file.endswith('_metadata.txt'):
-                        Driver.met_path = os.path.join(path, file)
-            return Driver.met_path is not None and Driver.tif_path is not None
+            if len(parts_of_file_name) >= 4:
+                Driver.component_id = parts_of_file_name[3]
+                for file in os.listdir(path):
+                    # check if current file is a file
+                    if os.path.isfile(os.path.join(path, file)):
+                        if file.endswith('.jpg'):
+                            if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
+                                Driver.thumbnail_path = os.path.join(path, file)
+                                Driver.quicklook_path = os.path.join(path, file)
+                        if file.endswith('_metadata.txt'):
+                            Driver.met_path = os.path.join(path, file)
+                return Driver.met_path is not None and Driver.tif_path is not None
+            else:
+                return False
         return False
 
     @staticmethod
