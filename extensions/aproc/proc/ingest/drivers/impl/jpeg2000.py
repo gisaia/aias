@@ -50,4 +50,4 @@ class Driver(ProcDriver):
 
     @staticmethod
     def get_main_asset_format(root):
-        return AssetFormat.geotiff.value
+        return AssetFormat.jpg2000.value
