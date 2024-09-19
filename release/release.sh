@@ -33,8 +33,6 @@ build_and_publish_docker aproc-proc
 
 build_and_publish_docker aproc-service
 
-build_and_publish_docker aproc-ingest
-
 #---------------    AGATE    ----------------
 
 build_and_publish_docker agate
