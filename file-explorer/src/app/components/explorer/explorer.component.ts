@@ -84,7 +84,7 @@ export class ExplorerComponent implements OnInit {
         if (!!confirm.status) {
           this.jobService.ingestDirectory(node, confirm.annotations).subscribe({
             next: () => {
-              this.jobService.refreshTasksAndArchives.next(true);
+              this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: HttpErrorResponse) => {

@@ -116,7 +116,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
         if (!!confirm.status) {
           this.jobService.ingestArchive(archive, confirm.annotations).subscribe({
             next: () => {
-              this.jobService.refreshTasksAndArchives.next(true);
+              this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: HttpErrorResponse) => {
