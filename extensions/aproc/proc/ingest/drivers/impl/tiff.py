@@ -26,7 +26,8 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        return ImageDriverHelper.fetch_assets(self, url, assets)
+        # return ImageDriverHelper.fetch_assets(self, url, assets)
+        return assets
 
     # Implements drivers method
     def get_item_id(self, url: str) -> str:
