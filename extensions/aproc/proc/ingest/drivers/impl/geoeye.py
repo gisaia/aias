@@ -192,8 +192,6 @@ class Driver(ProcDriver):
                         if file.endswith('_metadata.txt'):
                             Driver.met_path = os.path.join(path, file)
                 return Driver.met_path is not None and Driver.tif_path is not None
-            else:
-                return False
         return False
 
     @staticmethod
