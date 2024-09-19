@@ -96,7 +96,7 @@ class AprocProcess(Process):
                 execute = Execute(inputs=inputs.model_dump())
                 r = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
-                    msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + r.content)
+                    msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))
                     LOGGER.error(msg)
                     raise Exception(msg)
                 else:
