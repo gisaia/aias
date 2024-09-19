@@ -63,12 +63,10 @@ class Driver(DownloadDriver):
         if ((not target_projection or target_projection == 'native') and (
                 not target_format or target_format == 'native')) and (not crop_wkt):
             # If the projetion and the format are natives, just copy the file and the georef file
-            georef_file_extensions = ['.tfw', ".TFW", ".J2W", ".j2w", ".aux.xml", ".AUX.XML"]
-            for ext in georef_file_extensions:
-                candidate = Path(asset.href).parent.joinpath(Path(asset.href).stem).with_suffix(ext)
-                if candidate.exists() and candidate.is_file():
-                    Driver.LOGGER.info("Copy {} to {}".format(candidate, target_directory))
-                    shutil.copy(candidate, target_directory)
+            if item.assets and item.assets.get(Role.extent.value) is not None and Path(item.assets.get(Role.extent.value).href).exists():
+                geo_ext_file = item.assets.get(Role.extent.value).href
+                Driver.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
+                shutil.copy(geo_ext_file, target_directory)
             shutil.copy(asset.href, target_directory)
             return
         if target_projection == 'native':
