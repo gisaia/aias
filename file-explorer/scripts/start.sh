@@ -107,9 +107,9 @@ mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
 ## FAM ##
 ### FAM_SERVER_URL
 if [ -z "${FAM_SERVER_URL}" ]; then
-  FAM_SERVER_URL="https://arlas.crts-staff.local/fam"
+  FAM_SERVER_URL="https://localhost:81/fam"
   export FAM_SERVER_URL
-  echo "Default url : https://arlas.crts-staff.local/fam"
+  echo "Default url : https://localhost:81/fam"
 else
   echo ${FAM_SERVER_URL} "is used for 'file_manager.url'."
 fi
@@ -161,9 +161,9 @@ mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
 ## APROC ##
 ### APROC_SERVER_URL
 if [ -z "${APROC_SERVER_URL}" ]; then
-  APROC_SERVER_URL="https://arlas.crts-staff.local/aproc"
+  APROC_SERVER_URL="https://localhost:81/aproc"
   export APROC_SERVER_URL
-  echo "Default url : https://arlas.crts-staff.local/aproc"
+  echo "Default url : https://localhost:81/aproc"
 else
   echo ${APROC_SERVER_URL} "is used for 'jobs.url'."
 fi
@@ -172,9 +172,9 @@ mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
 
 ### APROC_CATALOG
 if [ -z "${APROC_CATALOG}" ]; then
-  APROC_CATALOG="crts"
+  APROC_CATALOG="catalog"
   export APROC_CATALOG
-  echo "Default catalog : crts"
+  echo "Default catalog : catalog"
 else
   echo ${APROC_CATALOG} "is used for 'jobs.catalog'."
 fi
@@ -195,9 +195,9 @@ mv /usr/share/nginx/html/settings.yaml.tmp /usr/share/nginx/html/settings.yaml
 ## AIRS ##
 ### AIRS_SERVER_URL
 if [ -z "${AIRS_SERVER_URL}" ]; then
-  AIRS_SERVER_URL="https://arlas.crts-staff.local/airs"
+  AIRS_SERVER_URL="https://localhost:81/airs"
   export AIRS_SERVER_URL
-  echo "Default url : https://arlas.crts-staff.local/airs"
+  echo "Default url : https://localhost:81/airs"
 else
   echo ${AIRS_SERVER_URL} "is used for 'status.url'."
 fi
