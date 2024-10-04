@@ -3,18 +3,18 @@ authentication:
   auth_mode: 'iam'
   force_connect: true
   threshold: 60000
-  url: https://arlas.crts-staff.local/arlas_iam_server
+  url: https://localhost:81/arlas_iam_server
   sign_up_enabled: false
 file_manager:
-  url: https://arlas.crts-staff.local/fam
+  url: https://localhost:81/fam
   default_path: ''
-  collection: 'catalogue_crts'
+  collection: 'catalogue'
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://arlas.crts-staff.local/aproc
-  collection: 'catalogue_crts'
-  catalog: 'crts'
+  url: https://localhost:81/aproc
+  collection: 'catalogue'
+  catalog: 'catalogue'
 status:
-  url: https://arlas.crts-staff.local/airs
-  collection: 'catalogue_crts'
+  url: https://localhost:81/airs
+  collection: 'catalogue'
