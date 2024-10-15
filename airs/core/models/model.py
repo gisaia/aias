@@ -272,6 +272,7 @@ class Properties(BaseModel, extra=Extra.allow):
     acq__acquisition_mode: str | None = Field(default=None, title="The name of the acquisition mode.")
     acq__acquisition_orbit_direction: str | None = Field(default=None, title="Acquisition orbit direction (ASCENDING or DESCENDING).")
     acq__acquisition_type: str | None = Field(default=None, title="Acquisition type (STRIP)")
+    acq__acquisition_orbit: float | None = Field(default=None, title="Acquisition orbit")
     acq__across_track: float | None = Field(default=None, title="Across track angle")
     acq__along_track: float | None = Field(default=None, title="Along track angle")
     acq__archiving_date: Datetime | None = Field(default=None, title="Archiving date")
