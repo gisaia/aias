@@ -9,6 +9,7 @@ s3_access_key_id = os.getenv("AIRS_S3_ACCESS_KEY_ID","airs")
 s3_access_key = os.getenv("AIRS_S3_SECRET_ACCESS_KEY","airssecret")
 s3_region = os.getenv("AIRS_S3_REGION","None")
 s3_bucket = os.getenv("AIRS_S3_BUCKET","airstest")
+s3_download_bucket = os.getenv("DOWNLOAD_S3_BUCKET","downloads")
 
 index_endpoint_url = "http://elasticsearch:9200"
 s3_endpoint_url = "http://minio:9000"

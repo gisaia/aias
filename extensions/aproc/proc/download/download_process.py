@@ -1,13 +1,17 @@
 import hashlib
-import json
+import mimetypes
 import os
+import shutil
+from datetime import datetime
+
 import requests
 from celery import Task, shared_task
 from pydantic import BaseModel, Field
-from datetime import datetime
 
+import airs.core.s3 as s3
 from airs.core.models import mapper
 from airs.core.models.model import Item
+from airs.core.settings import S3 as S3Configuration
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -137,12 +141,14 @@ class AprocProcess(Process):
         return (send_to, user_id)
 
     def __get_download_location__(item: Item, send_to: str) -> str:
-        if send_to is None: send_to = "anonymous"
-        target_directory = os.path.join(Configuration.settings.outbox_directory, send_to.split("@")[0].replace(".","_").replace("-","_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+        if send_to is None:
+            send_to = "anonymous"
+        relative_target_directory = os.path.join(send_to.split("@")[0].replace(".", "_").replace("-", "_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+        target_directory = os.path.join(Configuration.settings.outbox_directory, relative_target_directory)
         if not os.path.exists(target_directory):
             LOGGER.info("create {}".format(target_directory))
             os.makedirs(target_directory)
-        return target_directory
+        return (target_directory, relative_target_directory)
 
     def get_resource_id(inputs: BaseModel):
         inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())        
@@ -181,7 +187,7 @@ class AprocProcess(Process):
                 try:
                     LOGGER.info("Download will be done by {}".format(driver.name))
                     __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
-                    target_directory = AprocProcess.__get_download_location__(item, send_to)
+                    target_directory, relative_target_directory = AprocProcess.__get_download_location__(item, send_to)
                     LOGGER.info("Download will be placed in {}".format(target_directory))
                     mail_context["target_directory"] = target_directory
                     mail_context = AprocProcess.__update_paths__(mail_context)
@@ -192,10 +198,16 @@ class AprocProcess(Process):
                         target_projection=target_projection,
                         target_format=target_format,
                         raw_archive=raw_archive)
+                    if Configuration.settings.outbox_s3 and Configuration.settings.outbox_s3.bucket:
+                        AprocProcess.__dir2s3(target_directory, relative_target_directory, Configuration.settings.outbox_s3)
+                        if Configuration.settings.clean_outbox_directory:
+                            Driver.LOGGER.debug("clean {}".format(target_directory))
+                            shutil.rmtree(target_directory)
+                        mail_context["target_directory"] = Configuration.settings.outbox_s3.asset_http_endpoint_url.format(Configuration.settings.outbox_s3.bucket, relative_target_directory)
                     Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
                     Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
                     LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
-                    download_locations.append(target_directory)
+                    download_locations.append(mail_context["target_directory"])
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))
                     LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
@@ -212,6 +224,26 @@ class AprocProcess(Process):
                 Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
         return OutputDownloadProcess(download_locations=download_locations).model_dump()
+
+    def __dir2s3(directory: str, s3_dir: str, s3_conf: S3Configuration):
+        s3_client = s3.get_client_from_configuration(s3_conf)
+
+        uploadFileNames = []
+        for (sourceDir, dirname, files) in os.walk(directory):
+            for file in files:
+                uploadFileNames.append(os.path.join(sourceDir, file)[len(directory):])
+
+        for key in uploadFileNames:
+            local_path = os.path.join(directory, key.strip("/"))
+            destpath = os.path.join(s3_dir, key.strip("/"))
+            type, encpoding = mimetypes.guess_type(local_path, strict=False)
+            if type:
+                extra = {"ContentType": type}
+            else:
+                extra = None
+            LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, type, s3_conf.bucket, destpath))
+            with open(local_path, 'rb') as file:
+                s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
 
     def __get_item_from_arlas__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:

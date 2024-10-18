@@ -12,6 +12,10 @@ rm -rf ./outbox
 mkdir outbox
 
 # Start  minio
-docker compose -f docker-compose.yaml -f docker-compose-create-bucket.yaml up -d --remove-orphans --build --wait || true
+
+export BUCKET_NAME=$AIRS_S3_BUCKET
+docker compose -f docker-compose.yaml -f docker-compose-create-bucket.yaml up -d --build --wait || true
+export BUCKET_NAME=$DOWNLOAD_S3_BUCKET
+docker compose -f docker-compose.yaml -f docker-compose-create-bucket.yaml up -d --build --wait || true
 
 docker compose -f docker-compose.yaml -f docker-compose-tests.yaml up --build --wait || true

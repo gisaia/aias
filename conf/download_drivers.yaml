@@ -2,7 +2,16 @@ arlas_url_search: $ARLAS_URL_SEARCH
 arlaseo_mapping_url: $ARLASEO_MAPPING_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json"
 download_mapping_url: $DOWNLOAD_MAPPING_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/downloads_mapping.json"
 
+
+clean_outbox_directory: $CLEAN_DOWNLOAD_OUTBOX_DIR|True
 outbox_directory: $APROC_DOWNLOAD_OUTBOX_DIR
+outbox_s3:
+  bucket: $DOWNLOAD_S3_BUCKET
+  access_key_id: $DOWNLOAD_S3_ACCESS_KEY_ID
+  secret_access_key: $DOWNLOAD_S3_SECRET_ACCESS_KEY
+  asset_http_endpoint_url: $DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL
+  endpoint_url: $DOWNLOAD_S3_ENDPOINT_URL
+
 notification_admin_emails: $APROC_DOWNLOAD_ADMIN_EMAILS
 
 # Usable variables in messages: {target_projection}, {target_format}, {arlas-user-email}, {item_id}, {asset_name}, {collection}, {target_directory}, {file_name}

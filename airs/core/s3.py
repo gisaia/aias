@@ -1,18 +1,24 @@
 from boto3 import Session
 
-from airs.core.settings import Configuration
+from airs.core.settings import Configuration, S3
 
-__session=None
+__session = None
 
-def get_session()->Session:
+
+def get_session() -> Session:
     global __session
     if __session is None:
-        __session = Session(
-            aws_access_key_id=Configuration.settings.s3.access_key_id,
-            aws_secret_access_key=Configuration.settings.s3.secret_access_key,
-            region_name=Configuration.settings.s3.region
-        )
+        __session = get_session_from_configuration(Configuration.settings.s3)
     return __session
+
+
+def get_session_from_configuration(s3: S3) -> Session:
+    return Session(
+        aws_access_key_id=s3.access_key_id,
+        aws_secret_access_key=s3.secret_access_key,
+        region_name=s3.region
+    )
+
 
 def get_client():
     if Configuration.settings.s3.endpoint_url is not None:
@@ -20,7 +26,14 @@ def get_client():
     else:
         return get_session().client("s3")
 
-def get_matching_s3_objects(bucket, prefix="", suffix="")->str:
+
+def get_client_from_configuration(s3: S3):
+    return get_session_from_configuration(s3).client("s3", endpoint_url=s3.endpoint_url)
+
+
+def get_matching_s3_objects(bucket, prefix="", suffix="", s3_client=None) -> str:
+    if s3_client is None:
+        s3_client = get_client()
     """
     Generate objects in an S3 bucket.
 
@@ -34,8 +47,8 @@ def get_matching_s3_objects(bucket, prefix="", suffix="")->str:
 
     """
 
-    s3 = get_client()
-    paginator = s3.get_paginator("list_objects_v2")
+    s3_client = get_client()
+    paginator = s3_client.get_paginator("list_objects_v2")
 
     kwargs = {'Bucket': bucket}
 

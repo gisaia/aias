@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
+import json
+
+from airs.core.settings import S3
 
 
 class Driver(BaseModel, extra=Extra.allow):
@@ -16,16 +19,20 @@ class SMPTConfiguration(BaseModel, extra='allow'):
     password: str = Field(title="smtp user password")
     from_addr: str = Field(title="Emails address of the system that sends the emails")
 
+
 class Index(BaseModel, extra=Extra.allow):
     index_name: str
     endpoint_url: str
     login: str = Field(None)
     pwd: str = Field(None)
 
+
 class Settings(BaseModel, extra='allow'):
     arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
     drivers: list[Driver] = Field(title="Configuration of the drivers")
-    outbox_directory: str = Field(title="Directory where the downloads will be placed")
+    outbox_directory: str = Field(title="Directory where the downloads will be placed. Must be configured, even so you enabled outbox_s3")
+    outbox_s3: S3 | None = Field(title="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
+    clean_outbox_directory: bool = Field(True, title="Clean outbox directory once files copied on S3")
     notification_admin_emails: str = Field(title="List of admin emails for receiving download notifications, comma seperated.")
     smtp: SMPTConfiguration = Field(title="Emails address of the system that sends the emails")
     email_content_user: str = Field(title="Content of the email to be sent to the user")
@@ -44,11 +51,13 @@ class Settings(BaseModel, extra='allow'):
     arlaseo_mapping_url: str = Field(title="Location of the arlas eo mapping")
     download_mapping_url: str = Field(title="Location of the download requests mapping")
 
+
 class Configuration:
     settings: Settings | None = Field(title="aproc Download service configuration")
 
     @staticmethod
     def init(configuration_file: str):
         envyaml = EnvYAML(configuration_file, strict=False)
-        print(envyaml.export())
+        print(json.dumps(envyaml.export(), indent=2))
         Configuration.settings = Settings(**envyaml.export())
+        return Configuration.settings

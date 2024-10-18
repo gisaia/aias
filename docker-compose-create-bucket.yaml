@@ -16,7 +16,9 @@ services:
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
+      echo create bucket $$BUCKET_NAME;
       /usr/bin/mc mb myminio/$$BUCKET_NAME;
       /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
+      /usr/bin/mc ls myminio
       exit 0;
       "

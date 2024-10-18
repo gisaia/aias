@@ -36,12 +36,15 @@ class Driver(DownloadDriver):
         if raw_archive:
             if item.properties.item_format and (
                     item.properties.item_format == ItemFormat.geotiff.value or item.properties.item_format == ItemFormat.jpeg2000.value):
+                Driver.LOGGER.debug("copy {} in {}".format(asset.href, target_directory))
                 shutil.copy(asset.href, target_directory)
                 if item.assets and item.assets.get(Role.extent.value) and Path(
                         item.assets.get(Role.extent.value).href).exists():
+                    Driver.LOGGER.debug("geo file {} detected and copied".format(item.assets.get(Role.extent.value).href))
                     shutil.copy(item.assets.get(Role.extent.value).href, target_directory)
                 if item.assets and item.assets.get(Role.metadata.value) and Path(
                         item.assets.get(Role.metadata.value).href).exists():
+                    Driver.LOGGER.debug("metadata {} detected and copied".format(item.assets.get(Role.metadata.value).href))
                     shutil.copy(item.assets.get(Role.metadata.value).href, target_directory)
             else:
                 make_raw_archive_zip(asset.href, target_directory)
@@ -67,6 +70,7 @@ class Driver(DownloadDriver):
                 geo_ext_file = item.assets.get(Role.extent.value).href
                 Driver.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
                 shutil.copy(geo_ext_file, target_directory)
+            Driver.LOGGER.debug("copy {} in {}".format(asset.href, target_directory))
             shutil.copy(asset.href, target_directory)
             return
         if target_projection == 'native':

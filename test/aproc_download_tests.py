@@ -1,11 +1,12 @@
+import glob
 import json
 import os
 import unittest
 import zipfile
-import glob
 from test.utils import (AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL,
-                        COLLECTION, ID, ITEM_PATH, BBOX,
-                        SMTP_SERVER, TOKEN, index_collection_prefix, setUpTest)
+                        BBOX, COLLECTION, ID, ITEM_PATH, SMTP_SERVER, TOKEN,
+                        index_collection_prefix, s3_download_bucket,
+                        s3_endpoint_url, setUpTest)
 from time import sleep
 
 import requests
@@ -56,14 +57,21 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 3)
 
+    def __download_found(url: str):
+        if url.startswith("http"):
+            print("downloads placed on s3")
+            return requests.head(url).status_code == 200
+        else:
+            print("downloads placed in directory")
+            return os.path.exists("./" + url)
+        
     def test_download_project_native_format_native_nocrop(self):
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID},{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif")
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw")
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"))
 
         # MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER + "?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
@@ -77,8 +85,8 @@ class Tests(unittest.TestCase):
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"))
-        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw"))
 
     def test_download_archive_geotiff(self):
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=True))
@@ -86,8 +94,7 @@ class Tests(unittest.TestCase):
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif")
-        os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tfw")
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"))
 
     def test_download_project_3857_format_jp2_crop(self):
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection="EPSG:27572", raw_archive=False))
@@ -95,9 +102,9 @@ class Tests(unittest.TestCase):
         status = self.wait_for_success(status)
         result = self.get_result(status)
         # FILE MUST EXISTS
-        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w"))
-        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2"))
-        self.assertTrue(os.path.exists("./" + result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
 
     def test_download_cancelled(self):
         # test 1 : cancell before it's running
