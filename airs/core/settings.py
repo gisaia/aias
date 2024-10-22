@@ -6,20 +6,21 @@ LOGGER = Logger.logger
 
 
 class S3(BaseModel):
-    access_key_id:str
-    secret_access_key:str
-    platform:str=Field(None)
-    tier:str="Standard"
-    region:str=Field(None)
-    asset_http_endpoint_url:str
-    endpoint_url:str
-    bucket:str
+    access_key_id: str | None = None
+    secret_access_key: str | None = None
+    platform: str | None = None
+    tier: str = "Standard"
+    region: str | None = None
+    asset_http_endpoint_url: str | None = None
+    endpoint_url: str | None = None
+    bucket: str | None = None
+
 
 class Index(BaseModel, extra=Extra.allow):
     collection_prefix:str
     endpoint_url:str
-    login:str=Field(None)
-    pwd:str=Field(None)
+    login:str | None
+    pwd:str | None
 
 class Settings(BaseModel, extra=Extra.allow):
     s3:S3

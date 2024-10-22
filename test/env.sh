@@ -57,6 +57,14 @@ export APROC_DOWNLOAD_CONTENT_ADMIN="\"ARLAS Services: The download of {collecti
 export APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN="\"ARLAS Services: {arlas-user-email} requested the download of {collection}/{item_id}.\""
 export APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN="\"ARLAS Services: {arlas-user-email} requested the download of {collection}/{item_id} for projection {target_projection} ({target_format}). <br>ARLAS Services.\""
 
+export DOWNLOAD_S3_BUCKET=downloads
+#export DOWNLOAD_S3_BUCKET=
+export DOWNLOAD_S3_ACCESS_KEY_ID=airs
+export DOWNLOAD_S3_SECRET_ACCESS_KEY=airssecret
+export DOWNLOAD_S3_ENDPOINT_URL=http://minio:9000
+export DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=http://minio:9000/{}/{}
+export CLEAN_DOWNLOAD_OUTBOX_DIR=False
+
 export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
 export APROC_PATH_TO_WINDOWS=true
 export APROC_LOGGER_LEVEL=DEBUG

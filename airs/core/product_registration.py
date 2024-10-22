@@ -161,7 +161,7 @@ def __upload_item(key, item:Item)->str:
     try:
         LOGGER.info("uploading {} ...".format(key))
         s3.get_client().put_object(
-            Bucket=Configuration.settings.s3.bucket, 
+            Bucket=Configuration.settings.s3.bucket,
             Key=key,
             Body=to_json(item),
             ContentType="application/json"
@@ -169,7 +169,7 @@ def __upload_item(key, item:Item)->str:
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
-        LOGGER.error("Failed to upload {} on ".format(key))
+        LOGGER.error("Failed to upload {} on bucket {}".format(key, Configuration.settings.s3.bucket))
         LOGGER.exception(e)
         raise exceptions.InternalError("storage", e)
 

@@ -9,18 +9,17 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-COPY ./aproc /app/aproc
-COPY ./extensions /app/extensions
-# TODO : move to python package with pip3 install
-COPY ./airs/core/models /app/airs/core/models
-COPY ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
-COPY ./airs/__init__.py /app/airs/__init__.py
-COPY ./common /app/common
-COPY ./conf /app/conf
-COPY ./scripts/aproc/start.sh /app/
-COPY ./conf /app/conf
+ENV APP_HOME=/app
 
-ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
+COPY ./aproc $APP_HOME/aproc
+COPY ./extensions $APP_HOME/extensions
+COPY ./airs/core/ $APP_HOME/airs/core/
+COPY ./common $APP_HOME/common
+COPY ./conf $APP_HOME/conf
+COPY ./scripts/aproc/start.sh $APP_HOME/
+COPY ./conf $APP_HOME/conf
+
+ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
 ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
 
 EXPOSE 8001
