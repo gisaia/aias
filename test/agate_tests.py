@@ -5,7 +5,7 @@ from test.utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
                         ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH,
                         index_collection_prefix, setUpTest)
 from time import sleep
-
+from urllib import parse
 import requests
 
 from airs.core.models import mapper
@@ -21,28 +21,39 @@ class Tests(unittest.TestCase):
         except Exception:
             ...
         self.__add_item__()
-        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]),  headers={"Content-Type": "application/json"}, data=json.dumps({
+        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": "application/json"}, data=json.dumps({
               "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
               "id_path": "id",
               "geometry_path": "geometry",
               "centroid_path": "centroid",
               "timestamp_path": "properties.datetime"
         }))
-        self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
+        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
 
-    def test_access(self):
+    def test_airs_access(self):
         # TEST OK for non public
-        r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
+        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
+        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
         # TEST KO for non public with wrong prefix
-        r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertFalse(r.ok, str(r.status_code)+" "+str(r.content))
+        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
+        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
         # TEST KO for non public
-        r = requests.get(AGATE_ENDPOINT,  headers={"X-Forwarded-Uri": "/"+"/".join(["object", "collections", ARLAS_COLLECTION, "items", ID+"shouldnotwork", "assets", ASSET])})
-        self.assertFalse(r.ok, str(r.status_code)+" "+str(r.content))
+        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET])})
+        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
         # TEST OK for public
-        r = requests.get(AGATE_ENDPOINT, headers={"X-Forwarded-Uri": "/"+"/".join(["object", "collections", ARLAS_COLLECTION, "items", ID+"shouldnotworkbutpublic", "assets", "thumbnail"])})
-        self.assertTrue(r.ok, str(r.status_code)+" "+str(r.content))
+        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotworkbutpublic", "assets", "thumbnail"])})
+        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+
+    def test_titiler_access(self):
+        # TEST OK for non public
+        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))})
+        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+        # TEST KO for non public with wrong prefix
+        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))})
+        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
+        # TEST KO for non public
+        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET]))})
+        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
 
     def __add_item__(self) -> Item:
         print("create item")
