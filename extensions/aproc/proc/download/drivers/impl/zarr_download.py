@@ -1,5 +1,6 @@
 import enum
 import json
+import os
 import re
 import tempfile
 import zipfile
@@ -12,8 +13,7 @@ from airs.core.models.model import AssetFormat, Item, Role
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
-from extensions.aproc.proc.download.drivers.impl.utils import (extract,
-                                                               get_file_name)
+from extensions.aproc.proc.download.drivers.impl.utils import extract
 
 
 class GoogleStorageConstants(str, enum.Enum):
@@ -50,11 +50,15 @@ class GoogleStorage(BaseModel):
     api_key: GoogleStorageApiKey
 
 
-Storage = Annotated[Union[GoogleStorage], Field(discriminator="type")]
+class NoStorage(BaseModel):
+    type: Literal[None] = None
+
+
+Storage = Annotated[Union[GoogleStorage, NoStorage], Field(discriminator="type")]
 
 
 class Configuration(BaseModel):
-    input: Storage
+    input: Storage | None = Field(None)
 
 
 class Driver(DownloadDriver):
@@ -77,10 +81,12 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
-        if raw_archive is False:
+        if raw_archive is True:
             raise DriverException("Raw archive can't be returned for a zarr download.")
         if target_format != AssetFormat.zarr.value:
             raise DriverException(f"Target format must be {Role.zarr.value}")
+        if target_projection == 'native':
+            target_projection = item.properties.proj__epsg
 
         import rasterio
         import rioxarray
@@ -89,7 +95,7 @@ class Driver(DownloadDriver):
 
         asset_href = item.assets.get(Role.data.value).href
 
-        with smart_open.open(asset_href, "rb", transport_params=self.__get_storage_parameters(asset_href, self.configuration)) as fb:
+        with smart_open.open(asset_href, "rb", transport_params=self.__get_storage_parameters(asset_href)) as fb:
             with zipfile.ZipFile(fb) as raster_zip:
                 file_names = raster_zip.namelist()
                 raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
@@ -146,7 +152,7 @@ class Driver(DownloadDriver):
                 temporary_raster.delete = True
                 temporary_raster.close()
 
-        zarr_name = get_file_name(item, target_format)
+        zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
         bands: xr.Dataset = None
 
@@ -167,13 +173,17 @@ class Driver(DownloadDriver):
             import rasterio.session
 
             if self.configuration.input.type != "gs":
-                raise
-            api_key = self.configuration.input.api_key
+                Driver.LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
+                credentials = None
+                os.environ["GS_NO_SIGN_REQUEST"] = "YES"
+            else:
+                os.environ["GS_NO_SIGN_REQUEST"] = "NO"
+                with tempfile.NamedTemporaryFile("w+", delete=False) as f:
+                    json.dump(self.configuration.input.api_key.model_dump(), f)
+                    f.close()
+                credentials = f.name
 
-            with tempfile.NamedTemporaryFile("w+", delete=False) as f:
-                json.dump(api_key.model_dump(), f)
-                f.close()
-            return rasterio.session.GSSession(f.name)
+            return rasterio.session.GSSession(credentials)
         else:
             raise NotImplementedError(f"Storage '{storage_type}' not compatible")
 
@@ -187,10 +197,15 @@ class Driver(DownloadDriver):
             from google.oauth2 import service_account
 
             if self.configuration.input.type != "gs":
-                raise
-            api_key = self.configuration.input.api_key
+                import google.auth.credentials
 
-            credentials = service_account.Credentials.from_service_account_info(api_key)
+                Driver.LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
+                credentials = google.auth.credentials.AnonymousCredentials()
+            else:
+                # TODO: check if bucket match ?
+                api_key = self.configuration.input.api_key
+                credentials = service_account.Credentials.from_service_account_info(api_key)
+
             client = Client("APROC", credentials=credentials)
             return {"client": client}
         else:

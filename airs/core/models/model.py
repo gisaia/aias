@@ -108,7 +108,7 @@ class Role(Enum):
     covmat = "covmat"
     prd = "prd"
     extent = "extent"
-    
+
 
 class CommonBandName(Enum):
     coastal = "coastal"
@@ -127,7 +127,7 @@ class CommonBandName(Enum):
     lwir = "lwir"
     lwir11 = "lwir11"
     lwir12 = "lwir12"
-    
+
 
 class VariableType(Enum):
     data = "data"
@@ -138,7 +138,7 @@ class DimensionType(Enum):
     spatial = "spatial"
     temporal = "temporal"
     geometry = "geometry"
-    
+
 
 class RasterType(BaseModel):
     source: str

@@ -39,11 +39,11 @@ services:
       - ARLAS_APP_PATH=/
       - ARLAS_BASE_URI=http://localhost:9999/server/
     healthcheck:
-          test: ["CMD","java","HttpHealthcheck.java","http://localhost:9999/admin/healthcheck"]
-          interval: 10s
-          timeout: 10s
-          retries: 6
-  
+      test: ["CMD","java","HttpHealthcheck.java","http://localhost:9999/admin/healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+
   agate:
     networks:
       - aias

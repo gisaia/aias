@@ -151,7 +151,7 @@ class AprocProcess(Process):
         return (target_directory, relative_target_directory)
 
     def get_resource_id(inputs: BaseModel):
-        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())        
+        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"]+r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 

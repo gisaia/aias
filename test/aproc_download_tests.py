@@ -1,12 +1,10 @@
-import glob
 import json
 import os
 import unittest
-import zipfile
 from test.utils import (AIRS_URL, APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL,
-                        BBOX, COLLECTION, ID, ITEM_PATH, SMTP_SERVER, TOKEN,
-                        index_collection_prefix, s3_download_bucket,
-                        s3_endpoint_url, setUpTest)
+                        BBOX, COLLECTION, ID, ITEM_PATH, SENTINEL_2_ID,
+                        SENTINEL_2_ITEM, SMTP_SERVER, TOKEN,
+                        index_collection_prefix, setUpTest)
 from time import sleep
 
 import requests
@@ -25,7 +23,7 @@ class Tests(unittest.TestCase):
     def setUp(self):
         setUpTest()
         requests.delete(SMTP_SERVER + "/*")
-        self.__add_item__()
+        self.__add_item__(ITEM_PATH, ID)
         sleep(3)
         # Create collection
         print("create collection {}".format(ARLAS_COLLECTION))
@@ -64,9 +62,9 @@ class Tests(unittest.TestCase):
         else:
             print("downloads placed in directory")
             return os.path.exists("./" + url)
-        
+
     def test_download_project_native_format_native_nocrop(self):
-        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID},{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=False))
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}, {"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format="native", target_projection="native", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
         result = self.get_result(status)
@@ -105,6 +103,20 @@ class Tests(unittest.TestCase):
         self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.J2w"))
         self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2"))
         self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
+
+    def test_download_zarr(self):
+        self.__add_item__(SENTINEL_2_ITEM, SENTINEL_2_ID)
+        sleep(3)
+
+        crop_wkt = "POLYGON ((0.087547 42.794645, 0.087547 42.832926, 0.176811 42.832926, 0.176811 42.794645, 0.087547 42.794645))"
+
+        r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": SENTINEL_2_ID}], crop_wkt=crop_wkt,
+                                                            target_format=AssetFormat.zarr.value, target_projection="native", raw_archive=False))
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        status = self.wait_for_success(status)
+        result = self.get_result(status)
+        # FILE MUST EXISTS
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.ZARR"))
 
     def test_download_cancelled(self):
         # test 1 : cancell before it's running
@@ -155,14 +167,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(status.status, StatusCode.successful, status.message)
         return status
 
-    def __add_item__(self) -> Item:
-        print("create item")
-        with open(ITEM_PATH, 'r') as file:
+    def __add_item__(self, item_path: str, id: str) -> Item:
+        print(f"create item {id}")
+        with open(item_path, 'r') as file:
             data = file.read()
             r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok, msg=r.content)
         print("item created")
-        r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID))
+        r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", id))
         self.assertTrue(r.ok, msg=r.content)
         return mapper.item_from_json(r.content)
 

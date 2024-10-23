@@ -410,7 +410,7 @@ def __check_register_item_params(item:Item):
     if item.centroid is None:
         raise exceptions.InvalidItemsException([item.id], reason="Item centroid is not set or is not valid")
     if item.geometry is None:
-        raise exceptions.InvalidItemsException([item.id], reason="Item bbox is not set or is not valid")
+        raise exceptions.InvalidItemsException([item.id], reason="Item geometry is not set or is not valid")
     if item.properties is None:
         item.properties=Properties()
     if item.properties.datetime is None and item.properties.start_datetime is None and item.properties.end_datetime is None:

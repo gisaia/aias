@@ -1,0 +1,61 @@
+{
+    "stac_version": "1.0.0",
+    "type": "Feature",
+    "id": "e3229ea8-a7f8-4c88-a3ca-265cea2f6862",
+    "properties": {
+      "title": "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE",
+      "proj:epsg": 32630,
+      "end_datetime": "2024-08-27T10:50:21.024Z",
+      "start_datetime": "2024-08-27T10:50:21.024Z",
+      "item_format": "SAFE_COMPACT",
+      "constellation": "Sentinel-2",
+      "processing__level": "L1C"
+    },
+    "centroid":[0.1173810934595738, 42.815349620898765],
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -0.5727044512579443,
+            42.33837210143769
+          ],
+          [
+            0.7578584453312875,
+            42.302451615096686
+          ],
+          [
+            0.818123703703737,
+            43.28908179869983
+          ],
+          [
+            -0.53371085887888,
+            43.32625697132075
+          ],
+          [
+            -0.5727044512579443,
+            42.33837210143769
+          ]
+        ]
+      ]
+    },
+    "assets": {
+      "data": {
+        "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.zip",
+        "type": "application/zip",
+        "title": "archive",
+        "proj:epsg": 32630,
+        "roles": [
+          "data"
+        ],
+        "airs__managed": false
+      }
+    },
+    "bbox": [-0.5727044512579443, 42.302451615096686, 0.818123703703737, 43.32625697132075],
+    "stac_extensions": [
+      "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+      "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+    ],
+    "collection": "digitalearth.africa",
+    "catalog": "theia-snow"
+  }
