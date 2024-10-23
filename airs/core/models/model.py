@@ -65,6 +65,8 @@ class AssetFormat(Enum):
     pvl = "PVL"
     yaml = "YAML"
     geojson = "GEOJSON"
+    zarr = "ZARR"
+
 
 class Role(Enum):
     airs_item = "airs_item"
