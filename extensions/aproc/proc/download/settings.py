@@ -58,6 +58,5 @@ class Configuration:
     @staticmethod
     def init(configuration_file: str):
         envyaml = EnvYAML(configuration_file, strict=False)
-        print(json.dumps(envyaml.export(), indent=2))
         Configuration.settings = Settings(**envyaml.export())
         return Configuration.settings
