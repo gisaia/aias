@@ -1,4 +1,3 @@
-from aproc.core.settings import Configuration
 from aproc.core.processes.processes import Processes
 
 

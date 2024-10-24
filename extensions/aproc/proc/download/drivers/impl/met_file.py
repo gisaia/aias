@@ -1,29 +1,29 @@
 import os
-from airs.core.models.model import Item, Role, ItemFormat, AssetFormat
-from aproc.core.settings import Configuration
-from extensions.aproc.proc.download.drivers.driver import Driver as DownloadDriver
-
-from extensions.aproc.proc.download.drivers.impl.utils import make_raw_archive_zip
 import shutil
 import xml.etree.ElementTree as ET
+
+from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
+from extensions.aproc.proc.download.drivers.driver import \
+    Driver as DownloadDriver
+from extensions.aproc.proc.download.drivers.impl.utils import \
+    make_raw_archive_zip
 
 
 class Driver(DownloadDriver):
 
     # Implements drivers method
     @staticmethod
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         ...
 
     # Implements drivers method
     @staticmethod
     def supports(item: Item) -> bool:
         item_format = item.properties.item_format
-        return item_format == ItemFormat.dimap.value or \
-               item_format == ItemFormat.terrasar.value or \
-               item_format == ItemFormat.spot5.value
+        return item_format == ItemFormat.dimap.value \
+            or item_format == ItemFormat.terrasar.value \
+            or item_format == ItemFormat.spot5.value
 
-    
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         asset = item.assets.get(Role.metadata.value)
@@ -34,7 +34,7 @@ class Driver(DownloadDriver):
         met_file_name = os.path.basename(met_file)
         # Default driver is GTiff
         driver_target = "GTiff"
-        extension='.tif'
+        extension = '.tif'
         if (not target_format) or (target_format == 'native'):
             if item.properties.main_asset_format == AssetFormat.jpg2000.value:
                 driver_target = "JP2OpenJPEG"
@@ -43,13 +43,13 @@ class Driver(DownloadDriver):
         elif target_format == "Jpeg2000":
             driver_target = "JP2OpenJPEG"
         if driver_target == "JP2OpenJPEG":
-            extension='.JP2'
+            extension = '.JP2'
         # If the projetion and the format are natives, just copy the file
         if (target_projection == target_format == 'native') and (not crop_wkt):
             if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
-                self.copy_from_dimap(met_file,target_directory,extension)
+                self.copy_from_dimap(met_file, target_directory, extension)
             elif item.properties.item_format == ItemFormat.terrasar.value:
-                self.copy_from_terrasarx(met_file,target_directory)
+                self.copy_from_terrasarx(met_file, target_directory)
             return
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
@@ -57,13 +57,12 @@ class Driver(DownloadDriver):
         images = []
         from extensions.aproc.proc.download.drivers.impl.utils import extract
         if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
-            images =list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension],self.get_dimap_images(met_file, extension)))
+            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension], self.get_dimap_images(met_file, extension)))
         elif item.properties.item_format == ItemFormat.terrasar.value:
-            images =list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension],self.get_terrasarx_images(met_file, extension)))
-        extract(images,crop_wkt, met_file, driver_target, target_projection, target_directory ,target_file_name)
+            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension], self.get_terrasarx_images(met_file, extension)))
+        extract(images, crop_wkt, met_file, driver_target, target_projection, target_directory, target_file_name)
 
-
-    def get_dimap_images(self,href,extension):
+    def get_dimap_images(self, href, extension):
         dir_name = os.path.dirname(href)
         tree = ET.parse(href)
         root = tree.getroot()
@@ -75,9 +74,9 @@ class Driver(DownloadDriver):
                                     f.attrib["href"],
                                     os.path.join(dir_name, os.path.splitext(f.attrib["href"])[0]+georef_file_extension),
                                     os.path.splitext(f.attrib["href"])[0]+georef_file_extension], files_elements))
-        return files;
+        return files
 
-    def get_terrasarx_images(self,href, extension):
+    def get_terrasarx_images(self, href, extension):
         dir_name = os.path.dirname(href)
         tree = ET.parse(href)
         root = tree.getroot()
@@ -88,24 +87,24 @@ class Driver(DownloadDriver):
         files = []
         for file in files_elements:
             f = [str(file.find('path').text), str(file.find('filename').text)]
-            files.append([os.path.join(dir_name,f[0],f[1]),f[1],
-                          os.path.join(dir_name,f[0], os.path.splitext(f[1])[0]+georef_file_extension),
+            files.append([os.path.join(dir_name, f[0], f[1]), f[1],
+                          os.path.join(dir_name, f[0], os.path.splitext(f[1])[0]+georef_file_extension),
                           os.path.splitext(f[1])[0]+georef_file_extension])
         return files
 
-    def copy_from_dimap(self,href: str, target_directory: str,extension: str):
+    def copy_from_dimap(self, href: str, target_directory: str, extension: str):
         files = self.get_dimap_images(href, extension)
-        self.copy_from_met(files,target_directory)
+        self.copy_from_met(files, target_directory)
 
-    def copy_from_terrasarx(self,href: str, target_directory: str):
+    def copy_from_terrasarx(self, href: str, target_directory: str):
         files = self.get_terrasarx_images(href)
-        self.copy_from_met(files,target_directory)
+        self.copy_from_met(files, target_directory)
 
-    def copy_from_met(self,files,target_directory):
+    def copy_from_met(self, files, target_directory):
         for f in files:
             valid_and_exist = os.path.isfile(f[0]) and os.path.exists(f[0])
             if valid_and_exist:
-                shutil.copyfile(f[0],target_directory + "/" + f[1])
+                shutil.copyfile(f[0], target_directory + "/" + f[1])
             valid_and_exist = os.path.isfile(f[2]) and os.path.exists(f[2])
             if valid_and_exist:
-                shutil.copyfile(f[2],target_directory + "/" + f[3])
+                shutil.copyfile(f[2], target_directory + "/" + f[3])

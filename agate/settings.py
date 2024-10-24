@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
+from pydantic import BaseModel, Extra, Field
+
 from agate.logger import Logger
 
 LOGGER = Logger.logger
@@ -14,6 +15,7 @@ class Settings(BaseModel, extra=Extra.allow):
     public_url_patterns: list[str]
     url_header: str
     url_header_prefix: str
+
 
 class Configuration:
     settings: Settings = None

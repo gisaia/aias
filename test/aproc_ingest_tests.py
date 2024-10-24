@@ -1,12 +1,12 @@
 import json
 import unittest
-from test.utils import APROC_ENDPOINT, COLLECTION, CATALOG, setUpTest
+from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, setUpTest
 from time import sleep
 
 import requests
 
 from airs.core.models import mapper
-from airs.core.models.model import Item, Asset, Role
+from airs.core.models.model import Item, Role
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList

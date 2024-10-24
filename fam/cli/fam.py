@@ -3,10 +3,9 @@ import os
 import typer
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 
-from common.exception_handler import EXCEPTION_HANDLERS
 from common.healthcheck import ROUTER as HEALTHCHECK
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 from fam.core.settings import Configuration

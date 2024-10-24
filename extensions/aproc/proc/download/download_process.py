@@ -30,7 +30,7 @@ LOGGER = Logger.logger
 
 
 def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name + " " + state + " "  + str(meta))
+    LOGGER.info(task.name + " " + state + " " + str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
 
@@ -156,7 +156,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive:bool = True) -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True) -> dict:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
@@ -280,7 +280,7 @@ class AprocProcess(Process):
                 if not not Configuration.settings.email_path_prefix_add:
                     mail_context["target_directory"] = os.path.join(Configuration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(Configuration.settings.outbox_directory).removeprefix("/"))
                 if Configuration.settings.email_path_to_windows:
-                    mail_context["target_directory"] = mail_context["target_directory"].replace("/","\\")
+                    mail_context["target_directory"] = mail_context["target_directory"].replace("/", "\\")
         except Exception as e:
             LOGGER.exception(e)
         return mail_context

@@ -1,9 +1,7 @@
-import os
 import shutil
 from pathlib import Path
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import \
@@ -14,20 +12,20 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     @staticmethod
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         ...
 
     # Implements drivers method
     @staticmethod
     def supports(item: Item) -> bool:
         item_format = item.properties.item_format
-        return item_format == ItemFormat.geotiff.value or \
-               item_format == ItemFormat.jpeg2000.value or \
-               item_format == ItemFormat.ast_dem.value or \
-               item_format == ItemFormat.csk.value or \
-               item_format == ItemFormat.digitalglobe.value or \
-               item_format == ItemFormat.geoeye.value or \
-               item_format == ItemFormat.rapideye.value
+        return item_format == ItemFormat.geotiff.value \
+            or item_format == ItemFormat.jpeg2000.value \
+            or item_format == ItemFormat.ast_dem.value \
+            or item_format == ItemFormat.csk.value \
+            or item_format == ItemFormat.digitalglobe.value \
+            or item_format == ItemFormat.geoeye.value \
+            or item_format == ItemFormat.rapideye.value
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str,

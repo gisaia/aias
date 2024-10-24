@@ -2,8 +2,8 @@ import datetime
 import os
 
 from fastapi import APIRouter, HTTPException, status
-from fam.core.fam import Fam
 
+from fam.core.fam import Fam
 from fam.core.model import Archive, File, PathRequest
 from fam.core.settings import Configuration
 
@@ -14,8 +14,8 @@ MAX_SIZE = 1000
 @ROUTER.get("/root", response_model=File)
 async def root():
     return File(
-        name=Configuration.settings.inputs_directory, 
-        path=Configuration.settings.inputs_directory, 
+        name=Configuration.settings.inputs_directory,
+        path=Configuration.settings.inputs_directory,
         is_dir=os.path.isdir(Configuration.settings.inputs_directory),
         last_modification_date=datetime.datetime.fromtimestamp(os.path.getmtime(Configuration.settings.inputs_directory)),
         creation_date=datetime.datetime.fromtimestamp(os.path.getctime(Configuration.settings.inputs_directory)))

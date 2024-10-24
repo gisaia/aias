@@ -1,15 +1,15 @@
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
-import xml.etree.ElementTree as ET
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    geotiff_to_jpg, get_epsg, get_file_size, get_geom_bbox_centroid,
+    get_hash_url)
 
 
 class Driver(ProcDriver):
@@ -20,9 +20,9 @@ class Driver(ProcDriver):
     tfw_path = None
     met_path = None
     output_folder = None
-    
+
     # Implements drivers method
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         Driver.output_folder = configuration['tmp_directory']
         return
 
@@ -97,7 +97,7 @@ class Driver(ProcDriver):
             y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
             coords = []
-            #order lower left; lower right: upper left ; upper right
+            # order lower left; lower right: upper left ; upper right
             for vertex in root.findall('productInfo/sceneInfo/sceneCornerCoord'):
                 coord = [float(vertex.find('lon').text), float(vertex.find('lat').text)]
                 coords.append(coord)

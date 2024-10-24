@@ -4,7 +4,6 @@ import shutil
 import requests
 
 from airs.core.models.model import Item, Role
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import get_file_name
@@ -13,7 +12,7 @@ from extensions.aproc.proc.download.drivers.impl.utils import get_file_name
 class Driver(DownloadDriver):
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         ...
 
     # Implements drivers method

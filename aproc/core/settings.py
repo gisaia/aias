@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from envyaml import EnvYAML
+from pydantic import BaseModel, Field
+
 from aproc.core.logger import Logger
 
 LOGGER = Logger.logger

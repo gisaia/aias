@@ -22,8 +22,8 @@ def setup_gdal():
 
 def prepare_wkt_extract(wkt: str, target_crs):
     import pyproj
-    import shapely.wkt
     import shapely.ops
+    import shapely.wkt
 
     epsg_4326 = pyproj.Proj('EPSG:4326')
     epsg_target = pyproj.Proj(target_crs)

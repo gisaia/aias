@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
+from pydantic import BaseModel, Extra, Field
 
 
 class Driver(BaseModel, extra=Extra.allow):

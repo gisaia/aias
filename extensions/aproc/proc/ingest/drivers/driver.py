@@ -1,6 +1,7 @@
 import hashlib
 import os
 from abc import ABC, abstractmethod
+
 from airs.core.models.model import Asset, Item
 from aproc.core.logger import Logger
 
@@ -65,6 +66,7 @@ class Driver(ABC):
             bool: True if the driver supports the archive format, False otherwise
         """
         ...
+
     @abstractmethod
     def get_item_id(self, url: str) -> str:
         """Return the id of the item currently process by the driver.

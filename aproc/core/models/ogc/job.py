@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel, Extra, Field
 
 from aproc.core.models.ogc.enums import JobType, StatusCode

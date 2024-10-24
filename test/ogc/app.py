@@ -2,10 +2,10 @@
 
 import uvicorn
 from fastapi import FastAPI
-from aproc.service.aproc_services import AprocServices
 
-from common.exception_handler import EXCEPTION_HANDLERS
+from aproc.service.aproc_services import AprocServices
 from aproc.service.ogc_processes_api import ROUTER
+from common.exception_handler import EXCEPTION_HANDLERS
 
 app = FastAPI()
 app.include_router(ROUTER)

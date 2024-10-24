@@ -1,13 +1,14 @@
 import importlib
+
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
-
 from extensions.aproc.proc.download.drivers.driver import Driver
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import \
     Configuration as DownloadSettings
 
 LOGGER = Logger.logger
+
 
 class Drivers():
     drivers: list[Driver] = None

@@ -5,10 +5,9 @@ from datetime import datetime
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url, get_epsg)
+    get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url, setup_gdal)
 
 
 class Driver(ProcDriver):
@@ -20,8 +19,8 @@ class Driver(ProcDriver):
     georef_path = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
-         return
+    def init(configuration: dict):
+        return
 
     # Implements drivers method
     def supports(url: str) -> bool:
@@ -88,9 +87,9 @@ class Driver(ProcDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         from osgeo import gdal, ogr, osr
         from osgeo.gdalconst import GA_ReadOnly
+        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         setup_gdal()
         tree = ET.parse(self.dim_path)
         root = tree.getroot()

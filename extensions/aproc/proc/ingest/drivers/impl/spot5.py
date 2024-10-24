@@ -1,12 +1,15 @@
 import os
-from pathlib import Path
 import xml.etree.ElementTree as ET
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
-from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, setup_gdal, get_geom_bbox_centroid, \
-    get_hash_url, get_epsg
 from datetime import datetime
+from pathlib import Path
+
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
+from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -17,7 +20,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
 
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         return
 
     # Implements drivers method
@@ -137,6 +140,6 @@ class Driver(ProcDriver):
                     if file.lower() == "icon.jpg":
                         Driver.thumbnail_path = os.path.join(path, file)
 
-            return Driver.tif_path is not None and \
-                   Driver.dim_path is not None
+            return Driver.tif_path is not None \
+                and Driver.dim_path is not None
         return False

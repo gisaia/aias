@@ -1,10 +1,10 @@
-import json
 import datetime
+import json
 
 from airs.core.models.model import Item
 
 
-def serialize_datetime(obj): 
+def serialize_datetime(obj):
     if isinstance(obj, datetime.datetime):
         return int(obj.timestamp())
     raise TypeError("Type not serializable")

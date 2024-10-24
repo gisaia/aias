@@ -3,15 +3,14 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
-from .image_driver_helper import ImageDriverHelper
-
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+
+from .image_driver_helper import ImageDriverHelper
 
 
 class Driver(ProcDriver):
@@ -23,7 +22,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
 
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         return
 
     # Implements drivers method

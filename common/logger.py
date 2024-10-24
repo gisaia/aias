@@ -1,6 +1,6 @@
 import logging
-import ecs_logging
 
+import ecs_logging
 from uvicorn.logging import DefaultFormatter
 
 
@@ -26,7 +26,6 @@ class CustomLogger:
         handler = logging.StreamHandler()
         handler.setFormatter(ecs_logging.StdlibFormatter())
         cls.__logger.addHandler(handler)
-
 
     @classmethod
     @property

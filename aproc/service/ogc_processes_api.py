@@ -1,4 +1,3 @@
-import json
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
@@ -41,6 +40,7 @@ def get_conformance() -> Conforms:
 def get_jobs(offset: int = 0, limit: int = 10, process_id: str = None, status: str = None):
     return Processes.list_jobs(offset=offset, limit=limit, process_id=process_id, status=status)
 
+
 @ROUTER.get("/jobs/{jobId}",
             response_model_exclude_none=True,
             responses={
@@ -56,15 +56,15 @@ def get_job(jobId: str):
 
 
 @ROUTER.get("/jobs/{jobId}/cancel",
-               response_model_exclude_none=True,
-               responses={
-                        status.HTTP_200_OK: {
-                            "model": StatusInfo
-                        },
-                        status.HTTP_422_UNPROCESSABLE_ENTITY: {
-                            "model": RESTException
-                        }
-               })
+            response_model_exclude_none=True,
+            responses={
+                    status.HTTP_200_OK: {
+                        "model": StatusInfo
+                    },
+                    status.HTTP_422_UNPROCESSABLE_ENTITY: {
+                        "model": RESTException
+                    }
+            })
 def delete_job(jobId: str):
     return Processes.inerrupt(jobId)
 

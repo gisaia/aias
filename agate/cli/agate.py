@@ -1,14 +1,16 @@
+import os
+
 import typer
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
-import os
+from starlette.middleware.cors import CORSMiddleware
 
 from agate.rest.service import ROUTER
 from agate.settings import Configuration
 from common.exception_handler import EXCEPTION_HANDLERS
 from common.healthcheck import ROUTER as HEALTHCHECK
+
 cli = typer.Typer()
 AGATE_CORS_ORIGINS = os.getenv("AGATE_CORS_ORIGINS", "*")
 AGATE_CORS_METHODS = os.getenv("AGATE_CORS_METHODS", "*")

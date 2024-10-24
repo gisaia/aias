@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
+from pydantic import BaseModel, Extra
+
 from airs.core.logger import Logger
 
 LOGGER = Logger.logger
@@ -17,21 +18,23 @@ class S3(BaseModel):
 
 
 class Index(BaseModel, extra=Extra.allow):
-    collection_prefix:str
-    endpoint_url:str
-    login:str | None
-    pwd:str | None
+    collection_prefix: str
+    endpoint_url: str
+    login: str | None
+    pwd: str | None
+
 
 class Settings(BaseModel, extra=Extra.allow):
-    s3:S3
-    index:Index
-    arlaseo_mapping_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json"
-    arlaseo_collection_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json"
+    s3: S3
+    index: Index
+    arlaseo_mapping_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json"
+    arlaseo_collection_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json"
+
 
 class Configuration:
-    settings:Settings=None
+    settings: Settings = None
 
     @staticmethod
-    def init(configuration_file:str):
-        envyaml=EnvYAML(configuration_file, strict=False)
-        Configuration.settings=Settings.model_validate(envyaml.export())
+    def init(configuration_file: str):
+        envyaml = EnvYAML(configuration_file, strict=False)
+        Configuration.settings = Settings.model_validate(envyaml.export())

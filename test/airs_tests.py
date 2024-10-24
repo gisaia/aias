@@ -1,7 +1,8 @@
 import os
 import unittest
-from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED, ITEM_PATH_MANAGED,
-                        index_collection_prefix, index_endpoint_url, setUpTest)
+from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED,
+                        ITEM_PATH_MANAGED, index_collection_prefix,
+                        index_endpoint_url, setUpTest)
 
 import elasticsearch
 import requests

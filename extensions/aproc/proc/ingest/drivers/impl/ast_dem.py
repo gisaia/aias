@@ -2,25 +2,13 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-
-from airs.core.models.model import (
-    Asset,
-    AssetFormat,
-    Item,
-    ItemFormat,
-    ObservationType,
-    Properties,
-    ResourceType,
-    Role,
-)
-from aproc.core.settings import Configuration
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    ObservationType, Properties, ResourceType,
+                                    Role)
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid,
-    get_hash_url,
-    get_file_size,
-    get_epsg,
-)
+    get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url)
+
 from .image_driver_helper import ImageDriverHelper
 
 
@@ -43,7 +31,7 @@ class Driver(ProcDriver):
 
     # Implements drivers method
 
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         return
 
     # Implements drivers method

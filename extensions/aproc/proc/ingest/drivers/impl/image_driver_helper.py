@@ -8,7 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     Properties, ResourceType, Role)
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, get_hash_url
+from extensions.aproc.proc.ingest.drivers.impl.utils import (get_file_size,
+                                                             get_hash_url)
 
 
 class ImageDriverHelper:
@@ -50,8 +51,8 @@ class ImageDriverHelper:
 
     # Implements drivers method
     def fetch_assets(driver: ProcDriver, url: str, assets: list[Asset]) -> list[Asset]:
-        #ImageDriverHelper.add_overview_if_you_can(driver, url, Role.thumbnail, driver.thumbnail_size, assets)
-        #ImageDriverHelper.add_overview_if_you_can(driver, url, Role.overview, driver.overview_size, assets)
+        # ImageDriverHelper.add_overview_if_you_can(driver, url, Role.thumbnail, driver.thumbnail_size, assets)
+        # ImageDriverHelper.add_overview_if_you_can(driver, url, Role.overview, driver.overview_size, assets)
         return assets
 
     # Implements drivers method

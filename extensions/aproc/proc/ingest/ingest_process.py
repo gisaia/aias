@@ -152,7 +152,7 @@ class AprocProcess(Process):
                             try:
                                 r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
                                 if r.ok:
-                                    LOGGER.debug("asset uploaded successfully")                    
+                                    LOGGER.debug("asset uploaded successfully")
                                 else:
                                     msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, Configuration.settings.airs_endpoint)
                                     LOGGER.error(msg)
@@ -164,7 +164,7 @@ class AprocProcess(Process):
                     else:
                         LOGGER.info("{} not managed".format(asset.name))
                 LOGGER.debug("ingestion: 6 - register")
-                __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
+                __update_status__(self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
                 item_already_exists = False
                 try:
                     r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
@@ -198,7 +198,7 @@ class AprocProcess(Process):
         else:
             LOGGER.error("No driver found for {}".format(url))
             raise DriverException("No driver found for  {}".format(url))
-        
+
     def __check_assets__(url: str, assets: list[Asset], file_exists: bool = False):
         for asset in assets:
             if asset.name is None:

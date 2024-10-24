@@ -6,7 +6,6 @@ import requests
 from celery import shared_task
 from pydantic import BaseModel, Field
 
-from airs.core.models.mapper import to_json
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode

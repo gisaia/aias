@@ -1,10 +1,10 @@
 import importlib
 import json
 import os
-from threading import Thread
-from urllib.parse import urlparse
 from datetime import datetime
+from threading import Thread
 from time import sleep
+from urllib.parse import urlparse
 
 from celery import Celery, states
 from celery.result import AsyncResult
@@ -15,7 +15,8 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
 from aproc.core.logger import Logger
-from aproc.core.models.ogc.job import JobType, StatusCode, StatusInfo, StatusInfoList
+from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
+                                       StatusInfoList)
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration
@@ -125,7 +126,7 @@ class Processes:
             return res.result
         else:
             return None
-        
+
     @staticmethod
     def inerrupt(task_id: str):
         res = AsyncResult(task_id, app=APROC_CELERY_APP)
@@ -252,12 +253,11 @@ class Processes:
             status_code = StatusCode.successful
         return status_code
 
-
     def __init_redis__():
         # At startup we clear and recreate the index.
         try:
             Processes.__get_redis_client__().ft("idx:airs_jobs").dropindex()
-        except :
+        except Exception:
             ...
         schema = (
             TagField("$.process_id", as_name="process_id"),

@@ -1,15 +1,15 @@
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
-import xml.etree.ElementTree as ET
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    geotiff_to_jpg, get_epsg, get_file_size, get_geom_bbox_centroid,
+    get_hash_url)
 
 
 class Driver(ProcDriver):
@@ -24,8 +24,9 @@ class Driver(ProcDriver):
     attr_path = None
     prefix_key = None
     output_folder = None
+
     # Implements drivers method
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         Driver.output_folder = configuration['tmp_directory']
         return
 
@@ -95,15 +96,15 @@ class Driver(ProcDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         tree = ET.parse(self.met_path)
         root = tree.getroot()
-        ul_lat = self.__get_coord__(root, self.prefix_key,"Top_Left_Geodetic_Coordinates", 0)
-        ul_lon = self.__get_coord__(root, self.prefix_key,"Top_Left_Geodetic_Coordinates", 1)
-        ur_lat = self.__get_coord__(root, self.prefix_key,"Top_Right_Geodetic_Coordinates", 0)
-        ur_lon = self.__get_coord__(root, self.prefix_key,"Top_Right_Geodetic_Coordinates", 1)
-        lr_lat = self.__get_coord__(root, self.prefix_key,"Bottom_Right_Geodetic_Coordinates", 0)
-        lr_lon = self.__get_coord__(root, self.prefix_key,"Bottom_Right_Geodetic_Coordinates", 1)
-        ll_lat = self.__get_coord__(root, self.prefix_key,"Bottom_Left_Geodetic_Coordinates", 0)
-        ll_lon = self.__get_coord__(root, self.prefix_key,"Bottom_Left_Geodetic_Coordinates", 1)
-        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
+        ul_lat = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 0)
+        ul_lon = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 1)
+        ur_lat = self.__get_coord__(root, self.prefix_key, "Top_Right_Geodetic_Coordinates", 0)
+        ur_lon = self.__get_coord__(root, self.prefix_key, "Top_Right_Geodetic_Coordinates", 1)
+        lr_lat = self.__get_coord__(root, self.prefix_key, "Bottom_Right_Geodetic_Coordinates", 0)
+        lr_lon = self.__get_coord__(root, self.prefix_key, "Bottom_Right_Geodetic_Coordinates", 1)
+        ll_lat = self.__get_coord__(root, self.prefix_key, "Bottom_Left_Geodetic_Coordinates", 0)
+        ll_lon = self.__get_coord__(root, self.prefix_key, "Bottom_Left_Geodetic_Coordinates", 1)
+        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
         x_pixel_size = float(root.find("PAMRasterBand/Metadata/MDI[@key='"+self.prefix_key + "Column_Spacing" + "']").text)
         y_pixel_size = float(root.find("PAMRasterBand/Metadata/MDI[@key='"+self.prefix_key + "Line_Spacing" + "']").text)
         gsd = (x_pixel_size+y_pixel_size)/2
@@ -177,15 +178,15 @@ class Driver(ProcDriver):
             tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
             if tfw_path.exists():
                 Driver.tfw_path = str(tfw_path)
-            return Driver.met_path is not None and \
-                   Driver.tif_path is not None and \
-                   Driver.attr_path is not None and \
-                   Driver.prefix_key is not None and \
-                   Driver.browse_path is not None and \
-                   Driver.h5_path is not None
+            return Driver.met_path is not None \
+                and Driver.tif_path is not None \
+                and Driver.attr_path is not None \
+                and Driver.prefix_key is not None \
+                and Driver.browse_path is not None \
+                and Driver.h5_path is not None
         return False
 
     @staticmethod
-    def __get_coord__(root,prefix,value,index):
+    def __get_coord__(root, prefix, value, index):
         field = prefix + value
         return float(root.find("PAMRasterBand/Metadata/MDI[@key='"+field+"']").text.split(" ")[index])

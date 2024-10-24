@@ -5,10 +5,9 @@ from pathlib import Path
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ObservationType, Properties, ResourceType,
                                     Role)
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_file_size, get_geom_bbox_centroid, get_hash_url, get_epsg
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url)
 
 
 class Driver(ProcDriver):
@@ -21,7 +20,7 @@ class Driver(ProcDriver):
     component_id = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         return
 
     # Implements drivers method
@@ -105,7 +104,6 @@ class Driver(ProcDriver):
                         break
                 if line_1.find('Component ID: ' + self.component_id) >= 0:
                     inside_component_section = True
-
 
         with open(self.met_path) as f_2:
             for line_2 in f_2:
@@ -223,4 +221,3 @@ class Driver(ProcDriver):
         if inside_coord:
             Driver.__get_latitude__(data, line, coord_number)
             Driver.__get_longitude__(data, line, coord_number)
-

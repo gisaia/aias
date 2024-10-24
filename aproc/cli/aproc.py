@@ -3,13 +3,13 @@ import os
 import typer
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 
 from aproc.service.aproc_services import AprocServices
+from aproc.service.ogc_processes_api import ROUTER
 from common.exception_handler import EXCEPTION_HANDLERS
 from common.healthcheck import ROUTER as HEALTHCHECK
-from aproc.service.ogc_processes_api import ROUTER
 
 cli = typer.Typer()
 APROC_HOST = os.getenv("APROC_HOST", "127.0.0.1")

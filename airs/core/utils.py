@@ -1,7 +1,7 @@
 import datetime
-from dateutil.relativedelta import relativedelta
 
 import pytz
+from dateutil.relativedelta import relativedelta
 
 utc = pytz.UTC
 seasons = {'Summer': (utc.localize(datetime.datetime(2014, 6, 21)), utc.localize(datetime.datetime(2014, 9, 22))),

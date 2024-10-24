@@ -10,7 +10,6 @@ import requests
 from airs.core.models import mapper
 from airs.core.models.model import Item, Properties
 from aproc.core.logger import Logger
-from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import Configuration
 
 LOGGER = Logger.logger
@@ -65,7 +64,7 @@ class Notifications:
                     doc.properties.__setattr__("reason", context.get("error", None))
                     doc.centroid = [0.0, 0.0]
                     doc.geometry = {"type": "Point", "coordinates": [0.0, 0.0]}
-                    
+
                 Notifications.__getES().index(
                     index=Configuration.settings.index_for_download.index_name,
                     document=mapper.to_airs_json(doc),

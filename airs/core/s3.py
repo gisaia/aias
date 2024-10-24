@@ -1,6 +1,6 @@
 from boto3 import Session
 
-from airs.core.settings import Configuration, S3
+from airs.core.settings import S3, Configuration
 
 __session = None
 
@@ -31,7 +31,7 @@ def get_client_from_configuration(s3: S3):
     return get_session_from_configuration(s3).client("s3", endpoint_url=s3.endpoint_url)
 
 
-def get_matching_s3_objects(bucket, prefix="", suffix="", s3_client=None) -> str:
+def get_matching_s3_objects(bucket, prefix="", suffix="", s3_client=None):
     if s3_client is None:
         s3_client = get_client()
     """
