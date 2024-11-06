@@ -91,15 +91,18 @@ def reproject_raster(in_path, crs, driver_target):
 
         with MemoryFile() as memfile:
             with memfile.open(**kwargs) as dst:
-                for i in range(1, src.count + 1):
-                    reproject(
-                        source=rasterio.band(src, i),
-                        destination=rasterio.band(dst, i),
-                        src_transform=src.transform,
-                        src_crs=src.crs,
-                        dst_transform=transform,
-                        dst_crs=crs,
-                        resampling=Resampling.nearest)
+                if src.crs != crs:
+                    for i in range(1, src.count + 1):
+                        reproject(
+                            source=rasterio.band(src, i),
+                            destination=rasterio.band(dst, i),
+                            src_transform=src.transform,
+                            src_crs=src.crs,
+                            dst_transform=transform,
+                            dst_crs=crs,
+                            resampling=Resampling.nearest)
+                else:
+                    dst.write(src.read())
             with memfile.open() as dataset:  # Reopen as DatasetReader
                 yield dataset  # Note yield not return as we're a contextmanager
 
