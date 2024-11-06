@@ -114,9 +114,9 @@ class Tests(unittest.TestCase):
                                                             target_format=AssetFormat.zarr.value, target_projection="native", raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
+
         result = self.get_result(status)
-        # FILE MUST EXISTS
-        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.ZARR"))
+        self.assertTrue(Tests.__download_found(result.download_locations[0] + "/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.ZARR.tar"))
 
     def test_download_cancelled(self):
         # test 1 : cancell before it's running

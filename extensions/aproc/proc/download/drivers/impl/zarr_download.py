@@ -2,6 +2,7 @@ import enum
 import json
 import os
 import re
+import tarfile
 import tempfile
 import zipfile
 from typing import Annotated, Literal, Union
@@ -84,11 +85,14 @@ class Driver(DownloadDriver):
         if raw_archive is True:
             raise DriverException("Raw archive can't be returned for a zarr download.")
         if target_format != AssetFormat.zarr.value:
-            raise DriverException(f"Target format must be {Role.zarr.value}")
+            raise DriverException(f"Target format must be {AssetFormat.zarr.value}")
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
 
+        import numpy as np
         import rasterio
+        import rasterio.enums
+        import rasterio.warp
         import rioxarray
         import smart_open
         import xarray as xr
@@ -98,30 +102,31 @@ class Driver(DownloadDriver):
         with smart_open.open(asset_href, "rb", transport_params=self.__get_storage_parameters(asset_href)) as fb:
             with zipfile.ZipFile(fb) as raster_zip:
                 file_names = raster_zip.namelist()
-                raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
+                raster_files = list(filter(
+                    lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
+
+        # Get dimensions of the highest resolution band
+        zarr_res = 10
+        # TODO: with band selection, it will depend on the highest resolution SELECTED band
 
         session = self.__get_rasterio_session(asset_href)
 
         with rasterio.Env(session):
-            # Get dimensions of the highest resolution band
-            zarr_res = 10
-            # TODO: with band selection, it will depend on the highest resolution SELECTED band
-
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
-            for i, rf in enumerate(raster_files):
+
+            for ri, rf in enumerate(raster_files):
                 with rasterio.open("zip+" + asset_href + "!" + rf) as src:
                     repeats = src.res[0] / zarr_res
 
                     if repeats != 1:
-                        import numpy as np
-                        import rasterio.warp
-
                         align_transform, width, height = rasterio.warp.aligned_target(
                             src.transform, src.height, src.width, (zarr_res, zarr_res))
+
                         if int(repeats) == repeats:
                             repeats = int(repeats)
-                            data = np.zeros((1, src.height * repeats, src.width * repeats))
-                            data[0] = np.repeat(np.repeat(src.read()[0], repeats, axis=1), repeats, axis=0)
+                            data = np.zeros((src.count, src.height * repeats, src.width * repeats), dtype=src.dtypes[0])
+                            for i in range(src.count):
+                                data[i] = np.repeat(np.repeat(src.read()[i], repeats, axis=1), repeats, axis=0)
                             transform = align_transform
                         else:
                             # This method will create some differences with the original image
@@ -135,7 +140,7 @@ class Driver(DownloadDriver):
                                 dst_nodata=src.nodata,
                                 resampling=rasterio.enums.Resampling.nearest)
                     else:
-                        transform, width, height = src.transform, src.width, src.height
+                        transform, _, _ = src.transform, src.width, src.height
                         data = src.read()
 
                     profile = src.profile
@@ -146,23 +151,33 @@ class Driver(DownloadDriver):
                     with rasterio.open(temporary_raster.name, "w", **profile, quality=100, reversible=True) as dst:
                         dst.write(data)
 
-                extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
-                        target_projection, "/".join(tmp_files[i].split("/")[:-1]),
-                        tmp_files[i].split("/")[-1])
+                    extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
+                            target_projection, "/".join(tmp_files[ri].split("/")[:-1]),
+                            tmp_files[ri].split("/")[-1])
                 temporary_raster.delete = True
                 temporary_raster.close()
 
-        zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + target_format
+        zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
-        bands: xr.Dataset = None
 
+        chunk_size = 1000
+        zarr_path = target_directory + "/" + zarr_name
+        bands: xr.Dataset = None
         for b, r in zip(band_names, tmp_files):
-            da = rioxarray.open_rasterio(r, default_name=b)
+            da = rioxarray.open_rasterio(r, default_name=b, chunks=(1, chunk_size, chunk_size), driver="JP2OpenJPEg")
             if bands is None:
                 bands = da
             else:
                 bands = xr.merge([bands, da])
-        bands.to_zarr(target_directory + "/" + zarr_name, mode="w").close()
+        bands \
+            .squeeze("band").drop_vars("band") \
+            .chunk(chunk_size) \
+            .to_zarr(zarr_path, mode="w", consolidated=True) \
+            .close()
+
+        archive_path = zarr_path + ".tar"
+        with tarfile.open(archive_path, "w") as tar:
+            tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
     def __get_rasterio_session(self, href: str):
         storage_type = urlparse(href).scheme

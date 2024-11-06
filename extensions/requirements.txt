@@ -13,3 +13,4 @@ smart_open==6.2.0
 xarray[io]
 rioxarray
 numpy==1.26.4
+dask

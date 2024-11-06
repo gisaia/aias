@@ -41,7 +41,7 @@
     },
     "assets": {
       "data": {
-        "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.zip",
+        "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.zip",
         "type": "application/zip",
         "title": "archive",
         "proj:epsg": 32630,
