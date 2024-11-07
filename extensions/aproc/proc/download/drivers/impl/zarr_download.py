@@ -65,6 +65,7 @@ Storage = Annotated[Union[GoogleStorage, HttpsStorage, NoStorage], Field(discrim
 
 class Configuration(BaseModel):
     input: Storage | None = Field(None)
+    chunk_size: int = Field(1000)
 
 
 class Driver(DownloadDriver):
@@ -159,13 +160,12 @@ class Driver(DownloadDriver):
                     extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
                             target_projection, "/".join(tmp_files[ri].split("/")[:-1]),
                             tmp_files[ri].split("/")[-1])
-                temporary_raster.delete = True
-                temporary_raster.close()
+                os.remove(temporary_raster.name)
 
         zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
 
-        chunk_size = 1000
+        chunk_size = self.configuration.chunk_size
         zarr_path = target_directory + "/" + zarr_name
         bands: xr.Dataset = None
         for b, r in zip(band_names, tmp_files):
@@ -179,6 +179,9 @@ class Driver(DownloadDriver):
             .chunk(chunk_size) \
             .to_zarr(zarr_path, mode="w", consolidated=True) \
             .close()
+
+        for f in tmp_files:
+            os.remove(f)
 
         archive_path = zarr_path + ".tar"
         with tarfile.open(archive_path, "w") as tar:
