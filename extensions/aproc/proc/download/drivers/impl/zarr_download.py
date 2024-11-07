@@ -51,11 +51,16 @@ class GoogleStorage(BaseModel):
     api_key: GoogleStorageApiKey
 
 
+class HttpsStorage(BaseModel):
+    type: Literal["https"] = "https"
+    headers: dict[str, str]
+
+
 class NoStorage(BaseModel):
     type: Literal[None] = None
 
 
-Storage = Annotated[Union[GoogleStorage, NoStorage], Field(discriminator="type")]
+Storage = Annotated[Union[GoogleStorage, HttpsStorage, NoStorage], Field(discriminator="type")]
 
 
 class Configuration(BaseModel):
@@ -74,8 +79,8 @@ class Driver(DownloadDriver):
         return item.properties.constellation == "Sentinel-2" \
             and item.properties.processing__level == "L1C" \
             and data is not None and data.href is not None and (
-                data.href.startswith("s3://")
-                or data.href.startswith("gs://")
+                # data.href.startswith("s3://")
+                data.href.startswith("gs://")
                 or data.href.startswith("file://")
                 or data.href.startswith("http://")
                 or data.href.startswith("https://"))
@@ -182,8 +187,13 @@ class Driver(DownloadDriver):
     def __get_rasterio_session(self, href: str):
         storage_type = urlparse(href).scheme
 
-        if not storage_type or storage_type == "file":
+        if not storage_type or storage_type == "file" or storage_type == "http":
             return None
+
+        if storage_type == "https":
+            # TODO: might need some dev here
+            return None
+
         if storage_type == "gs":
             import rasterio.session
 
@@ -199,14 +209,21 @@ class Driver(DownloadDriver):
                 credentials = f.name
 
             return rasterio.session.GSSession(credentials)
-        else:
-            raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+
+        raise NotImplementedError(f"Storage '{storage_type}' not compatible")
 
     def __get_storage_parameters(self, href: str) -> dict:
         storage_type = urlparse(href).scheme
 
-        if not storage_type or storage_type == "file":
+        if not storage_type or storage_type == "file" or storage_type == "http":
             return {}
+
+        if storage_type == "https":
+            if self.configuration.input.type != "https":
+                Driver.LOGGER.warning("No headers is configured for HTTPS requests. Using no headers")
+                return {}
+            return {"headers": self.configuration.input.headers}
+
         if storage_type == "gs":
             from google.cloud.storage import Client
             from google.oauth2 import service_account
@@ -223,5 +240,5 @@ class Driver(DownloadDriver):
 
             client = Client("APROC", credentials=credentials)
             return {"client": client}
-        else:
-            raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+
+        raise NotImplementedError(f"Storage '{storage_type}' not compatible")
