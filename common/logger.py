@@ -27,7 +27,6 @@ class CustomLogger:
         handler.setFormatter(ecs_logging.StdlibFormatter())
         cls.__logger.addHandler(handler)
 
-
     @classmethod
     @property
     def logger(cls):
