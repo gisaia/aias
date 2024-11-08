@@ -16,8 +16,10 @@ class InvalidItemsException(Exception):
 
 class InternalError(Exception):
     component:str
+    msg: str
     reason:str
 
-    def __init__(self, component:str,reason:str) -> None:
+    def __init__(self, component:str, msg: str, reason:str) -> None:
         self.component=component
         self.reason=reason
+        self.msg = msg

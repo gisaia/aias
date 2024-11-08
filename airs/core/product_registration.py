@@ -129,9 +129,10 @@ def __upload_file(key, file, content_type)->str:
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
-        LOGGER.error("Failed to upload {}".format(key))
+        msg = "Failed to upload {}".format(key)
+        LOGGER.error(msg)
         LOGGER.exception(e)
-        raise exceptions.InternalError("storage", e)
+        raise exceptions.InternalError("storage", msg, e)
 
 def __delete_file(key):
     try:
@@ -139,9 +140,10 @@ def __delete_file(key):
         s3.get_client().delete_object(Bucket=Configuration.settings.s3.bucket, Key=key)
         LOGGER.info("{} deleted.".format(key))
     except Exception as e:
-        LOGGER.error("Failed to delete {} ".format(key))
+        msg = "Failed to delete {} ".format(key)
+        LOGGER.error(msg)
         LOGGER.exception(e)
-        raise exceptions.InternalError("storage", e)
+        raise exceptions.InternalError("storage", msg, e)
 
 def __delete_prefix(prefix:str):
     try:
@@ -153,11 +155,12 @@ def __delete_prefix(prefix:str):
             LOGGER.info("{} deleted.".format(object["Key"]))
         LOGGER.info("{} deleted.".format(prefix))
     except Exception as e:
-        LOGGER.error("Failed to delete {} ".format(prefix))
+        msg = "Failed to delete {} ".format(prefix)
+        LOGGER.error(msg)
         LOGGER.exception(e)
-        raise exceptions.InternalError("storage", e)
+        raise exceptions.InternalError("storage", msg, e)
 
-def __upload_item(key, item:Item)->str:
+def __upload_item(key, item: Item) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
         s3.get_client().put_object(
@@ -169,9 +172,10 @@ def __upload_item(key, item:Item)->str:
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
-        LOGGER.error("Failed to upload {} on bucket {}".format(key, Configuration.settings.s3.bucket))
+        msg = "Failed to upload {} on {}".format(key, Configuration.settings.s3.bucket)
+        LOGGER.error(msg)
         LOGGER.exception(e)
-        raise exceptions.InternalError("storage", e)
+        raise exceptions.InternalError("storage", msg, e)
 
 def asset_exists(collection:str, item_id:str, asset_name:str)->bool:
     """ check whether the asset exists or not on the configured S3
@@ -210,8 +214,9 @@ def __fetch_mapping__():
         if r.ok:
             return r.json()["mappings"]
         else:
-            LOGGER.error("Can not fetch the mapping for creating the ARLAS index. Aborting ...")
-            raise exceptions.InternalError("elasticsearch", r.reason)
+            msg = "Can not fetch the mapping for creating the ARLAS index. Aborting ..."
+            LOGGER.error(msg)
+            raise exceptions.InternalError("elasticsearch", msg, r.reason)
     else:
         with open(Configuration.settings.arlaseo_mapping_url) as f:
             return json.load(f)["mappings"]
