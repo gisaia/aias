@@ -7,6 +7,7 @@ Functions for ingestion:
 - Asynchronously register one archive (`/processes/ingest`) or a directory containing archives (`/processes/directory_ingest`) : ARLAS Processing (APROC)
 - List files and archives from a directory: File and Archive Management (FAM)
 
+Note: some STAC synchronisation scrips are provided. See [STAC Synchronisation](#stac-synchronisation)
 
 Functions for download:
 - Asynchronously download one or several archives (`/processes/download`) : ARLAS Processing (APROC)
@@ -580,4 +581,19 @@ To run the tests (this will also start the stack):
 
 ```shell
 ./test/tests.sh 
+```
+
+
+# STAC Synchronisation
+
+The following synchronisations are available:
+- [GEODES](https://geodes.cnes.fr/) 
+
+
+## GEODES
+
+To ingest into AIRS, the process needs to access the AIRS service. The simplest way is to run the docker container within the same network as AIRS:
+
+```shell
+docker run --rm --network arlas-net gisaia/stac-geodes:latest add https://geodes-portal.cnes.fr/api/stac/items --help
 ```
