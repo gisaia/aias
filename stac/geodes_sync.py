@@ -3,8 +3,6 @@ import sys
 
 import requests
 import typer
-from alive_progress import alive_bar
-from alive_progress import alive_it
 
 from airs.core.models.mapper import item_from_dict, to_json
 from airs.core.models.model import Asset, AssetFormat, Item, Role
@@ -81,21 +79,21 @@ def to_item(feature, extra_params={}) -> Item:
     return item
 
 
-def search(stac_url: str, start_date: int, end_date: int, bbox: list[float], max_hits: int, just_count: bool = False, process_function=None, extra_params={}):
+def search(stac_url: str, start_date: int, end_date: int, data_type: list[str], product_level: list[str], bbox: list[float], max_hits: int, just_count: bool = False, process_function=None, extra_params={}):
     data = {
         "sortBy": [{"direction": "desc", "field": "temporal:startDate"}],
         "limit": 50,
         "page": 1,
         "query": {
-            "dataType": {"in": ["PEPS_S2_L1C","MUSCATE_SENTINEL2_SENTINEL2_L2A","MUSCATE_Snow_SENTINEL2_L2B-SNOW","MUSCATE_WaterQual_SENTINEL2_L2B-WATER","MUSCATE_SENTINEL2_SENTINEL2_L3A"]},
-            "spaceborne:productType": {"in": ["REFLECTANCE", "REFLECTANCETOA", "S2MSI1C"]},
-            "spaceborne:productLevel": {"in": ["L1C"]}
         }
     }
-
-    if start_date: 
+    if data_type:
+        data["query"]["dataType"] = {"in": data_type}
+    if product_level:
+        data["query"]["spaceborne:productLevel"] = {"in": product_level}
+    if start_date:
         data["query"]["temporal:endDate"] = {"gte": start_date}
-    if end_date: 
+    if end_date:
         data["query"]["temporal:startDate"] = {"lte": end_date}
     if bbox:
         data["bbox"] = bbox
@@ -143,15 +141,18 @@ def add_to_airs(airs_url: str, collection: str, item: Item):
 def add(
     stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/)"),
     airs_url: str = typer.Argument(help="AIRS url (e.g. https://localhost/airs/)"),
+
     collection: str = typer.Argument(help="Name of the ARLAS Collection)"),
     catalog: str = typer.Argument(help="Name of the catalog within the collection)"),
+    data_type: list[str] = typer.Option(help="Data type ()", default=None),
+    product_level: list[str] = typer.Option(help="Product levels", default=None),
     start_date: str = typer.Option(help="Start date for the STAC search", default=None),
     end_date: str = typer.Option(help="End date for the STAC search", default=None),
     bbox: list[float] = typer.Option(help="BBOX (lon_min lat_min lon max lat_max)", default=None),
     max: int = typer.Option(help="Max number of feature to process", default=1000)
 ):
     try:
-        search(stac_url, start_date, end_date, bbox, max, process_function=lambda i: add_to_airs(airs_url=airs_url, collection=collection, item=i), extra_params={"collection": collection, "catalog": catalog})
+        search(stac_url, start_date, end_date, data_type, product_level, bbox, max, process_function=lambda i: add_to_airs(airs_url=airs_url, collection=collection, item=i), extra_params={"collection": collection, "catalog": catalog})
     except Exception as e:
         print("ERROR: Failled to add items: {}".format(e), file=sys.stderr)
 
@@ -159,23 +160,27 @@ def add(
 @app.command(help="Show STAC features")
 def show(
     stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/items)"),
+    data_type: list[str] = typer.Option(help="Data type ()", default=None),
+    product_level: list[str] = typer.Option(help="Product levels", default=None),
     start_date: str = typer.Option(help="Start date for the STAC search", default=None),
     end_date: str = typer.Option(help="End date for the STAC search", default=None),
     bbox: list[float] = typer.Option(help="BBOX (lon_min lat_min lon max lat_max)", default=None),
     max: int = typer.Option(help="Max number of feature to process", default=1000)
 ):
-    search(stac_url, start_date, end_date, bbox, max, process_function=lambda i: print(to_json(i)))
+    search(stac_url, start_date, end_date, data_type, product_level, bbox, max, process_function=lambda i: print(to_json(i)))
 
 
 @app.command(help="Count STAC features")
 def count(
     stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/items)"),
+    data_type: list[str] = typer.Option(help="Data type ()", default=None),
+    product_level: list[str] = typer.Option(help="Product levels", default=None),
     start_date: str = typer.Option(help="Start date for the STAC search", default=None),
     end_date: str = typer.Option(help="End date for the STAC search", default=None),
     bbox: list[float] = typer.Option(help="BBOX (lon_min lat_min lon max lat_max)", default=None),
     max: int = typer.Option(help="Max number of feature to process", default=1000)
 ):
-    search(stac_url, start_date, end_date, bbox, max, just_count=True)
+    search(stac_url, start_date, end_date, data_type, product_level, bbox, max, just_count=True)
 
 
 def main():
