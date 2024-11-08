@@ -20,13 +20,14 @@ def validation_exception_handler(req: Request, exc: RequestValidationError):
     # Format the detail of the error message
     detail = ""
     for error in exc.errors():
-        loc = error["loc"][1]
-        for i in range(2, len(error["loc"])):
-            if isinstance(error["loc"][i], str):
-                loc += f'.{error["loc"][i]}'
-            elif isinstance(error["loc"][i], int):
-                loc += f'[{str(error["loc"][i])}]'
-        detail += f'{loc}: {error["msg"]}\n'
+        if len(error["loc"]) > 1:
+            loc = error["loc"][1]
+            for i in range(2, len(error["loc"])):
+                if isinstance(error["loc"][i], str):
+                    loc += f'.{error["loc"][i]}'
+                elif isinstance(error["loc"][i], int):
+                    loc += f'[{str(error["loc"][i])}]'
+            detail += f'{loc}: {error["msg"]}\n'
     detail = detail[:-1]
 
     return JSONResponse(content=RESTException(
