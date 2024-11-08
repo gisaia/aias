@@ -592,8 +592,20 @@ The following synchronisations are available:
 
 ## GEODES
 
-To ingest into AIRS, the process needs to access the AIRS service. The simplest way is to run the docker container within the same network as AIRS:
+To ingest products from the GEODES catalogue into AIRS, the process needs to access the AIRS service. The simplest way is to run the docker container within the same network as AIRS. Below is an example:
 
 ```shell
-docker run --rm --network arlas-net gisaia/stac-geodes:latest add https://geodes-portal.cnes.fr/api/stac/items --help
+docker run --rm \
+  -v `pwd`:/app/  \
+  --network arlas-net aia/stac-geodes:latest \
+  add https://geodes-portal.cnes.fr/api/stac/items http://airs-server:8000/airs geodes S2L1C \
+  --data-type PEPS_S2_L1C \
+  --data-type MUSCATE_SENTINEL2_SENTINEL2_L2A \
+  --data-type MUSCATE_Snow_SENTINEL2_L2B-SNOW \
+  --data-type MUSCATE_WaterQual_SENTINEL2_L2B-WATER \
+  --data-type MUSCATE_SENTINEL2_SENTINEL2_L3A \
+  --product-level L1C \
+  --max 1000
 ```
+
+To get some help, simply run `docker run --rm --network arlas-net gisaia/stac-geodes:latest add https://geodes-portal.cnes.fr/api/stac/items --help`

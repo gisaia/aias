@@ -28,6 +28,8 @@ def validation_exception_handler(req: Request, exc: RequestValidationError):
                 elif isinstance(error["loc"][i], int):
                     loc += f'[{str(error["loc"][i])}]'
             detail += f'{loc}: {error["msg"]}\n'
+        elif len(error["loc"]) > 0:
+            detail += f'{error["loc"][0]}: {error["msg"]}\n'
     detail = detail[:-1]
 
     return JSONResponse(content=RESTException(

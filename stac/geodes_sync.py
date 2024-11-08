@@ -140,7 +140,7 @@ def add_to_airs(airs_url: str, collection: str, item: Item):
 @app.command(help="Add STAC features to ARLAS AIRS")
 def add(
     stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/)"),
-    airs_url: str = typer.Argument(help="AIRS url (e.g. https://localhost/airs/)"),
+    airs_url: str = typer.Argument(help="AIRS URL (e.g. https://localhost/airs/)"),
 
     collection: str = typer.Argument(help="Name of the ARLAS Collection)"),
     catalog: str = typer.Argument(help="Name of the catalog within the collection)"),
