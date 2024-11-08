@@ -10,5 +10,5 @@ docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_download_tests
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.agate_tests
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.fam_tests
-#docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m  test.aproc_ingest_heavyload_tests
+# docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m  test.aproc_ingest_heavyload_tests
 ./test/stop_stack.sh
