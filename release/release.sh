@@ -41,6 +41,10 @@ build_and_publish_docker agate
 # DOCKER
 build_and_publish_docker airs
 
+#---------------    GEODES    ----------------
+# DOCKER
+build_and_publish_docker stac-geodes
+
 
 # PYTHON PIP
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test

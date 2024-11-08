@@ -1,0 +1,16 @@
+FROM python:3.10.13-alpine3.19
+RUN apk update && apk add --upgrade libexpat
+RUN apk --no-cache add curl
+COPY test/requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip3 install -r requirements.txt
+
+COPY stac /app/stac
+COPY ./airs /app/airs
+COPY ./common /app/common
+
+ENV PYTHONPATH=/app
+
+ENTRYPOINT ["python3.10", "-m", "stac.geodes_sync"]
