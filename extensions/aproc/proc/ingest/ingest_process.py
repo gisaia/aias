@@ -5,7 +5,7 @@ from celery import Task, shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
-from airs.core.models.model import Asset, Properties
+from airs.core.models.model import Asset, Item, Properties
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -146,50 +146,11 @@ class AprocProcess(Process):
                     __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
                     i += 1
                     asset: Asset = asset
-                    if asset.airs__managed is True:
-                        with open(asset.href, 'rb') as filedesc:
-                            file = {'file': (asset.name, filedesc, asset.type)}
-                            try:
-                                r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
-                                if r.ok:
-                                    LOGGER.debug("asset uploaded successfully")                    
-                                else:
-                                    msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, Configuration.settings.airs_endpoint)
-                                    LOGGER.error(msg)
-                                    raise RegisterException(msg)
-                            except requests.exceptions.ConnectionError:
-                                msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
-                                LOGGER.error(msg)
-                                raise ConnectionException(msg)
-                    else:
-                        LOGGER.info("{} not managed".format(asset.name))
+                    AprocProcess.upload_asset_if_managed(item, asset, Configuration.settings.airs_endpoint)
                 LOGGER.debug("ingestion: 6 - register")
-                __update_status__(self, state='PROGRESS', meta={'step':'register_item', "ACTION": "INGEST", "TARGET": url})
-                item_already_exists = False
-                try:
-                    r = requests.get(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
-                    if r.ok:
-                        item_already_exists = True
-                except requests.exceptions.ConnectionError:
-                    msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
-                    LOGGER.error(msg)
-                    raise ConnectionException(msg)
-                try:
-                    if item_already_exists:
-                        r = requests.put(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
-                    else:
-                        r = requests.post(url=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
-                    if r.ok:
-                        item_from_json(r.content).model_dump()
-                        return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
-                    else:
-                        LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
-                        LOGGER.error(to_json(item))
-                        raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
-                except requests.exceptions.ConnectionError:
-                    msg = "AIRS Service can not be reached ({})".format(Configuration.settings.airs_endpoint)
-                    LOGGER.error(msg)
-                    raise ConnectionException(msg)
+                __update_status__(self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
+                item: Item = AprocProcess.insert_or_update_item(item, Configuration.settings.airs_endpoint)
+                return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
             except Exception as err:
                 msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)
@@ -198,7 +159,7 @@ class AprocProcess(Process):
         else:
             LOGGER.error("No driver found for {}".format(url))
             raise DriverException("No driver found for  {}".format(url))
-        
+
     def __check_assets__(url: str, assets: list[Asset], file_exists: bool = False):
         for asset in assets:
             if asset.name is None:
@@ -210,3 +171,48 @@ class AprocProcess(Process):
             if file_exists:
                 if asset.airs__managed is True and not os.path.exists(asset.href):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
+
+    def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
+        if asset.airs__managed is True:
+            with open(asset.href, 'rb') as filedesc:
+                file = {'file': (asset.name, filedesc, asset.type)}
+                try:
+                    r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
+                    if r.ok:
+                        LOGGER.debug("asset uploaded successfully")
+                    else:
+                        msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, airs_endpoint)
+                        LOGGER.error(msg)
+                        raise RegisterException(msg)
+                except requests.exceptions.ConnectionError:
+                    msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
+                    LOGGER.error(msg)
+                    raise ConnectionException(msg)
+        else:
+            LOGGER.info("{} not managed".format(asset.name))
+
+    def insert_or_update_item(item: Item, airs_endpoint):
+        item_already_exists = False
+        try:
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+            if r.ok:
+                item_already_exists = True
+        except requests.exceptions.ConnectionError:
+            msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
+            LOGGER.error(msg)
+            raise ConnectionException(msg)
+        try:
+            if item_already_exists:
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
+            else:
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
+            if r.ok:
+                return item_from_json(r.content).model_dump()
+            else:
+                LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
+                LOGGER.error(to_json(item))
+                raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
+        except requests.exceptions.ConnectionError:
+            msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
+            LOGGER.error(msg)
+            raise ConnectionException(msg)
