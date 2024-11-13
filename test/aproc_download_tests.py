@@ -104,7 +104,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(Tests.__download_found(result.download_locations[0] + "/ESA_WorldCover_10m_2021_v200_N15E000_Map.JP2.aux.xml"))
 
     def test_download_zarr(self):
-        add_item(SENTINEL_2_ITEM, SENTINEL_2_ID)
+        add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
         sleep(3)
 
         crop_wkt = "POLYGON ((0.087547 42.794645, 0.087547 42.832926, 0.176811 42.832926, 0.176811 42.794645, 0.087547 42.794645))"
