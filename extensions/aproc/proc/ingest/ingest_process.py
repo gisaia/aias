@@ -191,7 +191,7 @@ class AprocProcess(Process):
         else:
             LOGGER.info("{} not managed".format(asset.name))
 
-    def insert_or_update_item(item: Item, airs_endpoint):
+    def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
             r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
@@ -207,7 +207,7 @@ class AprocProcess(Process):
             else:
                 r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
             if r.ok:
-                return item_from_json(r.content).model_dump()
+                return item_from_json(r.content)
             else:
                 LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
                 LOGGER.error(to_json(item))

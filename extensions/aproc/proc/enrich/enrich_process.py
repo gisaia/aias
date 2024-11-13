@@ -33,7 +33,7 @@ def __update_status__(task: Task, state: str, meta: dict = None):
 
 
 class InputEnrichProcess(BaseModel):
-    requests: list[dict[str, str]] = Field(default=[], title="The list of item (collection, item_id) to enrich")
+    requests: list[dict[str, str]] = Field(default=[], title="The list of items (collection, item_id) to enrich")
     asset_type: str = Field(default=None, title="Name of the asset type to add (e.g. cog)")
 
 
@@ -109,14 +109,15 @@ class AprocProcess(Process):
                         asset_type=asset_type)
                     asset: Asset = asset
                     LOGGER.info("Enrichment success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "enrich", "event.outcome": "success", "event.module": "aproc-enrich", "arlas.collection": collection, "arlas.item.id": item_id})
-                    IngestAprocProcess.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
+
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
                     __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                     IngestAprocProcess.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
+
                     LOGGER.debug("ingestion: 3 - update")
                     __update_status__(self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})
                     item: Item = IngestAprocProcess.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
-                    return OutputEnrichProcess(item_location=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
+                    item_locations.append(os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id))
                 except Exception as e:
                     error_msg = "Failed to enrich the item {}/{} ({})".format(collection, item_id, str(e))
                     LOGGER.info("Enrichment failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "enrich", "event.outcome": "failure", "event.reason": error_msg, "event.module": "aproc-enrich", "arlas.collection": collection, "arlas.item.id": item_id})

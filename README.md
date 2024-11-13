@@ -206,12 +206,13 @@ List of processes:
 - `ingest` : it ingests an archive.
 - `directory_ingest` : it ingests archives found in a directory.
 - `download` : it ingests an archive.
+- `enrich` : it enriches an item (like adding a cog).
 
 ### Ingest process
 
 The `ingest` process takes a url pointing at an archive. The process runs the following steps:
 - identify the driver for ingestion
-- identify the assets to fetch (done by the driver)
+- identify the assets to fetch (done by the driver) 
 - fetch the assets (e.g. copy/download)  (done by the driver)
 - transform the assets if necessary (e.g. create cog)  (done by the driver)
 - upload the assets
@@ -240,6 +241,18 @@ The following drivers are available in the `extensions` directory:
 
 The drivers are configured in [drivers.yaml](conf/drivers.yaml)
 
+### Enrich process
+The `enrich` process takes a list of tuple collection/item id. The process runs the following step for each item:
+- say whether it supports a given archive or not
+- create the asset for the given item (done by the driver)
+- upload the asset
+- update the item
+
+A driver must implement the abstract class [Driver](extensions/aproc/proc/enrich/drivers/driver.py).
+The following drivers are available in the `extensions` directory:
+- `safe` for sentinel 2 products
+
+The drivers are configured in [enrich_drivers.yaml](conf/enrich_drivers.yaml)
 
 ## Prerequisites
 

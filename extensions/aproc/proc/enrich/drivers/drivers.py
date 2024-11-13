@@ -1,9 +1,9 @@
 import importlib
 
-from extensions.aproc.proc.ingest.drivers.driver import Driver
-from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.settings import \
-    Configuration as IngestSettings
+from extensions.aproc.proc.enrich.drivers.driver import Driver
+from extensions.aproc.proc.enrich.drivers.exceptions import DriverException
+from extensions.aproc.proc.enrich.settings import \
+    Configuration as EnrichSettings
 
 
 class Drivers():
@@ -11,9 +11,9 @@ class Drivers():
 
     @staticmethod
     def init(configuration_file: str):
-        IngestSettings.init(configuration_file=configuration_file)
+        EnrichSettings.init(configuration_file=configuration_file)
         Drivers.drivers = []
-        for driver_configuration in IngestSettings.settings.drivers:
+        for driver_configuration in EnrichSettings.settings.drivers:
             try:
                 driver: Driver = importlib.import_module(driver_configuration.class_name).Driver
                 driver.init(driver_configuration.configuration)
