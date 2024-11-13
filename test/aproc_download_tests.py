@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
     def setUp(self):
         setUpTest()
         requests.delete(SMTP_SERVER + "/*")
-        add_item(ITEM_PATH, ID)
+        add_item(self, ITEM_PATH, ID)
         sleep(3)
         # Create collection
         print("create collection {}".format(ARLAS_COLLECTION))
