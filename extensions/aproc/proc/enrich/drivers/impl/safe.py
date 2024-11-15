@@ -3,6 +3,8 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
+from urllib.parse import urlparse
+import io
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ResourceType, Role)
@@ -62,27 +64,57 @@ class Driver(EnrichDriver):
             if data_asset:
                 Driver.LOGGER.info("Building cog for {}".format(item.id))
 
-                import smart_open
                 from osgeo import gdal
 
-                with smart_open.open(data_asset.href, "rb",
-                                     transport_params=Driver.configuration.get_storage_parameters(data_asset.href, Driver.LOGGER)) as fb:
-                    with zipfile.ZipFile(fb) as raster_zip:
-                        file_names = raster_zip.namelist()
-                        raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI.jp2", f), file_names))
+                tci_file_path = Driver.__download_TCI(data_asset.href)
 
-                        if len(raster_files) == 0:
-                            raise DriverException("No TCI file found in the SAFE archive.")
-                        if len(raster_files) > 1:
-                            Driver.LOGGER.warning("More than one TCI file found, using the first one.")
-
-                        tci_file_path = os.path.join(tempfile.gettempdir(), raster_files[0])
-                        raster_zip.extract(raster_files[0], tempfile.gettempdir())
-
-                        kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
-                        gdal.Warp(asset_location, tci_file_path, **kwargs)
-                        os.remove(tci_file_path)
+                kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
+                gdal.Warp(asset_location, tci_file_path, **kwargs)
+                os.remove(tci_file_path)
             else:
                 raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
         else:
             raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
+
+    def __download_TCI(href: str):
+        storage_type = urlparse(href).scheme
+        transport_params = Driver.configuration.get_storage_parameters(href, Driver.LOGGER)
+
+        # With GS, it has been observed that performances for extracting a file directly from the zip remotely
+        # Is far more slower than downloading the whole archive and then unzipping
+        if storage_type == "gs":
+            from google.cloud.storage import Client
+
+            storage_client: Client = transport_params["client"]
+            bucket = storage_client.bucket(urlparse(href).netloc)
+            blob = bucket.blob(urlparse(href).path[1:])
+
+            # Download archive then extract it
+            tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
+            blob.download_to_filename(tmp_file)
+            tci_file_path = Driver.__extract(tmp_file)
+
+            # Remove temporary archive
+            os.remove(tmp_file)
+        else:
+            import smart_open
+
+            with smart_open.open(href, "rb", transport_params=transport_params) as fb:
+                tci_file_path = Driver.__extract(fb)
+
+        return tci_file_path
+
+    def __extract(zip_file: str | io.TextIOWrapper):
+        with zipfile.ZipFile(zip_file) as raster_zip:
+            file_names = raster_zip.namelist()
+            raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI.jp2", f), file_names))
+
+            if len(raster_files) == 0:
+                raise DriverException("No TCI file found in the SAFE archive.")
+            if len(raster_files) > 1:
+                Driver.LOGGER.warning("More than one TCI file found, using the first one.")
+
+            tci_file_path = os.path.join(tempfile.gettempdir(), raster_files[0])
+            raster_zip.extract(raster_files[0], tempfile.gettempdir())
+
+        return tci_file_path

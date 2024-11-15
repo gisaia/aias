@@ -72,16 +72,14 @@ class S3Configuration(BaseModel):
             from google.oauth2 import service_account
 
             if self.input.type != "gs":
-                import google.auth.credentials
-
                 LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
-                credentials = google.auth.credentials.AnonymousCredentials()
+                client = Client.create_anonymous_client()
             else:
                 # TODO: check if bucket match ?
                 api_key = self.input.api_key
                 credentials = service_account.Credentials.from_service_account_info(api_key)
+                client = Client("APROC", credentials=credentials)
 
-            client = Client("APROC", credentials=credentials)
             return {"client": client}
 
         raise NotImplementedError(f"Storage '{storage_type}' not compatible")
