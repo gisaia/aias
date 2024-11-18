@@ -1,8 +1,6 @@
 import hashlib
-import mimetypes
 import os
-import shutil
-from datetime import datetime
+from time import time
 
 import requests
 from celery import Task, shared_task
@@ -19,7 +17,6 @@ from aproc.core.utils import base_model2description
 from extensions.aproc.proc.enrich.drivers.driver import Driver
 from extensions.aproc.proc.enrich.drivers.drivers import Drivers
 from extensions.aproc.proc.enrich.drivers.exceptions import DriverException
-from extensions.aproc.proc.enrich.settings import Configuration
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestAprocProcess
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -104,15 +101,23 @@ class AprocProcess(Process):
                 try:
                     LOGGER.info("ingestion: 1 - enrichment will be done by {}".format(driver.name))
                     __update_status__(self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
+                    LOGGER.info("Build asset {}".format(asset_type))
+                    start = time()
                     asset, asset_location = driver.create_asset(
                         item=item,
                         asset_type=asset_type)
+                    end = time()
+                    LOGGER.info("took {} ms".format(end - start))
                     asset: Asset = asset
+                    asset.href = asset_location
                     LOGGER.info("Enrichment success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "enrich", "event.outcome": "success", "event.module": "aproc-enrich", "arlas.collection": collection, "arlas.item.id": item_id})
 
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
                     __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
+                    start = time()
                     IngestAprocProcess.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
+                    end = time()
+                    LOGGER.info("took {} ms".format(end - start))
 
                     LOGGER.debug("ingestion: 3 - update")
                     __update_status__(self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})

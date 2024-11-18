@@ -5,7 +5,7 @@ import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
 import io
-
+from time import time
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ResourceType, Role)
 from extensions.aproc.proc.enrich.drivers.driver import Driver as EnrichDriver
@@ -65,11 +65,14 @@ class Driver(EnrichDriver):
                 Driver.LOGGER.info("Building cog for {}".format(item.id))
 
                 from osgeo import gdal
-
+                start = time()
                 tci_file_path = Driver.__download_TCI(data_asset.href)
+                Driver.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
+                start = time()
                 kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
                 gdal.Warp(asset_location, tci_file_path, **kwargs)
+                Driver.LOGGER.info("Creating COG took {} s".format(time() - start))
                 os.remove(tci_file_path)
             else:
                 raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
