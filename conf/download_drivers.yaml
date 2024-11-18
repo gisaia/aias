@@ -73,5 +73,4 @@ drivers:
           private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
           private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
         headers:
-        #  TODO: be able to configure them
     priority: 1

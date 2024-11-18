@@ -29,7 +29,9 @@ class Driver(DownloadDriver):
     # Implements drivers method
     def supports(item: Item) -> bool:
         data = item.assets.get(Role.data.value)
-        return item.properties.constellation.lower() == "Sentinel-2".lower() \
+        return item.properties.constellation \
+            and item.properties.processing__level \
+            and item.properties.constellation.lower() == "Sentinel-2".lower() \
             and item.properties.processing__level.lower() == "L1C".lower() \
             and data is not None and data.href is not None and (
                 # data.href.startswith("s3://")
