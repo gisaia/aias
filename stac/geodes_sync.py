@@ -5,7 +5,7 @@ import requests
 import typer
 
 from airs.core.models.mapper import item_from_dict, to_json
-from airs.core.models.model import Asset, AssetFormat, Item, Role
+from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Role
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -36,11 +36,12 @@ def to_item(feature, extra_params={}) -> Item:
     item.properties.sensor = feature.get("properties").get("spaceborne:satelliteSensor")
     item.properties.acq__acquisition_orbit = feature.get("properties").get("spaceborne:orbitID")
     item.properties.acq__acquisition_orbit_direction = feature.get("properties").get("spaceborne:orbitDirection")
+    item.properties.item_format = ItemFormat.safe.value
 
     for name, asset in item.assets.items():
         asset: Asset = asset
         asset.airs__managed = False
-        
+
     # ASSETS
     assets = {}
     md_count = 1
