@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel
 from envyaml import EnvYAML
 from airs.core.logger import Logger
 
@@ -16,13 +16,13 @@ class S3(BaseModel):
     bucket: str | None = None
 
 
-class Index(BaseModel, extra=Extra.allow):
+class Index(BaseModel, extra="allow"):
     collection_prefix:str
     endpoint_url:str
     login:str | None
     pwd:str | None
 
-class Settings(BaseModel, extra=Extra.allow):
+class Settings(BaseModel, extra="allow"):
     s3:S3
     index:Index
     arlaseo_mapping_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json"

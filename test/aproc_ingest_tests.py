@@ -149,7 +149,6 @@ class Tests(unittest.TestCase):
         self.assertIsNotNone(item.properties.main_asset_format)
         self.assertIsNotNone(item.properties.main_asset_name)
         self.assertIsNotNone(item.properties.proj__epsg)
-        print(mapper.to_json(item))
 
     def test_job_by_id(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"

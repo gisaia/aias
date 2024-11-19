@@ -1,9 +1,7 @@
-import os
 import shutil
 from pathlib import Path
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
-from aproc.core.settings import Configuration
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import \
@@ -14,7 +12,7 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     @staticmethod
-    def init(configuration: Configuration):
+    def init(configuration: dict):
         ...
 
     # Implements drivers method

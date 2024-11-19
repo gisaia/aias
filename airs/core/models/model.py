@@ -65,6 +65,7 @@ class AssetFormat(Enum):
     pvl = "PVL"
     yaml = "YAML"
     geojson = "GEOJSON"
+    cog = "COG"
     zarr = "ZARR"
 
 

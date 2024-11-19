@@ -1,7 +1,12 @@
+import unittest
 import elasticsearch
 import os
 import time
 import unicodedata
+
+import requests
+from airs.core.models import mapper
+from airs.core.models.model import Item
 from extensions.aproc.proc.ingest.drivers.drivers import Drivers
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX", "airs")
@@ -115,3 +120,15 @@ def filter_data(arr):
             item['children'] = filter_data(item['children'])
         return item
     return list(map(func, list(filter(filter_condition, arr))))
+
+
+def add_item(calling_test: unittest.TestCase, item_path: str, id: str) -> Item:
+    print(f"create item {id}")
+    with open(item_path, 'r') as file:
+        data = file.read()
+        r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+        calling_test.assertTrue(r.ok, msg=r.content)
+    print("item created")
+    r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", id))
+    calling_test.assertTrue(r.ok, msg=r.content)
+    return mapper.item_from_json(r.content)
