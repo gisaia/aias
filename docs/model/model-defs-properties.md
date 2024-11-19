@@ -24,8 +24,10 @@ airs_model#/properties/properties/anyOf/0
 | [programme](#programme)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")                                                                                                                                                                                                    |
 | [constellation](#constellation)                                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")                                                                                                                                                                                            |
 | [satellite](#satellite)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-satellite.md "airs_model#/$defs/Properties/properties/satellite")                                                                                                                                                                                                    |
+| [platform](#platform)                                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-satellite-platform.md "airs_model#/$defs/Properties/properties/platform")                                                                                                                                                                                            |
 | [instrument](#instrument)                                                 | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")                                                                                                                                                                                                  |
 | [sensor](#sensor)                                                         | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")                                                                                                                                                                                                          |
+| [sensor\_mode](#sensor_mode)                                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md "airs_model#/$defs/Properties/properties/sensor_mode")                                                                                                                                                                                  |
 | [sensor\_type](#sensor_type)                                              | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")                                                                                                                                                                                                         |
 | [annotations](#annotations)                                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")                                                                                                                                                                                         |
 | [gsd](#gsd)                                                               | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")                                                                                                                                                                                            |
@@ -68,6 +70,7 @@ airs_model#/properties/properties/anyOf/0
 | [acq\_\_acquisition\_mode](#acq__acquisition_mode)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-the-name-of-the-acquisition-mode.md "airs_model#/$defs/Properties/properties/acq__acquisition_mode")                                                                                                                                                                             |
 | [acq\_\_acquisition\_orbit\_direction](#acq__acquisition_orbit_direction) | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit_direction")                                                                                                                                               |
 | [acq\_\_acquisition\_type](#acq__acquisition_type)                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-acquisition-type-strip.md "airs_model#/$defs/Properties/properties/acq__acquisition_type")                                                                                                                                                                                       |
+| [acq\_\_acquisition\_orbit](#acq__acquisition_orbit)                      | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-acquisition-orbit.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit")                                                                                                                                                                                           |
 | [acq\_\_across\_track](#acq__across_track)                                | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-across-track-angle.md "airs_model#/$defs/Properties/properties/acq__across_track")                                                                                                                                                                                               |
 | [acq\_\_along\_track](#acq__along_track)                                  | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-along-track-angle.md "airs_model#/$defs/Properties/properties/acq__along_track")                                                                                                                                                                                                 |
 | [acq\_\_archiving\_date](#acq__archiving_date)                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-archiving-date.md "airs_model#/$defs/Properties/properties/acq__archiving_date")                                                                                                                                                                                                 |
@@ -265,6 +268,30 @@ any of
 
 *   [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-anyof-1.md "check type definition")
 
+## platform
+
+
+
+`platform`
+
+*   is optional
+
+*   Type: merged type ([Name of the satellite platform](model-defs-properties-properties-name-of-the-satellite-platform.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-name-of-the-satellite-platform.md "airs_model#/$defs/Properties/properties/platform")
+
+### platform Type
+
+merged type ([Name of the satellite platform](model-defs-properties-properties-name-of-the-satellite-platform.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-1.md "check type definition")
+
 ## instrument
 
 
@@ -312,6 +339,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-name-of-the-sensor-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-name-of-the-sensor-anyof-1.md "check type definition")
+
+## sensor\_mode
+
+
+
+`sensor_mode`
+
+*   is optional
+
+*   Type: merged type ([Mode of the sensor during acquisition](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md "airs_model#/$defs/Properties/properties/sensor_mode")
+
+### sensor\_mode Type
+
+merged type ([Mode of the sensor during acquisition](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md))
+
+any of
+
+*   [Untitled string in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-1.md "check type definition")
 
 ## sensor\_type
 
@@ -1320,6 +1371,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-acquisition-type-strip-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-acquisition-type-strip-anyof-1.md "check type definition")
+
+## acq\_\_acquisition\_orbit
+
+
+
+`acq__acquisition_orbit`
+
+*   is optional
+
+*   Type: merged type ([Acquisition orbit](model-defs-properties-properties-acquisition-orbit.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-acquisition-orbit.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit")
+
+### acq\_\_acquisition\_orbit Type
+
+merged type ([Acquisition orbit](model-defs-properties-properties-acquisition-orbit.md))
+
+any of
+
+*   [Untitled number in Item](model-defs-properties-properties-acquisition-orbit-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-acquisition-orbit-anyof-1.md "check type definition")
 
 ## acq\_\_across\_track
 
