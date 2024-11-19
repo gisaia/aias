@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 from pydantic import Field
 
-from airs.core.models.model import AssetFormat, Item, Role
+from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
@@ -29,16 +29,9 @@ class Driver(DownloadDriver):
     # Implements drivers method
     def supports(item: Item) -> bool:
         data = item.assets.get(Role.data.value)
-        return item.properties.constellation \
-            and item.properties.processing__level \
-            and item.properties.constellation.lower() == "Sentinel-2".lower() \
-            and item.properties.processing__level.lower() == "L1C".lower() \
-            and data is not None and data.href is not None and (
-                # data.href.startswith("s3://")
-                data.href.startswith("gs://")
-                or data.href.startswith("file://")
-                or data.href.startswith("http://")
-                or data.href.startswith("https://"))
+        return item.properties.item_format \
+            and item.properties.item_format.lower() == ItemFormat.safe.value.lower() \
+            and data is not None and data.href is not None
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
