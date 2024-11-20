@@ -46,6 +46,7 @@ class GoogleStorage(BaseModel):
 class HttpsStorage(BaseModel):
     type: Literal["https"] = "https"
     headers: dict[str, str]
+    domain: str
 
 
 class NoStorage(BaseModel):
@@ -60,13 +61,14 @@ class S3Configuration(BaseModel):
 
     def get_storage_parameters(self, href: str, LOGGER: logging.Logger) -> dict:
         storage_type = urlparse(href).scheme
+        netloc = urlparse(href).netloc
 
         if not storage_type or storage_type == "file" or storage_type == "http":
             return {}
 
         if storage_type == "https":
-            if self.input.type != "https":
-                LOGGER.warning("No headers is configured for HTTPS requests. Using no headers")
+            if self.input.type != "https" or netloc != self.input.domain:
+                LOGGER.warning("No headers is configured for this domain. Using no headers")
                 return {}
             return {"headers": self.input.headers}
 
@@ -74,9 +76,7 @@ class S3Configuration(BaseModel):
             from google.cloud.storage import Client
             from google.oauth2 import service_account
 
-            bucket = urlparse(href).netloc
-
-            if self.input.type != "gs" or bucket != self.input.bucket:
+            if self.input.type != "gs" or netloc != self.input.bucket:
                 LOGGER.warning("No api_key is configured for this Google Storage. Using anonymous credentials")
                 client = Client.create_anonymous_client()
             else:
