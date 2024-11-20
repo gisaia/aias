@@ -9,6 +9,7 @@ from extensions.aproc.proc.download.settings import \
 
 LOGGER = Logger.logger
 
+
 class Drivers():
     drivers: list[Driver] = None
 
@@ -24,7 +25,7 @@ class Drivers():
                 driver.name = driver_configuration.name
                 Drivers.drivers.append(driver)
             except ModuleNotFoundError:
-                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
+                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
     def solve(item: Item) -> Driver:
