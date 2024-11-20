@@ -1,10 +1,8 @@
-import json
 import os
 import re
 import tarfile
 import tempfile
 import zipfile
-from urllib.parse import urlparse
 
 from pydantic import Field
 
@@ -62,7 +60,7 @@ class Driver(DownloadDriver):
         zarr_res = 10
         # TODO: with band selection, it will depend on the highest resolution SELECTED band
 
-        session = self.__get_rasterio_session(asset_href)
+        session = self.configuration.get_rasterio_session(asset_href, Driver.LOGGER)
 
         with rasterio.Env(session):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
@@ -133,31 +131,3 @@ class Driver(DownloadDriver):
         archive_path = zarr_path + ".tar"
         with tarfile.open(archive_path, "w") as tar:
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
-
-    def __get_rasterio_session(self, href: str):
-        storage_type = urlparse(href).scheme
-
-        if not storage_type or storage_type == "file" or storage_type == "http":
-            return None
-
-        if storage_type == "https":
-            # TODO: might need some dev here
-            return None
-
-        if storage_type == "gs":
-            import rasterio.session
-
-            if self.configuration.input.type != "gs":
-                Driver.LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
-                credentials = None
-                os.environ["GS_NO_SIGN_REQUEST"] = "YES"
-            else:
-                os.environ["GS_NO_SIGN_REQUEST"] = "NO"
-                with tempfile.NamedTemporaryFile("w+", delete=False) as f:
-                    json.dump(self.configuration.input.api_key.model_dump(), f)
-                    f.close()
-                credentials = f.name
-
-            return rasterio.session.GSSession(credentials)
-
-        raise NotImplementedError(f"Storage '{storage_type}' not compatible")

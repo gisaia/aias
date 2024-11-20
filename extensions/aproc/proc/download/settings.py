@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
-import json
 
 from airs.core.settings import S3
 
