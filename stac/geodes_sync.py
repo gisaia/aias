@@ -21,6 +21,7 @@ def to_item(feature, extra_params={}) -> Item:
     feature.pop("stac_extensions")
     feature.pop("links")
 
+    fields_to_keep = {}
     # TO ITEM
     item = item_from_dict(feature)
     item.collection = extra_params.get("collection")
@@ -28,7 +29,7 @@ def to_item(feature, extra_params={}) -> Item:
     item.properties.programme = "Copernicus"
     item.properties.constellation = "Sentinel-2"
     item.properties.processing__level = feature.get("properties").get("spaceborne:productLevel")
-    item.properties.sensor = feature.get("properties").get("spaceborne:sensorMode")
+    item.properties.sensor_mode = feature.get("properties").get("spaceborne:sensorMode")
     item.properties.data_type = feature.get("properties").get("dataType")
     item.properties.item_type = feature.get("properties").get("spaceborne:productType")
     item.properties.eo__cloud_cover = feature.get("properties").get("spaceborne:cloudCover")
@@ -37,6 +38,7 @@ def to_item(feature, extra_params={}) -> Item:
     item.properties.acq__acquisition_orbit = feature.get("properties").get("spaceborne:orbitID")
     item.properties.acq__acquisition_orbit_direction = feature.get("properties").get("spaceborne:orbitDirection")
     item.properties.item_format = ItemFormat.safe.value
+    fields_to_keep["accessService:endpointURL"] = feature.get("properties").get("accessService:endpointURL")
 
     for name, asset in item.assets.items():
         asset: Asset = asset
@@ -72,11 +74,8 @@ def to_item(feature, extra_params={}) -> Item:
             item.properties.locations.append(country.get("name"))
             for region in country.get("regions", []):
                 item.properties.locations.append(country.get("name"))
-    if item.properties.model_extra.get("spaceborne__political"):
-        item.properties.model_extra.pop("spaceborne__political")
-    if item.properties.model_extra.get("spaceborne__references"):
-        item.properties.model_extra.pop("spaceborne__references")
     item.properties.model_extra.clear()
+    item.properties.model_extra.update(fields_to_keep)
     return item
 
 
