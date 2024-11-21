@@ -1,11 +1,13 @@
+import io
 import os
 import re
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
-from urllib.parse import urlparse
-import io
 from time import time
+from urllib.parse import urlparse
+
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ResourceType, Role)
 from extensions.aproc.proc.enrich.drivers.driver import Driver as EnrichDriver
@@ -99,6 +101,22 @@ class Driver(EnrichDriver):
 
             # Remove temporary archive
             os.remove(tmp_file)
+        elif Driver.configuration.is_download_required(href):
+            import requests
+
+            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+            r = requests.get(href, headers=transport_params["headers"],
+                             stream=True, verify=False)
+
+            tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(href).path.strip("/").split("/")[-1])
+            if (os.path.splitext(tmp_asset)[1] != ".zip"):
+                tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
+
+            with open(tmp_asset, "wb") as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+
+            tci_file_path = Driver.__extract(tmp_asset)
+            os.remove(tmp_asset)
         else:
             import smart_open
 

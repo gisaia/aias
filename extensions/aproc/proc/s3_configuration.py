@@ -47,6 +47,7 @@ class HttpsStorage(BaseModel):
     type: Literal["https"] = "https"
     headers: dict[str, str]
     domain: str
+    force_download: bool = Field(False)
 
 
 class NoStorage(BaseModel):
@@ -117,3 +118,9 @@ class S3Configuration(BaseModel):
             return rasterio.session.GSSession(credentials)
 
         raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+
+    def is_download_required(self, href: str):
+        return self.input.type == "https" \
+            and urlparse(href).scheme == "https" \
+            and urlparse(href).netloc == self.input.domain \
+            and self.input.force_download

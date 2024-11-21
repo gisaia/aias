@@ -15,4 +15,5 @@ drivers:
         # HTTPS
         headers: $APROC_INPUT_STORAGE_HEADERS
         domain: $APROC_INPUT_STORAGE_DOMAIN
+        force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD
     priority: 1
