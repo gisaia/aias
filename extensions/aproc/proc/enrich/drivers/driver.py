@@ -1,7 +1,7 @@
 import hashlib
 import os
 from abc import ABC, abstractmethod
-from airs.core.models.model import Asset, Item
+from airs.core.models.model import Asset, Item, Role
 from aproc.core.logger import Logger
 
 
@@ -12,6 +12,7 @@ class Driver(ABC):
     LOGGER = Logger.logger
     thumbnail_size = 256
     overview_size = 1024
+    alternative_asset_href_field: str = None
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
@@ -42,6 +43,13 @@ class Driver(ABC):
         """
         dir = self.get_assets_dir(url)
         return os.path.sep.join([dir, asset.name])
+
+    @staticmethod
+    def get_asset_href(item: Item) -> str | None:
+        if Driver.alternative_asset_href_field:
+            return item.properties[Driver.alternative_asset_href_field]
+        data = item.assets.get(Role.data.value)
+        return data.href if data else None
 
     @staticmethod
     @abstractmethod

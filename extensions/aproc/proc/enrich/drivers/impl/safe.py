@@ -13,8 +13,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.enrich.drivers.driver import Driver as EnrichDriver
 from extensions.aproc.proc.enrich.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
-from extensions.aproc.proc.s3_configuration import \
-    S3Configuration as Configuration
+from extensions.aproc.proc.s3_configuration import S3Configuration
 
 
 class Driver(EnrichDriver):
@@ -24,7 +23,7 @@ class Driver(EnrichDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        Driver.configuration = Configuration.model_validate(configuration)
+        Driver.configuration = S3Configuration.model_validate(configuration)
 
     # Implements drivers method
     @staticmethod
@@ -62,13 +61,13 @@ class Driver(EnrichDriver):
 
     def __build_asset(item: Item, asset_type: str, asset_location: str):
         if asset_type.lower() == "cog":
-            data_asset = item.assets.get(Role.data.value)
-            if data_asset:
+            href = Driver.get_asset_href(item)
+            if href:
                 Driver.LOGGER.info("Building cog for {}".format(item.id))
 
                 from osgeo import gdal
                 start = time()
-                tci_file_path = Driver.__download_TCI(data_asset.href)
+                tci_file_path = Driver.__download_TCI(href)
                 Driver.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
                 start = time()

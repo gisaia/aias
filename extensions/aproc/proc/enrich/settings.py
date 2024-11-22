@@ -8,6 +8,7 @@ class Driver(BaseModel, extra=Extra.allow):
     configuration: dict | None = Field(title="Driver configuration")
     priority: int | None = Field(title="Driver priority. If two drivers are eligible (supports returns a FetchRequest) then driver with highest priority will be selected over driver with lower priority.)")
     assets_dir: str | None = Field(title="Location for storing temporary asset files")
+    alternative_asset_href_field: str | None = Field(None, title="Property field to use as an alternative to the data's href")
 
 
 class Settings(BaseModel, extra='allow'):
