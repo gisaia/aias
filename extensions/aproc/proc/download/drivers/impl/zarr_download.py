@@ -9,7 +9,7 @@ import zipfile
 import requests
 from pydantic import Field
 
-from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
+from airs.core.models.model import AssetFormat, Item, ItemFormat
 from extensions.aproc.proc.download.drivers.driver import \
     Driver as DownloadDriver
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
@@ -17,7 +17,7 @@ from extensions.aproc.proc.download.drivers.impl.utils import extract
 from extensions.aproc.proc.s3_configuration import S3Configuration
 
 
-class Configuration(S3Configuration):
+class ZarrConfiguration(S3Configuration):
     chunk_size: int = Field(1000)
 
 
@@ -25,14 +25,14 @@ class Driver(DownloadDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        Driver.configuration = Configuration.model_validate(configuration)
+        Driver.configuration = ZarrConfiguration.model_validate(configuration)
 
     # Implements drivers method
     def supports(item: Item) -> bool:
-        data = item.assets.get(Role.data.value)
+        href = Driver.get_asset_href(item)
         return item.properties.item_format \
             and item.properties.item_format.lower() == ItemFormat.safe.value.lower() \
-            and data is not None and data.href is not None
+            and href is not None
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
@@ -51,7 +51,7 @@ class Driver(DownloadDriver):
         import smart_open
         import xarray as xr
 
-        asset_href = item.assets.get(Role.data.value).href
+        asset_href = Driver.get_asset_href(item)
         tmp_asset = None
 
         if self.configuration.is_download_required(asset_href):

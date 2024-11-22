@@ -20,6 +20,7 @@ class Drivers():
                 driver.priority = driver_configuration.priority
                 driver.name = driver_configuration.name
                 driver.__assets_dir__ = driver_configuration.assets_dir
+                driver.alternative_asset_href_field = driver_configuration.alternative_asset_href_field
                 Drivers.drivers.append(driver)
             except ModuleNotFoundError:
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))

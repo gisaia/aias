@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from airs.core.models.model import Item
+from airs.core.models.model import Item, Role
 from aproc.core.logger import Logger
 
 
@@ -10,6 +10,7 @@ class Driver(ABC):
     priority: int = 0
     name: str = None
     LOGGER = Logger.logger
+    alternative_asset_href_field: str = None
 
     @staticmethod
     @abstractmethod
@@ -33,6 +34,13 @@ class Driver(ABC):
             bool: True if supported
         """
         ...
+
+    @staticmethod
+    def get_asset_href(item: Item) -> str | None:
+        if Driver.alternative_asset_href_field:
+            return item.properties[Driver.alternative_asset_href_field]
+        data = item.assets.get(Role.data.value)
+        return data.href if data else None
 
     @abstractmethod
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
 
+from airs.core.models.model import Item, Role
 from airs.core.settings import S3
 
 
@@ -9,6 +10,13 @@ class Driver(BaseModel, extra=Extra.allow):
     class_name: str | None = Field(title="Name of the driver class")
     configuration: dict | None = Field(title="Driver configuration")
     priority: int | None = Field(title="Driver priority. If two drivers are eligible then driver with highest priority will be selected over driver with lower priority.)")
+    alternative_asset_href_field: str | None = Field(None, title="Property field to use as an alternative to the data's href")
+
+    def get_asset_href(self, item: Item) -> str | None:
+        if self.alternative_asset_href_field:
+            return item.properties[self.alternative_asset_href_field]
+        data = item.assets.get(Role.data.value)
+        return data.href if data else None
 
 
 class SMPTConfiguration(BaseModel, extra='allow'):

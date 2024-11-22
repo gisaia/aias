@@ -61,7 +61,7 @@ The AIRS Model is based on the STAC specifications. It supports the following ex
 
 Also, metadata are enriched by the service and placed in the `generated` namespace.
 
-Namespaces are prefixes in the key names of the JSON. The `:` is used for seperating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation. 
+Namespaces are prefixes in the key names of the JSON. The `:` is used for seperating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation.
 
 For more details, see the [model documentation](docs/model/model.md)
 
@@ -129,7 +129,7 @@ Result:
 
 ```shell
 curl -I \
-    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification" 
+    "http://127.0.0.1:8000/arlas/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification"
 ```
 Result:
 
@@ -212,7 +212,7 @@ List of processes:
 
 The `ingest` process takes a url pointing at an archive. The process runs the following steps:
 - identify the driver for ingestion
-- identify the assets to fetch (done by the driver) 
+- identify the assets to fetch (done by the driver)
 - fetch the assets (e.g. copy/download)  (done by the driver)
 - transform the assets if necessary (e.g. create cog)  (done by the driver)
 - upload the assets
@@ -593,14 +593,14 @@ Returns
 To run the tests (this will also start the stack):
 
 ```shell
-./test/tests.sh 
+./test/tests.sh
 ```
 
 
 # STAC Synchronisation
 
 The following synchronisations are available:
-- [GEODES](https://geodes.cnes.fr/) 
+- [GEODES](https://geodes.cnes.fr/)
 
 
 ## GEODES
