@@ -1,11 +1,12 @@
-import json
+import io
 import os
 import re
+import shutil
 import tarfile
 import tempfile
 import zipfile
-from urllib.parse import urlparse
 
+import requests
 from pydantic import Field
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
@@ -51,19 +52,35 @@ class Driver(DownloadDriver):
         import xarray as xr
 
         asset_href = item.assets.get(Role.data.value).href
+        tmp_asset = None
 
-        with smart_open.open(asset_href, "rb", transport_params=self.configuration.get_storage_parameters(asset_href, Driver.LOGGER)) as fb:
-            with zipfile.ZipFile(fb) as raster_zip:
-                file_names = raster_zip.namelist()
-                raster_files = list(filter(
-                    lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
+        if self.configuration.is_download_required(asset_href):
+            from urllib.parse import urlparse
 
-        # Get dimensions of the highest resolution band
-        zarr_res = 10
-        # TODO: with band selection, it will depend on the highest resolution SELECTED band
+            Driver.LOGGER.info("Downloading archive for Zarr creation.")
 
-        session = self.__get_rasterio_session(asset_href)
+            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+            r = requests.get(asset_href, headers=self.configuration.get_storage_parameters(asset_href, Driver.LOGGER)["headers"],
+                             stream=True, verify=False)
 
+            tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(asset_href).path.strip("/").split("/")[-1])
+            if (os.path.splitext(tmp_asset)[1] != ".zip"):
+                tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
+
+            Driver.LOGGER.warning(tmp_asset)
+            with open(tmp_asset, "wb") as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+
+            raster_files = self.__find_raster_files(tmp_asset)
+            asset_href = f"file://{tmp_asset}"
+        else:
+            Driver.LOGGER.info("Streaming archive for Zarr creation.")
+            with smart_open.open(asset_href, "rb", transport_params=self.configuration.get_storage_parameters(asset_href, Driver.LOGGER)) as fb:
+                raster_files = self.__find_raster_files(fb)
+
+        zarr_res = self.__get_zarr_resolution()
+
+        session = self.configuration.get_rasterio_session(asset_href, Driver.LOGGER)
         with rasterio.Env(session):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
@@ -129,35 +146,21 @@ class Driver(DownloadDriver):
 
         for f in tmp_files:
             os.remove(f)
+        if tmp_asset:
+            os.remove(tmp_asset)
 
         archive_path = zarr_path + ".tar"
         with tarfile.open(archive_path, "w") as tar:
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
-    def __get_rasterio_session(self, href: str):
-        storage_type = urlparse(href).scheme
+    def __find_raster_files(self, fb: str | io.TextIOWrapper):
+        with zipfile.ZipFile(fb) as raster_zip:
+            file_names = raster_zip.namelist()
+            raster_files = list(filter(
+                lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
 
-        if not storage_type or storage_type == "file" or storage_type == "http":
-            return None
+        return raster_files
 
-        if storage_type == "https":
-            # TODO: might need some dev here
-            return None
-
-        if storage_type == "gs":
-            import rasterio.session
-
-            if self.configuration.input.type != "gs":
-                Driver.LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
-                credentials = None
-                os.environ["GS_NO_SIGN_REQUEST"] = "YES"
-            else:
-                os.environ["GS_NO_SIGN_REQUEST"] = "NO"
-                with tempfile.NamedTemporaryFile("w+", delete=False) as f:
-                    json.dump(self.configuration.input.api_key.model_dump(), f)
-                    f.close()
-                credentials = f.name
-
-            return rasterio.session.GSSession(credentials)
-
-        raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+    def __get_zarr_resolution(self):
+        # TODO: with band selection, it will depend on the highest resolution SELECTED band
+        return 10

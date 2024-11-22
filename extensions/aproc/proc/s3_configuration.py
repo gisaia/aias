@@ -1,5 +1,8 @@
 import enum
+import json
 import logging
+import os
+import tempfile
 from typing import Annotated, Literal, Union
 from urllib.parse import urlparse
 
@@ -43,6 +46,8 @@ class GoogleStorage(BaseModel):
 class HttpsStorage(BaseModel):
     type: Literal["https"] = "https"
     headers: dict[str, str]
+    domain: str
+    force_download: bool = Field(False)
 
 
 class NoStorage(BaseModel):
@@ -57,13 +62,14 @@ class S3Configuration(BaseModel):
 
     def get_storage_parameters(self, href: str, LOGGER: logging.Logger) -> dict:
         storage_type = urlparse(href).scheme
+        netloc = urlparse(href).netloc
 
         if not storage_type or storage_type == "file" or storage_type == "http":
             return {}
 
         if storage_type == "https":
-            if self.input.type != "https":
-                LOGGER.warning("No headers is configured for HTTPS requests. Using no headers")
+            if self.input.type != "https" or netloc != self.input.domain:
+                LOGGER.warning("No headers is configured for this domain. Using no headers")
                 return {}
             return {"headers": self.input.headers}
 
@@ -71,11 +77,10 @@ class S3Configuration(BaseModel):
             from google.cloud.storage import Client
             from google.oauth2 import service_account
 
-            if self.input.type != "gs":
-                LOGGER.warning("No api_key is configured for Google Storage, but requesting an item on Google Storage. Using anonymous credentials")
+            if self.input.type != "gs" or netloc != self.input.bucket:
+                LOGGER.warning("No api_key is configured for this Google Storage. Using anonymous credentials")
                 client = Client.create_anonymous_client()
             else:
-                # TODO: check if bucket match ?
                 api_key = self.input.api_key
                 credentials = service_account.Credentials.from_service_account_info(api_key)
                 client = Client("APROC", credentials=credentials)
@@ -83,3 +88,39 @@ class S3Configuration(BaseModel):
             return {"client": client}
 
         raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+
+    def get_rasterio_session(self, href: str, LOGGER: logging.Logger):
+        storage_type = urlparse(href).scheme
+
+        if not storage_type or storage_type == "file" or storage_type == "http":
+            return None
+
+        if storage_type == "https":
+            # TODO: might need some dev here
+            return None
+
+        if storage_type == "gs":
+            import rasterio.session
+
+            bucket = urlparse(href).netloc
+
+            if self.input.type != "gs" or bucket != self.input.bucket:
+                LOGGER.warning("No api_key is configured for this Google Storage bucket. Using anonymous credentials")
+                credentials = None
+                os.environ["GS_NO_SIGN_REQUEST"] = "YES"
+            else:
+                os.environ["GS_NO_SIGN_REQUEST"] = "NO"
+                with tempfile.NamedTemporaryFile("w+", delete=False) as f:
+                    json.dump(self.input.api_key.model_dump(), f)
+                    f.close()
+                credentials = f.name
+
+            return rasterio.session.GSSession(credentials)
+
+        raise NotImplementedError(f"Storage '{storage_type}' not compatible")
+
+    def is_download_required(self, href: str):
+        return self.input.type == "https" \
+            and urlparse(href).scheme == "https" \
+            and urlparse(href).netloc == self.input.domain \
+            and self.input.force_download
