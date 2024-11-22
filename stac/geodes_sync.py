@@ -73,7 +73,7 @@ def to_item(feature, extra_params={}) -> Item:
         for country in continent.get("countries", []):
             item.properties.locations.append(country.get("name"))
             for region in country.get("regions", []):
-                item.properties.locations.append(country.get("name"))
+                item.properties.locations.append(region.get("name"))
     item.properties.model_extra.clear()
     item.properties.model_extra.update(fields_to_keep)
     return item
