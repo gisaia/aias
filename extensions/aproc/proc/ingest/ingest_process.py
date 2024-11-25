@@ -163,14 +163,14 @@ class AprocProcess(Process):
     def __check_assets__(url: str, assets: list[Asset], file_exists: bool = False):
         for asset in assets:
             if asset.name is None:
-                raise DriverException("Invalid asset for {} : no name provided".format(url))
+                raise DriverException("Invalid asset for {} : no name provided".format(url))
             if asset.href is None:
-                raise DriverException("Invalid asset {} for {} : no href provided".format(asset.name, url))
+                raise DriverException("Invalid asset {} for {} : no href provided".format(asset.name, url))
             if asset.roles is None:
-                raise DriverException("Invalid asset {} for {} : no roles provided".format(asset.name, url))
+                raise DriverException("Invalid asset {} for {} : no roles provided".format(asset.name, url))
             if file_exists:
                 if asset.airs__managed is True and not os.path.exists(asset.href):
-                    raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
+                    raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
@@ -196,17 +196,23 @@ class AprocProcess(Process):
         try:
             r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
             if r.ok:
+                LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
+            else:
+                LOGGER.debug("Item {}/{} does not yes exist: triggers insert".format(item.collection, item.id))
         except requests.exceptions.ConnectionError:
             msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
             LOGGER.error(msg)
             raise ConnectionException(msg)
         try:
             if item_already_exists:
+                LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
                 r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
             else:
+                LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
                 r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
             if r.ok:
+                LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return item_from_json(r.content)
             else:
                 LOGGER.error("Item has not been registered: {} - {}".format(r.status_code, r.content))
