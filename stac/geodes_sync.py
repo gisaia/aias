@@ -108,7 +108,7 @@ def search(stac_url: str, start_date: int, end_date: int, data_type: list[str], 
             doc = r.json()
             to_do = min(doc.get("context", {}).get("matched", 0), max_hits)
             if just_count:
-                print("{} items found.".format(doc.get("context", {}).get("matched", 0)))
+                print("{} items found.".format(doc.get("context", {}).get("matched", 0)))
                 return
             for feature in doc.get("features", []):
                 item = to_item(feature, extra_params)

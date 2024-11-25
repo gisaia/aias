@@ -126,7 +126,7 @@ def __upload_file(key, file, content_type)->str:
         s3.get_client().upload_fileobj(file, Configuration.settings.s3.bucket, key, ExtraArgs={
             "ContentType":content_type
         })
-        LOGGER.info("{} uploaded.".format(key))
+        LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
         msg = "Failed to upload {}".format(key)
@@ -169,7 +169,7 @@ def __upload_item(key, item: Item) -> str:
             Body=to_json(item),
             ContentType="application/json"
         )
-        LOGGER.info("{} uploaded.".format(key))
+        LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
         msg = "Failed to upload {} on {}".format(key, Configuration.settings.s3.bucket)
@@ -289,7 +289,7 @@ def reindex(collection:str):
 
 def item_exists(collection:str, item_id:str)->bool:
     if not __getES().indices.exists(index=__get_es_index_name(collection)):
-        LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
+        LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
         return False
     try:
         r=__getES().get(index=__get_es_index_name(collection), id=item_id)

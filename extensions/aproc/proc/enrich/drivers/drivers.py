@@ -23,7 +23,7 @@ class Drivers():
                 driver.alternative_asset_href_field = driver_configuration.alternative_asset_href_field
                 Drivers.drivers.append(driver)
             except ModuleNotFoundError:
-                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
+                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
     def solve(url: str) -> Driver:

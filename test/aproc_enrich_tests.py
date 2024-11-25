@@ -1,9 +1,10 @@
 import json
 from time import sleep
 import unittest
+from airs.core.models import mapper
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
-from test.utils import (APROC_ENDPOINT, COLLECTION, SENTINEL_2_ID,
+from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, SENTINEL_2_ID,
                         SENTINEL_2_ITEM, setUpTest, add_item)
 
 import requests
@@ -27,6 +28,10 @@ class Tests(unittest.TestCase):
             sleep(1)
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
+
+        # check that the item has the new asset
+        item = mapper.item_from_dict(requests.get("/".join([AIRS_URL, "collections", COLLECTION, "items", SENTINEL_2_ID])).json())
+        self.assertIsNotNone(item.assets.get("cog"))
 
     def ingest_sentinel(self):
         add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)

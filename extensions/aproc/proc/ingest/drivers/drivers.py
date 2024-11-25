@@ -22,7 +22,7 @@ class Drivers():
                 driver.__assets_dir__ = driver_configuration.assets_dir
                 Drivers.drivers.append(driver)
             except ModuleNotFoundError:
-                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
+                raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
     def solve(url: str) -> Driver:

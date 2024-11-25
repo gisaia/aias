@@ -126,9 +126,9 @@ def add_item(calling_test: unittest.TestCase, item_path: str, id: str) -> Item:
     print(f"create item {id}")
     with open(item_path, 'r') as file:
         data = file.read()
-        r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+        r = requests.post(url="/".join([AIRS_URL, "collections", COLLECTION, "items"]), data=data, headers={"Content-Type": "application/json"})
         calling_test.assertTrue(r.ok, msg=r.content)
     print("item created")
-    r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", id))
+    r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", id]))
     calling_test.assertTrue(r.ok, msg=r.content)
     return mapper.item_from_json(r.content)
