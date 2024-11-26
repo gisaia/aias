@@ -38,7 +38,7 @@ class Driver(DownloadDriver):
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         if raw_archive is True:
             raise DriverException("Raw archive can't be returned for a zarr download.")
-        if target_format != AssetFormat.zarr.value:
+        if target_format.lower() != AssetFormat.zarr.value.lower():
             raise DriverException(f"Target format must be {AssetFormat.zarr.value}")
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
@@ -86,6 +86,10 @@ class Driver(DownloadDriver):
 
             for ri, rf in enumerate(raster_files):
                 with rasterio.open("zip+" + asset_href + "!" + rf) as src:
+                    # In case no projection is defined, get the one of any of the band
+                    if target_projection is None:
+                        target_projection = src.crs
+
                     repeats = src.res[0] / zarr_res
 
                     if repeats != 1:
