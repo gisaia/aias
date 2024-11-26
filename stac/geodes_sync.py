@@ -151,13 +151,13 @@ def list_collections(stac_url: str):
     collections = r.json().get("collections", [])
     table = [["id", "dataType", "processingLevel", "start/end", "count"]]
     for collection in collections:
-        count = collection.get("summaries").get("total_items", "")
+        count = collection.get("summaries", {}).get("total_items", "")
         if count > 0:
             table.append([
                 collection.get("id"),
-                collection.get("summaries").get("dataType"),
-                ",".join(collection.get("summaries").get("dcs:processingLevel", [])),
-                collection.get("extent").get("temporal").get("interval", []),
+                collection.get("summaries", {}).get("dataType"),
+                ",".join(collection.get("summaries", {}).get("dcs:processingLevel", [])),
+                collection.get("extent", {}).get("temporal", {}).get("interval", []),
                 count
             ])
     return table
