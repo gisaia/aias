@@ -6,6 +6,7 @@ import typer
 
 from airs.core.models.mapper import item_from_dict, to_json
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Role
+from prettytable import PrettyTable
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -26,8 +27,8 @@ def to_item(feature, extra_params={}) -> Item:
     item = item_from_dict(feature)
     item.collection = extra_params.get("collection")
     item.catalog = extra_params.get("catalog")
-    item.properties.programme = "Copernicus"
-    item.properties.constellation = "Sentinel-2"
+    item.properties.programme = feature.get("properties").get("programme", "")
+    item.properties.constellation = feature.get("properties").get("constellation", "")
     item.properties.processing__level = feature.get("properties").get("spaceborne:productLevel")
     item.properties.sensor_mode = feature.get("properties").get("spaceborne:sensorMode")
     item.properties.data_type = feature.get("properties").get("dataType")
@@ -103,7 +104,7 @@ def search(stac_url: str, start_date: int, end_date: int, data_type: list[str], 
     to_do = max_hits
     while page:
         data["page"] = page
-        r = requests.post(url=stac_url, headers=headers, data=json.dumps(data), verify=False)
+        r = requests.post(url="/".join([stac_url, "items"]), headers=headers, data=json.dumps(data), verify=False)
         if r.ok:
             doc = r.json()
             to_do = min(doc.get("context", {}).get("matched", 0), max_hits)
@@ -137,11 +138,34 @@ def add_to_airs(airs_url: str, collection: str, item: Item):
         print("ERROR: Failled to add {}: {} ({})".format(item.id, r.status_code, r.content), file=sys.stderr)
 
 
+def __print_table(field_names: list[str], rows, sortby: str = None):
+    tab = PrettyTable(field_names, sortby=sortby, align="l")
+    tab.add_rows(rows)
+    print(tab)
+
+
+def list_collections(stac_url: str):
+    data = '{"page":1, "limit":500}'
+    headers = {"content-type": "application/json"}
+    r = requests.post(url="/".join([stac_url, "collections"]), headers=headers, data=data, verify=False)
+    collections = r.json().get("collections", [])
+    table = [["id", "dataType", "processingLevel", "start/end", "count"]]
+    for collection in collections:
+        count = collection.get("summaries").get("total_items", "")
+        if count > 0:
+            table.append([
+                collection.get("id"),
+                collection.get("summaries").get("dataType"),
+                ",".join(collection.get("summaries").get("dcs:processingLevel", [])),
+                collection.get("extent").get("temporal").get("interval", []),
+                count
+            ])
+    return table
+
 @app.command(help="Add STAC features to ARLAS AIRS")
 def add(
     stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/)"),
     airs_url: str = typer.Argument(help="AIRS URL (e.g. https://localhost/airs/)"),
-
     collection: str = typer.Argument(help="Name of the ARLAS Collection)"),
     catalog: str = typer.Argument(help="Name of the catalog within the collection)"),
     data_type: list[str] = typer.Option(help="Data type ()", default=None),
@@ -159,7 +183,7 @@ def add(
 
 @app.command(help="Show STAC features")
 def show(
-    stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/items)"),
+    stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac)"),
     data_type: list[str] = typer.Option(help="Data type ()", default=None),
     product_level: list[str] = typer.Option(help="Product levels", default=None),
     start_date: str = typer.Option(help="Start date for the STAC search", default=None),
@@ -167,19 +191,30 @@ def show(
     bbox: list[float] = typer.Option(help="BBOX (lon_min lat_min lon max lat_max)", default=None),
     max: int = typer.Option(help="Max number of feature to process", default=1000)
 ):
+    stac_url = stac_url.removesuffix("/items")
     search(stac_url, start_date, end_date, data_type, product_level, bbox, max, process_function=lambda i: print(to_json(i)))
+
+
+@app.command(help="List collections")
+def collections(
+    stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac)"),
+):
+    stac_url = stac_url.removesuffix("/items")
+    t = list_collections(stac_url)
+    __print_table(t[0], t[1:], sortby=t[0][0])
 
 
 @app.command(help="Count STAC features")
 def count(
-    stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac/items)"),
-    data_type: list[str] = typer.Option(help="Data type ()", default=None),
+    stac_url: str = typer.Argument(help="STAC URL (e.g. https://geodes-portal.cnes.fr/api/stac)"),
+    data_type: list[str] = typer.Option(help="Data type (PEPS_S1_L1, PEPS_S1_L2, PEPS_S2_L1C, MUSCATE_SENTINEL2_SENTINEL2_L2A, MUSCATE_Snow_SENTINEL2_L2B-SNOW, MUSCATE_WaterQual_SENTINEL2_L2B-WATER, MUSCATE_SENTINEL2_SENTINEL2_L3A)", default=None),
     product_level: list[str] = typer.Option(help="Product levels", default=None),
     start_date: str = typer.Option(help="Start date for the STAC search", default=None),
     end_date: str = typer.Option(help="End date for the STAC search", default=None),
     bbox: list[float] = typer.Option(help="BBOX (lon_min lat_min lon max lat_max)", default=None),
     max: int = typer.Option(help="Max number of feature to process", default=1000)
 ):
+    stac_url = stac_url.removesuffix("/items")
     search(stac_url, start_date, end_date, data_type, product_level, bbox, max, just_count=True)
 
 
