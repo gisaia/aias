@@ -1,7 +1,7 @@
 FROM python:3.10.13-alpine3.19
 RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
-COPY test/requirements.txt /app/requirements.txt
+COPY requirements-stac.txt /app/requirements.txt
 
 WORKDIR /app
 
