@@ -48,6 +48,8 @@
 
 *   [Untitled array in Item](./model-defs-group-properties-the-rasters-belonging-to-this-temporal-group-anyof-0.md) – `airs_model#/$defs/Group/properties/rasters/anyOf/0`
 
+*   [Untitled array in Item](./model-defs-properties-properties-a-list-of-keywords-anyof-0.md) – `airs_model#/$defs/Properties/properties/keywords/anyOf/0`
+
 *   [Untitled array in Item](./model-defs-properties-properties-list-of-locations-covered-by-the-item-anyof-0.md) – `airs_model#/$defs/Properties/properties/locations/anyOf/0`
 
 *   [Untitled array in Item](./model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-0.md) – `airs_model#/$defs/Properties/properties/eo__bands/anyOf/0`

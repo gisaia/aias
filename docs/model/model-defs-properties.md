@@ -21,6 +21,7 @@ airs_model#/properties/properties/anyOf/0
 | [datetime](#datetime)                                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "airs_model#/$defs/Properties/properties/datetime")                                                                                                                             |
 | [start\_datetime](#start_datetime)                                        | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/start_datetime")                                                                                                       |
 | [end\_datetime](#end_datetime)                                            | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/end_datetime")                                                                                                             |
+| [keywords](#keywords)                                                     | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-a-list-of-keywords.md "airs_model#/$defs/Properties/properties/keywords")                                                                                                                                                                                                        |
 | [programme](#programme)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")                                                                                                                                                                                                    |
 | [constellation](#constellation)                                           | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")                                                                                                                                                                                            |
 | [satellite](#satellite)                                                   | Merged | Optional | cannot be null | [Item](model-defs-properties-properties-name-of-the-satellite.md "airs_model#/$defs/Properties/properties/satellite")                                                                                                                                                                                                    |
@@ -195,6 +196,30 @@ any of
 *   [Untitled string in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-0.md "check type definition")
 
 *   [Untitled null in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-1.md "check type definition")
+
+## keywords
+
+
+
+`keywords`
+
+*   is optional
+
+*   Type: merged type ([A list of keywords](model-defs-properties-properties-a-list-of-keywords.md))
+
+*   cannot be null
+
+*   defined in: [Item](model-defs-properties-properties-a-list-of-keywords.md "airs_model#/$defs/Properties/properties/keywords")
+
+### keywords Type
+
+merged type ([A list of keywords](model-defs-properties-properties-a-list-of-keywords.md))
+
+any of
+
+*   [Untitled array in Item](model-defs-properties-properties-a-list-of-keywords-anyof-0.md "check type definition")
+
+*   [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-anyof-1.md "check type definition")
 
 ## programme
 
