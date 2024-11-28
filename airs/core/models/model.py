@@ -228,6 +228,7 @@ class Properties(BaseModel, extra=Extra.allow):
     datetime: Datetime | None = Field(default=None, title="datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
     start_datetime: Datetime | None = Field(default=None, title="Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
     end_datetime: Datetime | None = Field(default=None, title="Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
+    keywords: List[str] | None = Field(default=None, title="A list of keywords")
     programme: str | None = Field(default=None, title="Name of the programme")
     constellation: str | None = Field(default=None, title="Name of the constellation")
     satellite: str | None = Field(default=None, title="Name of the satellite")

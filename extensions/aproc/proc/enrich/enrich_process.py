@@ -111,6 +111,9 @@ class AprocProcess(Process):
                     asset: Asset = asset
                     asset.href = asset_location
                     item.assets[asset.name] = asset
+                    if item.properties.keywords is None:
+                        item.properties.keywords = []
+                    item.properties.keywords.append("has_{}".format(asset_type))
                     LOGGER.info("Enrichment success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "enrich", "event.outcome": "success", "event.module": "aproc-enrich", "arlas.collection": collection, "arlas.item.id": item_id})
 
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
