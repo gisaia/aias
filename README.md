@@ -98,7 +98,7 @@ The following environment variables must be set to run AIRS:
 | AIRS_S3_PLATFORM                                       |
 | AIRS_S3_ASSET_HTTP_ENDPOINT_URL                        |
 | AIRS_S3_ENDPOINT_URL                                   |
-| AIRS_MAPPING_URL                                       |
+| ARLASEO_MAPPING_URL                                       |
 | AIRS_COLLECTION_URL                                    |
 | AIRS_PREFIX                                            |
 | AIRS_LOGGER_LEVEL                                      |
