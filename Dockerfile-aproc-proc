@@ -43,8 +43,8 @@ COPY ./setup.py $APP_HOME/setup.py
 
 RUN pip install -e $APP_HOME
 
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.8/mapping.json" -o $APP_HOME//conf/mapping.json
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.8/downloads_mapping.json" -o $APP_HOME//conf/downloads_mapping.json
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json" -o $APP_HOME//conf/mapping.json
+RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json" -o $APP_HOME//conf/downloads_mapping.json
 
 ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=$APP_HOME//conf/mapping.json

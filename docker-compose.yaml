@@ -108,8 +108,8 @@ services:
       - AIRS_S3_PLATFORM=${AIRS_S3_PLATFORM}
       - AIRS_S3_ASSET_HTTP_ENDPOINT_URL=${AIRS_S3_ASSET_HTTP_ENDPOINT_URL}
       - AIRS_S3_ENDPOINT_URL=${AIRS_S3_ENDPOINT_URL}
-      - ARLASEO_MAPPING_URL=${ARLASEO_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.8/mapping.json}
-      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.8/collection.json}
+      - ARLASEO_MAPPING_URL=${ARLASEO_MAPPING_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json}
+      - AIRS_COLLECTION_URL=${AIRS_COLLECTION_URL:-https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json}
       - AIRS_LOGGER_LEVEL=${AIRS_LOGGER_LEVEL:-INFO}
       - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://minio:9000}
       - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}

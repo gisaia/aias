@@ -25,8 +25,8 @@ class Index(BaseModel, extra="allow"):
 class Settings(BaseModel, extra="allow"):
     s3:S3
     index:Index
-    arlaseo_mapping_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/8/mapping.json"
-    arlaseo_collection_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.8/collection.json"
+    arlaseo_mapping_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/9/mapping.json"
+    arlaseo_collection_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json"
 
 class Configuration:
     settings:Settings=None
