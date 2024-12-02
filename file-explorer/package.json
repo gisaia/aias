@@ -10,7 +10,8 @@
     "test": "ng test",
     "postinstall": "patch-package --patch-dir node_modules/arlas-web-core/patches",
     "i18n:init": "ngx-translate-extract --input ./src --output ./src/assets/i18n/template.json --key-as-default-value --replace --format json",
-    "i18n:extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/{en,fr}.json --format json"
+    "i18n:extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/{en,fr}.json --format json",
+    "license-check": "license-check-and-add check -f license-check-and-add.json"
   },
   "private": true,
   "peerDependencies": {
@@ -58,6 +59,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
+    "license-check-and-add": "^4.0.5",
     "node": "^18.19.0",
     "typescript": "4.8.2"
   },
