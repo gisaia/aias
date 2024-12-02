@@ -14,11 +14,15 @@
           <div mat-line class="label">
             {{archive.name}}
           </div>
-          <div mat-line class="detail">{{'last update:' | translate}} {{archive.last_modification_date | date:'short'}}</div>
-          <div mat-line class="detail">{{'id:' | translate}} {{archive.id}}</div>
+          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short')} }}</div>
+          <div mat-line class="detail">{{ 'id:' | translate:{id: archive.id} }}</div>
         </div>
         <div class="actions">
-          <mat-chip-list ><mat-chip [disableRipple]="true" class="driver-chip">{{archive.driver_name}}</mat-chip></mat-chip-list>
+          <mat-chip-listbox>
+            <mat-chip-option [disableRipple]="true" class="driver-chip">
+              {{archive.driver_name}}
+            </mat-chip-option>
+          </mat-chip-listbox>
           <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
             (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
             remove_circle
@@ -28,12 +32,12 @@
             [matTooltip]="'Already activated' | translate">
             check_circle
           </span>
-          
+
           <span class="material-symbols-outlined no-pointer not-activated"
             *ngIf="!archive.status" [matTooltip]="'Not activated' | translate">
             unpublished
           </span>
-          
+
           <span class="material-symbols-outlined pointer" *ngIf="!archive.status"
             (click)="activate(archive)" [matTooltip]="'Activate this file'| translate">
             add_circle
@@ -52,10 +56,10 @@
     {{'Select a folder to display list of available archives' | translate}}
   </div>
   <div class="no-archive" *ngIf="!!archives && archives.length === 0">
-    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{this.archivesPath}}
+    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath}}
   </div>
   <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" [name]="'archives'" size="default" color="#fff" type="line-scale"
       [fullScreen]="false">
-      <p style="color: white"> {{'Loading archives' | translate}}... </p>
+      <p style="color: white"> {{'Loading archives...' | translate}} </p>
     </ngx-spinner>
 </div>

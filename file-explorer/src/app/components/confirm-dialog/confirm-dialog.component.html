@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>{{title}} </h2>
-<mat-dialog-content>
+<mat-dialog-content class="content">
   <div>
     {{message}}
   </div>
@@ -10,7 +10,7 @@
   </mat-form-field>
 </mat-dialog-content>
 
-<mat-dialog-actions>
+<mat-dialog-actions class="actions">
   <button mat-raised-button color="primary" [color]="'primary'"
     [mat-dialog-close]="{status: true, annotations: anno?.value}">
     {{action | translate}}
@@ -18,5 +18,4 @@
   <button mat-stroked-button [mat-dialog-close]="{status: false}">
     {{'Cancel' | translate}}
   </button>
-
 </mat-dialog-actions>

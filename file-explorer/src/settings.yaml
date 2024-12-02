@@ -3,18 +3,18 @@ authentication:
   auth_mode: 'iam'
   force_connect: true
   threshold: 60000
-  url: https://localhost:81/arlas_iam_server
+  url: https://localhost/arlas_iam_server
   sign_up_enabled: false
 file_manager:
-  url: https://localhost:81/fam
+  url: https://localhost/fam
   default_path: ''
   collection: 'catalogue'
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://localhost:81/aproc
+  url: https://localhost/aproc
   collection: 'catalogue'
   catalog: 'catalogue'
 status:
-  url: https://localhost:81/airs
+  url: https://localhost/airs
   collection: 'catalogue'
