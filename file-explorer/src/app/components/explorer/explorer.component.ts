@@ -5,7 +5,7 @@ import { FamService } from '@services/fam/fam.service';
 import { Subject } from 'rxjs';
 import { DynamicFileNode } from '@tools/interface';
 import { JobService } from '@services/job/job.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
