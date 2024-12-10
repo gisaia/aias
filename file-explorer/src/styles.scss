@@ -95,3 +95,16 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
+
+.toast-container {
+  .ngx-toastr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+  }
+
+  .toast-close-button {
+    position: unset;
+  }
+}
