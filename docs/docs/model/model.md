@@ -6,9 +6,9 @@ airs_model
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                              |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :---------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json](../../out/model.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                    |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------ |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json](model.schema.json "open original schema") |
 
 ## Item Type
 
@@ -34,13 +34,13 @@ airs_model
 
 `collection`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the collection the item belongs to.](model-properties-name-of-the-collection-the-item-belongs-to.md))
+* Type: merged type ([Name of the collection the item belongs to.](model-properties-name-of-the-collection-the-item-belongs-to.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "airs_model#/properties/collection")
+* defined in: [Item](model-properties-name-of-the-collection-the-item-belongs-to.md "airs_model#/properties/collection")
 
 ### collection Type
 
@@ -48,9 +48,9 @@ merged type ([Name of the collection the item belongs to.](model-properties-name
 
 any of
 
-*   [Untitled string in Item](model-properties-name-of-the-collection-the-item-belongs-to-anyof-0.md "check type definition")
+* [Untitled string in Item](model-properties-name-of-the-collection-the-item-belongs-to-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-name-of-the-collection-the-item-belongs-to-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-name-of-the-collection-the-item-belongs-to-anyof-1.md "check type definition")
 
 ## catalog
 
@@ -58,13 +58,13 @@ any of
 
 `catalog`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the catalog the item belongs to.](model-properties-name-of-the-catalog-the-item-belongs-to.md))
+* Type: merged type ([Name of the catalog the item belongs to.](model-properties-name-of-the-catalog-the-item-belongs-to.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "airs_model#/properties/catalog")
+* defined in: [Item](model-properties-name-of-the-catalog-the-item-belongs-to.md "airs_model#/properties/catalog")
 
 ### catalog Type
 
@@ -72,9 +72,9 @@ merged type ([Name of the catalog the item belongs to.](model-properties-name-of
 
 any of
 
-*   [Untitled string in Item](model-properties-name-of-the-catalog-the-item-belongs-to-anyof-0.md "check type definition")
+* [Untitled string in Item](model-properties-name-of-the-catalog-the-item-belongs-to-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-name-of-the-catalog-the-item-belongs-to-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-name-of-the-catalog-the-item-belongs-to-anyof-1.md "check type definition")
 
 ## id
 
@@ -82,13 +82,13 @@ any of
 
 `id`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Unique item identifier. Must be unique within the collection.](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md))
+* Type: merged type ([Unique item identifier. Must be unique within the collection.](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md "airs_model#/properties/id")
+* defined in: [Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection.md "airs_model#/properties/id")
 
 ### id Type
 
@@ -96,9 +96,9 @@ merged type ([Unique item identifier. Must be unique within the collection.](mod
 
 any of
 
-*   [Untitled string in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-0.md "check type definition")
+* [Untitled string in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-unique-item-identifier-must-be-unique-within-the-collection-anyof-1.md "check type definition")
 
 ## geometry
 
@@ -106,13 +106,13 @@ any of
 
 `geometry`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Defines the full footprint of the asset represented by this item, formatted according to \`RFC 7946, section 3.1 (GeoJSON) \<https://tools.ietf.org/html/rfc7946>\`\_](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md))
+* Type: merged type ([Defines the full footprint of the asset represented by this item, formatted according to \`RFC 7946, section 3.1 (GeoJSON) \<https://tools.ietf.org/html/rfc7946>\`\_](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")
+* defined in: [Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_.md "airs_model#/properties/geometry")
 
 ### geometry Type
 
@@ -120,9 +120,9 @@ merged type ([Defines the full footprint of the asset represented by this item, 
 
 any of
 
-*   [Untitled object in Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_-anyof-0.md "check type definition")
+* [Untitled object in Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-defines-the-full-footprint-of-the-asset-represented-by-this-item-formatted-according-to-rfc-7946-section-31-geojson-httpstoolsietforghtmlrfc7946_-anyof-1.md "check type definition")
 
 ## bbox
 
@@ -130,13 +130,13 @@ any of
 
 `bbox`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2\*n where n is the number of dimensions. Could also be None in the case of a null geometry.](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md))
+* Type: merged type ([Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2\*n where n is the number of dimensions. Could also be None in the case of a null geometry.](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox")
+* defined in: [Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry.md "airs_model#/properties/bbox")
 
 ### bbox Type
 
@@ -144,9 +144,9 @@ merged type ([Bounding Box of the asset represented by this item using either 2D
 
 any of
 
-*   [Untitled array in Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry-anyof-0.md "check type definition")
+* [Untitled array in Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-bounding-box-of-the-asset-represented-by-this-item-using-either-2d-or-3d-geometries-the-length-of-the-array-must-be-2n-where-n-is-the-number-of-dimensions-could-also-be-none-in-the-case-of-a-null-geometry-anyof-1.md "check type definition")
 
 ## centroid
 
@@ -154,13 +154,13 @@ any of
 
 `centroid`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Coordinates (lon/lat) of the geometry's centroid.](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md))
+* Type: merged type ([Coordinates (lon/lat) of the geometry's centroid.](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md "airs_model#/properties/centroid")
+* defined in: [Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid.md "airs_model#/properties/centroid")
 
 ### centroid Type
 
@@ -168,9 +168,9 @@ merged type ([Coordinates (lon/lat) of the geometry's centroid.](model-propertie
 
 any of
 
-*   [Untitled array in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-0.md "check type definition")
+* [Untitled array in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-coordinates-lonlat-of-the-geometrys-centroid-anyof-1.md "check type definition")
 
 ## assets
 
@@ -178,13 +178,13 @@ any of
 
 `assets`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item.](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md))
+* Type: merged type ([A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item.](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "airs_model#/properties/assets")
+* defined in: [Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item.md "airs_model#/properties/assets")
 
 ### assets Type
 
@@ -192,9 +192,9 @@ merged type ([A dictionary mapping string keys to Asset objects. All Asset value
 
 any of
 
-*   [Untitled object in Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item-anyof-0.md "check type definition")
+* [Untitled object in Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-a-dictionary-mapping-string-keys-to-asset-objects-all-asset-values-in-the-dictionary-will-have-their-owner-attribute-set-to-the-created-item-anyof-1.md "check type definition")
 
 ## properties
 
@@ -202,13 +202,13 @@ any of
 
 `properties`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Item properties](model-properties-item-properties.md))
+* Type: merged type ([Item properties](model-properties-item-properties.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-properties-item-properties.md "airs_model#/properties/properties")
+* defined in: [Item](model-properties-item-properties.md "airs_model#/properties/properties")
 
 ### properties Type
 
@@ -216,9 +216,9 @@ merged type ([Item properties](model-properties-item-properties.md))
 
 any of
 
-*   [Properties](model-defs-properties.md "check type definition")
+* [Properties](model-defs-properties.md "check type definition")
 
-*   [Untitled null in Item](model-properties-item-properties-anyof-1.md "check type definition")
+* [Untitled null in Item](model-properties-item-properties-anyof-1.md "check type definition")
 
 ## Additional Properties
 
@@ -283,13 +283,13 @@ Reference this group by using
 
 `name`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Asset's name. But be the same as the key in the \`assets\` dictionary.](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md))
+* Type: merged type ([Asset's name. But be the same as the key in the \`assets\` dictionary.](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")
+* defined in: [Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary.md "airs_model#/$defs/Asset/properties/name")
 
 #### name Type
 
@@ -297,9 +297,9 @@ merged type ([Asset's name. But be the same as the key in the \`assets\` diction
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-assets-name-but-be-the-same-as-the-key-in-the-assets-dictionary-anyof-1.md "check type definition")
 
 ### size
 
@@ -307,13 +307,13 @@ any of
 
 `size`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Asset's size in Bytes.](model-defs-asset-properties-assets-size-in-bytes.md))
+* Type: merged type ([Asset's size in Bytes.](model-defs-asset-properties-assets-size-in-bytes.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-assets-size-in-bytes.md "airs_model#/$defs/Asset/properties/size")
+* defined in: [Item](model-defs-asset-properties-assets-size-in-bytes.md "airs_model#/$defs/Asset/properties/size")
 
 #### size Type
 
@@ -321,9 +321,9 @@ merged type ([Asset's size in Bytes.](model-defs-asset-properties-assets-size-in
 
 any of
 
-*   [Untitled integer in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-assets-size-in-bytes-anyof-1.md "check type definition")
 
 ### href
 
@@ -331,13 +331,13 @@ any of
 
 `href`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
+* Type: merged type ([Absolute link to the asset object.](model-defs-asset-properties-absolute-link-to-the-asset-object.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")
+* defined in: [Item](model-defs-asset-properties-absolute-link-to-the-asset-object.md "airs_model#/$defs/Asset/properties/href")
 
 #### href Type
 
@@ -345,9 +345,9 @@ merged type ([Absolute link to the asset object.](model-defs-asset-properties-ab
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-absolute-link-to-the-asset-object-anyof-1.md "check type definition")
 
 ### asset\_type
 
@@ -355,13 +355,13 @@ any of
 
 `asset_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Type of data (ResourceType)](model-defs-asset-properties-type-of-data-resourcetype.md))
+* Type: merged type ([Type of data (ResourceType)](model-defs-asset-properties-type-of-data-resourcetype.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-type-of-data-resourcetype.md "airs_model#/$defs/Asset/properties/asset_type")
+* defined in: [Item](model-defs-asset-properties-type-of-data-resourcetype.md "airs_model#/$defs/Asset/properties/asset_type")
 
 #### asset\_type Type
 
@@ -369,9 +369,9 @@ merged type ([Type of data (ResourceType)](model-defs-asset-properties-type-of-d
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
 
 ### asset\_format
 
@@ -379,13 +379,13 @@ any of
 
 `asset_format`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Data format (AssetFormat)](model-defs-asset-properties-data-format-assetformat.md))
+* Type: merged type ([Data format (AssetFormat)](model-defs-asset-properties-data-format-assetformat.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-data-format-assetformat.md "airs_model#/$defs/Asset/properties/asset_format")
+* defined in: [Item](model-defs-asset-properties-data-format-assetformat.md "airs_model#/$defs/Asset/properties/asset_format")
 
 #### asset\_format Type
 
@@ -393,9 +393,9 @@ merged type ([Data format (AssetFormat)](model-defs-asset-properties-data-format
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-data-format-assetformat-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-data-format-assetformat-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-data-format-assetformat-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-data-format-assetformat-anyof-1.md "check type definition")
 
 ### storage\_\_requester\_pays
 
@@ -403,13 +403,13 @@ any of
 
 `storage__requester_pays`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
+* Type: merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Asset/properties/storage__requester_pays")
+* defined in: [Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Asset/properties/storage__requester_pays")
 
 #### storage\_\_requester\_pays Type
 
@@ -417,9 +417,9 @@ merged type ([Is the data requester pays or is it data manager/cloud provider pa
 
 any of
 
-*   [Untitled boolean in Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
 
 ### storage\_\_tier
 
@@ -427,13 +427,13 @@ any of
 
 `storage__tier`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
+* Type: merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Asset/properties/storage__tier")
+* defined in: [Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Asset/properties/storage__tier")
 
 #### storage\_\_tier Type
 
@@ -441,9 +441,9 @@ merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
 
 ### storage\_\_platform
 
@@ -451,13 +451,13 @@ any of
 
 `storage__platform`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
+* Type: merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Asset/properties/storage__platform")
+* defined in: [Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Asset/properties/storage__platform")
 
 #### storage\_\_platform Type
 
@@ -465,9 +465,9 @@ merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](mod
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
 
 ### storage\_\_region
 
@@ -475,13 +475,13 @@ any of
 
 `storage__region`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
+* Type: merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Asset/properties/storage__region")
+* defined in: [Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Asset/properties/storage__region")
 
 #### storage\_\_region Type
 
@@ -489,9 +489,9 @@ merged type ([The region where the data is stored. Relevant to speed of access a
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
 
 ### airs\_\_managed
 
@@ -499,13 +499,13 @@ any of
 
 `airs__managed`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the asset is managed by AIRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md))
+* Type: merged type ([Whether the asset is managed by AIRS or not.](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md "airs_model#/$defs/Asset/properties/airs__managed")
+* defined in: [Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not.md "airs_model#/$defs/Asset/properties/airs__managed")
 
 #### airs\_\_managed Type
 
@@ -513,9 +513,9 @@ merged type ([Whether the asset is managed by AIRS or not.](model-defs-asset-pro
 
 any of
 
-*   [Untitled boolean in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-whether-the-asset-is-managed-by-airs-or-not-anyof-1.md "check type definition")
 
 #### airs\_\_managed Default Value
 
@@ -531,13 +531,13 @@ true
 
 `airs__object_store_bucket`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Object store bucket for the asset object.](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md))
+* Type: merged type ([Object store bucket for the asset object.](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_bucket")
+* defined in: [Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_bucket")
 
 #### airs\_\_object\_store\_bucket Type
 
@@ -545,9 +545,9 @@ merged type ([Object store bucket for the asset object.](model-defs-asset-proper
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-object-store-bucket-for-the-asset-object-anyof-1.md "check type definition")
 
 ### airs\_\_object\_store\_key
 
@@ -555,13 +555,13 @@ any of
 
 `airs__object_store_key`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Object store key of the asset object.](model-defs-asset-properties-object-store-key-of-the-asset-object.md))
+* Type: merged type ([Object store key of the asset object.](model-defs-asset-properties-object-store-key-of-the-asset-object.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_key")
+* defined in: [Item](model-defs-asset-properties-object-store-key-of-the-asset-object.md "airs_model#/$defs/Asset/properties/airs__object_store_key")
 
 #### airs\_\_object\_store\_key Type
 
@@ -569,9 +569,9 @@ merged type ([Object store key of the asset object.](model-defs-asset-properties
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-object-store-key-of-the-asset-object-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-object-store-key-of-the-asset-object-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-object-store-key-of-the-asset-object-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-object-store-key-of-the-asset-object-anyof-1.md "check type definition")
 
 ### title
 
@@ -579,13 +579,13 @@ any of
 
 `title`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional displayed title for clients and users.](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md))
+* Type: merged type ([Optional displayed title for clients and users.](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "airs_model#/$defs/Asset/properties/title")
+* defined in: [Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users.md "airs_model#/$defs/Asset/properties/title")
 
 #### title Type
 
@@ -593,9 +593,9 @@ merged type ([Optional displayed title for clients and users.](model-defs-asset-
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-optional-displayed-title-for-clients-and-users-anyof-1.md "check type definition")
 
 ### description
 
@@ -603,13 +603,13 @@ any of
 
 `description`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md))
+* Type: merged type ([A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Asset/properties/description")
+* defined in: [Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Asset/properties/description")
 
 #### description Type
 
@@ -617,9 +617,9 @@ merged type ([A description of the Asset providing additional details, such as h
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-a-description-of-the-asset-providing-additional-details-such-as-how-it-was-processed-or-created-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-1.md "check type definition")
 
 ### type
 
@@ -627,13 +627,13 @@ any of
 
 `type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional description of the media type. Registered Media Types are preferred. See MediaType for common media types.](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md))
+* Type: merged type ([Optional description of the media type. Registered Media Types are preferred. See MediaType for common media types.](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "airs_model#/$defs/Asset/properties/type")
+* defined in: [Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types.md "airs_model#/$defs/Asset/properties/type")
 
 #### type Type
 
@@ -641,9 +641,9 @@ merged type ([Optional description of the media type. Registered Media Types are
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-optional-description-of-the-media-type-registered-media-types-are-preferred-see-mediatype-for-common-media-types-anyof-1.md "check type definition")
 
 ### roles
 
@@ -651,13 +651,13 @@ any of
 
 `roles`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md))
+* Type: merged type ([Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "airs_model#/$defs/Asset/properties/roles")
+* defined in: [Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset.md "airs_model#/$defs/Asset/properties/roles")
 
 #### roles Type
 
@@ -665,9 +665,9 @@ merged type ([Optional, Semantic roles (i.e. thumbnail, overview, data, metadata
 
 any of
 
-*   [Untitled array in Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-optional-semantic-roles-ie-thumbnail-overview-data-metadata-of-the-asset-anyof-1.md "check type definition")
 
 ### extra\_fields
 
@@ -675,13 +675,13 @@ any of
 
 `extra_fields`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md))
+* Type: merged type ([Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "airs_model#/$defs/Asset/properties/extra_fields")
+* defined in: [Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json.md "airs_model#/$defs/Asset/properties/extra_fields")
 
 #### extra\_fields Type
 
@@ -689,9 +689,9 @@ merged type ([Optional, additional fields for this asset. This is used by extens
 
 any of
 
-*   [Untitled object in Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json-anyof-0.md "check type definition")
+* [Untitled object in Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-optional-additional-fields-for-this-asset-this-is-used-by-extensions-as-a-way-to-serialize-and-deserialize-properties-on-asset-object-json-anyof-1.md "check type definition")
 
 ### gsd
 
@@ -699,13 +699,13 @@ any of
 
 `gsd`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Ground Sampling Distance (resolution) of the asset](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md))
+* Type: merged type ([Ground Sampling Distance (resolution) of the asset](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "airs_model#/$defs/Asset/properties/gsd")
+* defined in: [Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset.md "airs_model#/$defs/Asset/properties/gsd")
 
 #### gsd Type
 
@@ -713,9 +713,9 @@ merged type ([Ground Sampling Distance (resolution) of the asset](model-defs-ass
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-ground-sampling-distance-resolution-of-the-asset-anyof-1.md "check type definition")
 
 ### eo\_\_bands
 
@@ -723,13 +723,13 @@ any of
 
 `eo__bands`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
+* Type: merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Asset/properties/eo__bands")
+* defined in: [Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Asset/properties/eo__bands")
 
 #### eo\_\_bands Type
 
@@ -737,9 +737,9 @@ merged type ([An array of available bands where each object is a Band Object. If
 
 any of
 
-*   [Untitled array in Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
 
 ### sar\_\_instrument\_mode
 
@@ -747,13 +747,13 @@ any of
 
 `sar__instrument_mode`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
+* Type: merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Asset/properties/sar__instrument_mode")
+* defined in: [Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Asset/properties/sar__instrument_mode")
 
 #### sar\_\_instrument\_mode Type
 
@@ -761,9 +761,9 @@ merged type ([The name of the sensor acquisition mode that is commonly used. Thi
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
 
 ### sar\_\_frequency\_band
 
@@ -771,13 +771,13 @@ any of
 
 `sar__frequency_band`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
+* Type: merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Asset/properties/sar__frequency_band")
+* defined in: [Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Asset/properties/sar__frequency_band")
 
 #### sar\_\_frequency\_band Type
 
@@ -785,9 +785,9 @@ merged type ([The common name for the frequency band to make it easier to search
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
 
 ### sar\_\_center\_frequency
 
@@ -795,13 +795,13 @@ any of
 
 `sar__center_frequency`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
+* Type: merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Asset/properties/sar__center_frequency")
+* defined in: [Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Asset/properties/sar__center_frequency")
 
 #### sar\_\_center\_frequency Type
 
@@ -809,9 +809,9 @@ merged type ([The center frequency of the instrument, in gigahertz (GHz).](model
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
 
 ### sar\_\_polarizations
 
@@ -819,13 +819,13 @@ any of
 
 `sar__polarizations`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Any combination of polarizations.](model-defs-asset-properties-any-combination-of-polarizations.md))
+* Type: merged type ([Any combination of polarizations.](model-defs-asset-properties-any-combination-of-polarizations.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-any-combination-of-polarizations.md "airs_model#/$defs/Asset/properties/sar__polarizations")
+* defined in: [Item](model-defs-asset-properties-any-combination-of-polarizations.md "airs_model#/$defs/Asset/properties/sar__polarizations")
 
 #### sar\_\_polarizations Type
 
@@ -833,9 +833,9 @@ merged type ([Any combination of polarizations.](model-defs-asset-properties-any
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-any-combination-of-polarizations-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-any-combination-of-polarizations-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
 
 ### sar\_\_product\_type
 
@@ -843,13 +843,13 @@ any of
 
 `sar__product_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The product type, for example SSC, MGD, or SGC](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
+* Type: merged type ([The product type, for example SSC, MGD, or SGC](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Asset/properties/sar__product_type")
+* defined in: [Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Asset/properties/sar__product_type")
 
 #### sar\_\_product\_type Type
 
@@ -857,9 +857,9 @@ merged type ([The product type, for example SSC, MGD, or SGC](model-defs-asset-p
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
 
 ### sar\_\_resolution\_range
 
@@ -867,13 +867,13 @@ any of
 
 `sar__resolution_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
+* Type: merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_range")
+* defined in: [Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_range")
 
 #### sar\_\_resolution\_range Type
 
@@ -881,9 +881,9 @@ merged type ([The range resolution, which is the maximum ability to distinguish 
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
 ### sar\_\_resolution\_azimuth
 
@@ -891,13 +891,13 @@ any of
 
 `sar__resolution_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
+* Type: merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_azimuth")
+* defined in: [Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Asset/properties/sar__resolution_azimuth")
 
 #### sar\_\_resolution\_azimuth Type
 
@@ -905,9 +905,9 @@ merged type ([The azimuth resolution, which is the maximum ability to distinguis
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
 ### sar\_\_pixel\_spacing\_range
 
@@ -915,13 +915,13 @@ any of
 
 `sar__pixel_spacing_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
+* Type: merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_range")
+* defined in: [Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_range")
 
 #### sar\_\_pixel\_spacing\_range Type
 
@@ -929,9 +929,9 @@ merged type ([The range pixel spacing, which is the distance between adjacent pi
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
 ### sar\_\_pixel\_spacing\_azimuth
 
@@ -939,13 +939,13 @@ any of
 
 `sar__pixel_spacing_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
+* Type: merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_azimuth")
+* defined in: [Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Asset/properties/sar__pixel_spacing_azimuth")
 
 #### sar\_\_pixel\_spacing\_azimuth Type
 
@@ -953,9 +953,9 @@ merged type ([The azimuth pixel spacing, which is the distance between adjacent 
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_range
 
@@ -963,13 +963,13 @@ any of
 
 `sar__looks_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
+* Type: merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_range")
+* defined in: [Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_range")
 
 #### sar\_\_looks\_range Type
 
@@ -977,9 +977,9 @@ merged type ([Number of range looks, which is the number of groups of signal sam
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_azimuth
 
@@ -987,13 +987,13 @@ any of
 
 `sar__looks_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
+* Type: merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_azimuth")
+* defined in: [Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Asset/properties/sar__looks_azimuth")
 
 #### sar\_\_looks\_azimuth Type
 
@@ -1001,9 +1001,9 @@ merged type ([Number of azimuth looks, which is the number of groups of signal s
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_equivalent\_number
 
@@ -1011,13 +1011,13 @@ any of
 
 `sar__looks_equivalent_number`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The equivalent number of looks (ENL).](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md))
+* Type: merged type ([The equivalent number of looks (ENL).](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Asset/properties/sar__looks_equivalent_number")
+* defined in: [Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Asset/properties/sar__looks_equivalent_number")
 
 #### sar\_\_looks\_equivalent\_number Type
 
@@ -1025,9 +1025,9 @@ merged type ([The equivalent number of looks (ENL).](model-defs-asset-properties
 
 any of
 
-*   [Untitled number in Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
 
 ### sar\_\_observation\_direction
 
@@ -1035,13 +1035,13 @@ any of
 
 `sar__observation_direction`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
+* Type: merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Asset/properties/sar__observation_direction")
+* defined in: [Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Asset/properties/sar__observation_direction")
 
 #### sar\_\_observation\_direction Type
 
@@ -1049,9 +1049,9 @@ merged type ([Antenna pointing direction relative to the flight trajectory of th
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
 
 ### proj\_\_epsg
 
@@ -1059,13 +1059,13 @@ any of
 
 `proj__epsg`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([EPSG code of the datasource.](model-defs-asset-properties-epsg-code-of-the-datasource.md))
+* Type: merged type ([EPSG code of the datasource.](model-defs-asset-properties-epsg-code-of-the-datasource.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Asset/properties/proj__epsg")
+* defined in: [Item](model-defs-asset-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Asset/properties/proj__epsg")
 
 #### proj\_\_epsg Type
 
@@ -1073,9 +1073,9 @@ merged type ([EPSG code of the datasource.](model-defs-asset-properties-epsg-cod
 
 any of
 
-*   [Untitled integer in Item](model-defs-asset-properties-epsg-code-of-the-datasource-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-asset-properties-epsg-code-of-the-datasource-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
 
 ### proj\_\_wkt2
 
@@ -1083,13 +1083,13 @@ any of
 
 `proj__wkt2`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
+* Type: merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Asset/properties/proj__wkt2")
+* defined in: [Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Asset/properties/proj__wkt2")
 
 #### proj\_\_wkt2 Type
 
@@ -1097,9 +1097,9 @@ merged type ([PROJJSON object representing the Coordinate Reference System (CRS)
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
 
 ### proj\_\_geometry
 
@@ -1107,13 +1107,13 @@ any of
 
 `proj__geometry`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Defines the footprint of this Item.](model-defs-asset-properties-defines-the-footprint-of-this-item.md))
+* Type: merged type ([Defines the footprint of this Item.](model-defs-asset-properties-defines-the-footprint-of-this-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Asset/properties/proj__geometry")
+* defined in: [Item](model-defs-asset-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Asset/properties/proj__geometry")
 
 #### proj\_\_geometry Type
 
@@ -1121,9 +1121,9 @@ merged type ([Defines the footprint of this Item.](model-defs-asset-properties-d
 
 any of
 
-*   [Untitled undefined type in Item](model-defs-asset-properties-defines-the-footprint-of-this-item-anyof-0.md "check type definition")
+* [Untitled undefined type in Item](model-defs-asset-properties-defines-the-footprint-of-this-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
 
 ### proj\_\_bbox
 
@@ -1131,13 +1131,13 @@ any of
 
 `proj__bbox`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
+* Type: merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Asset/properties/proj__bbox")
+* defined in: [Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Asset/properties/proj__bbox")
 
 #### proj\_\_bbox Type
 
@@ -1145,9 +1145,9 @@ merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](m
 
 any of
 
-*   [Untitled array in Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
 
 ### proj\_\_centroid
 
@@ -1155,13 +1155,13 @@ any of
 
 `proj__centroid`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
+* Type: merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Asset/properties/proj__centroid")
+* defined in: [Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Asset/properties/proj__centroid")
 
 #### proj\_\_centroid Type
 
@@ -1169,9 +1169,9 @@ merged type ([Coordinates representing the centroid of the Item (in lat/long).](
 
 any of
 
-*   [Untitled undefined type in Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-0.md "check type definition")
+* [Untitled undefined type in Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
 
 ### proj\_\_shape
 
@@ -1179,13 +1179,13 @@ any of
 
 `proj__shape`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
+* Type: merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__shape")
+* defined in: [Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__shape")
 
 #### proj\_\_shape Type
 
@@ -1193,9 +1193,9 @@ merged type ([Number of pixels in Y and X directions for the default grid.](mode
 
 any of
 
-*   [Untitled array in Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
 
 ### proj\_\_transform
 
@@ -1203,13 +1203,13 @@ any of
 
 `proj__transform`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The affine transformation coefficients for the default grid.](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
+* Type: merged type ([The affine transformation coefficients for the default grid.](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__transform")
+* defined in: [Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Asset/properties/proj__transform")
 
 #### proj\_\_transform Type
 
@@ -1217,9 +1217,9 @@ merged type ([The affine transformation coefficients for the default grid.](mode
 
 any of
 
-*   [Untitled array in Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
 
 ### Additional Properties
 
@@ -1250,13 +1250,13 @@ Reference this group by using
 
 `name`
 
-*   is required
+* is required
 
-*   Type: `string` ([The name of the band (e.g., B01, B8, band2, red).](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md))
+* Type: `string` ([The name of the band (e.g., B01, B8, band2, red).](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")
+* defined in: [Item](model-defs-band-properties-the-name-of-the-band-eg-b01-b8-band2-red.md "airs_model#/$defs/Band/properties/name")
 
 #### name Type
 
@@ -1272,13 +1272,13 @@ Reference this group by using
 
 `common_name`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names.](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md))
+* Type: merged type ([The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names.](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name")
+* defined in: [Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names.md "airs_model#/$defs/Band/properties/common_name")
 
 #### common\_name Type
 
@@ -1286,9 +1286,9 @@ merged type ([The name commonly used to refer to the band to make it easier to s
 
 any of
 
-*   [Untitled string in Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-the-name-commonly-used-to-refer-to-the-band-to-make-it-easier-to-search-for-bands-across-instruments-see-the-list-of-accepted-common-names-anyof-1.md "check type definition")
 
 ### description
 
@@ -1296,13 +1296,13 @@ any of
 
 `description`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation.](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md))
+* Type: merged type ([Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation.](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")
+* defined in: [Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation.md "airs_model#/$defs/Band/properties/description")
 
 #### description Type
 
@@ -1310,9 +1310,9 @@ merged type ([Description to fully explain the band. CommonMark 0.29 syntax MAY 
 
 any of
 
-*   [Untitled string in Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-description-to-fully-explain-the-band-commonmark-029-syntax-may-be-used-for-rich-text-representation-anyof-1.md "check type definition")
 
 ### center\_wavelength
 
@@ -1320,13 +1320,13 @@ any of
 
 `center_wavelength`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The center wavelength of the band, in micrometers (μm).](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md))
+* Type: merged type ([The center wavelength of the band, in micrometers (μm).](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")
+* defined in: [Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm.md "airs_model#/$defs/Band/properties/center_wavelength")
 
 #### center\_wavelength Type
 
@@ -1334,9 +1334,9 @@ merged type ([The center wavelength of the band, in micrometers (μm).](model-de
 
 any of
 
-*   [Untitled number in Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-the-center-wavelength-of-the-band-in-micrometers-μm-anyof-1.md "check type definition")
 
 ### full\_width\_half\_max
 
@@ -1344,13 +1344,13 @@ any of
 
 `full_width_half_max`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md))
+* Type: merged type ([Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")
+* defined in: [Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm.md "airs_model#/$defs/Band/properties/full_width_half_max")
 
 #### full\_width\_half\_max Type
 
@@ -1358,9 +1358,9 @@ merged type ([Full width at half maximum (FWHM). The width of the band, as measu
 
 any of
 
-*   [Untitled number in Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-full-width-at-half-maximum-fwhm-the-width-of-the-band-as-measured-at-half-the-maximum-transmission-in-micrometers-μm-anyof-1.md "check type definition")
 
 ### solar\_illumination
 
@@ -1368,13 +1368,13 @@ any of
 
 `solar_illumination`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md))
+* Type: merged type ([The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")
+* defined in: [Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers.md "airs_model#/$defs/Band/properties/solar_illumination")
 
 #### solar\_illumination Type
 
@@ -1382,9 +1382,9 @@ merged type ([The solar illumination of the band, as measured at half the maximu
 
 any of
 
-*   [Untitled number in Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-the-solar-illumination-of-the-band-as-measured-at-half-the-maximum-transmission-in-wm2micrometers-anyof-1.md "check type definition")
 
 ### quality\_indicators
 
@@ -1392,13 +1392,13 @@ any of
 
 `quality_indicators`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Set of indicators for estimating the quality of the datacube variable (band).](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md))
+* Type: merged type ([Set of indicators for estimating the quality of the datacube variable (band).](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")
+* defined in: [Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band.md "airs_model#/$defs/Band/properties/quality_indicators")
 
 #### quality\_indicators Type
 
@@ -1406,9 +1406,9 @@ merged type ([Set of indicators for estimating the quality of the datacube varia
 
 any of
 
-*   [Indicators](model-defs-indicators.md "check type definition")
+* [Indicators](model-defs-indicators.md "check type definition")
 
-*   [Untitled null in Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-band-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-variable-band-anyof-1.md "check type definition")
 
 ### Additional Properties
 
@@ -1445,13 +1445,13 @@ Reference this group by using
 
 `timestamp`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The timestamp of this temporal group.](model-defs-group-properties-the-timestamp-of-this-temporal-group.md))
+* Type: merged type ([The timestamp of this temporal group.](model-defs-group-properties-the-timestamp-of-this-temporal-group.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")
+* defined in: [Item](model-defs-group-properties-the-timestamp-of-this-temporal-group.md "airs_model#/$defs/Group/properties/timestamp")
 
 #### timestamp Type
 
@@ -1459,9 +1459,9 @@ merged type ([The timestamp of this temporal group.](model-defs-group-properties
 
 any of
 
-*   [Untitled integer in Item](model-defs-group-properties-the-timestamp-of-this-temporal-group-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-group-properties-the-timestamp-of-this-temporal-group-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-group-properties-the-timestamp-of-this-temporal-group-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-group-properties-the-timestamp-of-this-temporal-group-anyof-1.md "check type definition")
 
 ### rasters
 
@@ -1469,13 +1469,13 @@ any of
 
 `rasters`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The rasters belonging to this temporal group.](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md))
+* Type: merged type ([The rasters belonging to this temporal group.](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")
+* defined in: [Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group.md "airs_model#/$defs/Group/properties/rasters")
 
 #### rasters Type
 
@@ -1483,9 +1483,9 @@ merged type ([The rasters belonging to this temporal group.](model-defs-group-pr
 
 any of
 
-*   [Untitled array in Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-group-properties-the-rasters-belonging-to-this-temporal-group-anyof-1.md "check type definition")
 
 ### quality\_indicators
 
@@ -1493,13 +1493,13 @@ any of
 
 `quality_indicators`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Set of indicators for estimating the quality of the datacube group. The indicators are group based.](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md))
+* Type: merged type ([Set of indicators for estimating the quality of the datacube group. The indicators are group based.](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators")
+* defined in: [Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based.md "airs_model#/$defs/Group/properties/quality_indicators")
 
 #### quality\_indicators Type
 
@@ -1507,9 +1507,9 @@ merged type ([Set of indicators for estimating the quality of the datacube group
 
 any of
 
-*   [Indicators](model-defs-indicators.md "check type definition")
+* [Indicators](model-defs-indicators.md "check type definition")
 
-*   [Untitled null in Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-group-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-group-the-indicators-are-group-based-anyof-1.md "check type definition")
 
 ## Definitions group Indicators
 
@@ -1532,13 +1532,13 @@ Reference this group by using
 
 `time_compacity`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Indicates whether the temporal extend of the temporal slices (groups) are compact or not compared to the cube temporal extend. Computed as follow: 1-range(group rasters) / range(cube rasters).](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md))
+* Type: merged type ([Indicates whether the temporal extend of the temporal slices (groups) are compact or not compared to the cube temporal extend. Computed as follow: 1-range(group rasters) / range(cube rasters).](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity")
+* defined in: [Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters.md "airs_model#/$defs/Indicators/properties/time_compacity")
 
 #### time\_compacity Type
 
@@ -1546,9 +1546,9 @@ merged type ([Indicates whether the temporal extend of the temporal slices (grou
 
 any of
 
-*   [Untitled number in Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-indicators-properties-indicates-whether-the-temporal-extend-of-the-temporal-slices-groups-are-compact-or-not-compared-to-the-cube-temporal-extend-computed-as-follow-1-rangegroup-rasters--rangecube-rasters-anyof-1.md "check type definition")
 
 ### spatial\_coverage
 
@@ -1556,13 +1556,13 @@ any of
 
 `spatial_coverage`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md))
+* Type: merged type ([Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")
+* defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi.md "airs_model#/$defs/Indicators/properties/spatial_coverage")
 
 #### spatial\_coverage Type
 
@@ -1570,9 +1570,9 @@ merged type ([Indicates the proportion of the region of interest that is covered
 
 any of
 
-*   [Untitled number in Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-indicators-properties-indicates-the-proportion-of-the-region-of-interest-that-is-covered-by-the-input-rasters-computed-as-follow-areaintersectionunionrastersroi--arearoi-anyof-1.md "check type definition")
 
 ### group\_lightness
 
@@ -1580,13 +1580,13 @@ any of
 
 `group_lightness`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Indicates the proportion of non overlapping regions between the different input rasters. Computed as follow: area(intersection(union(rasters),roi)) / sum(area(intersection(raster, roi)))](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md))
+* Type: merged type ([Indicates the proportion of non overlapping regions between the different input rasters. Computed as follow: area(intersection(union(rasters),roi)) / sum(area(intersection(raster, roi)))](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")
+* defined in: [Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi.md "airs_model#/$defs/Indicators/properties/group_lightness")
 
 #### group\_lightness Type
 
@@ -1594,9 +1594,9 @@ merged type ([Indicates the proportion of non overlapping regions between the di
 
 any of
 
-*   [Untitled number in Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-indicators-properties-indicates-the-proportion-of-non-overlapping-regions-between-the-different-input-rasters-computed-as-follow-areaintersectionunionrastersroi--sumareaintersectionraster-roi-anyof-1.md "check type definition")
 
 ### time\_regularity
 
@@ -1604,13 +1604,13 @@ any of
 
 `time_regularity`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Indicates the regularity of the extends between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps)](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md))
+* Type: merged type ([Indicates the regularity of the extends between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps)](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")
+* defined in: [Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps.md "airs_model#/$defs/Indicators/properties/time_regularity")
 
 #### time\_regularity Type
 
@@ -1618,9 +1618,9 @@ merged type ([Indicates the regularity of the extends between the temporal slice
 
 any of
 
-*   [Untitled number in Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-indicators-properties-indicates-the-regularity-of-the-extends-between-the-temporal-slices-groups-computed-as-follow-1-stdinter-group-temporal-gapsavginter-group-temporal-gaps-anyof-1.md "check type definition")
 
 ## Definitions group Properties
 
@@ -1745,13 +1745,13 @@ Reference this group by using
 
 `datetime`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([datetime associated with this item. If None, a start\_datetime and end\_datetime must be supplied.](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md))
+* Type: merged type ([datetime associated with this item. If None, a start\_datetime and end\_datetime must be supplied.](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "airs_model#/$defs/Properties/properties/datetime")
+* defined in: [Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied.md "airs_model#/$defs/Properties/properties/datetime")
 
 #### datetime Type
 
@@ -1759,9 +1759,9 @@ merged type ([datetime associated with this item. If None, a start\_datetime and
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-datetime-associated-with-this-item-if-none-a-start_datetime-and-end_datetime-must-be-supplied-anyof-1.md "check type definition")
 
 ### start\_datetime
 
@@ -1769,13 +1769,13 @@ any of
 
 `start_datetime`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional start datetime, part of common metadata. This value will override any start\_datetime key in properties.](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md))
+* Type: merged type ([Optional start datetime, part of common metadata. This value will override any start\_datetime key in properties.](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/start_datetime")
+* defined in: [Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/start_datetime")
 
 #### start\_datetime Type
 
@@ -1783,9 +1783,9 @@ merged type ([Optional start datetime, part of common metadata. This value will 
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-optional-start-datetime-part-of-common-metadata-this-value-will-override-any-start_datetime-key-in-properties-anyof-1.md "check type definition")
 
 ### end\_datetime
 
@@ -1793,13 +1793,13 @@ any of
 
 `end_datetime`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Optional end datetime, part of common metadata. This value will override any end\_datetime key in properties.](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md))
+* Type: merged type ([Optional end datetime, part of common metadata. This value will override any end\_datetime key in properties.](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/end_datetime")
+* defined in: [Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties.md "airs_model#/$defs/Properties/properties/end_datetime")
 
 #### end\_datetime Type
 
@@ -1807,9 +1807,9 @@ merged type ([Optional end datetime, part of common metadata. This value will ov
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-optional-end-datetime-part-of-common-metadata-this-value-will-override-any-end_datetime-key-in-properties-anyof-1.md "check type definition")
 
 ### keywords
 
@@ -1817,13 +1817,13 @@ any of
 
 `keywords`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([A list of keywords](model-defs-properties-properties-a-list-of-keywords.md))
+* Type: merged type ([A list of keywords](model-defs-properties-properties-a-list-of-keywords.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-a-list-of-keywords.md "airs_model#/$defs/Properties/properties/keywords")
+* defined in: [Item](model-defs-properties-properties-a-list-of-keywords.md "airs_model#/$defs/Properties/properties/keywords")
 
 #### keywords Type
 
@@ -1831,9 +1831,9 @@ merged type ([A list of keywords](model-defs-properties-properties-a-list-of-key
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-a-list-of-keywords-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-a-list-of-keywords-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-anyof-1.md "check type definition")
 
 ### programme
 
@@ -1841,13 +1841,13 @@ any of
 
 `programme`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the programme](model-defs-properties-properties-name-of-the-programme.md))
+* Type: merged type ([Name of the programme](model-defs-properties-properties-name-of-the-programme.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")
+* defined in: [Item](model-defs-properties-properties-name-of-the-programme.md "airs_model#/$defs/Properties/properties/programme")
 
 #### programme Type
 
@@ -1855,9 +1855,9 @@ merged type ([Name of the programme](model-defs-properties-properties-name-of-th
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-programme-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-programme-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-programme-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-programme-anyof-1.md "check type definition")
 
 ### constellation
 
@@ -1865,13 +1865,13 @@ any of
 
 `constellation`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the constellation](model-defs-properties-properties-name-of-the-constellation.md))
+* Type: merged type ([Name of the constellation](model-defs-properties-properties-name-of-the-constellation.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")
+* defined in: [Item](model-defs-properties-properties-name-of-the-constellation.md "airs_model#/$defs/Properties/properties/constellation")
 
 #### constellation Type
 
@@ -1879,9 +1879,9 @@ merged type ([Name of the constellation](model-defs-properties-properties-name-o
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-constellation-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-constellation-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-constellation-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-constellation-anyof-1.md "check type definition")
 
 ### satellite
 
@@ -1889,13 +1889,13 @@ any of
 
 `satellite`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the satellite](model-defs-properties-properties-name-of-the-satellite.md))
+* Type: merged type ([Name of the satellite](model-defs-properties-properties-name-of-the-satellite.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-satellite.md "airs_model#/$defs/Properties/properties/satellite")
+* defined in: [Item](model-defs-properties-properties-name-of-the-satellite.md "airs_model#/$defs/Properties/properties/satellite")
 
 #### satellite Type
 
@@ -1903,9 +1903,9 @@ merged type ([Name of the satellite](model-defs-properties-properties-name-of-th
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-satellite-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-satellite-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-anyof-1.md "check type definition")
 
 ### platform
 
@@ -1913,13 +1913,13 @@ any of
 
 `platform`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the satellite platform](model-defs-properties-properties-name-of-the-satellite-platform.md))
+* Type: merged type ([Name of the satellite platform](model-defs-properties-properties-name-of-the-satellite-platform.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-satellite-platform.md "airs_model#/$defs/Properties/properties/platform")
+* defined in: [Item](model-defs-properties-properties-name-of-the-satellite-platform.md "airs_model#/$defs/Properties/properties/platform")
 
 #### platform Type
 
@@ -1927,9 +1927,9 @@ merged type ([Name of the satellite platform](model-defs-properties-properties-n
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-satellite-platform-anyof-1.md "check type definition")
 
 ### instrument
 
@@ -1937,13 +1937,13 @@ any of
 
 `instrument`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the instrument](model-defs-properties-properties-name-of-the-instrument.md))
+* Type: merged type ([Name of the instrument](model-defs-properties-properties-name-of-the-instrument.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")
+* defined in: [Item](model-defs-properties-properties-name-of-the-instrument.md "airs_model#/$defs/Properties/properties/instrument")
 
 #### instrument Type
 
@@ -1951,9 +1951,9 @@ merged type ([Name of the instrument](model-defs-properties-properties-name-of-t
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-instrument-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-instrument-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-instrument-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-instrument-anyof-1.md "check type definition")
 
 ### sensor
 
@@ -1961,13 +1961,13 @@ any of
 
 `sensor`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the sensor](model-defs-properties-properties-name-of-the-sensor.md))
+* Type: merged type ([Name of the sensor](model-defs-properties-properties-name-of-the-sensor.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")
+* defined in: [Item](model-defs-properties-properties-name-of-the-sensor.md "airs_model#/$defs/Properties/properties/sensor")
 
 #### sensor Type
 
@@ -1975,9 +1975,9 @@ merged type ([Name of the sensor](model-defs-properties-properties-name-of-the-s
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-sensor-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-sensor-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-sensor-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-sensor-anyof-1.md "check type definition")
 
 ### sensor\_mode
 
@@ -1985,13 +1985,13 @@ any of
 
 `sensor_mode`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Mode of the sensor during acquisition](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md))
+* Type: merged type ([Mode of the sensor during acquisition](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md "airs_model#/$defs/Properties/properties/sensor_mode")
+* defined in: [Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition.md "airs_model#/$defs/Properties/properties/sensor_mode")
 
 #### sensor\_mode Type
 
@@ -1999,9 +1999,9 @@ merged type ([Mode of the sensor during acquisition](model-defs-properties-prope
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-mode-of-the-sensor-during-acquisition-anyof-1.md "check type definition")
 
 ### sensor\_type
 
@@ -2009,13 +2009,13 @@ any of
 
 `sensor_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Type of sensor](model-defs-properties-properties-type-of-sensor.md))
+* Type: merged type ([Type of sensor](model-defs-properties-properties-type-of-sensor.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")
+* defined in: [Item](model-defs-properties-properties-type-of-sensor.md "airs_model#/$defs/Properties/properties/sensor_type")
 
 #### sensor\_type Type
 
@@ -2023,9 +2023,9 @@ merged type ([Type of sensor](model-defs-properties-properties-type-of-sensor.md
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-type-of-sensor-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-type-of-sensor-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-type-of-sensor-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-type-of-sensor-anyof-1.md "check type definition")
 
 ### annotations
 
@@ -2033,13 +2033,13 @@ any of
 
 `annotations`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
+* Type: merged type ([Human annotations for the item](model-defs-properties-properties-human-annotations-for-the-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")
+* defined in: [Item](model-defs-properties-properties-human-annotations-for-the-item.md "airs_model#/$defs/Properties/properties/annotations")
 
 #### annotations Type
 
@@ -2047,9 +2047,9 @@ merged type ([Human annotations for the item](model-defs-properties-properties-h
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-human-annotations-for-the-item-anyof-1.md "check type definition")
 
 ### gsd
 
@@ -2057,13 +2057,13 @@ any of
 
 `gsd`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Ground Sampling Distance (resolution)](model-defs-properties-properties-ground-sampling-distance-resolution.md))
+* Type: merged type ([Ground Sampling Distance (resolution)](model-defs-properties-properties-ground-sampling-distance-resolution.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")
+* defined in: [Item](model-defs-properties-properties-ground-sampling-distance-resolution.md "airs_model#/$defs/Properties/properties/gsd")
 
 #### gsd Type
 
@@ -2071,9 +2071,9 @@ merged type ([Ground Sampling Distance (resolution)](model-defs-properties-prope
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-ground-sampling-distance-resolution-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-ground-sampling-distance-resolution-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-ground-sampling-distance-resolution-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-ground-sampling-distance-resolution-anyof-1.md "check type definition")
 
 ### secondary\_id
 
@@ -2081,13 +2081,13 @@ any of
 
 `secondary_id`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Secondary identifier](model-defs-properties-properties-secondary-identifier.md))
+* Type: merged type ([Secondary identifier](model-defs-properties-properties-secondary-identifier.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-secondary-identifier.md "airs_model#/$defs/Properties/properties/secondary_id")
+* defined in: [Item](model-defs-properties-properties-secondary-identifier.md "airs_model#/$defs/Properties/properties/secondary_id")
 
 #### secondary\_id Type
 
@@ -2095,9 +2095,9 @@ merged type ([Secondary identifier](model-defs-properties-properties-secondary-i
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-secondary-identifier-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-secondary-identifier-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-secondary-identifier-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-secondary-identifier-anyof-1.md "check type definition")
 
 ### data\_type
 
@@ -2105,13 +2105,13 @@ any of
 
 `data_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Type of data](model-defs-properties-properties-type-of-data.md))
+* Type: merged type ([Type of data](model-defs-properties-properties-type-of-data.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")
+* defined in: [Item](model-defs-properties-properties-type-of-data.md "airs_model#/$defs/Properties/properties/data_type")
 
 #### data\_type Type
 
@@ -2119,9 +2119,9 @@ merged type ([Type of data](model-defs-properties-properties-type-of-data.md))
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-type-of-data-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-type-of-data-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-type-of-data-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-type-of-data-anyof-1.md "check type definition")
 
 ### item\_type
 
@@ -2129,13 +2129,13 @@ any of
 
 `item_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Type of data (ResourceType)](model-defs-properties-properties-type-of-data-resourcetype.md))
+* Type: merged type ([Type of data (ResourceType)](model-defs-properties-properties-type-of-data-resourcetype.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")
+* defined in: [Item](model-defs-properties-properties-type-of-data-resourcetype.md "airs_model#/$defs/Properties/properties/item_type")
 
 #### item\_type Type
 
@@ -2143,9 +2143,9 @@ merged type ([Type of data (ResourceType)](model-defs-properties-properties-type
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-type-of-data-resourcetype-anyof-1.md "check type definition")
 
 ### item\_format
 
@@ -2153,13 +2153,13 @@ any of
 
 `item_format`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Data format (ItemFormat)](model-defs-properties-properties-data-format-itemformat.md))
+* Type: merged type ([Data format (ItemFormat)](model-defs-properties-properties-data-format-itemformat.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-data-format-itemformat.md "airs_model#/$defs/Properties/properties/item_format")
+* defined in: [Item](model-defs-properties-properties-data-format-itemformat.md "airs_model#/$defs/Properties/properties/item_format")
 
 #### item\_format Type
 
@@ -2167,9 +2167,9 @@ merged type ([Data format (ItemFormat)](model-defs-properties-properties-data-fo
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-data-format-itemformat-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-data-format-itemformat-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-data-format-itemformat-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-data-format-itemformat-anyof-1.md "check type definition")
 
 ### main\_asset\_format
 
@@ -2177,13 +2177,13 @@ any of
 
 `main_asset_format`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Data format of the main asset (AssetFormat)](model-defs-properties-properties-data-format-of-the-main-asset-assetformat.md))
+* Type: merged type ([Data format of the main asset (AssetFormat)](model-defs-properties-properties-data-format-of-the-main-asset-assetformat.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_format")
+* defined in: [Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_format")
 
 #### main\_asset\_format Type
 
@@ -2191,9 +2191,9 @@ merged type ([Data format of the main asset (AssetFormat)](model-defs-properties
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-data-format-of-the-main-asset-assetformat-anyof-1.md "check type definition")
 
 ### main\_asset\_name
 
@@ -2201,13 +2201,13 @@ any of
 
 `main_asset_name`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Name of the main asset (AssetFormat)](model-defs-properties-properties-name-of-the-main-asset-assetformat.md))
+* Type: merged type ([Name of the main asset (AssetFormat)](model-defs-properties-properties-name-of-the-main-asset-assetformat.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-name-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_name")
+* defined in: [Item](model-defs-properties-properties-name-of-the-main-asset-assetformat.md "airs_model#/$defs/Properties/properties/main_asset_name")
 
 #### main\_asset\_name Type
 
@@ -2215,9 +2215,9 @@ merged type ([Name of the main asset (AssetFormat)](model-defs-properties-proper
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-name-of-the-main-asset-assetformat-anyof-1.md "check type definition")
 
 ### observation\_type
 
@@ -2225,13 +2225,13 @@ any of
 
 `observation_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Type of observation (ObservationType)](model-defs-properties-properties-type-of-observation-observationtype.md))
+* Type: merged type ([Type of observation (ObservationType)](model-defs-properties-properties-type-of-observation-observationtype.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-type-of-observation-observationtype.md "airs_model#/$defs/Properties/properties/observation_type")
+* defined in: [Item](model-defs-properties-properties-type-of-observation-observationtype.md "airs_model#/$defs/Properties/properties/observation_type")
 
 #### observation\_type Type
 
@@ -2239,9 +2239,9 @@ merged type ([Type of observation (ObservationType)](model-defs-properties-prope
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-type-of-observation-observationtype-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-type-of-observation-observationtype-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-type-of-observation-observationtype-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-type-of-observation-observationtype-anyof-1.md "check type definition")
 
 ### data\_coverage
 
@@ -2249,13 +2249,13 @@ any of
 
 `data_coverage`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Estimate of data cover](model-defs-properties-properties-estimate-of-data-cover.md))
+* Type: merged type ([Estimate of data cover](model-defs-properties-properties-estimate-of-data-cover.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")
+* defined in: [Item](model-defs-properties-properties-estimate-of-data-cover.md "airs_model#/$defs/Properties/properties/data_coverage")
 
 #### data\_coverage Type
 
@@ -2263,9 +2263,9 @@ merged type ([Estimate of data cover](model-defs-properties-properties-estimate-
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-estimate-of-data-cover-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-estimate-of-data-cover-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-estimate-of-data-cover-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-estimate-of-data-cover-anyof-1.md "check type definition")
 
 ### water\_coverage
 
@@ -2273,13 +2273,13 @@ any of
 
 `water_coverage`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Estimate of water cover](model-defs-properties-properties-estimate-of-water-cover.md))
+* Type: merged type ([Estimate of water cover](model-defs-properties-properties-estimate-of-water-cover.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")
+* defined in: [Item](model-defs-properties-properties-estimate-of-water-cover.md "airs_model#/$defs/Properties/properties/water_coverage")
 
 #### water\_coverage Type
 
@@ -2287,9 +2287,9 @@ merged type ([Estimate of water cover](model-defs-properties-properties-estimate
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-estimate-of-water-cover-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-estimate-of-water-cover-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-estimate-of-water-cover-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-estimate-of-water-cover-anyof-1.md "check type definition")
 
 ### locations
 
@@ -2297,13 +2297,13 @@ any of
 
 `locations`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([List of locations covered by the item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md))
+* Type: merged type ([List of locations covered by the item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "airs_model#/$defs/Properties/properties/locations")
+* defined in: [Item](model-defs-properties-properties-list-of-locations-covered-by-the-item.md "airs_model#/$defs/Properties/properties/locations")
 
 #### locations Type
 
@@ -2311,9 +2311,9 @@ merged type ([List of locations covered by the item](model-defs-properties-prope
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-list-of-locations-covered-by-the-item-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-list-of-locations-covered-by-the-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-list-of-locations-covered-by-the-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-list-of-locations-covered-by-the-item-anyof-1.md "check type definition")
 
 ### create\_datetime
 
@@ -2321,13 +2321,13 @@ any of
 
 `create_datetime`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Date of item creation in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
+* Type: merged type ([Date of item creation in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/create_datetime")
+* defined in: [Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/create_datetime")
 
 #### create\_datetime Type
 
@@ -2335,9 +2335,9 @@ merged type ([Date of item creation in the catalog, managed by the ARLAS Item Re
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-date-of-item-creation-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
 
 ### update\_datetime
 
@@ -2345,13 +2345,13 @@ any of
 
 `update_datetime`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Update date of the item in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
+* Type: merged type ([Update date of the item in the catalog, managed by the ARLAS Item Registration Service](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/update_datetime")
+* defined in: [Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service.md "airs_model#/$defs/Properties/properties/update_datetime")
 
 #### update\_datetime Type
 
@@ -2359,9 +2359,9 @@ merged type ([Update date of the item in the catalog, managed by the ARLAS Item 
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-update-date-of-the-item-in-the-catalog-managed-by-the-arlas-item-registration-service-anyof-1.md "check type definition")
 
 ### view\_\_off\_nadir
 
@@ -2369,13 +2369,13 @@ any of
 
 `view__off_nadir`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md))
+* Type: merged type ([The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__off_nadir")
+* defined in: [Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__off_nadir")
 
 #### view\_\_off\_nadir Type
 
@@ -2383,9 +2383,9 @@ merged type ([The angle from the sensor between nadir (straight down) and the sc
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-angle-from-the-sensor-between-nadir-straight-down-and-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
 
 ### view\_\_incidence\_angle
 
@@ -2393,13 +2393,13 @@ any of
 
 `view__incidence_angle`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md))
+* Type: merged type ([The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__incidence_angle")
+* defined in: [Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90.md "airs_model#/$defs/Properties/properties/view__incidence_angle")
 
 #### view\_\_incidence\_angle Type
 
@@ -2407,9 +2407,9 @@ merged type ([The incidence angle is the angle between the vertical (normal) to 
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-incidence-angle-is-the-angle-between-the-vertical-normal-to-the-intercepting-surface-and-the-line-of-sight-back-to-the-satellite-at-the-scene-center-measured-in-degrees-0-90-anyof-1.md "check type definition")
 
 ### view\_\_azimuth
 
@@ -2417,13 +2417,13 @@ any of
 
 `view__azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Viewing azimuth angle. The angle measured from the sub-satellite point (point on the ground below the platform) between the scene center and true north. Measured clockwise from north in degrees (0-360).](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md))
+* Type: merged type ([Viewing azimuth angle. The angle measured from the sub-satellite point (point on the ground below the platform) between the scene center and true north. Measured clockwise from north in degrees (0-360).](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__azimuth")
+* defined in: [Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__azimuth")
 
 #### view\_\_azimuth Type
 
@@ -2431,9 +2431,9 @@ merged type ([Viewing azimuth angle. The angle measured from the sub-satellite p
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-viewing-azimuth-angle-the-angle-measured-from-the-sub-satellite-point-point-on-the-ground-below-the-platform-between-the-scene-center-and-true-north-measured-clockwise-from-north-in-degrees-0-360-anyof-1.md "check type definition")
 
 ### view\_\_sun\_azimuth
 
@@ -2441,13 +2441,13 @@ any of
 
 `view__sun_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Sun azimuth angle. From the scene center point on the ground, this is the angle between truth north and the sun. Measured clockwise in degrees (0-360).](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md))
+* Type: merged type ([Sun azimuth angle. From the scene center point on the ground, this is the angle between truth north and the sun. Measured clockwise in degrees (0-360).](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__sun_azimuth")
+* defined in: [Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360.md "airs_model#/$defs/Properties/properties/view__sun_azimuth")
 
 #### view\_\_sun\_azimuth Type
 
@@ -2455,9 +2455,9 @@ merged type ([Sun azimuth angle. From the scene center point on the ground, this
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-sun-azimuth-angle-from-the-scene-center-point-on-the-ground-this-is-the-angle-between-truth-north-and-the-sun-measured-clockwise-in-degrees-0-360-anyof-1.md "check type definition")
 
 ### view\_\_sun\_elevation
 
@@ -2465,13 +2465,13 @@ any of
 
 `view__sun_elevation`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Sun elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° \[...\]](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md))
+* Type: merged type ([Sun elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° \[...\]](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "airs_model#/$defs/Properties/properties/view__sun_elevation")
+* defined in: [Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10-.md "airs_model#/$defs/Properties/properties/view__sun_elevation")
 
 #### view\_\_sun\_elevation Type
 
@@ -2479,9 +2479,9 @@ merged type ([Sun elevation angle. The angle from the tangent of the scene cente
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10--anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10--anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10--anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-sun-elevation-angle-the-angle-from-the-tangent-of-the-scene-center-point-to-the-sun-measured-from-the-horizon-in-degrees--90-90-negative-values-indicate-the-sun-is-below-the-horizon-eg-sun-elevation-of--10--anyof-1.md "check type definition")
 
 ### storage\_\_requester\_pays
 
@@ -2489,13 +2489,13 @@ any of
 
 `storage__requester_pays`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
+* Type: merged type ([Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Properties/properties/storage__requester_pays")
+* defined in: [Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets.md "airs_model#/$defs/Properties/properties/storage__requester_pays")
 
 #### storage\_\_requester\_pays Type
 
@@ -2503,9 +2503,9 @@ merged type ([Is the data requester pays or is it data manager/cloud provider pa
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-is-the-data-requester-pays-or-is-it-data-managercloud-provider-pays-defaults-to-false-whether-the-requester-pays-for-accessing-assets-anyof-1.md "check type definition")
 
 ### storage\_\_tier
 
@@ -2513,13 +2513,13 @@ any of
 
 `storage__tier`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
+* Type: merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Properties/properties/storage__tier")
+* defined in: [Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc.md "airs_model#/$defs/Properties/properties/storage__tier")
 
 #### storage\_\_tier Type
 
@@ -2527,9 +2527,9 @@ merged type ([Cloud Provider Storage Tiers (Standard, Glacier, etc.)](model-defs
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-cloud-provider-storage-tiers-standard-glacier-etc-anyof-1.md "check type definition")
 
 ### storage\_\_platform
 
@@ -2537,13 +2537,13 @@ any of
 
 `storage__platform`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
+* Type: merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Properties/properties/storage__platform")
+* defined in: [Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other.md "airs_model#/$defs/Properties/properties/storage__platform")
 
 #### storage\_\_platform Type
 
@@ -2551,9 +2551,9 @@ merged type ([PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)](mod
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-paas-solutions-alibaba-aws-azure-gcp-ibm-oracle-other-anyof-1.md "check type definition")
 
 ### storage\_\_region
 
@@ -2561,13 +2561,13 @@ any of
 
 `storage__region`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
+* Type: merged type ([The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Properties/properties/storage__region")
+* defined in: [Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider.md "airs_model#/$defs/Properties/properties/storage__region")
 
 #### storage\_\_region Type
 
@@ -2575,9 +2575,9 @@ merged type ([The region where the data is stored. Relevant to speed of access a
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-region-where-the-data-is-stored-relevant-to-speed-of-access-and-inter-region-egress-costs-as-defined-by-paas-provider-anyof-1.md "check type definition")
 
 ### eo\_\_cloud\_cover
 
@@ -2585,13 +2585,13 @@ any of
 
 `eo__cloud_cover`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Estimate of cloud cover.](model-defs-properties-properties-estimate-of-cloud-cover.md))
+* Type: merged type ([Estimate of cloud cover.](model-defs-properties-properties-estimate-of-cloud-cover.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "airs_model#/$defs/Properties/properties/eo__cloud_cover")
+* defined in: [Item](model-defs-properties-properties-estimate-of-cloud-cover.md "airs_model#/$defs/Properties/properties/eo__cloud_cover")
 
 #### eo\_\_cloud\_cover Type
 
@@ -2599,9 +2599,9 @@ merged type ([Estimate of cloud cover.](model-defs-properties-properties-estimat
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-estimate-of-cloud-cover-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-estimate-of-cloud-cover-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-estimate-of-cloud-cover-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-estimate-of-cloud-cover-anyof-1.md "check type definition")
 
 ### eo\_\_snow\_cover
 
@@ -2609,13 +2609,13 @@ any of
 
 `eo__snow_cover`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Estimate of snow and ice cover.](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md))
+* Type: merged type ([Estimate of snow and ice cover.](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "airs_model#/$defs/Properties/properties/eo__snow_cover")
+* defined in: [Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover.md "airs_model#/$defs/Properties/properties/eo__snow_cover")
 
 #### eo\_\_snow\_cover Type
 
@@ -2623,9 +2623,9 @@ merged type ([Estimate of snow and ice cover.](model-defs-properties-properties-
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-estimate-of-snow-and-ice-cover-anyof-1.md "check type definition")
 
 ### eo\_\_bands
 
@@ -2633,13 +2633,13 @@ any of
 
 `eo__bands`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
+* Type: merged type ([An array of available bands where each object is a Band Object. If given, requires at least one band.](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Properties/properties/eo__bands")
+* defined in: [Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band.md "airs_model#/$defs/Properties/properties/eo__bands")
 
 #### eo\_\_bands Type
 
@@ -2647,9 +2647,9 @@ merged type ([An array of available bands where each object is a Band Object. If
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-an-array-of-available-bands-where-each-object-is-a-band-object-if-given-requires-at-least-one-band-anyof-1.md "check type definition")
 
 ### processing\_\_expression
 
@@ -2657,13 +2657,13 @@ any of
 
 `processing__expression`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below).](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md))
+* Type: merged type ([An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below).](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "airs_model#/$defs/Properties/properties/processing__expression")
+* defined in: [Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below.md "airs_model#/$defs/Properties/properties/processing__expression")
 
 #### processing\_\_expression Type
 
@@ -2671,9 +2671,9 @@ merged type ([An expression or processing chain that describes how the data has 
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-an-expression-or-processing-chain-that-describes-how-the-data-has-been-processed-alternatively-you-can-also-link-to-a-processing-chain-with-the-relation-type-processing-expression-see-below-anyof-1.md "check type definition")
 
 ### processing\_\_lineage
 
@@ -2681,13 +2681,13 @@ any of
 
 `processing__lineage`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO.](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md))
+* Type: merged type ([Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO.](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "airs_model#/$defs/Properties/properties/processing__lineage")
+* defined in: [Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso.md "airs_model#/$defs/Properties/properties/processing__lineage")
 
 #### processing\_\_lineage Type
 
@@ -2695,9 +2695,9 @@ merged type ([Lineage Information provided as free text information about the ho
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-lineage-information-provided-as-free-text-information-about-the-how-observations-were-processed-or-models-that-were-used-to-create-the-resource-being-described-nasa-iso-anyof-1.md "check type definition")
 
 ### processing\_\_level
 
@@ -2705,13 +2705,13 @@ any of
 
 `processing__level`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name commonly used to refer to the processing level to make it easier to search for product level across collections or items. The short name must be used (only L, not Level).](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md))
+* Type: merged type ([The name commonly used to refer to the processing level to make it easier to search for product level across collections or items. The short name must be used (only L, not Level).](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "airs_model#/$defs/Properties/properties/processing__level")
+* defined in: [Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level.md "airs_model#/$defs/Properties/properties/processing__level")
 
 #### processing\_\_level Type
 
@@ -2719,9 +2719,9 @@ merged type ([The name commonly used to refer to the processing level to make it
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-name-commonly-used-to-refer-to-the-processing-level-to-make-it-easier-to-search-for-product-level-across-collections-or-items-the-short-name-must-be-used-only-l-not-level-anyof-1.md "check type definition")
 
 ### processing\_\_facility
 
@@ -2729,13 +2729,13 @@ any of
 
 `processing__facility`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites.](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md))
+* Type: merged type ([The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites.](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "airs_model#/$defs/Properties/properties/processing__facility")
+* defined in: [Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites.md "airs_model#/$defs/Properties/properties/processing__facility")
 
 #### processing\_\_facility Type
 
@@ -2743,9 +2743,9 @@ merged type ([The name of the facility that produced the data. For example, Cope
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-name-of-the-facility-that-produced-the-data-for-example-copernicus-s1-core-ground-segment---dpa-for-product-of-sentinel-1-satellites-anyof-1.md "check type definition")
 
 ### processing\_\_software
 
@@ -2753,13 +2753,13 @@ any of
 
 `processing__software`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([A dictionary with name/version for key/value describing one or more softwares that produced the data.](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md))
+* Type: merged type ([A dictionary with name/version for key/value describing one or more softwares that produced the data.](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "airs_model#/$defs/Properties/properties/processing__software")
+* defined in: [Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data.md "airs_model#/$defs/Properties/properties/processing__software")
 
 #### processing\_\_software Type
 
@@ -2767,9 +2767,9 @@ merged type ([A dictionary with name/version for key/value describing one or mor
 
 any of
 
-*   [Untitled object in Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data-anyof-0.md "check type definition")
+* [Untitled object in Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-a-dictionary-with-nameversion-for-keyvalue-describing-one-or-more-softwares-that-produced-the-data-anyof-1.md "check type definition")
 
 ### dc3\_\_quality\_indicators
 
@@ -2777,13 +2777,13 @@ any of
 
 `dc3__quality_indicators`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator.](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md))
+* Type: merged type ([Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator.](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "airs_model#/$defs/Properties/properties/dc3__quality_indicators")
+* defined in: [Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator.md "airs_model#/$defs/Properties/properties/dc3__quality_indicators")
 
 #### dc3\_\_quality\_indicators Type
 
@@ -2791,9 +2791,9 @@ merged type ([Set of indicators for estimating the quality of the datacube based
 
 any of
 
-*   [Indicators](model-defs-indicators.md "check type definition")
+* [Indicators](model-defs-indicators.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-set-of-indicators-for-estimating-the-quality-of-the-datacube-based-on-the-composition-the-indicators-are-group-based-a-cube-indicator-is-the-product-of-its-corresponding-group-indicator-anyof-1.md "check type definition")
 
 ### dc3\_\_composition
 
@@ -2801,13 +2801,13 @@ any of
 
 `dc3__composition`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([List of raster groups used for elaborating the cube temporal slices.](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md))
+* Type: merged type ([List of raster groups used for elaborating the cube temporal slices.](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "airs_model#/$defs/Properties/properties/dc3__composition")
+* defined in: [Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices.md "airs_model#/$defs/Properties/properties/dc3__composition")
 
 #### dc3\_\_composition Type
 
@@ -2815,9 +2815,9 @@ merged type ([List of raster groups used for elaborating the cube temporal slice
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-list-of-raster-groups-used-for-elaborating-the-cube-temporal-slices-anyof-1.md "check type definition")
 
 ### dc3\_\_number\_of\_chunks
 
@@ -2825,13 +2825,13 @@ any of
 
 `dc3__number_of_chunks`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of chunks (if zarr or similar partitioned format) within the cube.](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md))
+* Type: merged type ([Number of chunks (if zarr or similar partitioned format) within the cube.](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "airs_model#/$defs/Properties/properties/dc3__number_of_chunks")
+* defined in: [Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube.md "airs_model#/$defs/Properties/properties/dc3__number_of_chunks")
 
 #### dc3\_\_number\_of\_chunks Type
 
@@ -2839,9 +2839,9 @@ merged type ([Number of chunks (if zarr or similar partitioned format) within th
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-number-of-chunks-if-zarr-or-similar-partitioned-format-within-the-cube-anyof-1.md "check type definition")
 
 ### dc3\_\_chunk\_weight
 
@@ -2849,13 +2849,13 @@ any of
 
 `dc3__chunk_weight`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Weight of a chunk (number of bytes).](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md))
+* Type: merged type ([Weight of a chunk (number of bytes).](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "airs_model#/$defs/Properties/properties/dc3__chunk_weight")
+* defined in: [Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes.md "airs_model#/$defs/Properties/properties/dc3__chunk_weight")
 
 #### dc3\_\_chunk\_weight Type
 
@@ -2863,9 +2863,9 @@ merged type ([Weight of a chunk (number of bytes).](model-defs-properties-proper
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-weight-of-a-chunk-number-of-bytes-anyof-1.md "check type definition")
 
 ### dc3\_\_fill\_ratio
 
@@ -2873,13 +2873,13 @@ any of
 
 `dc3__fill_ratio`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([1: the cube is full, 0 the cube is empty, in between the cube is partially filled.](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md))
+* Type: merged type ([1: the cube is full, 0 the cube is empty, in between the cube is partially filled.](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "airs_model#/$defs/Properties/properties/dc3__fill_ratio")
+* defined in: [Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled.md "airs_model#/$defs/Properties/properties/dc3__fill_ratio")
 
 #### dc3\_\_fill\_ratio Type
 
@@ -2887,9 +2887,9 @@ merged type ([1: the cube is full, 0 the cube is empty, in between the cube is p
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-1-the-cube-is-full-0-the-cube-is-empty-in-between-the-cube-is-partially-filled-anyof-1.md "check type definition")
 
 ### cube\_\_dimensions
 
@@ -2897,13 +2897,13 @@ any of
 
 `cube__dimensions`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Uniquely named dimensions of the datacube.](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md))
+* Type: merged type ([Uniquely named dimensions of the datacube.](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__dimensions")
+* defined in: [Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__dimensions")
 
 #### cube\_\_dimensions Type
 
@@ -2911,9 +2911,9 @@ merged type ([Uniquely named dimensions of the datacube.](model-defs-properties-
 
 any of
 
-*   [Untitled object in Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube-anyof-0.md "check type definition")
+* [Untitled object in Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-uniquely-named-dimensions-of-the-datacube-anyof-1.md "check type definition")
 
 ### cube\_\_variables
 
@@ -2921,13 +2921,13 @@ any of
 
 `cube__variables`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Uniquely named variables of the datacube.](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md))
+* Type: merged type ([Uniquely named variables of the datacube.](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__variables")
+* defined in: [Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube.md "airs_model#/$defs/Properties/properties/cube__variables")
 
 #### cube\_\_variables Type
 
@@ -2935,9 +2935,9 @@ merged type ([Uniquely named variables of the datacube.](model-defs-properties-p
 
 any of
 
-*   [Untitled object in Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube-anyof-0.md "check type definition")
+* [Untitled object in Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-uniquely-named-variables-of-the-datacube-anyof-1.md "check type definition")
 
 ### acq\_\_acquisition\_mode
 
@@ -2945,13 +2945,13 @@ any of
 
 `acq__acquisition_mode`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name of the acquisition mode.](model-defs-properties-properties-the-name-of-the-acquisition-mode.md))
+* Type: merged type ([The name of the acquisition mode.](model-defs-properties-properties-the-name-of-the-acquisition-mode.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-of-the-acquisition-mode.md "airs_model#/$defs/Properties/properties/acq__acquisition_mode")
+* defined in: [Item](model-defs-properties-properties-the-name-of-the-acquisition-mode.md "airs_model#/$defs/Properties/properties/acq__acquisition_mode")
 
 #### acq\_\_acquisition\_mode Type
 
@@ -2959,9 +2959,9 @@ merged type ([The name of the acquisition mode.](model-defs-properties-propertie
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-name-of-the-acquisition-mode-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-name-of-the-acquisition-mode-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-name-of-the-acquisition-mode-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-name-of-the-acquisition-mode-anyof-1.md "check type definition")
 
 ### acq\_\_acquisition\_orbit\_direction
 
@@ -2969,13 +2969,13 @@ any of
 
 `acq__acquisition_orbit_direction`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Acquisition orbit direction (ASCENDING or DESCENDING).](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending.md))
+* Type: merged type ([Acquisition orbit direction (ASCENDING or DESCENDING).](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit_direction")
+* defined in: [Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit_direction")
 
 #### acq\_\_acquisition\_orbit\_direction Type
 
@@ -2983,9 +2983,9 @@ merged type ([Acquisition orbit direction (ASCENDING or DESCENDING).](model-defs
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-acquisition-orbit-direction-ascending-or-descending-anyof-1.md "check type definition")
 
 ### acq\_\_acquisition\_type
 
@@ -2993,13 +2993,13 @@ any of
 
 `acq__acquisition_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Acquisition type (STRIP)](model-defs-properties-properties-acquisition-type-strip.md))
+* Type: merged type ([Acquisition type (STRIP)](model-defs-properties-properties-acquisition-type-strip.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-acquisition-type-strip.md "airs_model#/$defs/Properties/properties/acq__acquisition_type")
+* defined in: [Item](model-defs-properties-properties-acquisition-type-strip.md "airs_model#/$defs/Properties/properties/acq__acquisition_type")
 
 #### acq\_\_acquisition\_type Type
 
@@ -3007,9 +3007,9 @@ merged type ([Acquisition type (STRIP)](model-defs-properties-properties-acquisi
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-acquisition-type-strip-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-acquisition-type-strip-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-acquisition-type-strip-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-acquisition-type-strip-anyof-1.md "check type definition")
 
 ### acq\_\_acquisition\_orbit
 
@@ -3017,13 +3017,13 @@ any of
 
 `acq__acquisition_orbit`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Acquisition orbit](model-defs-properties-properties-acquisition-orbit.md))
+* Type: merged type ([Acquisition orbit](model-defs-properties-properties-acquisition-orbit.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-acquisition-orbit.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit")
+* defined in: [Item](model-defs-properties-properties-acquisition-orbit.md "airs_model#/$defs/Properties/properties/acq__acquisition_orbit")
 
 #### acq\_\_acquisition\_orbit Type
 
@@ -3031,9 +3031,9 @@ merged type ([Acquisition orbit](model-defs-properties-properties-acquisition-or
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-acquisition-orbit-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-acquisition-orbit-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-acquisition-orbit-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-acquisition-orbit-anyof-1.md "check type definition")
 
 ### acq\_\_across\_track
 
@@ -3041,13 +3041,13 @@ any of
 
 `acq__across_track`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Across track angle](model-defs-properties-properties-across-track-angle.md))
+* Type: merged type ([Across track angle](model-defs-properties-properties-across-track-angle.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-across-track-angle.md "airs_model#/$defs/Properties/properties/acq__across_track")
+* defined in: [Item](model-defs-properties-properties-across-track-angle.md "airs_model#/$defs/Properties/properties/acq__across_track")
 
 #### acq\_\_across\_track Type
 
@@ -3055,9 +3055,9 @@ merged type ([Across track angle](model-defs-properties-properties-across-track-
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-across-track-angle-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-across-track-angle-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-across-track-angle-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-across-track-angle-anyof-1.md "check type definition")
 
 ### acq\_\_along\_track
 
@@ -3065,13 +3065,13 @@ any of
 
 `acq__along_track`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Along track angle](model-defs-properties-properties-along-track-angle.md))
+* Type: merged type ([Along track angle](model-defs-properties-properties-along-track-angle.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-along-track-angle.md "airs_model#/$defs/Properties/properties/acq__along_track")
+* defined in: [Item](model-defs-properties-properties-along-track-angle.md "airs_model#/$defs/Properties/properties/acq__along_track")
 
 #### acq\_\_along\_track Type
 
@@ -3079,9 +3079,9 @@ merged type ([Along track angle](model-defs-properties-properties-along-track-an
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-along-track-angle-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-along-track-angle-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-along-track-angle-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-along-track-angle-anyof-1.md "check type definition")
 
 ### acq\_\_archiving\_date
 
@@ -3089,13 +3089,13 @@ any of
 
 `acq__archiving_date`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Archiving date](model-defs-properties-properties-archiving-date.md))
+* Type: merged type ([Archiving date](model-defs-properties-properties-archiving-date.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-archiving-date.md "airs_model#/$defs/Properties/properties/acq__archiving_date")
+* defined in: [Item](model-defs-properties-properties-archiving-date.md "airs_model#/$defs/Properties/properties/acq__archiving_date")
 
 #### acq\_\_archiving\_date Type
 
@@ -3103,9 +3103,9 @@ merged type ([Archiving date](model-defs-properties-properties-archiving-date.md
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-archiving-date-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-archiving-date-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-archiving-date-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-archiving-date-anyof-1.md "check type definition")
 
 ### acq\_\_download\_orbit
 
@@ -3113,13 +3113,13 @@ any of
 
 `acq__download_orbit`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Download orbit](model-defs-properties-properties-download-orbit.md))
+* Type: merged type ([Download orbit](model-defs-properties-properties-download-orbit.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-download-orbit.md "airs_model#/$defs/Properties/properties/acq__download_orbit")
+* defined in: [Item](model-defs-properties-properties-download-orbit.md "airs_model#/$defs/Properties/properties/acq__download_orbit")
 
 #### acq\_\_download\_orbit Type
 
@@ -3127,9 +3127,9 @@ merged type ([Download orbit](model-defs-properties-properties-download-orbit.md
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-download-orbit-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-download-orbit-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-download-orbit-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-download-orbit-anyof-1.md "check type definition")
 
 ### acq\_\_request\_id
 
@@ -3137,13 +3137,13 @@ any of
 
 `acq__request_id`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Original request identifier](model-defs-properties-properties-original-request-identifier.md))
+* Type: merged type ([Original request identifier](model-defs-properties-properties-original-request-identifier.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-original-request-identifier.md "airs_model#/$defs/Properties/properties/acq__request_id")
+* defined in: [Item](model-defs-properties-properties-original-request-identifier.md "airs_model#/$defs/Properties/properties/acq__request_id")
 
 #### acq\_\_request\_id Type
 
@@ -3151,9 +3151,9 @@ merged type ([Original request identifier](model-defs-properties-properties-orig
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-original-request-identifier-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-original-request-identifier-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-original-request-identifier-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-original-request-identifier-anyof-1.md "check type definition")
 
 ### acq\_\_quality\_average
 
@@ -3161,13 +3161,13 @@ any of
 
 `acq__quality_average`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Quality average](model-defs-properties-properties-quality-average.md))
+* Type: merged type ([Quality average](model-defs-properties-properties-quality-average.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-quality-average.md "airs_model#/$defs/Properties/properties/acq__quality_average")
+* defined in: [Item](model-defs-properties-properties-quality-average.md "airs_model#/$defs/Properties/properties/acq__quality_average")
 
 #### acq\_\_quality\_average Type
 
@@ -3175,9 +3175,9 @@ merged type ([Quality average](model-defs-properties-properties-quality-average.
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-quality-average-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-quality-average-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-quality-average-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-quality-average-anyof-1.md "check type definition")
 
 ### acq\_\_quality\_computation
 
@@ -3185,13 +3185,13 @@ any of
 
 `acq__quality_computation`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Quality computation](model-defs-properties-properties-quality-computation.md))
+* Type: merged type ([Quality computation](model-defs-properties-properties-quality-computation.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-quality-computation.md "airs_model#/$defs/Properties/properties/acq__quality_computation")
+* defined in: [Item](model-defs-properties-properties-quality-computation.md "airs_model#/$defs/Properties/properties/acq__quality_computation")
 
 #### acq\_\_quality\_computation Type
 
@@ -3199,9 +3199,9 @@ merged type ([Quality computation](model-defs-properties-properties-quality-comp
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-quality-computation-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-quality-computation-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-quality-computation-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-quality-computation-anyof-1.md "check type definition")
 
 ### acq\_\_receiving\_station
 
@@ -3209,13 +3209,13 @@ any of
 
 `acq__receiving_station`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Receiving station](model-defs-properties-properties-receiving-station.md))
+* Type: merged type ([Receiving station](model-defs-properties-properties-receiving-station.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-receiving-station.md "airs_model#/$defs/Properties/properties/acq__receiving_station")
+* defined in: [Item](model-defs-properties-properties-receiving-station.md "airs_model#/$defs/Properties/properties/acq__receiving_station")
 
 #### acq\_\_receiving\_station Type
 
@@ -3223,9 +3223,9 @@ merged type ([Receiving station](model-defs-properties-properties-receiving-stat
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-receiving-station-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-receiving-station-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-receiving-station-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-receiving-station-anyof-1.md "check type definition")
 
 ### acq\_\_reception\_date
 
@@ -3233,13 +3233,13 @@ any of
 
 `acq__reception_date`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Reception date](model-defs-properties-properties-reception-date.md))
+* Type: merged type ([Reception date](model-defs-properties-properties-reception-date.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-reception-date.md "airs_model#/$defs/Properties/properties/acq__reception_date")
+* defined in: [Item](model-defs-properties-properties-reception-date.md "airs_model#/$defs/Properties/properties/acq__reception_date")
 
 #### acq\_\_reception\_date Type
 
@@ -3247,9 +3247,9 @@ merged type ([Reception date](model-defs-properties-properties-reception-date.md
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-reception-date-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-reception-date-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-reception-date-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-reception-date-anyof-1.md "check type definition")
 
 ### acq\_\_spectral\_mode
 
@@ -3257,13 +3257,13 @@ any of
 
 `acq__spectral_mode`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Spectral mode](model-defs-properties-properties-spectral-mode.md))
+* Type: merged type ([Spectral mode](model-defs-properties-properties-spectral-mode.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-spectral-mode.md "airs_model#/$defs/Properties/properties/acq__spectral_mode")
+* defined in: [Item](model-defs-properties-properties-spectral-mode.md "airs_model#/$defs/Properties/properties/acq__spectral_mode")
 
 #### acq\_\_spectral\_mode Type
 
@@ -3271,9 +3271,9 @@ merged type ([Spectral mode](model-defs-properties-properties-spectral-mode.md))
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-spectral-mode-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-spectral-mode-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-spectral-mode-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-spectral-mode-anyof-1.md "check type definition")
 
 ### sar\_\_instrument\_mode
 
@@ -3281,13 +3281,13 @@ any of
 
 `sar__instrument_mode`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
+* Type: merged type ([The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for "Wave mode" of Sentinel-1 and Envisat ASAR satellites.](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Properties/properties/sar__instrument_mode")
+* defined in: [Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites.md "airs_model#/$defs/Properties/properties/sar__instrument_mode")
 
 #### sar\_\_instrument\_mode Type
 
@@ -3295,9 +3295,9 @@ merged type ([The name of the sensor acquisition mode that is commonly used. Thi
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-name-of-the-sensor-acquisition-mode-that-is-commonly-used-this-should-be-the-short-name-if-available-for-example-wv-for-wave-mode-of-sentinel-1-and-envisat-asar-satellites-anyof-1.md "check type definition")
 
 ### sar\_\_frequency\_band
 
@@ -3305,13 +3305,13 @@ any of
 
 `sar__frequency_band`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
+* Type: merged type ([The common name for the frequency band to make it easier to search for bands across instruments. See section "Common Frequency Band Names" for a list of accepted names.](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Properties/properties/sar__frequency_band")
+* defined in: [Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names.md "airs_model#/$defs/Properties/properties/sar__frequency_band")
 
 #### sar\_\_frequency\_band Type
 
@@ -3319,9 +3319,9 @@ merged type ([The common name for the frequency band to make it easier to search
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-common-name-for-the-frequency-band-to-make-it-easier-to-search-for-bands-across-instruments-see-section-common-frequency-band-names-for-a-list-of-accepted-names-anyof-1.md "check type definition")
 
 ### sar\_\_center\_frequency
 
@@ -3329,13 +3329,13 @@ any of
 
 `sar__center_frequency`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
+* Type: merged type ([The center frequency of the instrument, in gigahertz (GHz).](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Properties/properties/sar__center_frequency")
+* defined in: [Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz.md "airs_model#/$defs/Properties/properties/sar__center_frequency")
 
 #### sar\_\_center\_frequency Type
 
@@ -3343,9 +3343,9 @@ merged type ([The center frequency of the instrument, in gigahertz (GHz).](model
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-center-frequency-of-the-instrument-in-gigahertz-ghz-anyof-1.md "check type definition")
 
 ### sar\_\_polarizations
 
@@ -3353,13 +3353,13 @@ any of
 
 `sar__polarizations`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Any combination of polarizations.](model-defs-properties-properties-any-combination-of-polarizations.md))
+* Type: merged type ([Any combination of polarizations.](model-defs-properties-properties-any-combination-of-polarizations.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-any-combination-of-polarizations.md "airs_model#/$defs/Properties/properties/sar__polarizations")
+* defined in: [Item](model-defs-properties-properties-any-combination-of-polarizations.md "airs_model#/$defs/Properties/properties/sar__polarizations")
 
 #### sar\_\_polarizations Type
 
@@ -3367,9 +3367,9 @@ merged type ([Any combination of polarizations.](model-defs-properties-propertie
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-any-combination-of-polarizations-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-any-combination-of-polarizations-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-any-combination-of-polarizations-anyof-1.md "check type definition")
 
 ### sar\_\_product\_type
 
@@ -3377,13 +3377,13 @@ any of
 
 `sar__product_type`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The product type, for example SSC, MGD, or SGC](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
+* Type: merged type ([The product type, for example SSC, MGD, or SGC](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Properties/properties/sar__product_type")
+* defined in: [Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc.md "airs_model#/$defs/Properties/properties/sar__product_type")
 
 #### sar\_\_product\_type Type
 
@@ -3391,9 +3391,9 @@ merged type ([The product type, for example SSC, MGD, or SGC](model-defs-propert
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
 
 ### sar\_\_resolution\_range
 
@@ -3401,13 +3401,13 @@ any of
 
 `sar__resolution_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
+* Type: merged type ([The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_range")
+* defined in: [Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_range")
 
 #### sar\_\_resolution\_range Type
 
@@ -3415,9 +3415,9 @@ merged type ([The range resolution, which is the maximum ability to distinguish 
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-range-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-perpendicular-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
 ### sar\_\_resolution\_azimuth
 
@@ -3425,13 +3425,13 @@ any of
 
 `sar__resolution_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
+* Type: merged type ([The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_azimuth")
+* defined in: [Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m.md "airs_model#/$defs/Properties/properties/sar__resolution_azimuth")
 
 #### sar\_\_resolution\_azimuth Type
 
@@ -3439,9 +3439,9 @@ merged type ([The azimuth resolution, which is the maximum ability to distinguis
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-azimuth-resolution-which-is-the-maximum-ability-to-distinguish-two-adjacent-targets-parallel-to-the-flight-path-in-meters-m-anyof-1.md "check type definition")
 
 ### sar\_\_pixel\_spacing\_range
 
@@ -3449,13 +3449,13 @@ any of
 
 `sar__pixel_spacing_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
+* Type: merged type ([The range pixel spacing, which is the distance between adjacent pixels perpendicular to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_range")
+* defined in: [Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_range")
 
 #### sar\_\_pixel\_spacing\_range Type
 
@@ -3463,9 +3463,9 @@ merged type ([The range pixel spacing, which is the distance between adjacent pi
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-range-pixel-spacing-which-is-the-distance-between-adjacent-pixels-perpendicular-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
 ### sar\_\_pixel\_spacing\_azimuth
 
@@ -3473,13 +3473,13 @@ any of
 
 `sar__pixel_spacing_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
+* Type: merged type ([The azimuth pixel spacing, which is the distance between adjacent pixels parallel to the flight path, in meters (m). Strongly RECOMMENDED to be specified for products of type GRD.](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_azimuth")
+* defined in: [Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd.md "airs_model#/$defs/Properties/properties/sar__pixel_spacing_azimuth")
 
 #### sar\_\_pixel\_spacing\_azimuth Type
 
@@ -3487,9 +3487,9 @@ merged type ([The azimuth pixel spacing, which is the distance between adjacent 
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-azimuth-pixel-spacing-which-is-the-distance-between-adjacent-pixels-parallel-to-the-flight-path-in-meters-m-strongly-recommended-to-be-specified-for-products-of-type-grd-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_range
 
@@ -3497,13 +3497,13 @@ any of
 
 `sar__looks_range`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
+* Type: merged type ([Number of range looks, which is the number of groups of signal samples (looks) perpendicular to the flight path.](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_range")
+* defined in: [Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_range")
 
 #### sar\_\_looks\_range Type
 
@@ -3511,9 +3511,9 @@ merged type ([Number of range looks, which is the number of groups of signal sam
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-number-of-range-looks-which-is-the-number-of-groups-of-signal-samples-looks-perpendicular-to-the-flight-path-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_azimuth
 
@@ -3521,13 +3521,13 @@ any of
 
 `sar__looks_azimuth`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
+* Type: merged type ([Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_azimuth")
+* defined in: [Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path.md "airs_model#/$defs/Properties/properties/sar__looks_azimuth")
 
 #### sar\_\_looks\_azimuth Type
 
@@ -3535,9 +3535,9 @@ merged type ([Number of azimuth looks, which is the number of groups of signal s
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-number-of-azimuth-looks-which-is-the-number-of-groups-of-signal-samples-looks-parallel-to-the-flight-path-anyof-1.md "check type definition")
 
 ### sar\_\_looks\_equivalent\_number
 
@@ -3545,13 +3545,13 @@ any of
 
 `sar__looks_equivalent_number`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The equivalent number of looks (ENL).](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md))
+* Type: merged type ([The equivalent number of looks (ENL).](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Properties/properties/sar__looks_equivalent_number")
+* defined in: [Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl.md "airs_model#/$defs/Properties/properties/sar__looks_equivalent_number")
 
 #### sar\_\_looks\_equivalent\_number Type
 
@@ -3559,9 +3559,9 @@ merged type ([The equivalent number of looks (ENL).](model-defs-properties-prope
 
 any of
 
-*   [Untitled number in Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl-anyof-0.md "check type definition")
+* [Untitled number in Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-equivalent-number-of-looks-enl-anyof-1.md "check type definition")
 
 ### sar\_\_observation\_direction
 
@@ -3569,13 +3569,13 @@ any of
 
 `sar__observation_direction`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
+* Type: merged type ([Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Properties/properties/sar__observation_direction")
+* defined in: [Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right.md "airs_model#/$defs/Properties/properties/sar__observation_direction")
 
 #### sar\_\_observation\_direction Type
 
@@ -3583,9 +3583,9 @@ merged type ([Antenna pointing direction relative to the flight trajectory of th
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-antenna-pointing-direction-relative-to-the-flight-trajectory-of-the-satellite-either-left-or-right-anyof-1.md "check type definition")
 
 ### proj\_\_epsg
 
@@ -3593,13 +3593,13 @@ any of
 
 `proj__epsg`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([EPSG code of the datasource.](model-defs-properties-properties-epsg-code-of-the-datasource.md))
+* Type: merged type ([EPSG code of the datasource.](model-defs-properties-properties-epsg-code-of-the-datasource.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Properties/properties/proj__epsg")
+* defined in: [Item](model-defs-properties-properties-epsg-code-of-the-datasource.md "airs_model#/$defs/Properties/properties/proj__epsg")
 
 #### proj\_\_epsg Type
 
@@ -3607,9 +3607,9 @@ merged type ([EPSG code of the datasource.](model-defs-properties-properties-eps
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-epsg-code-of-the-datasource-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-epsg-code-of-the-datasource-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-epsg-code-of-the-datasource-anyof-1.md "check type definition")
 
 ### proj\_\_wkt2
 
@@ -3617,13 +3617,13 @@ any of
 
 `proj__wkt2`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
+* Type: merged type ([PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Properties/properties/proj__wkt2")
+* defined in: [Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent.md "airs_model#/$defs/Properties/properties/proj__wkt2")
 
 #### proj\_\_wkt2 Type
 
@@ -3631,9 +3631,9 @@ merged type ([PROJJSON object representing the Coordinate Reference System (CRS)
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-projjson-object-representing-the-coordinate-reference-system-crs-that-the-projgeometry-and-projbbox-fields-represent-anyof-1.md "check type definition")
 
 ### proj\_\_geometry
 
@@ -3641,13 +3641,13 @@ any of
 
 `proj__geometry`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Defines the footprint of this Item.](model-defs-properties-properties-defines-the-footprint-of-this-item.md))
+* Type: merged type ([Defines the footprint of this Item.](model-defs-properties-properties-defines-the-footprint-of-this-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Properties/properties/proj__geometry")
+* defined in: [Item](model-defs-properties-properties-defines-the-footprint-of-this-item.md "airs_model#/$defs/Properties/properties/proj__geometry")
 
 #### proj\_\_geometry Type
 
@@ -3655,9 +3655,9 @@ merged type ([Defines the footprint of this Item.](model-defs-properties-propert
 
 any of
 
-*   [Untitled undefined type in Item](model-defs-properties-properties-defines-the-footprint-of-this-item-anyof-0.md "check type definition")
+* [Untitled undefined type in Item](model-defs-properties-properties-defines-the-footprint-of-this-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-defines-the-footprint-of-this-item-anyof-1.md "check type definition")
 
 ### proj\_\_bbox
 
@@ -3665,13 +3665,13 @@ any of
 
 `proj__bbox`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
+* Type: merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Properties/properties/proj__bbox")
+* defined in: [Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions.md "airs_model#/$defs/Properties/properties/proj__bbox")
 
 #### proj\_\_bbox Type
 
@@ -3679,9 +3679,9 @@ merged type ([Bounding box of the Item in the asset CRS in 2 or 3 dimensions.](m
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-bounding-box-of-the-item-in-the-asset-crs-in-2-or-3-dimensions-anyof-1.md "check type definition")
 
 ### proj\_\_centroid
 
@@ -3689,13 +3689,13 @@ any of
 
 `proj__centroid`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
+* Type: merged type ([Coordinates representing the centroid of the Item (in lat/long).](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Properties/properties/proj__centroid")
+* defined in: [Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong.md "airs_model#/$defs/Properties/properties/proj__centroid")
 
 #### proj\_\_centroid Type
 
@@ -3703,9 +3703,9 @@ merged type ([Coordinates representing the centroid of the Item (in lat/long).](
 
 any of
 
-*   [Untitled undefined type in Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-0.md "check type definition")
+* [Untitled undefined type in Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-coordinates-representing-the-centroid-of-the-item-in-latlong-anyof-1.md "check type definition")
 
 ### proj\_\_shape
 
@@ -3713,13 +3713,13 @@ any of
 
 `proj__shape`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
+* Type: merged type ([Number of pixels in Y and X directions for the default grid.](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__shape")
+* defined in: [Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__shape")
 
 #### proj\_\_shape Type
 
@@ -3727,9 +3727,9 @@ merged type ([Number of pixels in Y and X directions for the default grid.](mode
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-number-of-pixels-in-y-and-x-directions-for-the-default-grid-anyof-1.md "check type definition")
 
 ### proj\_\_transform
 
@@ -3737,13 +3737,13 @@ any of
 
 `proj__transform`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The affine transformation coefficients for the default grid.](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
+* Type: merged type ([The affine transformation coefficients for the default grid.](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__transform")
+* defined in: [Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid.md "airs_model#/$defs/Properties/properties/proj__transform")
 
 #### proj\_\_transform Type
 
@@ -3751,9 +3751,9 @@ merged type ([The affine transformation coefficients for the default grid.](mode
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-affine-transformation-coefficients-for-the-default-grid-anyof-1.md "check type definition")
 
 ### generated\_\_has\_overview
 
@@ -3761,13 +3761,13 @@ any of
 
 `generated__has_overview`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has an overview or not.](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md))
+* Type: merged type ([Whether the item has an overview or not.](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "airs_model#/$defs/Properties/properties/generated__has_overview")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not.md "airs_model#/$defs/Properties/properties/generated__has_overview")
 
 #### generated\_\_has\_overview Type
 
@@ -3775,9 +3775,9 @@ merged type ([Whether the item has an overview or not.](model-defs-properties-pr
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-an-overview-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_has\_thumbnail
 
@@ -3785,13 +3785,13 @@ any of
 
 `generated__has_thumbnail`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has a thumbnail or not.](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md))
+* Type: merged type ([Whether the item has a thumbnail or not.](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "airs_model#/$defs/Properties/properties/generated__has_thumbnail")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not.md "airs_model#/$defs/Properties/properties/generated__has_thumbnail")
 
 #### generated\_\_has\_thumbnail Type
 
@@ -3799,9 +3799,9 @@ merged type ([Whether the item has a thumbnail or not.](model-defs-properties-pr
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-thumbnail-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_has\_metadata
 
@@ -3809,13 +3809,13 @@ any of
 
 `generated__has_metadata`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has a metadata file or not.](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md))
+* Type: merged type ([Whether the item has a metadata file or not.](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_metadata")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_metadata")
 
 #### generated\_\_has\_metadata Type
 
@@ -3823,9 +3823,9 @@ merged type ([Whether the item has a metadata file or not.](model-defs-propertie
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-metadata-file-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_has\_data
 
@@ -3833,13 +3833,13 @@ any of
 
 `generated__has_data`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has a data file or not.](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md))
+* Type: merged type ([Whether the item has a data file or not.](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_data")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not.md "airs_model#/$defs/Properties/properties/generated__has_data")
 
 #### generated\_\_has\_data Type
 
@@ -3847,9 +3847,9 @@ merged type ([Whether the item has a data file or not.](model-defs-properties-pr
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-data-file-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_has\_cog
 
@@ -3857,13 +3857,13 @@ any of
 
 `generated__has_cog`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has a cog or not.](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md))
+* Type: merged type ([Whether the item has a cog or not.](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "airs_model#/$defs/Properties/properties/generated__has_cog")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not.md "airs_model#/$defs/Properties/properties/generated__has_cog")
 
 #### generated\_\_has\_cog Type
 
@@ -3871,9 +3871,9 @@ merged type ([Whether the item has a cog or not.](model-defs-properties-properti
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-cog-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_has\_zarr
 
@@ -3881,13 +3881,13 @@ any of
 
 `generated__has_zarr`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Whether the item has a zarr or not.](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md))
+* Type: merged type ([Whether the item has a zarr or not.](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "airs_model#/$defs/Properties/properties/generated__has_zarr")
+* defined in: [Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not.md "airs_model#/$defs/Properties/properties/generated__has_zarr")
 
 #### generated\_\_has\_zarr Type
 
@@ -3895,9 +3895,9 @@ merged type ([Whether the item has a zarr or not.](model-defs-properties-propert
 
 any of
 
-*   [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not-anyof-0.md "check type definition")
+* [Untitled boolean in Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-whether-the-item-has-a-zarr-or-not-anyof-1.md "check type definition")
 
 ### generated\_\_date\_keywords
 
@@ -3905,13 +3905,13 @@ any of
 
 `generated__date_keywords`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([A list of keywords indicating clues on the date](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md))
+* Type: merged type ([A list of keywords indicating clues on the date](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "airs_model#/$defs/Properties/properties/generated__date_keywords")
+* defined in: [Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date.md "airs_model#/$defs/Properties/properties/generated__date_keywords")
 
 #### generated\_\_date\_keywords Type
 
@@ -3919,9 +3919,9 @@ merged type ([A list of keywords indicating clues on the date](model-defs-proper
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-a-list-of-keywords-indicating-clues-on-the-date-anyof-1.md "check type definition")
 
 ### generated\_\_day\_of\_week
 
@@ -3929,13 +3929,13 @@ any of
 
 `generated__day_of_week`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Day of week.](model-defs-properties-properties-day-of-week.md))
+* Type: merged type ([Day of week.](model-defs-properties-properties-day-of-week.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-day-of-week.md "airs_model#/$defs/Properties/properties/generated__day_of_week")
+* defined in: [Item](model-defs-properties-properties-day-of-week.md "airs_model#/$defs/Properties/properties/generated__day_of_week")
 
 #### generated\_\_day\_of\_week Type
 
@@ -3943,9 +3943,9 @@ merged type ([Day of week.](model-defs-properties-properties-day-of-week.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-day-of-week-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-day-of-week-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-day-of-week-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-day-of-week-anyof-1.md "check type definition")
 
 ### generated\_\_day\_of\_year
 
@@ -3953,13 +3953,13 @@ any of
 
 `generated__day_of_year`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Day of year.](model-defs-properties-properties-day-of-year.md))
+* Type: merged type ([Day of year.](model-defs-properties-properties-day-of-year.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-day-of-year.md "airs_model#/$defs/Properties/properties/generated__day_of_year")
+* defined in: [Item](model-defs-properties-properties-day-of-year.md "airs_model#/$defs/Properties/properties/generated__day_of_year")
 
 #### generated\_\_day\_of\_year Type
 
@@ -3967,9 +3967,9 @@ merged type ([Day of year.](model-defs-properties-properties-day-of-year.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-day-of-year-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-day-of-year-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-day-of-year-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-day-of-year-anyof-1.md "check type definition")
 
 ### generated\_\_hour\_of\_day
 
@@ -3977,13 +3977,13 @@ any of
 
 `generated__hour_of_day`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Hour of day.](model-defs-properties-properties-hour-of-day.md))
+* Type: merged type ([Hour of day.](model-defs-properties-properties-hour-of-day.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-hour-of-day.md "airs_model#/$defs/Properties/properties/generated__hour_of_day")
+* defined in: [Item](model-defs-properties-properties-hour-of-day.md "airs_model#/$defs/Properties/properties/generated__hour_of_day")
 
 #### generated\_\_hour\_of\_day Type
 
@@ -3991,9 +3991,9 @@ merged type ([Hour of day.](model-defs-properties-properties-hour-of-day.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-hour-of-day-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-hour-of-day-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-hour-of-day-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-hour-of-day-anyof-1.md "check type definition")
 
 ### generated\_\_minute\_of\_day
 
@@ -4001,13 +4001,13 @@ any of
 
 `generated__minute_of_day`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Minute of day.](model-defs-properties-properties-minute-of-day.md))
+* Type: merged type ([Minute of day.](model-defs-properties-properties-minute-of-day.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-minute-of-day.md "airs_model#/$defs/Properties/properties/generated__minute_of_day")
+* defined in: [Item](model-defs-properties-properties-minute-of-day.md "airs_model#/$defs/Properties/properties/generated__minute_of_day")
 
 #### generated\_\_minute\_of\_day Type
 
@@ -4015,9 +4015,9 @@ merged type ([Minute of day.](model-defs-properties-properties-minute-of-day.md)
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-minute-of-day-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-minute-of-day-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-minute-of-day-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-minute-of-day-anyof-1.md "check type definition")
 
 ### generated\_\_month
 
@@ -4025,13 +4025,13 @@ any of
 
 `generated__month`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Month](model-defs-properties-properties-month.md))
+* Type: merged type ([Month](model-defs-properties-properties-month.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-month.md "airs_model#/$defs/Properties/properties/generated__month")
+* defined in: [Item](model-defs-properties-properties-month.md "airs_model#/$defs/Properties/properties/generated__month")
 
 #### generated\_\_month Type
 
@@ -4039,9 +4039,9 @@ merged type ([Month](model-defs-properties-properties-month.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-month-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-month-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-month-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-month-anyof-1.md "check type definition")
 
 ### generated\_\_year
 
@@ -4049,13 +4049,13 @@ any of
 
 `generated__year`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Year](model-defs-properties-properties-year.md))
+* Type: merged type ([Year](model-defs-properties-properties-year.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-year.md "airs_model#/$defs/Properties/properties/generated__year")
+* defined in: [Item](model-defs-properties-properties-year.md "airs_model#/$defs/Properties/properties/generated__year")
 
 #### generated\_\_year Type
 
@@ -4063,9 +4063,9 @@ merged type ([Year](model-defs-properties-properties-year.md))
 
 any of
 
-*   [Untitled integer in Item](model-defs-properties-properties-year-anyof-0.md "check type definition")
+* [Untitled integer in Item](model-defs-properties-properties-year-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-year-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-year-anyof-1.md "check type definition")
 
 ### generated\_\_season
 
@@ -4073,13 +4073,13 @@ any of
 
 `generated__season`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Season](model-defs-properties-properties-season.md))
+* Type: merged type ([Season](model-defs-properties-properties-season.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-season.md "airs_model#/$defs/Properties/properties/generated__season")
+* defined in: [Item](model-defs-properties-properties-season.md "airs_model#/$defs/Properties/properties/generated__season")
 
 #### generated\_\_season Type
 
@@ -4087,9 +4087,9 @@ merged type ([Season](model-defs-properties-properties-season.md))
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-season-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-season-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-season-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-season-anyof-1.md "check type definition")
 
 ### generated\_\_tltrbrbl
 
@@ -4097,13 +4097,13 @@ any of
 
 `generated__tltrbrbl`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([The coordinates of the top left, top right, bottom right, bottom left corners of the item.](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md))
+* Type: merged type ([The coordinates of the top left, top right, bottom right, bottom left corners of the item.](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "airs_model#/$defs/Properties/properties/generated__tltrbrbl")
+* defined in: [Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item.md "airs_model#/$defs/Properties/properties/generated__tltrbrbl")
 
 #### generated\_\_tltrbrbl Type
 
@@ -4111,9 +4111,9 @@ merged type ([The coordinates of the top left, top right, bottom right, bottom l
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-the-coordinates-of-the-top-left-top-right-bottom-right-bottom-left-corners-of-the-item-anyof-1.md "check type definition")
 
 ### generated\_\_band\_common\_names
 
@@ -4121,13 +4121,13 @@ any of
 
 `generated__band_common_names`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([List of the band common names.](model-defs-properties-properties-list-of-the-band-common-names.md))
+* Type: merged type ([List of the band common names.](model-defs-properties-properties-list-of-the-band-common-names.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-the-band-common-names.md "airs_model#/$defs/Properties/properties/generated__band_common_names")
+* defined in: [Item](model-defs-properties-properties-list-of-the-band-common-names.md "airs_model#/$defs/Properties/properties/generated__band_common_names")
 
 #### generated\_\_band\_common\_names Type
 
@@ -4135,9 +4135,9 @@ merged type ([List of the band common names.](model-defs-properties-properties-l
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-list-of-the-band-common-names-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-list-of-the-band-common-names-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-list-of-the-band-common-names-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-list-of-the-band-common-names-anyof-1.md "check type definition")
 
 ### generated\_\_band\_names
 
@@ -4145,13 +4145,13 @@ any of
 
 `generated__band_names`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([List of the band names.](model-defs-properties-properties-list-of-the-band-names.md))
+* Type: merged type ([List of the band names.](model-defs-properties-properties-list-of-the-band-names.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-list-of-the-band-names.md "airs_model#/$defs/Properties/properties/generated__band_names")
+* defined in: [Item](model-defs-properties-properties-list-of-the-band-names.md "airs_model#/$defs/Properties/properties/generated__band_names")
 
 #### generated\_\_band\_names Type
 
@@ -4159,9 +4159,9 @@ merged type ([List of the band names.](model-defs-properties-properties-list-of-
 
 any of
 
-*   [Untitled array in Item](model-defs-properties-properties-list-of-the-band-names-anyof-0.md "check type definition")
+* [Untitled array in Item](model-defs-properties-properties-list-of-the-band-names-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-list-of-the-band-names-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-list-of-the-band-names-anyof-1.md "check type definition")
 
 ### generated\_\_geohash2
 
@@ -4169,13 +4169,13 @@ any of
 
 `generated__geohash2`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Geohash on the first two characters.](model-defs-properties-properties-geohash-on-the-first-two-characters.md))
+* Type: merged type ([Geohash on the first two characters.](model-defs-properties-properties-geohash-on-the-first-two-characters.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "airs_model#/$defs/Properties/properties/generated__geohash2")
+* defined in: [Item](model-defs-properties-properties-geohash-on-the-first-two-characters.md "airs_model#/$defs/Properties/properties/generated__geohash2")
 
 #### generated\_\_geohash2 Type
 
@@ -4183,9 +4183,9 @@ merged type ([Geohash on the first two characters.](model-defs-properties-proper
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-two-characters-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-two-characters-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-two-characters-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-two-characters-anyof-1.md "check type definition")
 
 ### generated\_\_geohash3
 
@@ -4193,13 +4193,13 @@ any of
 
 `generated__geohash3`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Geohash on the first three characters.](model-defs-properties-properties-geohash-on-the-first-three-characters.md))
+* Type: merged type ([Geohash on the first three characters.](model-defs-properties-properties-geohash-on-the-first-three-characters.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "airs_model#/$defs/Properties/properties/generated__geohash3")
+* defined in: [Item](model-defs-properties-properties-geohash-on-the-first-three-characters.md "airs_model#/$defs/Properties/properties/generated__geohash3")
 
 #### generated\_\_geohash3 Type
 
@@ -4207,9 +4207,9 @@ merged type ([Geohash on the first three characters.](model-defs-properties-prop
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-three-characters-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-three-characters-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-three-characters-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-three-characters-anyof-1.md "check type definition")
 
 ### generated\_\_geohash4
 
@@ -4217,13 +4217,13 @@ any of
 
 `generated__geohash4`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Geohash on the first four characters.](model-defs-properties-properties-geohash-on-the-first-four-characters.md))
+* Type: merged type ([Geohash on the first four characters.](model-defs-properties-properties-geohash-on-the-first-four-characters.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "airs_model#/$defs/Properties/properties/generated__geohash4")
+* defined in: [Item](model-defs-properties-properties-geohash-on-the-first-four-characters.md "airs_model#/$defs/Properties/properties/generated__geohash4")
 
 #### generated\_\_geohash4 Type
 
@@ -4231,9 +4231,9 @@ merged type ([Geohash on the first four characters.](model-defs-properties-prope
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-four-characters-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-four-characters-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-four-characters-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-four-characters-anyof-1.md "check type definition")
 
 ### generated\_\_geohash5
 
@@ -4241,13 +4241,13 @@ any of
 
 `generated__geohash5`
 
-*   is optional
+* is optional
 
-*   Type: merged type ([Geohash on the first five characters.](model-defs-properties-properties-geohash-on-the-first-five-characters.md))
+* Type: merged type ([Geohash on the first five characters.](model-defs-properties-properties-geohash-on-the-first-five-characters.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "airs_model#/$defs/Properties/properties/generated__geohash5")
+* defined in: [Item](model-defs-properties-properties-geohash-on-the-first-five-characters.md "airs_model#/$defs/Properties/properties/generated__geohash5")
 
 #### generated\_\_geohash5 Type
 
@@ -4255,9 +4255,9 @@ merged type ([Geohash on the first five characters.](model-defs-properties-prope
 
 any of
 
-*   [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-five-characters-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-properties-properties-geohash-on-the-first-five-characters-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-five-characters-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-properties-properties-geohash-on-the-first-five-characters-anyof-1.md "check type definition")
 
 ### Additional Properties
 
@@ -4283,13 +4283,13 @@ Reference this group by using
 
 `type`
 
-*   is required
+* is required
 
-*   Type: `object` ([RasterType](model-defs-rastertype.md))
+* Type: `object` ([RasterType](model-defs-rastertype.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
+* defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
 
 #### type Type
 
@@ -4301,13 +4301,13 @@ Reference this group by using
 
 `path`
 
-*   is required
+* is required
 
-*   Type: `string` ([Path](model-defs-raster-properties-path.md))
+* Type: `string` ([Path](model-defs-raster-properties-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
+* defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
 
 #### path Type
 
@@ -4319,13 +4319,13 @@ Reference this group by using
 
 `id`
 
-*   is required
+* is required
 
-*   Type: `string` ([Id](model-defs-raster-properties-id.md))
+* Type: `string` ([Id](model-defs-raster-properties-id.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
+* defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
 
 #### id Type
 
@@ -4350,13 +4350,13 @@ Reference this group by using
 
 `source`
 
-*   is required
+* is required
 
-*   Type: `string` ([Source](model-defs-rastertype-properties-source.md))
+* Type: `string` ([Source](model-defs-rastertype-properties-source.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
+* defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
 
 #### source Type
 
@@ -4368,13 +4368,13 @@ Reference this group by using
 
 `format`
 
-*   is required
+* is required
 
-*   Type: `string` ([Format](model-defs-rastertype-properties-format.md))
+* Type: `string` ([Format](model-defs-rastertype-properties-format.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
+* defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
 
 #### format Type
 

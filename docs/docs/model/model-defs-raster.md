@@ -6,9 +6,9 @@ airs_model#/$defs/Raster
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                      |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json\*](model.schema.json "open original schema") |
 
 ## Raster Type
 
@@ -28,13 +28,13 @@ airs_model#/$defs/Raster
 
 `type`
 
-*   is required
+* is required
 
-*   Type: `object` ([RasterType](model-defs-rastertype.md))
+* Type: `object` ([RasterType](model-defs-rastertype.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
+* defined in: [Item](model-defs-rastertype.md "airs_model#/$defs/Raster/properties/type")
 
 ### type Type
 
@@ -46,13 +46,13 @@ airs_model#/$defs/Raster
 
 `path`
 
-*   is required
+* is required
 
-*   Type: `string` ([Path](model-defs-raster-properties-path.md))
+* Type: `string` ([Path](model-defs-raster-properties-path.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
+* defined in: [Item](model-defs-raster-properties-path.md "airs_model#/$defs/Raster/properties/path")
 
 ### path Type
 
@@ -64,13 +64,13 @@ airs_model#/$defs/Raster
 
 `id`
 
-*   is required
+* is required
 
-*   Type: `string` ([Id](model-defs-raster-properties-id.md))
+* Type: `string` ([Id](model-defs-raster-properties-id.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
+* defined in: [Item](model-defs-raster-properties-id.md "airs_model#/$defs/Raster/properties/id")
 
 ### id Type
 

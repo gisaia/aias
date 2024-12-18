@@ -6,9 +6,9 @@ airs_model#/$defs/RasterType
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                      |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [model.schema.json\*](model.schema.json "open original schema") |
 
 ## RasterType Type
 
@@ -27,13 +27,13 @@ airs_model#/$defs/RasterType
 
 `source`
 
-*   is required
+* is required
 
-*   Type: `string` ([Source](model-defs-rastertype-properties-source.md))
+* Type: `string` ([Source](model-defs-rastertype-properties-source.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
+* defined in: [Item](model-defs-rastertype-properties-source.md "airs_model#/$defs/RasterType/properties/source")
 
 ### source Type
 
@@ -45,13 +45,13 @@ airs_model#/$defs/RasterType
 
 `format`
 
-*   is required
+* is required
 
-*   Type: `string` ([Format](model-defs-rastertype-properties-format.md))
+* Type: `string` ([Format](model-defs-rastertype-properties-format.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
+* defined in: [Item](model-defs-rastertype-properties-format.md "airs_model#/$defs/RasterType/properties/format")
 
 ### format Type
 

@@ -6,9 +6,9 @@ airs_model#/$defs/Asset/properties/sar__product_type
 
 
 
-| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                |
-| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
-| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                      |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](model.schema.json "open original schema") |
 
 ## sar\_\_product\_type Type
 
@@ -16,6 +16,6 @@ merged type ([The product type, for example SSC, MGD, or SGC](model-defs-asset-p
 
 any of
 
-*   [Untitled string in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
+* [Untitled string in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-0.md "check type definition")
 
-*   [Untitled null in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")
+* [Untitled null in Item](model-defs-asset-properties-the-product-type-for-example-ssc-mgd-or-sgc-anyof-1.md "check type definition")

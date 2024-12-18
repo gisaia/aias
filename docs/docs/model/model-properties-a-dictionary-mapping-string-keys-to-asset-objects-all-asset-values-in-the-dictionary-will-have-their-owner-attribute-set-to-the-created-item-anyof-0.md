@@ -6,9 +6,9 @@ airs_model#/properties/assets/anyOf/0
 
 
 
-| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                |
-| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------ |
-| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](../../out/model.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                      |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :-------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [model.schema.json\*](model.schema.json "open original schema") |
 
 ## 0 Type
 
@@ -26,13 +26,13 @@ Additional properties are allowed, as long as they follow this schema:
 
 
 
-*   is optional
+* is optional
 
-*   Type: `object` ([Asset](model-defs-asset.md))
+* Type: `object` ([Asset](model-defs-asset.md))
 
-*   cannot be null
+* cannot be null
 
-*   defined in: [Item](model-defs-asset.md "airs_model#/properties/assets/anyOf/0/additionalProperties")
+* defined in: [Item](model-defs-asset.md "airs_model#/properties/assets/anyOf/0/additionalProperties")
 
 ### additionalProperties Type
 
