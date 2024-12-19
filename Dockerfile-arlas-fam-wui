@@ -8,7 +8,7 @@ COPY ./file-explorer/package.json  ./
 COPY ./file-explorer/package-lock.json  ./
 
 ## installing necessary libraries
-RUN npm install
+RUN npm install --ignore-scripts && npm run postinstall
 
 COPY ./file-explorer/scripts/start.sh ./
 
