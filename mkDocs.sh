@@ -16,3 +16,4 @@ cat docs/docs/model/model.md >> docs/docs/model/README.md
 
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
+cp docs/docs/model/README.md target/README.md
