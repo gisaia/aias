@@ -45,11 +45,13 @@ build_and_publish_docker airs
 # DOCKER
 build_and_publish_docker stac-geodes
 
-
-# PYTHON PIP
+# Clean target folder
+rm -r target
 export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
-docker run -v `pwd`:/app  python:3 /bin/bash -c  "cd /app/; pip3 install pydantic ; python3 -m airs.core.models.utils > /app/docs/model/model.schema.json"
-jsonschema2md -d docs/model/ -o docs/model/
+
+# Generate documentation
+./mkDocs.sh
+# PYTHON PIP
 ./release/publish.sh $VERSION
 
 # FILE EXPLORER
