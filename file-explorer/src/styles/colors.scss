@@ -17,15 +17,11 @@
  * under the License.
  */
 
-@import "@angular/material/theming";
+@use '@angular/material' as mat;
+@import '../file-explorer-theme.scss';
 
-$primary-palette: mat-palette($mat-blue, 800);
-$accent-palette: mat-palette($mat-blue, 800);
-$warn-palette: mat-palette($mat-red);
-
-
-$primaryColor: mat-color($primary-palette);
-$accentColor: mat-color($accent-palette);
+$primaryColor: mat.get-theme-color($app-theme, primary, 500);
+$accentColor: mat.get-theme-color($app-theme, accent, 500);
 
 $infoColor: #0c5460;
 $infoBackgroundColor: #d1ecf1;

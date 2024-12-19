@@ -18,7 +18,7 @@
           <div mat-line class="detail">{{ 'id:' | translate:{id: archive.id} }}</div>
         </div>
         <div class="actions">
-          <mat-chip-listbox>
+          <mat-chip-listbox [selectable]="false">
             <mat-chip-option [disableRipple]="true" class="driver-chip">
               {{archive.driver_name}}
             </mat-chip-option>

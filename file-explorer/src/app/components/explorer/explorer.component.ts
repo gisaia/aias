@@ -29,6 +29,7 @@ import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialo
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { marker } from '@colsen1991/ngx-translate-extract-marker';
 
 @Component({
   selector: 'app-explorer',
@@ -97,7 +98,7 @@ export class ExplorerComponent implements OnInit {
   public activate(node: DynamicFileNode) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate folder:', { folder: node.name });
-    dialogRef.componentInstance.action = 'Activate';
+    dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {

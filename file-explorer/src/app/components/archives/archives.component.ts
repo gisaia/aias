@@ -20,6 +20,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { marker } from '@colsen1991/ngx-translate-extract-marker';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
@@ -128,8 +129,8 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   public activate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Activate') + ' : ' + archive.name;
-    dialogRef.componentInstance.action = 'Activate';
+    dialogRef.componentInstance.title = this.translate.instant('Activate:', {name: archive.name});
+    dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
@@ -159,8 +160,8 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   public desactivate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Dereferencing') + ' : ' + archive.name;
-    dialogRef.componentInstance.action = 'Dereference';
+    dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', {name: archive.name});
+    dialogRef.componentInstance.action = marker('Dereference');
     dialogRef.componentInstance.showAnnotations = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
