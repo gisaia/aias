@@ -20,13 +20,13 @@ class ImageDriverHelper:
         tfw_path = Path(url).with_suffix(".tfw")
         if tfw_path.exists():
             assets.append(Asset(href=str(tfw_path), size=get_file_size(str(tfw_path)),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
 
         j2w_path = Path(url).with_suffix(".j2w")
         if j2w_path.exists():
             assets.append(Asset(href=str(j2w_path), size=get_file_size(str(j2w_path)),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
@@ -35,7 +35,7 @@ class ImageDriverHelper:
             from PIL import Image
             Image.MAX_IMAGE_PIXELS = 2000000000
             asset = Asset(href=None,
-                          roles=[role.value], name=role.value, type=MimeType.PNG,
+                          roles=[role.value], name=role.value, type=MimeType.PNG.value,
                           description=role.value, asset_format=AssetFormat.png.value)
             asset.href = driver.get_asset_filepath(url, asset)
             image = Image.open(url)

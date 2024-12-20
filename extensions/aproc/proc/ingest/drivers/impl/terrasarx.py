@@ -47,24 +47,24 @@ class Driver(ProcDriver):
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
             geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
             quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG,
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT,
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF,
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 

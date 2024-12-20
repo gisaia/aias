@@ -39,17 +39,17 @@ class Driver(ProcDriver):
         assets = []
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG,
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.dim_path, size=get_file_size(self.dim_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML,
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
         assets.append(Asset(href=self.roi_path, size=get_file_size(self.roi_path),
-                            roles=[Role.data_mask.value], name=Role.data_mask.value, type=MimeType.GML,
+                            roles=[Role.data_mask.value], name=Role.data_mask.value, type=MimeType.GML.value,
                             description=Role.data_mask.value, airs__managed=False, asset_format=AssetFormat.gml.value))
 
         if Driver.image_path:
@@ -72,7 +72,7 @@ class Driver(ProcDriver):
             if Driver.georef_path.lower().endswith("tfw"):
                 format = AssetFormat.tfw.value
             assets.append(Asset(href=self.georef_path, size=get_file_size(self.georef_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=format, asset_type=ResourceType.other.value))
         return assets
 

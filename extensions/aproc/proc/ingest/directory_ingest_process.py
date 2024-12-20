@@ -70,7 +70,7 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
-    def get_resource_id(self, inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel):
         return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
     @shared_task(bind=True, track_started=True)

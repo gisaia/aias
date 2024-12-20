@@ -44,14 +44,14 @@ class Driver(ProcDriver):
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, Driver.thumbnail_size, assets)
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, Driver.overview_size, assets)
         assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML,
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF,
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 

@@ -189,7 +189,7 @@ def __upload_item(key, item: Item) -> str:
             Bucket=Configuration.settings.s3.bucket,
             Key=key,
             Body=to_json(item),
-            ContentType=MimeType.JSON,
+            ContentType=MimeType.JSON.value,
         )
         LOGGER.info("{} uploaded.".format(key))
         return key
@@ -482,7 +482,7 @@ def __set_assets_links(item: Item) -> Item:
         ),
         description="ARLAS item for {}".format(item.id),
         title="ARLAS item for {}".format(item.id),
-        type=MimeType.JSON,
+        type=MimeType.JSON.value,
         roles=[Role.airs_item.value],
     )
     item.assets[Role.airs_item.value].airs__managed = True

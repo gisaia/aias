@@ -80,7 +80,7 @@ class AprocProcess(Process):
     def before_execute(headers: dict[str, str], requests: list[dict[str, str]], asset_type: str) -> dict[str, str]:
         return {}
 
-    def get_resource_id(self, inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel):
         inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump())        
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()

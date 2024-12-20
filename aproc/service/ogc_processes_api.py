@@ -122,14 +122,14 @@ def get_landing_page(request: Request) -> LandingPage:
     conformance = Link(
         href=server_root + "/conformace",
         rel="http://www.opengis.net/def/rel/ogc/1.0/conformance",
-        type=MimeType.JSON,
+        type=MimeType.JSON.value,
         title="OGC API - Processes conformance classes " +
               "implemented by this server"
     )
     processes = Link(
         href=server_root + "/processes",
         rel="http://www.opengis.net/def/rel/ogc/1.0/processes",
-        type=MimeType.JSON,
+        type=MimeType.JSON.value,
         title="Metadata about the processes"
     )
     jobs = Link(

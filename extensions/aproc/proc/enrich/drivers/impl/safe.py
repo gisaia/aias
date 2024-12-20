@@ -42,7 +42,7 @@ class Driver(EnrichDriver):
                     asset_type=ResourceType.gridded.value,
                     asset_format=AssetFormat.geotiff.value,
                     roles=[Role.cog.value],
-                    type=MimeType.TIFF,
+                    type=MimeType.TIFF.value,
                     title="{} for {}/{}".format(asset_type, item.collection, item.id),
                     description="{} for {}/{}".format(asset_type, item.collection, item.id),
                     proj__epsg=3857,
