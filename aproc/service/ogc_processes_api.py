@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
+from airs.core.models.model import MimeType
 from aproc.core.logger import CustomLogger as Logger
 from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    InlineOrRefData, LandingPage, Link,
@@ -41,12 +42,13 @@ def get_conformance() -> Conforms:
 def get_jobs(offset: int = 0, limit: int = 10, process_id: str = None, status: str = None):
     return Processes.list_jobs(offset=offset, limit=limit, process_id=process_id, status=status)
 
+
 @ROUTER.get("/jobs/{jobId}",
             response_model_exclude_none=True,
             responses={
                 status.HTTP_200_OK: {
                     "model": StatusInfo
-                    },
+                },
                 status.HTTP_422_UNPROCESSABLE_ENTITY: {
                     "model": RESTException
                 }
@@ -56,15 +58,15 @@ def get_job(jobId: str):
 
 
 @ROUTER.get("/jobs/{jobId}/cancel",
-               response_model_exclude_none=True,
-               responses={
-                        status.HTTP_200_OK: {
-                            "model": StatusInfo
-                        },
-                        status.HTTP_422_UNPROCESSABLE_ENTITY: {
-                            "model": RESTException
-                        }
-               })
+            response_model_exclude_none=True,
+            responses={
+                status.HTTP_200_OK: {
+                    "model": StatusInfo
+                },
+                status.HTTP_422_UNPROCESSABLE_ENTITY: {
+                    "model": RESTException
+                }
+            })
 def delete_job(jobId: str):
     return Processes.inerrupt(jobId)
 
@@ -74,7 +76,7 @@ def delete_job(jobId: str):
             responses={
                 status.HTTP_200_OK: {
                     "model": dict[str, InlineOrRefData]
-                    },
+                },
                 status.HTTP_422_UNPROCESSABLE_ENTITY: {
                     "model": RESTException
                 }
@@ -92,7 +94,7 @@ def get_job_result(jobId: str):
             responses={
                 status.HTTP_200_OK: {
                     "model": dict[str, InlineOrRefData]
-                    },
+                },
                 status.HTTP_422_UNPROCESSABLE_ENTITY: {
                     "model": RESTException
                 }
@@ -120,14 +122,14 @@ def get_landing_page(request: Request) -> LandingPage:
     conformance = Link(
         href=server_root + "/conformace",
         rel="http://www.opengis.net/def/rel/ogc/1.0/conformance",
-        type="application/json",
+        type=MimeType.JSON.value,
         title="OGC API - Processes conformance classes " +
               "implemented by this server"
     )
     processes = Link(
         href=server_root + "/processes",
         rel="http://www.opengis.net/def/rel/ogc/1.0/processes",
-        type="application/json",
+        type=MimeType.JSON.value,
         title="Metadata about the processes"
     )
     jobs = Link(
@@ -183,7 +185,7 @@ def __get_process(process_id: str) -> Process:
             responses={
                 status.HTTP_200_OK: {
                     "model": ProcessDescription
-                    },
+                },
                 status.HTTP_404_NOT_FOUND: {
                     "model": RESTException
                 },
@@ -200,7 +202,7 @@ def get_process_description(process_id: str):
              responses={
                 status.HTTP_200_OK: {
                     "model": BaseModel
-                    },
+                },
                 status.HTTP_201_CREATED: {
                     "model": StatusInfo
                 },

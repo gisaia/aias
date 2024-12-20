@@ -28,6 +28,7 @@ class Driver(DownloadDriver):
         Driver.configuration = ZarrConfiguration.model_validate(configuration)
 
     # Implements drivers method
+    @staticmethod
     def supports(item: Item) -> bool:
         href = Driver.get_asset_href(item)
         return item.properties.item_format \

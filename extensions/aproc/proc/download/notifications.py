@@ -10,7 +10,6 @@ import requests
 from airs.core.models import mapper
 from airs.core.models.model import Item, Properties
 from aproc.core.logger import Logger
-from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import Configuration
 
 LOGGER = Logger.logger
@@ -18,6 +17,7 @@ LOGGER = Logger.logger
 
 class Notifications:
 
+    @staticmethod
     def init():
         LOGGER.info("SMTP configuration: {}".format(Configuration.settings.smtp.model_dump_json()))
         if not Notifications.__getES().indices.exists(index=Configuration.settings.index_for_download.index_name):
@@ -32,6 +32,7 @@ class Notifications:
         else:
             LOGGER.debug("Index {} found.".format(Configuration.settings.index_for_download.index_name))
 
+    @staticmethod
     def report(item: Item, subject: str, msg: str, to: list[str], context: dict[str, str], outcome: str = None):
         if outcome:
             try:
@@ -94,6 +95,7 @@ class Notifications:
             LOGGER.error("Error while sending email.")
             LOGGER.exception(e)
 
+    @staticmethod
     def __fetch_mapping__(location: str):
         if (location.startswith("http")):
             r = requests.get(location, verify=False)
@@ -106,6 +108,7 @@ class Notifications:
             with open(location) as f:
                 return json.load(f)["mappings"]
 
+    @staticmethod
     def __getES() -> elasticsearch.Elasticsearch:
         if Configuration.settings.index_for_download.login:
             return elasticsearch.Elasticsearch(Configuration.settings.index_for_download.endpoint_url, basic_auth=(Configuration.settings.index_for_download.login, Configuration.settings.index_for_download.pwd), verify_certs=False)

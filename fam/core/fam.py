@@ -6,6 +6,7 @@ from fam.core.model import Archive
 
 class Fam():
 
+    @staticmethod
     def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
         if size >= max_size or os.path.basename(path).startswith("."):
             return []

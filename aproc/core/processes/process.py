@@ -44,6 +44,7 @@ class Process(ABC):
     def execute(self, context: dict[str, str], **kwargs) -> BaseModel:
         ...
 
+    @staticmethod
     @abstractmethod
-    def get_resource_id(self, inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel):
         ...

@@ -3,7 +3,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
@@ -22,11 +22,12 @@ class Driver(ProcDriver):
     tfw_path = None
 
     # Implements drivers method
-
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         try:
             result = Driver.__check_path__(url)
@@ -40,27 +41,27 @@ class Driver(ProcDriver):
         assets = []
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
-                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                      roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         assets.append(Asset(href=self.til_path, size=get_file_size(self.til_path),
-                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/pvl",
+                      roles=[Role.metadata.value], name=Role.metadata.value + "_imd", type=MimeType.PVL.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
         assets.append(Asset(href=self.imd_path, size=get_file_size(self.imd_path),
-                      roles=[Role.metadata.value], name=Role.metadata.value, type="text/pvl",
+                      roles=[Role.metadata.value], name=Role.metadata.value + "_til", type=MimeType.PVL.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
@@ -81,7 +82,7 @@ class Driver(ProcDriver):
         from osgeo import ogr
         tree = ET.parse(self.xml_path)
         root = tree.getroot()
-        #Calculate bbox
+        # Calculate bbox
         ul_lat = float(root.find("./TIL/TILE/ULLAT").text)
         ul_lon = float(root.find("./TIL/TILE/ULLON").text)
         ur_lat = float(root.find("./TIL/TILE/URLAT").text)
@@ -90,31 +91,31 @@ class Driver(ProcDriver):
         lr_lon = float(root.find("./TIL/TILE/LRLON").text)
         ll_lat = float(root.find("./TIL/TILE/LLLAT").text)
         ll_lon = float(root.find("./TIL/TILE/LLLON").text)
-        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon,ul_lat,ur_lon,ur_lat,lr_lon,lr_lat,ll_lon,ll_lat)
-        #Overwrite geometry and centroid if GIS_FILE is present with order shape file
+        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+        # Overwrite geometry and centroid if GIS_FILE is present with order shape file
         from os.path import abspath, dirname
         d = (dirname(abspath(url)))
-        if os.path.isdir(os.path.join(d,"GIS_FILE")):
-            for file in os.listdir(os.path.join(d,"GIS_FILES")):
+        if os.path.isdir(os.path.join(d, "GIS_FILE")):
+            for file in os.listdir(os.path.join(d, "GIS_FILES")):
                 if file.endswith("_ORDER_SHAPE.shp"):
                     setup_gdal()
-                    order_shape_file = os.path.join(d,"GIS_FILES",file)
+                    order_shape_file = os.path.join(d, "GIS_FILES", file)
                     driver = ogr.GetDriverByName("ESRI Shapefile")
-                    component_source = driver.Open(order_shape_file, 0) # read-only
+                    component_source = driver.Open(order_shape_file, 0)  # read-only
                     layer = component_source.GetLayer()
                     component_feature = layer.GetNextFeature()
                     component_geometry = component_feature.geometry()
                     geometry = component_feature.ExportToJson(as_object=True)["geometry"]
                     centroid_geom = component_geometry.Centroid()
-                    centroid_geom_list = str(centroid_geom).replace("(","").replace(")","").split(" ")
-                    centroid = [float(centroid_geom_list[1]),float(centroid_geom_list[2])]
+                    centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
+                    centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
                     break
 
         date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
         gsd = float(root.find("./IMD/IMAGE/MEANCOLLECTEDGSD").text)
-        processing__level=root.find("./IMD/PRODUCTLEVEL").text
-        eo__cloud_cover=float(root.find("./IMD/IMAGE/CLOUDCOVER").text) * 1000
+        processing__level = root.find("./IMD/PRODUCTLEVEL").text
+        eo__cloud_cover = float(root.find("./IMD/IMAGE/CLOUDCOVER").text) * 1000
         constellation = root.find("./IMD/IMAGE/SATID").text
         if root.find("./IMD/IMAGE/SATAZ") is not None:
             view__azimuth = float(root.find("./IMD/IMAGE/SATAZ").text)
@@ -159,6 +160,7 @@ class Driver(ProcDriver):
             item.properties.eo__cloud_cover = eo__cloud_cover
         return item
 
+    @staticmethod
     def __check_path__(path: str):
         Driver.thumbnail_path = None
         Driver.quicklook_path = None
@@ -185,8 +187,5 @@ class Driver(ProcDriver):
                 tfw_path = Path(Driver.tif_path).with_suffix(".TFW")
                 if tfw_path.exists():
                     Driver.tfw_path = str(tfw_path)
-            return Driver.tif_path is not None and \
-                   Driver.xml_path is not None and \
-                   Driver.til_path is not None and \
-                   Driver.imd_path is not None
+            return Driver.tif_path is not None and Driver.xml_path is not None and Driver.til_path is not None and Driver.imd_path is not None
         return False

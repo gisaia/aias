@@ -48,7 +48,7 @@ class Driver(DownloadDriver):
             if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
                 self.copy_from_dimap(met_file, target_directory, extension)
             elif item.properties.item_format == ItemFormat.terrasar.value:
-                self.copy_from_terrasarx(met_file, target_directory)
+                self.copy_from_terrasarx(met_file, target_directory, extension)
             return
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
@@ -56,9 +56,9 @@ class Driver(DownloadDriver):
         images = []
         from extensions.aproc.proc.download.drivers.impl.utils import extract
         if item.properties.item_format == ItemFormat.dimap.value or item.properties.item_format == ItemFormat.spot5.value:
-            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension], self.get_dimap_images(met_file, extension)))
+            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0] + extension], self.get_dimap_images(met_file, extension)))
         elif item.properties.item_format == ItemFormat.terrasar.value:
-            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0]+extension], self.get_terrasarx_images(met_file, extension)))
+            images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0] + extension], self.get_terrasarx_images(met_file, extension)))
         extract(images, crop_wkt, met_file, driver_target, target_projection, target_directory, target_file_name)
 
     def get_dimap_images(self, href: str, extension: str):
@@ -71,8 +71,8 @@ class Driver(DownloadDriver):
         files_elements = root.findall('./Raster_Data/Data_Access/Data_Files/Data_File/DATA_FILE_PATH')
         files = list(map(lambda f: [os.path.join(dir_name, f.attrib["href"]),
                                     f.attrib["href"],
-                                    os.path.join(dir_name, os.path.splitext(f.attrib["href"])[0]+georef_file_extension),
-                                    os.path.splitext(f.attrib["href"])[0]+georef_file_extension], files_elements))
+                                    os.path.join(dir_name, os.path.splitext(f.attrib["href"])[0] + georef_file_extension),
+                                    os.path.splitext(f.attrib["href"])[0] + georef_file_extension], files_elements))
         return files
 
     def get_terrasarx_images(self, href: str, extension: str):
@@ -87,16 +87,16 @@ class Driver(DownloadDriver):
         for file in files_elements:
             f = [str(file.find('path').text), str(file.find('filename').text)]
             files.append([os.path.join(dir_name, f[0], f[1]), f[1],
-                          os.path.join(dir_name, f[0], os.path.splitext(f[1])[0]+georef_file_extension),
-                          os.path.splitext(f[1])[0]+georef_file_extension])
+                          os.path.join(dir_name, f[0], os.path.splitext(f[1])[0] + georef_file_extension),
+                          os.path.splitext(f[1])[0] + georef_file_extension])
         return files
 
     def copy_from_dimap(self, href: str, target_directory: str, extension: str):
         files = self.get_dimap_images(href, extension)
         self.copy_from_met(files, target_directory)
 
-    def copy_from_terrasarx(self, href: str, target_directory: str):
-        files = self.get_terrasarx_images(href)
+    def copy_from_terrasarx(self, href: str, target_directory: str, extension: str):
+        files = self.get_terrasarx_images(href, extension)
         self.copy_from_met(files, target_directory)
 
     def copy_from_met(self, files, target_directory):

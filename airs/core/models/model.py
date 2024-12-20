@@ -5,6 +5,19 @@ from typing import Any, Dict, List
 from pydantic import BaseModel, Extra, Field
 
 
+class MimeType(Enum):
+    TIFF = "image/tiff"
+    XML = "text/xml"
+    JPG = "image/jpg"
+    PNG = "image/png"
+    JSON = "application/json"
+    PDF = "application/pdf"
+    PVL = "text/pvl"
+    TEXT = "text/plain"
+    MARKDOWN = "text/markdown"
+    GML = "application/gml+xml"
+
+
 class ProcessingLevel(Enum):
     RAW = "RAW"
     L1 = "L1"

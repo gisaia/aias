@@ -25,6 +25,7 @@ class Drivers():
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         Drivers.drivers.sort(key=lambda driver: driver.priority)
 
+    @staticmethod
     def solve(url: str) -> Driver:
         Drivers.__check_drivers()
         for driver in Drivers.drivers:
@@ -32,6 +33,7 @@ class Drivers():
                 return driver()
         return None
 
+    @staticmethod
     def get_driver_by_name(name: str) -> Driver:
         Drivers.__check_drivers()
         for driver in Drivers.drivers:
@@ -40,6 +42,7 @@ class Drivers():
                 return driver
         return None
 
+    @staticmethod
     def __check_drivers():
         if Drivers.drivers is None:
             raise Exception("Drivers not initialized")

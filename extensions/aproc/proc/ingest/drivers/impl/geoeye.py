@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
@@ -21,10 +21,12 @@ class Driver(ProcDriver):
     component_id = None
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         # url variable must be a folder path begining with a /
         try:
@@ -39,21 +41,21 @@ class Driver(ProcDriver):
         assets = []
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/plain",
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.txt.value, asset_type=ResourceType.other.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
@@ -164,6 +166,7 @@ class Driver(ProcDriver):
         )
         return item
 
+    @staticmethod
     def __check_path__(file_path: str):
         Driver.tif_path = None
         Driver.met_path = None

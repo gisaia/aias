@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, ObservationType, Properties, ResourceType, Role
+from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, MimeType, ObservationType, Properties, ResourceType, Role
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, setup_gdal, get_geom_bbox_centroid, \
     get_hash_url, get_epsg
 from datetime import datetime
+
 
 class Driver(ProcDriver):
     quicklook_path = None
@@ -16,11 +17,12 @@ class Driver(ProcDriver):
     tfw_path = None
 
     # Implements drivers method
-
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         try:
             result = Driver.__check_path__(url)
@@ -34,22 +36,22 @@ class Driver(ProcDriver):
         assets = []
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type="image/jpg",
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type="image/jpg",
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         assets.append(
             Asset(href=self.dim_path, size=get_file_size(self.dim_path),
-                  roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                  roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                   description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.metadata.value], name="tfw", type="text/plain",
+                                roles=[Role.metadata.value], name="tfw", type=MimeType.TEXT.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         return assets
 
@@ -116,6 +118,7 @@ class Driver(ProcDriver):
         )
         return item
 
+    @staticmethod
     def __check_path__(path: str):
         Driver.thumbnail_path = None
         Driver.quicklook_path = None

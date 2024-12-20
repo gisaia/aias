@@ -9,10 +9,12 @@ from .image_driver_helper import ImageDriverHelper
 class Driver(ProcDriver):
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         try:
             return (url.lower().endswith(".tif") or url.lower().endswith(".tiff")) and os.path.isfile(url) and os.path.exists(url)

@@ -16,6 +16,7 @@ class Driver(DownloadDriver):
         ...
 
     # Implements drivers method
+    @staticmethod
     def supports(item: Item) -> bool:
         href = Driver.get_asset_href(item)
         return href is not None\

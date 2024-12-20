@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .image_driver_helper import ImageDriverHelper
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
@@ -23,10 +23,12 @@ class Driver(ProcDriver):
 
     # Implements drivers method
 
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         try:
             result = Driver.__check_path__(url)
@@ -42,14 +44,14 @@ class Driver(ProcDriver):
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, Driver.thumbnail_size, assets)
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, Driver.overview_size, assets)
         assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type="text/xml",
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type="image/tif",
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if Driver.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type="text/plain",
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
 
@@ -131,6 +133,7 @@ class Driver(ProcDriver):
         )
         return item
 
+    @staticmethod
     def __check_path__(path: str):
         Driver.thumbnail_path = None
         Driver.quicklook_path = None
