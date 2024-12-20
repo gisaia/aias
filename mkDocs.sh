@@ -11,7 +11,7 @@ docker run --rm -v `pwd`/docs/docs/model:/schema/ gisaia/jsonschema2md:latest -d
 # sed -i'' 's/# /## /' docs/docs/model/model.md
 
 # Overwrite generated model README
-cat docs/docs/model/model.md >> docs/docs/model/README.md
+cp docs/docs/model/model.md docs/docs/model/README.md
 
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
