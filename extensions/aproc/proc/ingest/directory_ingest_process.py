@@ -6,7 +6,6 @@ import requests
 from celery import shared_task
 from pydantic import BaseModel, Field
 
-from airs.core.models.mapper import to_json
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -71,7 +70,7 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(self, inputs: BaseModel):
         return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
     @shared_task(bind=True, track_started=True)
@@ -108,6 +107,7 @@ class AprocProcess(Process):
                 raise Exception(msg)
         return list(map(lambda a: a.model_dump(), archives))
 
+    @staticmethod
     def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
         full_path = os.path.join(prefix, path)
         if not os.path.exists(full_path):

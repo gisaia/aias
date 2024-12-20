@@ -28,9 +28,21 @@ from extensions.aproc.proc.download.settings import Configuration
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
+EVENT_KIND_KEY = "event.kind"
+ARLAS_ITEM_ID_KEY = "arlas.item.id"
+ARLAS_COLLECTION_KEY = "arlas.collection"
+EVENT_CATEGORY_KEY = "event.category"
+EVENT_TYPE_KEY = "event.type"
+USER_ACTION_KEY = "user-action"
+EVENT_ACTION = "event.action"
+EVENT_OUTCOME_KEY = "event.outcome"
+USER_ID_KEY = "user.id"
+USER_EMAIL_KEY = "user.email"
+EVENT_MODULE_KEY = "event.module"
+
 
 def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name + " " + state + " "  + str(meta))
+    LOGGER.info(task.name + " " + state + " " + str(meta))
     if task.request.id is not None:
         task.update_state(state=state, meta=meta)
 
@@ -110,7 +122,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
+                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
@@ -118,6 +130,7 @@ class AprocProcess(Process):
                 LOGGER.debug("{} can access {}/{}".format(send_to, collection, item_id))
         return {}
 
+    @staticmethod
     def __get_user_email__(authorization: str):
         import jwt
         send_to: str = "anonymous"
@@ -140,6 +153,7 @@ class AprocProcess(Process):
             LOGGER.exception(e)
         return (send_to, user_id)
 
+    @staticmethod
     def __get_download_location__(item: Item, send_to: str) -> str:
         if send_to is None:
             send_to = "anonymous"
@@ -150,13 +164,13 @@ class AprocProcess(Process):
             os.makedirs(target_directory)
         return (target_directory, relative_target_directory)
 
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(self, inputs: BaseModel):
         inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())
-        hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"]+r["item_id"], inputs.requests))).encode())
+        hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive:bool = True) -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True) -> dict:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
@@ -177,7 +191,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
+                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
@@ -206,11 +220,11 @@ class AprocProcess(Process):
                         mail_context["target_directory"] = Configuration.settings.outbox_s3.asset_http_endpoint_url.format(Configuration.settings.outbox_s3.bucket, relative_target_directory)
                     Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
                     Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-                    LOGGER.info("Download success", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "success", "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
+                    LOGGER.info("Download success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "success", USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     download_locations.append(mail_context["target_directory"])
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))
-                    LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
+                    LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)
                     mail_context["error"] = error_msg
@@ -218,7 +232,7 @@ class AprocProcess(Process):
                     raise Exception(error_msg)
             else:
                 error_msg = "No driver found for {}/{}".format(collection, item_id)
-                LOGGER.info("Download failed", extra={"event.kind": "event", "event.category": "file", "event.type": "user-action", "event.action": "download", "event.outcome": "failure", "event.reason": error_msg, "user.id": user_id, "user.email": send_to, "event.module": "aproc-download", "arlas.collection": collection, "arlas.item.id": item_id})
+                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 mail_context["error"] = error_msg
                 Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
@@ -245,6 +259,7 @@ class AprocProcess(Process):
             with open(local_path, 'rb') as file:
                 s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
 
+    @staticmethod
     def __get_item_from_arlas__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
             url = Configuration.settings.arlas_url_search.format(collection=collection, item=item_id)
@@ -264,6 +279,7 @@ class AprocProcess(Process):
             LOGGER.exception(e)
             return None
 
+    @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):
         try:
             r = requests.get(url=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id))
@@ -274,13 +290,14 @@ class AprocProcess(Process):
         except Exception:
             return None
 
+    @staticmethod
     def __update_paths__(mail_context: dict[str, str]):
         try:
             if mail_context.get("target_directory"):
                 if not not Configuration.settings.email_path_prefix_add:
                     mail_context["target_directory"] = os.path.join(Configuration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(Configuration.settings.outbox_directory).removeprefix("/"))
                 if Configuration.settings.email_path_to_windows:
-                    mail_context["target_directory"] = mail_context["target_directory"].replace("/","\\")
+                    mail_context["target_directory"] = mail_context["target_directory"].replace("/", "\\")
         except Exception as e:
             LOGGER.exception(e)
         return mail_context

@@ -130,8 +130,8 @@ def writeWorldWidefrom_transform(affine, input):
         y = geotransform[5]
         y_rot = geotransform[3]
         y_size = geotransform[4]
-        x = x_size/2+x
-        y = y_size/2+y
+        x = x_size / 2 + x
+        y = y_size / 2 + y
         world_file.write('%s\n' % x_size)
         world_file.write('%s\n' % x_rot)
         world_file.write('%s\n' % y_rot)

@@ -8,7 +8,7 @@ from pathlib import Path
 from time import time
 from urllib.parse import urlparse
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
                                     ResourceType, Role)
 from extensions.aproc.proc.enrich.drivers.driver import Driver as EnrichDriver
 from extensions.aproc.proc.enrich.drivers.exceptions import DriverException
@@ -42,7 +42,7 @@ class Driver(EnrichDriver):
                     asset_type=ResourceType.gridded.value,
                     asset_format=AssetFormat.geotiff.value,
                     roles=[Role.cog.value],
-                    type="image/tiff",
+                    type=MimeType.TIFF,
                     title="{} for {}/{}".format(asset_type, item.collection, item.id),
                     description="{} for {}/{}".format(asset_type, item.collection, item.id),
                     proj__epsg=3857,
@@ -59,6 +59,7 @@ class Driver(EnrichDriver):
         else:
             raise DriverException("Asset type must be provided.")
 
+    @staticmethod
     def __build_asset(item: Item, asset_type: str, asset_location: str):
         if asset_type.lower() == "cog":
             href = Driver.get_asset_href(item)
@@ -80,6 +81,7 @@ class Driver(EnrichDriver):
         else:
             raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
 
+    @staticmethod
     def __download_TCI(href: str):
         storage_type = urlparse(href).scheme
         transport_params = Driver.configuration.get_storage_parameters(href, Driver.LOGGER)
@@ -124,6 +126,7 @@ class Driver(EnrichDriver):
 
         return tci_file_path
 
+    @staticmethod
     def __extract(zip_file: str | io.TextIOWrapper):
         with zipfile.ZipFile(zip_file) as raster_zip:
             file_names = raster_zip.namelist()

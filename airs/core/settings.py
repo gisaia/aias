@@ -17,21 +17,23 @@ class S3(BaseModel):
 
 
 class Index(BaseModel, extra="allow"):
-    collection_prefix:str
-    endpoint_url:str
-    login:str | None
-    pwd:str | None
+    collection_prefix: str
+    endpoint_url: str
+    login: str | None
+    pwd: str | None
+
 
 class Settings(BaseModel, extra="allow"):
-    s3:S3
-    index:Index
-    arlaseo_mapping_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/9/mapping.json"
-    arlaseo_collection_url:str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json"
+    s3: S3
+    index: Index
+    arlaseo_mapping_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/9/mapping.json"
+    arlaseo_collection_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json"
+
 
 class Configuration:
-    settings:Settings=None
+    settings: Settings = None
 
     @staticmethod
-    def init(configuration_file:str):
-        envyaml=EnvYAML(configuration_file, strict=False)
-        Configuration.settings=Settings.model_validate(envyaml.export())
+    def init(configuration_file: str):
+        envyaml = EnvYAML(configuration_file, strict=False)
+        Configuration.settings = Settings.model_validate(envyaml.export())
