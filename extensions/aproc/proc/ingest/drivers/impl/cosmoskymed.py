@@ -58,7 +58,7 @@ class Driver(ProcDriver):
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.TIFF.value,
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
                                 description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
