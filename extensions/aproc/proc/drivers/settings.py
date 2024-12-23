@@ -12,10 +12,6 @@ class Driver(BaseModel, extra=Extra.allow):
 
 class Settings(BaseModel, extra='allow'):
     drivers: list[Driver] = Field(title="Configuration of the drivers")
-    inputs_directory: str = Field(title="Location of the archives")
-    max_number_of_archive_for_ingest: int = Field(default=1000000, title="Maximum number of archives to ingest when ingesting a directory")
-    aproc_endpoint: str | None = Field(title="APROC ENDPOINT")
-    resource_id_hash_starts_at: int = Field(1, title="For some drivers, the resource id is the hash of the url path. Prefix can be ignored with this property.")
 
 
 class Configuration:
