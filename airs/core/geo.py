@@ -57,7 +57,7 @@ def getCorners(polygon: List[Tuple[float, float]]) -> BOX:
 def valid_bbox(bbox: List[float]):
     if bbox is None: 
         return False
-    if not len(bbox) == 4:
+    if len(bbox) != 4:
         return False
     if bbox[0] is None or bbox[1] is None or bbox[2] is None or bbox[3] is None:
         return False

@@ -24,21 +24,10 @@ from extensions.aproc.proc.download.drivers.exceptions import (
     DriverException, RegisterException)
 from extensions.aproc.proc.download.notifications import Notifications
 from extensions.aproc.proc.download.settings import Configuration
+from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
-
-EVENT_KIND_KEY = "event.kind"
-ARLAS_ITEM_ID_KEY = "arlas.item.id"
-ARLAS_COLLECTION_KEY = "arlas.collection"
-EVENT_CATEGORY_KEY = "event.category"
-EVENT_TYPE_KEY = "event.type"
-USER_ACTION_KEY = "user-action"
-EVENT_ACTION = "event.action"
-EVENT_OUTCOME_KEY = "event.outcome"
-USER_ID_KEY = "user.id"
-USER_EMAIL_KEY = "user.email"
-EVENT_MODULE_KEY = "event.module"
 
 
 def __update_status__(task: Task, state: str, meta: dict = None):
@@ -122,7 +111,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
@@ -191,7 +180,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
                 Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
@@ -224,7 +213,7 @@ class AprocProcess(Process):
                     download_locations.append(mail_context["target_directory"])
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))
-                    LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                    LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)
                     mail_context["error"] = error_msg
@@ -232,7 +221,7 @@ class AprocProcess(Process):
                     raise Exception(error_msg)
             else:
                 error_msg = "No driver found for {}/{}".format(collection, item_id)
-                LOGGER.info("Download failed", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", "event.reason": error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 mail_context["error"] = error_msg
                 Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
