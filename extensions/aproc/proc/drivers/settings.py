@@ -1,3 +1,4 @@
+from typing import Generic, TypeVar
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
 
@@ -10,14 +11,20 @@ class Driver(BaseModel, extra=Extra.allow):
     assets_dir: str | None = Field(title="Location for storing temporary asset files")
 
 
-class Settings(BaseModel, extra='allow'):
-    drivers: list[Driver] = Field(title="Configuration of the drivers")
+DRIVER = TypeVar('DRIVER', bound=Driver)
 
 
-class Configuration:
-    settings: Settings | None = Field(title="aproc Ingest Service configuration")
+class Settings(BaseModel, Generic[DRIVER], extra='allow'):
+    drivers: list[DRIVER] = Field(title="Configuration of the drivers")
+
+
+SETTINGS = TypeVar('SETTINGS', bound=Settings)
+
+
+class Configuration(Generic[SETTINGS]):
+    settings: SETTINGS | None = Field(title="Aproc Service driver configuration")
 
     @staticmethod
-    def init(configuration_file: str, settingsClass):
+    def init(configuration_file: str, SETTINGS):
         envyaml = EnvYAML(configuration_file, strict=False)
-        Configuration.settings = settingsClass(**envyaml.export())
+        Configuration.settings = SETTINGS(**envyaml.export())
