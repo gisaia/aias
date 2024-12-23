@@ -8,6 +8,7 @@ from airs.core.models.model import (
     AssetFormat,
     Item,
     ItemFormat,
+    MimeType,
     ObservationType,
     Properties,
     ResourceType,
@@ -42,11 +43,12 @@ class Driver(ProcDriver):
     }
 
     # Implements drivers method
-
+    @staticmethod
     def init(configuration: Configuration):
         return
 
     # Implements drivers method
+    @staticmethod
     def supports(url: str) -> bool:
         try:
             result = Driver.__check_path__(url)
@@ -64,7 +66,7 @@ class Driver(ProcDriver):
                 size=get_file_size(self.tif_path),
                 roles=[Role.data.value],
                 name=Role.data.value,
-                type="image/tif",
+                type=MimeType.TIFF.value,
                 description=Role.data.value,
                 airs__managed=False,
                 asset_format=AssetFormat.geotiff.value,
@@ -77,7 +79,7 @@ class Driver(ProcDriver):
                 size=get_file_size(self.met_path),
                 roles=[Role.metadata.value],
                 name=Role.metadata.value,
-                type="text/pvl",
+                type=MimeType.PVL.value,
                 description=Role.metadata.value,
                 airs__managed=False,
                 asset_format=AssetFormat.pvl.value,
@@ -91,7 +93,7 @@ class Driver(ProcDriver):
                     size=get_file_size(self.tfw_path),
                     roles=[Role.extent.value],
                     name=Role.extent.value,
-                    type="text/plain",
+                    type=MimeType.TEXT.value,
                     description=Role.metadata.value,
                     airs__managed=False,
                     asset_format=AssetFormat.tfw.value,
@@ -238,6 +240,7 @@ class Driver(ProcDriver):
         )
         return item
 
+    @staticmethod
     def __check_path__(path: str):
         Driver.tif_path = None
         Driver.met_path = None

@@ -10,6 +10,7 @@ seasons = {'Summer': (utc.localize(datetime.datetime(2014, 6, 21)), utc.localize
 
 
 class Utils:
+    @staticmethod
     def get_season(date):
         date = pytz.UTC.localize(datetime.datetime(date.year, date.month, date.day))
         date = date - relativedelta(years=date.year - 2014)

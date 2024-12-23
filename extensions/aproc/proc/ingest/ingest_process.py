@@ -160,6 +160,7 @@ class AprocProcess(Process):
             LOGGER.error("No driver found for {}".format(url))
             raise DriverException("No driver found for  {}".format(url))
 
+    @staticmethod
     def __check_assets__(url: str, assets: list[Asset], file_exists: bool = False):
         for asset in assets:
             if asset.name is None:
@@ -172,6 +173,7 @@ class AprocProcess(Process):
                 if asset.airs__managed is True and not os.path.exists(asset.href):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
+    @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
             with open(asset.href, 'rb') as filedesc:
@@ -191,6 +193,7 @@ class AprocProcess(Process):
         else:
             LOGGER.info("{} not managed".format(asset.name))
 
+    @staticmethod
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:

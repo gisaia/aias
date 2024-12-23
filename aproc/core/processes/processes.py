@@ -31,6 +31,7 @@ class Processes:
     __REDIS_PREFIX__ = "airs_job_id:"
     __REDIS_CONNECTION__: Redis = None
 
+    @staticmethod
     def __listen_status__():
         state = APROC_CELERY_APP.events.State()
 
@@ -173,6 +174,7 @@ class Processes:
     def list_jobs(offset: int = 0, limit: int = 100, process_id: str = None, status: str = None) -> StatusInfoList:
         return Processes.__retrieve_status_info_list__(offset, limit, process_id, status)
 
+    @staticmethod
     def __save_status_info__(status_info: StatusInfo):
         Processes.__get_redis_client__().json().set(Processes.__REDIS_PREFIX__ + status_info.jobID, "$",
                                                     {"job_id": status_info.jobID,
@@ -185,13 +187,16 @@ class Processes:
                                                      "status": status_info.status.value,
                                                      "message": status_info.message})
 
+    @staticmethod
     def __retrieve_status_info__(job_id) -> StatusInfo:
         return Processes.__to_status_info__(Processes.__get_redis_client__().json().get(Processes.__REDIS_PREFIX__ + job_id))
 
+    @staticmethod
     def __retrieve_status_info_by_resource_id__(resource_id: str) -> list[StatusInfo]:
         docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(query="@resource_id:{'" + resource_id.replace("-", "\\-") + "'}").docs
         return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
 
+    @staticmethod
     def __retrieve_status_info_list__(offset: int = 0, limit: int = 100, process_id: str = None, status: str = None) -> StatusInfoList:
         query_str = ""
         if process_id:
@@ -204,6 +209,7 @@ class Processes:
         r = Processes.__get_redis_client__().ft("idx:airs_jobs").search(q)
         return StatusInfoList(total=r.total, status_list=list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), r.docs)))
 
+    @staticmethod
     def __to_status_info__(o: dict) -> StatusInfo:
         if o:
             return StatusInfo(
@@ -222,6 +228,7 @@ class Processes:
         else:
             return None
 
+    @staticmethod
     def __to_status_info_code__(code: states) -> StatusCode:
         status_code = StatusCode.accepted
         if code == states.EXCEPTION_STATES:
@@ -252,7 +259,7 @@ class Processes:
             status_code = StatusCode.successful
         return status_code
 
-
+    @staticmethod
     def __init_redis__():
         # At startup we clear and recreate the index.
         try:
@@ -278,6 +285,7 @@ class Processes:
                         )
                         )
 
+    @staticmethod
     def __get_redis_client__() -> Redis:
         if Processes.__REDIS_CONNECTION__ is None:
             uri = urlparse(Configuration.settings.celery_result_backend)

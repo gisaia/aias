@@ -23,8 +23,7 @@ APROC_CORS_HEADERS = os.getenv("APROC_CORS_HEADERS", "*")
 @cli.command(help="Start the ARLAS Processing Service.")
 def run(
         host: str = typer.Argument(default=APROC_HOST, help="host"),
-        port: int = typer.Argument(default=APROC_PORT, help="port")
-        ):
+        port: int = typer.Argument(default=APROC_PORT, help="port")):
     api = FastAPI(version='0.0', title='ARLAS Processes',
                   description='ARLAS Processes',
                   middleware=[Middleware(CORSMiddleware, allow_origins=APROC_CORS_ORIGINS.split(","),
