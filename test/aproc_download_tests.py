@@ -25,7 +25,6 @@ class Tests(unittest.TestCase):
         add_item(self, ITEM_PATH, ID)
         sleep(3)
         # Create collection
-        print("create collection {}".format(ARLAS_COLLECTION))
         r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": "application/json"}, data=json.dumps({
                          "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
                          "id_path": "id",
@@ -54,6 +53,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 3)
 
+    @staticmethod
     def __download_found(url: str):
         if url.startswith("http"):
             print("downloads placed on s3")
@@ -154,7 +154,6 @@ class Tests(unittest.TestCase):
     def get_result(self, status: StatusInfo):
         # GET RESULT (and file location)
         result = requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"]))
-        print("result: {}".format(result.content))
         self.assertTrue(result.ok, result.status_code)
         result: OutputDownloadProcess = OutputDownloadProcess(**json.loads(result.content))
         return result

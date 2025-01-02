@@ -1,6 +1,6 @@
 import datetime
 import os
-from extensions.aproc.proc.ingest.drivers.drivers import Drivers
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from fam.core.model import Archive
 
 
@@ -10,7 +10,7 @@ class Fam():
     def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
-        driver = Drivers.solve(path)
+        driver = DriverManager.solve("ingest", path)
         if driver is not None:
             archive = Archive(id=driver.get_item_id(path),
                               name=os.path.basename(path),

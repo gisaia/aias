@@ -6,13 +6,15 @@ import dateutil.parser
 
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat, MimeType,
                                     Properties, ResourceType, Role)
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
-from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
+from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size, get_hash_url
 
 
 class ImageDriverHelper:
-    def identify_assets(driver: ProcDriver, format: str, url: str) -> list[Asset]:
+
+    def identify_assets(driver: IngestDriver, format: str, url: str) -> list[Asset]:
         assets = []
         assets.append(Asset(href=url,
                       roles=[Role.data.value], name=Role.data.value, type=format,
@@ -30,7 +32,8 @@ class ImageDriverHelper:
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
-    def add_overview_if_you_can(driver: ProcDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
+    def add_overview_if_you_can(driver: AbstractDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
+        driver.LOGGER.debug("Try to create the thumbnail of {}".format(url))
         try:
             from PIL import Image
             Image.MAX_IMAGE_PIXELS = 2000000000
@@ -38,6 +41,7 @@ class ImageDriverHelper:
                           roles=[role.value], name=role.value, type=MimeType.PNG.value,
                           description=role.value, asset_format=AssetFormat.png.value)
             asset.href = driver.get_asset_filepath(url, asset)
+            driver.LOGGER.debug("Try to create the thumbnail of {} in {}".format(url, asset.href))
             image = Image.open(url)
             image.thumbnail([size, size])
             image.save(asset.href, 'PNG')
@@ -49,21 +53,21 @@ class ImageDriverHelper:
             driver.LOGGER.error(e)
 
     # Implements drivers method
-    def fetch_assets(driver: ProcDriver, url: str, assets: list[Asset]) -> list[Asset]:
+    def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
         #ImageDriverHelper.add_overview_if_you_can(driver, url, Role.thumbnail, driver.thumbnail_size, assets)
         #ImageDriverHelper.add_overview_if_you_can(driver, url, Role.overview, driver.overview_size, assets)
         return assets
 
     # Implements drivers method
-    def get_item_id(driver: ProcDriver, url: str) -> str:
+    def get_item_id(driver: IngestDriver, url: str) -> str:
         return get_hash_url(url)
 
     # Implements drivers method
-    def transform_assets(driver: ProcDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
+    def transform_assets(driver: IngestDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method
-    def to_item(driver: ProcDriver, itemFormat: ItemFormat, assetFormat: AssetFormat, url: str, assets: list[Asset]) -> Item:
+    def to_item(driver: IngestDriver, itemFormat: ItemFormat, assetFormat: AssetFormat, url: str, assets: list[Asset]) -> Item:
         import rasterio
         import rasterio.features
         import rasterio.warp

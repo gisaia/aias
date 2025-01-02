@@ -1,18 +1,11 @@
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
 from envyaml import EnvYAML
-
-
-class Driver(BaseModel, extra=Extra.allow):
-    name: str | None = Field(title="Name of the driver")
-    class_name: str | None = Field(title="Name of the driver class")
-    configuration: dict | None = Field(title="Driver configuration")
-    priority: int | None = Field(title="Driver priority. If two drivers are eligible (supports returns a FetchRequest) then driver with highest priority will be selected over driver with lower priority.)")
-    assets_dir: str | None = Field(title="Location for storing temporary asset files")
-    alternative_asset_href_field: str | None = Field(None, title="Property field to use as an alternative to the data's href")
+from extensions.aproc.proc.drivers.driver_configuration import DriverConfiguration
+from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Settings(BaseModel, extra='allow'):
-    drivers: list[Driver] = Field(title="Configuration of the drivers")
+    drivers: list[DriverConfiguration] = Field(title="Configuration of the drivers")
 
 
 class Configuration:
@@ -22,3 +15,11 @@ class Configuration:
     def init(configuration_file: str):
         envyaml = EnvYAML(configuration_file, strict=False)
         Configuration.settings = Settings(**envyaml.export())
+
+    @staticmethod
+    def raise_if_not_valid():
+        MSG = "Enrich driver configuration exception: {}"
+        if Configuration.settings is None or Configuration.settings.drivers is None or len(Configuration.settings.drivers) == 0:
+            raise DriverException(MSG.format("No driver configured"))
+        for driver in Configuration.settings.drivers:
+            driver.raise_if_not_valid()

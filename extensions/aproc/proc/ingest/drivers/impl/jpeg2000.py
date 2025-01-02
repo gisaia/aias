@@ -2,20 +2,21 @@ import os
 
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from .image_driver_helper import ImageDriverHelper
 
 
-class Driver(ProcDriver):
+class Driver(IngestDriver):
+
+    def __init__(self):
+        super().__init__()
 
     # Implements drivers method
-    @staticmethod
-    def init(configuration: Configuration):
-        return
+    def init(self, configuration: Configuration):
+        ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def supports(self, url: str) -> bool:
         try:
             return (url.lower().endswith(".jp2")
                     or url.lower().endswith(".j2k")
@@ -27,7 +28,7 @@ class Driver(ProcDriver):
                     or url.lower().endswith(".jpx")
                     or url.lower().endswith(".jpc")) and os.path.isfile(url) and os.path.exists(url)
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method

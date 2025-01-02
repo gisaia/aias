@@ -6,36 +6,35 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeTy
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
     get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
 import xml.etree.ElementTree as ET
 
 
-class Driver(ProcDriver):
-    browse_path = None
-    quicklook_path = None
-    thumbnail_path = None
-    tif_path = None
-    tfw_path = None
-    met_path = None
-    output_folder = None
-    
-    # Implements drivers method
-    @staticmethod
-    def init(configuration: Configuration):
-        Driver.output_folder = configuration['tmp_directory']
-        return
+class Driver(IngestDriver):
+    def __init__(self):
+        super().__init__()
+        self.browse_path = None
+        self.quicklook_path = None
+        self.thumbnail_path = None
+        self.tif_path = None
+        self.tfw_path = None
+        self.met_path = None
+        self.output_folder = None
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def init(self, configuration: Configuration):
+        self.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
+
+    # Implements drivers method
+    def supports(self, url: str) -> bool:
         # url variable must be a folder path begining with a /
         try:
-            result = Driver.__check_path__(url)
+            result = self.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -62,7 +61,7 @@ class Driver(ProcDriver):
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        if Driver.tfw_path:
+        if self.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
@@ -99,7 +98,7 @@ class Driver(ProcDriver):
             y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
             coords = []
-            #order lower left; lower right: upper left ; upper right
+            # order lower left; lower right: upper left ; upper right
             for vertex in root.findall('productInfo/sceneInfo/sceneCornerCoord'):
                 coord = [float(vertex.find('lon').text), float(vertex.find('lat').text)]
                 coords.append(coord)
@@ -144,31 +143,29 @@ class Driver(ProcDriver):
         )
         return item
 
-    @staticmethod
-    def __check_path__(path: str):
-        Driver.tif_path = None
-        Driver.met_path = None
-        Driver.browse_path = None
+    def __check_path__(self, path: str):
+        self.tif_path = None
+        self.met_path = None
+        self.browse_path = None
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist:
             for f in os.listdir(path):
                 if f.endswith(".xml"):
-                    Driver.met_path = os.path.join(path, f)
+                    self.met_path = os.path.join(path, f)
                     for folder in os.listdir(path):
                         # check if current folder is a folder
                         if os.path.isdir(os.path.join(path, folder)):
                             if folder == "PREVIEW":
-                                Driver.browse_path = os.path.join(path, folder, "BROWSE.tif")
+                                self.browse_path = os.path.join(path, folder, "BROWSE.tif")
                             if folder == "IMAGEDATA":
                                 for file in os.listdir(os.path.join(path, folder)):
                                     if file.endswith(".tif"):
-                                        Driver.tif_path = os.path.join(path, folder, file)
-                                        tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+                                        self.tif_path = os.path.join(path, folder, file)
+                                        tfw_path = Path(self.tif_path).with_suffix(".tfw")
                                         if tfw_path.exists():
-                                            Driver.tfw_path = str(tfw_path)
-                    return Driver.met_path is not None and Driver.tif_path is not None and Driver.browse_path is not None
+                                            self.tfw_path = str(tfw_path)
+                    return self.met_path is not None and self.tif_path is not None and self.browse_path is not None
         return False
 
-    @staticmethod
-    def __get_coord__(root, field):
+    def __get_coord__(self, root, field):
         return float(root.find("productSpecific/geocodedImageInfo/geoParameter/sceneCoordsGeographic/" + field).text)

@@ -18,19 +18,22 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
-from extensions.aproc.proc.download.drivers.driver import Driver
-from extensions.aproc.proc.download.drivers.drivers import Drivers
-from extensions.aproc.proc.download.drivers.exceptions import (
-    DriverException, RegisterException)
+from extensions.aproc.proc.download.drivers.download_driver import \
+    DownloadDriver
 from extensions.aproc.proc.download.notifications import Notifications
-from extensions.aproc.proc.download.settings import Configuration
+from extensions.aproc.proc.download.settings import \
+    Configuration as DownloadConfiguration
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.drivers.exceptions import (DriverException,
+                                                      RegisterException)
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              DOWNLOAD_FAILED_MSG, EVENT_ACTION,
                                              EVENT_CATEGORY_KEY,
                                              EVENT_KIND_KEY, EVENT_MODULE_KEY,
                                              EVENT_OUTCOME_KEY, EVENT_REASON,
-                                             EVENT_TYPE_KEY, USER_ACTION_KEY, USER_EMAIL_KEY, USER_ID_KEY)
+                                             EVENT_TYPE_KEY, USER_ACTION_KEY,
+                                             USER_EMAIL_KEY, USER_ID_KEY)
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
@@ -78,7 +81,9 @@ class AprocProcess(Process):
     @staticmethod
     def init(configuration: dict):
         if configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME):
-            Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
+            DownloadConfiguration.init(configuration_file=configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME))
+            DownloadConfiguration.raise_if_not_valid()
+            DriverManager.init(summary.id, DownloadConfiguration.settings.drivers)
         else:
             raise DriverException("Invalid configuration for download drivers ({})".format(configuration))
         AprocProcess.input_model = InputDownloadProcess
@@ -109,8 +114,8 @@ class AprocProcess(Process):
                 "error": None,
                 "arlas-user-email": send_to
             }
-            Notifications.report(None, Configuration.settings.email_request_subject_admin, Configuration.settings.email_request_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
-            Notifications.report(None, Configuration.settings.email_request_subject_user, Configuration.settings.email_request_content_user, to=[send_to], context=mail_context)
+            Notifications.report(None, DownloadConfiguration.settings.email_request_subject_admin, DownloadConfiguration.settings.email_request_content_admin, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context)
+            Notifications.report(None, DownloadConfiguration.settings.email_request_subject_user, DownloadConfiguration.settings.email_request_content_user, to=[send_to], context=mail_context)
             # RGPD : log level is info
             LOGGER.debug("checking for download request {}/{} for {}".format(collection, item_id, send_to))
             item: Item = AprocProcess.__get_item_from_arlas__(collection=collection, item_id=item_id, headers=headers)
@@ -119,7 +124,7 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
-                Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
+                Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
             else:
                 LOGGER.debug("{} can access {}/{}".format(send_to, collection, item_id))
@@ -153,7 +158,7 @@ class AprocProcess(Process):
         if send_to is None:
             send_to = "anonymous"
         relative_target_directory = os.path.join(send_to.split("@")[0].replace(".", "_").replace("-", "_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
-        target_directory = os.path.join(Configuration.settings.outbox_directory, relative_target_directory)
+        target_directory = os.path.join(DownloadConfiguration.settings.outbox_directory, relative_target_directory)
         if not os.path.exists(target_directory):
             LOGGER.info("create {}".format(target_directory))
             os.makedirs(target_directory)
@@ -188,10 +193,10 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
-                Notifications.report(None, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
+                Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
 
-            driver: Driver = Drivers.solve(item)
+            driver: DownloadDriver = DriverManager.solve(summary.id, item)
             if driver is not None:
                 try:
                     LOGGER.info("Download will be done by {}".format(driver.name))
@@ -207,14 +212,14 @@ class AprocProcess(Process):
                         target_projection=target_projection,
                         target_format=target_format,
                         raw_archive=raw_archive)
-                    if Configuration.settings.outbox_s3 and Configuration.settings.outbox_s3.bucket:
-                        AprocProcess.__dir2s3(target_directory, relative_target_directory, Configuration.settings.outbox_s3)
-                        if Configuration.settings.clean_outbox_directory:
-                            Driver.LOGGER.debug("clean {}".format(target_directory))
+                    if DownloadConfiguration.settings.outbox_s3 and DownloadConfiguration.settings.outbox_s3.bucket:
+                        AprocProcess.__dir2s3(target_directory, relative_target_directory, DownloadConfiguration.settings.outbox_s3)
+                        if DownloadConfiguration.settings.clean_outbox_directory:
+                            LOGGER.debug("clean {}".format(target_directory))
                             shutil.rmtree(target_directory)
-                        mail_context["target_directory"] = Configuration.settings.outbox_s3.asset_http_endpoint_url.format(Configuration.settings.outbox_s3.bucket, relative_target_directory)
-                    Notifications.report(item, Configuration.settings.email_subject_user, Configuration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
-                    Notifications.report(item, Configuration.settings.email_subject_admin, Configuration.settings.email_content_admin, Configuration.settings.notification_admin_emails.split(","), context=mail_context)
+                        mail_context["target_directory"] = DownloadConfiguration.settings.outbox_s3.asset_http_endpoint_url.format(DownloadConfiguration.settings.outbox_s3.bucket, relative_target_directory)
+                    Notifications.report(item, DownloadConfiguration.settings.email_subject_user, DownloadConfiguration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
+                    Notifications.report(item, DownloadConfiguration.settings.email_subject_admin, DownloadConfiguration.settings.email_content_admin, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context)
                     LOGGER.info("Download success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "success", USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     download_locations.append(mail_context["target_directory"])
                 except Exception as e:
@@ -223,14 +228,14 @@ class AprocProcess(Process):
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)
                     mail_context["error"] = error_msg
-                    Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
+                    Notifications.report(item, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                     raise Exception(error_msg)
             else:
                 error_msg = "No driver found for {}/{}".format(collection, item_id)
                 LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 mail_context["error"] = error_msg
-                Notifications.report(item, Configuration.settings.email_subject_error_download, Configuration.settings.email_content_error_download, Configuration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
+                Notifications.report(item, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
         return OutputDownloadProcess(download_locations=download_locations).model_dump()
 
@@ -257,7 +262,7 @@ class AprocProcess(Process):
     @staticmethod
     def __get_item_from_arlas__(collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
-            url = Configuration.settings.arlas_url_search.format(collection=collection, item=item_id)
+            url = DownloadConfiguration.settings.arlas_url_search.format(collection=collection, item=item_id)
             r = requests.get(url=url, headers={"authorization": headers.get("authorization"), "arlas-org-filter": headers.get("arlas-org-filter")})
             if r.ok:
                 result = r.json()
@@ -289,9 +294,9 @@ class AprocProcess(Process):
     def __update_paths__(mail_context: dict[str, str]):
         try:
             if mail_context.get("target_directory"):
-                if not not Configuration.settings.email_path_prefix_add:
-                    mail_context["target_directory"] = os.path.join(Configuration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(Configuration.settings.outbox_directory).removeprefix("/"))
-                if Configuration.settings.email_path_to_windows:
+                if not not DownloadConfiguration.settings.email_path_prefix_add:
+                    mail_context["target_directory"] = os.path.join(DownloadConfiguration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(DownloadConfiguration.settings.outbox_directory).removeprefix("/"))
+                if DownloadConfiguration.settings.email_path_to_windows:
                     mail_context["target_directory"] = mail_context["target_directory"].replace("/", "\\")
         except Exception as e:
             LOGGER.exception(e)

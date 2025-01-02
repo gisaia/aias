@@ -3,13 +3,11 @@ from envyaml import EnvYAML
 
 from airs.core.models.model import Item, Role
 from airs.core.settings import S3
+from extensions.aproc.proc.drivers.driver_configuration import DriverConfiguration as DriverConfiguration
+from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
-class Driver(BaseModel, extra=Extra.allow):
-    name: str | None = Field(title="Name of the driver")
-    class_name: str | None = Field(title="Name of the driver class")
-    configuration: dict | None = Field(title="Driver configuration")
-    priority: int | None = Field(title="Driver priority. If two drivers are eligible then driver with highest priority will be selected over driver with lower priority.)")
+class Driver(DriverConfiguration):
     alternative_asset_href_field: str | None = Field(None, title="Property field to use as an alternative to the data's href")
 
     def get_asset_href(self, item: Item) -> str | None:
@@ -36,7 +34,7 @@ class Index(BaseModel, extra=Extra.allow):
 
 class Settings(BaseModel, extra='allow'):
     arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
-    drivers: list[Driver] = Field(title="Configuration of the drivers")
+    drivers: list[DriverConfiguration] = Field(title="Configuration of the drivers")
     outbox_directory: str = Field(title="Directory where the downloads will be placed. Must be configured, even so you enabled outbox_s3")
     outbox_s3: S3 | None = Field(title="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
     clean_outbox_directory: bool = Field(True, title="Clean outbox directory once files copied on S3")
@@ -67,3 +65,25 @@ class Configuration:
         envyaml = EnvYAML(configuration_file, strict=False)
         Configuration.settings = Settings(**envyaml.export())
         return Configuration.settings
+
+    @staticmethod
+    def raise_if_not_valid():
+        MSG = "Download driver configuration exception: {}"
+        if Configuration.settings is None or Configuration.settings.drivers is None or len(Configuration.settings.drivers) == 0:
+            raise DriverException(MSG.format("No driver configured"))
+        if Configuration.settings.index_for_download is None:
+            raise DriverException(MSG.format("index_for_download not configured"))
+        if Configuration.settings.index_for_download.index_name is None:
+            raise DriverException(MSG.format("index_for_download.index_name not configured"))
+        if Configuration.settings.index_for_download.endpoint_url is None:
+            raise DriverException(MSG.format("index_for_download.endpoint_url not configured"))
+        if Configuration.settings.arlas_url_search is None:
+            raise DriverException(MSG.format("arlas_url_search not configured"))
+        if Configuration.settings.outbox_directory is None:
+            raise DriverException(MSG.format("outbox_directory not configured"))
+        if Configuration.settings.arlaseo_mapping_url is None:
+            raise DriverException(MSG.format("arlaseo_mapping_url not configured"))
+        if Configuration.settings.download_mapping_url is None:
+            raise DriverException(MSG.format("download_mapping_url not configured"))
+        for driver in Configuration.settings.drivers:
+            driver.raise_if_not_valid()

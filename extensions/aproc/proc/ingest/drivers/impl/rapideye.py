@@ -9,47 +9,47 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeTy
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url, setup_gdal)
 
 
-class Driver(ProcDriver):
-    quicklook_path = None
-    thumbnail_path = None
-    xml_path = None
-    tif_path = None
-    tfw_path = None
+class Driver(IngestDriver):
+
+    def __init__(self):
+        super().__init__()
+        self.quicklook_path = None
+        self.thumbnail_path = None
+        self.xml_path = None
+        self.tif_path = None
+        self.tfw_path = None
 
     # Implements drivers method
-
-    @staticmethod
-    def init(configuration: Configuration):
-        return
+    def init(self, configuration: Configuration):
+        ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def supports(self, url: str) -> bool:
         try:
-            result = Driver.__check_path__(url)
+            result = self.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        if Driver.quicklook_path is None:
-            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, Driver.thumbnail_size, assets)
-            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, Driver.overview_size, assets)
+        if self.quicklook_path is None:
+            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets)
+            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
         assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
         assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        if Driver.tfw_path:
+        if self.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
@@ -133,25 +133,24 @@ class Driver(ProcDriver):
         )
         return item
 
-    @staticmethod
-    def __check_path__(path: str):
-        Driver.thumbnail_path = None
-        Driver.quicklook_path = None
-        Driver.tif_path = None
-        Driver.xml_path = None
+    def __check_path__(self, path: str):
+        self.thumbnail_path = None
+        self.quicklook_path = None
+        self.tif_path = None
+        self.xml_path = None
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist is True:
             for file in os.listdir(path):
                 if os.path.isfile(os.path.join(path, file)):
                     if file.endswith("_browse.tif"):
-                        Driver.quicklook_path = os.path.join(path, file)
-                        Driver.thumbnail_path = os.path.join(path, file)
+                        self.quicklook_path = os.path.join(path, file)
+                        self.thumbnail_path = os.path.join(path, file)
                     if file.endswith(".tif") and file.find("browse") < 0 and file.find("_udm") < 0:
-                        Driver.tif_path = os.path.join(path, file)
-                        tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+                        self.tif_path = os.path.join(path, file)
+                        tfw_path = Path(self.tif_path).with_suffix(".tfw")
                         if tfw_path.exists():
-                            Driver.tfw_path = str(tfw_path)
+                            self.tfw_path = str(tfw_path)
                     if file.endswith("_metadata.xml"):
-                        Driver.xml_path = os.path.join(path, file)
-            return Driver.tif_path is not None and Driver.xml_path is not None
+                        self.xml_path = os.path.join(path, file)
+            return self.tif_path is not None and self.xml_path is not None
         return False

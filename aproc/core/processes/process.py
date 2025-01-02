@@ -7,10 +7,10 @@ from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 
 
 class Process(ABC):
-    name: str = None
+    name: str = ""
     LOGGER = logging.getLogger(__name__)
     input_model: type[BaseModel]
-    __task_name__: str = None
+    __task_name__: str = ""
 
     @classmethod
     def set_logger(cls, logger) -> None:

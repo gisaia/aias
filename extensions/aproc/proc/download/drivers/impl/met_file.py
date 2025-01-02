@@ -1,6 +1,6 @@
 import os
 from airs.core.models.model import Item, ItemFormat, AssetFormat
-from extensions.aproc.proc.download.drivers.driver import Driver as DownloadDriver
+from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
 
 from extensions.aproc.proc.download.drivers.impl.utils import make_raw_archive_zip
 import shutil
@@ -9,16 +9,17 @@ import xml.etree.ElementTree as ET
 
 class Driver(DownloadDriver):
 
+    def __init__(self):
+        super().__init__()
+
     # Implements drivers method
-    @staticmethod
-    def init(configuration: dict):
+    def init(self, configuration: dict):
         ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(item: Item) -> bool:
+    def supports(self, item: Item) -> bool:
         item_format = item.properties.item_format
-        href = Driver.get_asset_href(item)
+        href = self.get_asset_href(item)
         return href is not None \
             and (item_format == ItemFormat.dimap.value
                  or item_format == ItemFormat.terrasar.value
@@ -26,7 +27,7 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
-        met_file = Driver.get_asset_href(item)
+        met_file = self.get_asset_href(item)
         if raw_archive:
             make_raw_archive_zip(met_file, target_directory)
             return
