@@ -41,11 +41,11 @@ class DriverManager():
         return None
 
     @staticmethod
-    def get_driver_by_name(process: str, name: str) -> AbstractDriver:
+    def get_driver_by_name(process: str, name_to_find: str) -> AbstractDriver:
         DriverManager.__check_drivers(process)
         for driver in DriverManager.drivers.get(process, []):
             driver: AbstractDriver = driver
-            if driver.name == name:
+            if driver.name == name_to_find:
                 return driver
         return None
 
