@@ -17,18 +17,12 @@ from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from extensions.aproc.proc.processes.process_model import InputProcess
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-def __update_status__(task: Task, state: str, meta: dict = None):
-    if task.request.id is not None:
-        task.update_state(state=state, meta=meta)
-    else:
-        LOGGER.debug(task.name + " " + state + " " + str(meta))
-
-
-class InputIngestProcess(BaseModel):
+class InputIngestProcess(InputProcess):
     collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
     url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
@@ -89,7 +83,7 @@ class AprocProcess(Process):
         raise DriverException("No driver found for  {}".format(url))
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str, annotations: str) -> dict:
+    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
@@ -110,17 +104,17 @@ class AprocProcess(Process):
         if not os.path.exists(url):
             msg = "File or directory {} not found".format(url)
             LOGGER.warning(msg)
-        driver: IngestDriver = DriverManager.solve(summary.id, url)
+        driver: IngestDriver = DriverManager.solve(summary.id, url, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         if driver is not None:
             try:
                 LOGGER.info("Driver {} will be used".format(driver.name))
                 LOGGER.debug("ingestion: 1 - identify_assets")
-                __update_status__(self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
+                Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
                 assets: list[Asset] = driver.identify_assets(url)
                 AprocProcess.__check_assets__(url, assets)
 
                 LOGGER.debug("ingestion: 2 - fetch_assets")
-                __update_status__(self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
+                Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'fetch_assets', "ACTION": "INGEST", "TARGET": url})
                 try:
                     assets = driver.fetch_assets(url, assets)
                 except Exception as e:
@@ -130,12 +124,12 @@ class AprocProcess(Process):
                 AprocProcess.__check_assets__(url, assets, file_exists=True)
 
                 LOGGER.debug("ingestion: 3 - transform_assets")
-                __update_status__(self, state='PROGRESS', meta={'step': 'transform_assets', "ACTION": "INGEST", "TARGET": url})
+                Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'transform_assets', "ACTION": "INGEST", "TARGET": url})
                 assets = driver.transform_assets(url, assets)
                 AprocProcess.__check_assets__(url, assets, file_exists=True)
 
                 LOGGER.debug("ingestion: 4 - create_item")
-                __update_status__(self, state='PROGRESS', meta={'step': 'create_item', "ACTION": "INGEST", "TARGET": url})
+                Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'create_item', "ACTION": "INGEST", "TARGET": url})
                 item = driver.to_item(url, assets)
                 item.collection = collection
                 item.catalog = catalog
@@ -145,12 +139,12 @@ class AprocProcess(Process):
                 LOGGER.debug("ingestion: 5 - upload")
                 i: int = 0
                 for asset_name, asset in item.assets.items():
-                    __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
                     i += 1
                     asset: Asset = asset
                     AprocProcess.upload_asset_if_managed(item, asset, Configuration.settings.airs_endpoint)
                 LOGGER.debug("ingestion: 6 - register")
-                __update_status__(self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
+                Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
                 item: Item = AprocProcess.insert_or_update_item(item, Configuration.settings.airs_endpoint)
                 return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
             except Exception as err:

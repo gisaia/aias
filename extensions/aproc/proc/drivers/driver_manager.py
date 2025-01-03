@@ -29,9 +29,16 @@ class DriverManager():
             LOGGER.info("{}: {}".format(driver.priority, driver.name))
 
     @staticmethod
-    def solve(process: str, ressource) -> AbstractDriver:
+    def solve(process: str, ressource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
         DriverManager.__check_drivers(process)
-        for driver_class in DriverManager.drivers.get(process, []):
+        drivers = DriverManager.drivers.get(process, [])
+        if include_drivers and len(include_drivers) > 0:
+            LOGGER.debug("keep only {}".format(include_drivers))
+            drivers = list(filter(lambda driver_class: driver_class.name in include_drivers, drivers))
+        if exclude_drivers and len(exclude_drivers) > 0:
+            LOGGER.debug("exclude {}".format(exclude_drivers))
+            drivers = list(filter(lambda driver_class: driver_class.name not in exclude_drivers, drivers))
+        for driver_class in drivers:
             try:
                 LOGGER.debug("Test driver {}".format(driver_class.name))
                 driver: AbstractDriver = driver_class()

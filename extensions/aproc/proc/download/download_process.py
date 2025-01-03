@@ -26,6 +26,7 @@ from extensions.aproc.proc.download.settings import \
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (DriverException,
                                                       RegisterException)
+from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              DOWNLOAD_FAILED_MSG, EVENT_ACTION,
@@ -39,13 +40,7 @@ DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name + " " + state + " " + str(meta))
-    if task.request.id is not None:
-        task.update_state(state=state, meta=meta)
-
-
-class InputDownloadProcess(BaseModel):
+class InputDownloadProcess(InputProcess):
     requests: list[dict[str, str]] = Field(default=[], title="The list of item (collection, item_id) to download")
     crop_wkt: str = Field(default=None, title="WKT geometry for cropping the data")
     target_projection: str = Field(default=None, title="epsg target projection")
@@ -98,7 +93,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")
@@ -170,7 +165,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True) -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
@@ -196,11 +191,11 @@ class AprocProcess(Process):
                 Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
 
-            driver: DownloadDriver = DriverManager.solve(summary.id, item)
+            driver: DownloadDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
             if driver is not None:
                 try:
                     LOGGER.info("Download will be done by {}".format(driver.name))
-                    __update_status__(self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
                     target_directory, relative_target_directory = AprocProcess.__get_download_location__(item, send_to)
                     LOGGER.info("Download will be placed in {}".format(target_directory))
                     mail_context["target_directory"] = target_directory
