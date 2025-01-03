@@ -13,6 +13,8 @@ import xml.etree.ElementTree as ET
 
 
 class Driver(IngestDriver):
+    output_folder = None
+
     def __init__(self):
         super().__init__()
         self.browse_path = None
@@ -21,11 +23,11 @@ class Driver(IngestDriver):
         self.tif_path = None
         self.tfw_path = None
         self.met_path = None
-        self.output_folder = None
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        self.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
+    def init(configuration: Configuration):
+        IngestDriver.init(configuration)
+        Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
     # Implements drivers method
     def supports(self, url: str) -> bool:
@@ -144,9 +146,7 @@ class Driver(IngestDriver):
         return item
 
     def __check_path__(self, path: str):
-        self.tif_path = None
-        self.met_path = None
-        self.browse_path = None
+        self.__init__()
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist:
             for f in os.listdir(path):

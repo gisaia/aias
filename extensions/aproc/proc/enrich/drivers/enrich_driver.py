@@ -6,15 +6,17 @@ from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
 class EnrichDriver(AbstractDriver):
+    alternative_asset_href_field = None
 
     def __init__(self):
-        super().__init__()        
+        super().__init__()
         self.thumbnail_size = 256
         self.overview_size = 1024
-        self.alternative_asset_href_field: str = None
 
-    def init(self, configuration: dict) -> None:
-        self.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
+    @staticmethod
+    def init(configuration: dict) -> None:
+        if configuration:
+            EnrichDriver.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets

@@ -44,8 +44,8 @@ class Driver(IngestDriver):
         self.tfw_path = None
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        return
+    def init(configuration: dict):
+        IngestDriver.init(configuration)
 
     # Implements drivers method
     def supports(self, url: str) -> bool:
@@ -240,8 +240,7 @@ class Driver(IngestDriver):
         return item
 
     def __check_path__(self, path: str):
-        self.tif_path = None
-        self.met_path = None
+        self.__init__()
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist:
             for f in os.listdir(path):

@@ -4,14 +4,19 @@ from abc import abstractmethod
 from airs.core.models.model import Asset, Item
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
+from aproc.core.settings import Configuration
 
 
 class IngestDriver(AbstractDriver):
 
     def __init__(self):
-        super().__init__()        
+        super().__init__()
         self.thumbnail_size = 256
         self.overview_size = 1024
+
+    # Implements drivers method
+    def init(configuration: Configuration):
+        return
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets

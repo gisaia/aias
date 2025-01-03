@@ -12,8 +12,8 @@ class Driver(IngestDriver):
         super().__init__()
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        ...
+    def init(configuration: Configuration):
+        IngestDriver.init(configuration)
 
     # Implements drivers method
     def supports(self, url: str) -> bool:

@@ -23,8 +23,8 @@ class Driver(IngestDriver):
         self.georef_path = None
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        ...
+    def init(configuration: Configuration):
+        IngestDriver.init(configuration)
 
     # Implements drivers method
     def supports(self, url: str) -> bool:
@@ -215,11 +215,8 @@ class Driver(IngestDriver):
 
     def __check_path__(self, path: str):
         # relative_folder_path variable must be a folder path beginning and finishing with a /
+        self.__init__()
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        self.thumbnail_path = None
-        self.quicklook_path = None
-        self.roi_path = None
-        self.dim_path = None
         cat_all_thumb_path = None
         cat_all_quick_path = None
         raw_all_thumb_path = None
