@@ -29,6 +29,10 @@ class DriverManager():
             LOGGER.info("{}: {}".format(driver.priority, driver.name))
 
     @staticmethod
+    def driver_names(process: str) -> list[str]:
+        return list(map(lambda p: p.name, DriverManager.drivers[process]))
+
+    @staticmethod
     def solve(process: str, ressource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
         DriverManager.__check_drivers(process)
         drivers = DriverManager.drivers.get(process, [])

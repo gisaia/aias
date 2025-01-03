@@ -83,6 +83,8 @@ class AprocProcess(Process):
             raise DriverException("Invalid configuration for download drivers ({})".format(configuration))
         AprocProcess.input_model = InputDownloadProcess
         Notifications.init()
+        description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
+        description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
     @staticmethod
     def get_process_description() -> ProcessDescription:

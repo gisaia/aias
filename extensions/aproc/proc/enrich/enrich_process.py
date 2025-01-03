@@ -65,6 +65,8 @@ class AprocProcess(Process):
         else:
             raise DriverException("Invalid configuration for enrich drivers ({})".format(configuration))
         AprocProcess.input_model = InputEnrichProcess
+        description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
+        description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
     @staticmethod
     def get_process_description() -> ProcessDescription:
