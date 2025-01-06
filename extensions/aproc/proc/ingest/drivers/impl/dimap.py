@@ -6,32 +6,33 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeTy
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url, get_epsg)
 
 
-class Driver(ProcDriver):
-    quicklook_path = None
-    thumbnail_path = None
-    dim_path = None
-    roi_path = None
-    image_path = None
-    georef_path = None
+class Driver(IngestDriver):
+
+    def __init__(self):
+        super().__init__()
+        self.quicklook_path = None
+        self.thumbnail_path = None
+        self.dim_path = None
+        self.roi_path = None
+        self.image_path = None
+        self.georef_path = None
 
     # Implements drivers method
-    @staticmethod
-    def init(configuration: Configuration):
-        return
+    def init(self, configuration: Configuration):
+        ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def supports(self, url: str) -> bool:
         try:
-            result = Driver.__check_path__(url)
+            result = self.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -52,24 +53,24 @@ class Driver(ProcDriver):
                             roles=[Role.data_mask.value], name=Role.data_mask.value, type=MimeType.GML.value,
                             description=Role.data_mask.value, airs__managed=False, asset_format=AssetFormat.gml.value))
 
-        if Driver.image_path:
+        if self.image_path:
             format = AssetFormat.other.value
             mime = None
-            if Driver.image_path.lower().endswith("jp2"):
+            if self.image_path.lower().endswith("jp2"):
                 format = AssetFormat.jpg2000.value
                 mime = "image/jp2"
-            if Driver.image_path.lower().endswith("tif") or Driver.image_path.lower().endswith("tiff"):
+            if self.image_path.lower().endswith("tif") or self.image_path.lower().endswith("tiff"):
                 format = AssetFormat.geotiff.value
                 mime = "image/tif"
             assets.append(Asset(href=self.image_path, size=get_file_size(self.image_path),
                                 roles=[Role.data.value], name=Role.data.value, type=mime,
                                 description=Role.data.value, airs__managed=False, asset_format=format))
 
-        if Driver.georef_path:
+        if self.georef_path:
             format = AssetFormat.other.value
-            if Driver.georef_path.lower().endswith("j2w"):
+            if self.georef_path.lower().endswith("j2w"):
                 format = AssetFormat.j2w.value
-            if Driver.georef_path.lower().endswith("tfw"):
+            if self.georef_path.lower().endswith("tfw"):
                 format = AssetFormat.tfw.value
             assets.append(Asset(href=self.georef_path, size=get_file_size(self.georef_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
@@ -105,8 +106,8 @@ class Driver(ProcDriver):
                                                           coords[2][0], coords[2][1], coords[3][0], coords[3][1])
 
         # Open ROI GML file to find the real footprint of the product
-        driver = ogr.GetDriverByName("GML")
-        component_source = driver.Open(self.roi_path, 0)  # read-only
+        ogr_d = ogr.GetDriverByName("GML")
+        component_source = ogr_d.Open(self.roi_path, 0)  # read-only
         layer = component_source.GetLayer()
         component_feature = layer.GetNextFeature()
         geo_ref = component_feature.GetGeometryRef()
@@ -212,14 +213,13 @@ class Driver(ProcDriver):
             item.properties.sensor_type = metadata["MISSION_INDEX"]
         return item
 
-    @staticmethod
-    def __check_path__(path: str):
+    def __check_path__(self, path: str):
         # relative_folder_path variable must be a folder path beginning and finishing with a /
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        Driver.thumbnail_path = None
-        Driver.quicklook_path = None
-        Driver.roi_path = None
-        Driver.dim_path = None
+        self.thumbnail_path = None
+        self.quicklook_path = None
+        self.roi_path = None
+        self.dim_path = None
         cat_all_thumb_path = None
         cat_all_quick_path = None
         raw_all_thumb_path = None
@@ -231,25 +231,25 @@ class Driver(ProcDriver):
                     if file == 'MASKS':
                         for mask in os.listdir(os.path.join(path, file)):
                             if mask.endswith('.GML') and mask.startswith('ROI'):
-                                Driver.roi_path = os.path.join(os.path.join(path, file), mask)
+                                self.roi_path = os.path.join(os.path.join(path, file), mask)
                 # check if current file is a file
                 if os.path.isfile(os.path.join(path, file)):
                     if file.endswith('.XML') and file.startswith('RPC'):
-                        Driver.rpc_file = os.path.join(path, file)
+                        self.rpc_file = os.path.join(path, file)
                     if file.endswith('.XML') and file.startswith('DIM'):
-                        Driver.dim_path = os.path.join(path, file)
+                        self.dim_path = os.path.join(path, file)
                     if file.endswith('.JPG') and file.startswith('PREVIEW'):
                         raw_all_quick_path = os.path.join(path, file)
 
                     # Data and georef
                     if file.lower().endswith(('.jpg', 'jp2')) and file.startswith('IMG_'):
-                        Driver.image_path = os.path.join(path, file)
+                        self.image_path = os.path.join(path, file)
                     if file.lower().endswith('.tfw') and file.startswith('IMG_'):
-                        Driver.georef_path = os.path.join(path, file)
+                        self.georef_path = os.path.join(path, file)
                     if file.lower().endswith('.j2w') and file.startswith('IMG_'):
-                        Driver.georef_path = os.path.join(path, file)
+                        self.georef_path = os.path.join(path, file)
                     if file.lower().endswith(('.tiff', '.tif')) and file.startswith('IMG_'):
-                        Driver.image_path = os.path.join(path, file)
+                        self.image_path = os.path.join(path, file)
 
                     if file.endswith('.JPG') and file.startswith('ICON'):
                         raw_all_thumb_path = os.path.join(path, file)
@@ -258,14 +258,14 @@ class Driver(ProcDriver):
                     if file.endswith('.JPG') and file.startswith('CAT_TB'):
                         cat_all_thumb_path = os.path.join(path, file)
             if cat_all_thumb_path is not None:
-                Driver.thumbnail_path = cat_all_thumb_path
+                self.thumbnail_path = cat_all_thumb_path
             else:
-                Driver.thumbnail_path = raw_all_thumb_path
+                self.thumbnail_path = raw_all_thumb_path
             if cat_all_quick_path is not None:
-                Driver.quicklook_path = cat_all_quick_path
+                self.quicklook_path = cat_all_quick_path
             else:
-                Driver.quicklook_path = raw_all_quick_path
-            return Driver.roi_path is not None and Driver.dim_path is not None
+                self.quicklook_path = raw_all_quick_path
+            return self.roi_path is not None and self.dim_path is not None
         return False
 
     @staticmethod

@@ -4,21 +4,22 @@ import shutil
 import requests
 
 from airs.core.models.model import Item
-from extensions.aproc.proc.download.drivers.driver import \
-    Driver as DownloadDriver
+from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import get_file_name
 
 
 class Driver(DownloadDriver):
 
+    def __init__(self):
+        super().__init__()
+
     # Implements drivers method
-    def init(configuration: dict):
+    def init(self, configuration: dict):
         ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(item: Item) -> bool:
-        href = Driver.get_asset_href(item)
+    def supports(self, item: Item) -> bool:
+        href = self.get_asset_href(item)
         return href is not None\
             and (href.startswith("file://")
                  or href.startswith("http://")
@@ -26,7 +27,7 @@ class Driver(DownloadDriver):
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
-        href = Driver.get_asset_href(item)
+        href = self.get_asset_href(item)
         file_name = get_file_name(item.id)
         if href.startswith("file://"):
             shutil.copy(href, os.path.join(target_directory, file_name))

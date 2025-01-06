@@ -2,24 +2,23 @@ import shutil
 from pathlib import Path
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
-from extensions.aproc.proc.download.drivers.driver import \
-    Driver as DownloadDriver
-from extensions.aproc.proc.download.drivers.impl.utils import \
-    make_raw_archive_zip
+from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
+from extensions.aproc.proc.download.drivers.impl.utils import make_raw_archive_zip
 
 
 class Driver(DownloadDriver):
 
+    def __init__(self):
+        super().__init__()
+
     # Implements drivers method
-    @staticmethod
-    def init(configuration: dict):
+    def init(self, configuration: dict):
         ...
 
     # Implements drivers method
-    @staticmethod
-    def supports(item: Item) -> bool:
+    def supports(self, item: Item) -> bool:
         item_format = item.properties.item_format
-        href = Driver.get_asset_href(item)
+        href = self.get_asset_href(item)
         return href is not None \
             and (item_format == ItemFormat.geotiff.value
                  or item_format == ItemFormat.jpeg2000.value
@@ -32,19 +31,19 @@ class Driver(DownloadDriver):
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str,
                             target_format: str, raw_archive: bool):
-        href = Driver.get_asset_href(item)
+        href = self.get_asset_href(item)
         if raw_archive:
             if item.properties.item_format and (
                     item.properties.item_format == ItemFormat.geotiff.value or item.properties.item_format == ItemFormat.jpeg2000.value):
-                Driver.LOGGER.debug("Copy {} in {}".format(href, target_directory))
+                self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
                 shutil.copy(href, target_directory)
                 if item.assets and item.assets.get(Role.extent.value) and Path(
                         item.assets.get(Role.extent.value).href).exists():
-                    Driver.LOGGER.debug("Geo file {} detected and copied".format(item.assets.get(Role.extent.value).href))
+                    self.LOGGER.debug("Geo file {} detected and copied".format(item.assets.get(Role.extent.value).href))
                     shutil.copy(item.assets.get(Role.extent.value).href, target_directory)
                 if item.assets and item.assets.get(Role.metadata.value) and Path(
                         item.assets.get(Role.metadata.value).href).exists():
-                    Driver.LOGGER.debug("Metadata {} detected and copied".format(item.assets.get(Role.metadata.value).href))
+                    self.LOGGER.debug("Metadata {} detected and copied".format(item.assets.get(Role.metadata.value).href))
                     shutil.copy(item.assets.get(Role.metadata.value).href, target_directory)
             else:
                 make_raw_archive_zip(href, target_directory)
@@ -68,9 +67,9 @@ class Driver(DownloadDriver):
             # If the projetion and the format are natives, just copy the file and the georef file
             if item.assets and item.assets.get(Role.extent.value) is not None and Path(item.assets.get(Role.extent.value).href).exists():
                 geo_ext_file = item.assets.get(Role.extent.value).href
-                Driver.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
+                self.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
                 shutil.copy(geo_ext_file, target_directory)
-            Driver.LOGGER.debug("Copy {} in {}".format(href, target_directory))
+            self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
             shutil.copy(href, target_directory)
             return
         if target_projection == 'native':
@@ -78,7 +77,7 @@ class Driver(DownloadDriver):
         # Some transformation to be done ...
         from extensions.aproc.proc.download.drivers.impl.utils import extract
         target_file_name = Path(Path(href).stem).with_suffix(extension)
-        Driver.LOGGER.info("Extract {} to {} in {} with projection {} and crop {}".format(href, target_file_name,
-                                                                                          target_directory,
-                                                                                          target_projection, crop_wkt))
+        self.LOGGER.info("Extract {} to {} in {} with projection {} and crop {}".format(href, target_file_name,
+                                                                                        target_directory,
+                                                                                        target_projection, crop_wkt))
         extract([], crop_wkt, href, driver_target, target_projection, target_directory, str(target_file_name))

@@ -1,44 +1,23 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from airs.core.models.model import Item, Role
-from aproc.core.logger import Logger
+from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
-class Driver(ABC):
+class DownloadDriver(AbstractDriver):
     """ Driver for exporting files for download
     """
-    priority: int = 0
-    name: str = None
-    LOGGER = Logger.logger
-    alternative_asset_href_field: str = None
 
-    @staticmethod
-    @abstractmethod
-    def init(configuration: dict) -> None:
-        """Method called at init time by the service.
+    def __init__(self):
+        super().__init__()
+        self.alternative_asset_href_field: str = None
 
-        Args:
-            configuration (dict): Driver's configuration
-        """
-        ...
+    def init(self, configuration: dict) -> None:
+        self.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
 
-    @staticmethod
-    @abstractmethod
-    def supports(item: Item) -> bool:
-        """Whether the driver support the item or not
-
-        Args:
-            item (Item): the item to download
-
-        Returns:
-            bool: True if supported
-        """
-        ...
-
-    @staticmethod
-    def get_asset_href(item: Item) -> str | None:
-        if Driver.alternative_asset_href_field:
-            return item.properties[Driver.alternative_asset_href_field]
+    def get_asset_href(self, item: Item) -> str | None:
+        if self.alternative_asset_href_field:
+            return item.properties[self.alternative_asset_href_field]
         data = item.assets.get(Role.data.value)
         return data.href if data else None
 

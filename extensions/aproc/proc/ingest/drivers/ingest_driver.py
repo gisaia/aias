@@ -1,17 +1,17 @@
 import hashlib
 import os
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from airs.core.models.model import Asset, Item
-from aproc.core.logger import Logger
+from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
+from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
-class Driver(ABC):
-    priority: int = 0
-    name: str = None
-    __assets_dir__: str = None
-    LOGGER = Logger.logger
-    thumbnail_size = 256
-    overview_size = 1024
+class IngestDriver(AbstractDriver):
+
+    def __init__(self):
+        super().__init__()        
+        self.thumbnail_size = 256
+        self.overview_size = 1024
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
@@ -22,10 +22,12 @@ class Driver(ABC):
         Returns:
             str: the directory for storing the assets
         """
+        if not url:
+            raise DriverException("Url can not be None")
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
-        dir = os.path.sep.join([self.__assets_dir__, unique])
-        if not os.path.exists(self.__assets_dir__):
-            os.makedirs(self.__assets_dir__)
+        dir = os.path.sep.join([self.assets_dir, unique])
+        if not os.path.exists(self.assets_dir):
+            os.makedirs(self.assets_dir)
         if not os.path.exists(dir):
             os.makedirs(dir)
         return dir
@@ -40,31 +42,14 @@ class Driver(ABC):
         Returns:
             str: the path to the file for storing the asset's file
         """
-        dir = self.get_assets_dir(url)
-        return os.path.sep.join([dir, asset.name])
+        if not url:
+            raise DriverException("Url can not be None")
+        if not asset:
+            raise DriverException("Asset can not be None")
+        if not asset.name:
+            raise DriverException("Asset name is undefined for {}".format(asset.model_dump_json()))
+        return os.path.sep.join([self.get_assets_dir(url), asset.name])
 
-    @staticmethod
-    @abstractmethod
-    def init(configuration: dict) -> None:
-        """Method called at init time by the service.
-
-        Args:
-            configuration (dict): Driver's configuration
-        """
-        ...
-
-    @staticmethod
-    @abstractmethod
-    def supports(url: str) -> bool:
-        """Return True if the provided url points to an archive supported by this driver.
-
-        Args:
-            url (str): archive's url
-
-        Returns:
-            bool: True if the driver supports the archive format, False otherwise
-        """
-        ...
     @abstractmethod
     def get_item_id(self, url: str) -> str:
         """Return the id of the item currently process by the driver.

@@ -14,10 +14,11 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
-from extensions.aproc.proc.enrich.drivers.driver import Driver
-from extensions.aproc.proc.enrich.drivers.drivers import Drivers
-from extensions.aproc.proc.enrich.drivers.exceptions import DriverException
+from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
+from extensions.aproc.proc.enrich.settings import Configuration as EnrichConfiguration
 from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestAprocProcess
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -63,7 +64,9 @@ class AprocProcess(Process):
     @staticmethod
     def init(configuration: dict):
         if configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME):
-            Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
+            EnrichConfiguration.init(configuration_file=configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME))
+            EnrichConfiguration.raise_if_not_valid()
+            DriverManager.init(summary.id, EnrichConfiguration.settings.drivers)
         else:
             raise DriverException("Invalid configuration for enrich drivers ({})".format(configuration))
         AprocProcess.input_model = InputEnrichProcess
@@ -97,7 +100,7 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 raise DriverException(error_msg)
-            driver: Driver = Drivers.solve(item)
+            driver: EnrichDriver = DriverManager.solve(summary.id, item)
             if driver is not None:
                 try:
                     LOGGER.info("ingestion: 1 - enrichment will be done by {}".format(driver.name))

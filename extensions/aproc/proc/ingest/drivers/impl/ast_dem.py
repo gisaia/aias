@@ -15,7 +15,7 @@ from airs.core.models.model import (
     Role,
 )
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     get_geom_bbox_centroid,
     get_hash_url,
@@ -25,12 +25,7 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
 from .image_driver_helper import ImageDriverHelper
 
 
-class Driver(ProcDriver):
-
-    met_path = None
-    tif_path = None
-    tfw_path = None
-
+class Driver(IngestDriver):
     synonyms = {
         "UPPERLEFTCORNERLATITUDE": "NORTHBOUNDINGCOORDINATE",
         "UPPERLEFTCORNERLONGITUDE": "WESTBOUNDINGCOORDINATE",
@@ -42,19 +37,23 @@ class Driver(ProcDriver):
         "LOWERLEFTCORNERLONGITUDE": "WESTBOUNDINGCOORDINATE",
     }
 
+    def __init__(self):
+        super().__init__()
+        self.met_path = None
+        self.tif_path = None
+        self.tfw_path = None
+
     # Implements drivers method
-    @staticmethod
-    def init(configuration: Configuration):
+    def init(self, configuration: Configuration):
         return
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def supports(self, url: str) -> bool:
         try:
-            result = Driver.__check_path__(url)
+            result = self.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -86,7 +85,7 @@ class Driver(ProcDriver):
                 asset_type=ResourceType.other.value,
             )
         )
-        if Driver.tfw_path:
+        if self.tfw_path:
             assets.append(
                 Asset(
                     href=self.tfw_path,
@@ -105,10 +104,10 @@ class Driver(ProcDriver):
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         ImageDriverHelper.add_overview_if_you_can(
-            self, Driver.tif_path, Role.thumbnail, self.thumbnail_size, assets
+            self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets
         )
         ImageDriverHelper.add_overview_if_you_can(
-            self, Driver.tif_path, Role.overview, self.overview_size, assets
+            self, self.tif_path, Role.overview, self.overview_size, assets
         )
         return assets
 
@@ -240,26 +239,24 @@ class Driver(ProcDriver):
         )
         return item
 
-    @staticmethod
-    def __check_path__(path: str):
-        Driver.tif_path = None
-        Driver.met_path = None
+    def __check_path__(self, path: str):
+        self.tif_path = None
+        self.met_path = None
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist:
             for f in os.listdir(path):
-                Driver.tif_path = os.path.join(path, f)
-                if Path(Driver.tif_path).is_file() and Driver.tif_path.lower().endswith((".tif", ".tiff")):
-                    tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+                self.tif_path = os.path.join(path, f)
+                if Path(self.tif_path).is_file() and self.tif_path.lower().endswith((".tif", ".tiff")):
+                    tfw_path = Path(self.tif_path).with_suffix(".tfw")
                     if tfw_path.exists():
-                        Driver.tfw_path = str(tfw_path)
-                    met_path = Path(Driver.tif_path).with_suffix(".tif.met")
+                        self.tfw_path = str(tfw_path)
+                    met_path = Path(self.tif_path).with_suffix(".tif.met")
                     if met_path.exists():
-                        Driver.met_path = str(met_path)
-                    return Driver.tif_path is not None and Driver.met_path is not None
+                        self.met_path = str(met_path)
+                    return self.tif_path is not None and self.met_path is not None
         return False
 
-    @staticmethod
-    def __get_corner_coord__(data, corner):
+    def __get_corner_coord__(self, data, corner):
         if data["INVENTORYMETADATA"]["SPATIALDOMAINCONTAINER"][
             "HORIZONTALSPATIALDOMAINCONTAINER"
         ].get("BOUNDINGBOX"):

@@ -10,9 +10,8 @@ import requests
 from pydantic import Field
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat
-from extensions.aproc.proc.download.drivers.driver import \
-    Driver as DownloadDriver
-from extensions.aproc.proc.download.drivers.exceptions import DriverException
+from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.drivers.impl.utils import extract
 from extensions.aproc.proc.s3_configuration import S3Configuration
 
@@ -22,15 +21,16 @@ class ZarrConfiguration(S3Configuration):
 
 
 class Driver(DownloadDriver):
-    # Implements drivers method
-    @staticmethod
-    def init(configuration: dict):
-        Driver.configuration = ZarrConfiguration.model_validate(configuration)
+    def __init__(self):
+        super().__init__()
 
     # Implements drivers method
-    @staticmethod
-    def supports(item: Item) -> bool:
-        href = Driver.get_asset_href(item)
+    def init(self, configuration: dict):
+        self.configuration = ZarrConfiguration.model_validate(configuration)
+
+    # Implements drivers method
+    def supports(self, item: Item) -> bool:
+        href = self.get_asset_href(item)
         return item.properties.item_format \
             and item.properties.item_format.lower() == ItemFormat.safe.value.lower() \
             and href is not None
@@ -52,36 +52,36 @@ class Driver(DownloadDriver):
         import smart_open
         import xarray as xr
 
-        asset_href = Driver.get_asset_href(item)
+        asset_href = self.get_asset_href(item)
         tmp_asset = None
 
         if self.configuration.is_download_required(asset_href):
             from urllib.parse import urlparse
 
-            Driver.LOGGER.info("Downloading archive for Zarr creation.")
+            self.LOGGER.info("Downloading archive for Zarr creation.")
 
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            r = requests.get(asset_href, headers=self.configuration.get_storage_parameters(asset_href, Driver.LOGGER)["headers"],
+            r = requests.get(asset_href, headers=self.configuration.get_storage_parameters(asset_href, self.LOGGER)["headers"],
                              stream=True, verify=False)
 
             tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(asset_href).path.strip("/").split("/")[-1])
             if (os.path.splitext(tmp_asset)[1] != ".zip"):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 
-            Driver.LOGGER.warning(tmp_asset)
+            self.LOGGER.warning(tmp_asset)
             with open(tmp_asset, "wb") as out_file:
                 shutil.copyfileobj(r.raw, out_file)
 
             raster_files = self.__find_raster_files(tmp_asset)
             asset_href = f"file://{tmp_asset}"
         else:
-            Driver.LOGGER.info("Streaming archive for Zarr creation.")
-            with smart_open.open(asset_href, "rb", transport_params=self.configuration.get_storage_parameters(asset_href, Driver.LOGGER)) as fb:
+            self.LOGGER.info("Streaming archive for Zarr creation.")
+            with smart_open.open(asset_href, "rb", transport_params=self.configuration.get_storage_parameters(asset_href, self.LOGGER)) as fb:
                 raster_files = self.__find_raster_files(fb)
 
         zarr_res = self.__get_zarr_resolution()
 
-        session = self.configuration.get_rasterio_session(asset_href, Driver.LOGGER)
+        session = self.configuration.get_rasterio_session(asset_href, self.LOGGER)
         with rasterio.Env(session):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 

@@ -12,11 +12,12 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
 from aproc.core.processes.process import Process as Process
 from aproc.core.utils import base_model2description
-from extensions.aproc.proc.ingest.drivers.drivers import Drivers
-from extensions.aproc.proc.ingest.drivers.exceptions import DriverException
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
+from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
@@ -57,7 +58,8 @@ class AprocProcess(Process):
     @staticmethod
     def init(configuration: dict):
         if configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME):
-            Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
+            IngestConfiguration.init(configuration_file=configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME))
+            DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
         else:
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
         AprocProcess.input_model = InputDirectoryIngestProcess
@@ -115,7 +117,7 @@ class AprocProcess(Process):
             return []
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
-        driver = Drivers.solve(full_path)
+        driver = DriverManager.solve(summary.id, full_path)
         if driver is not None:
             archive = Archive(id=driver.get_item_id(full_path),
                               name=os.path.basename(path),

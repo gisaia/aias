@@ -1,18 +1,20 @@
+from abc import abstractmethod
 import hashlib
 import os
-from abc import ABC, abstractmethod
 from airs.core.models.model import Asset, Item, Role
-from aproc.core.logger import Logger
+from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
-class Driver(ABC):
-    priority: int = 0
-    name: str = None
-    __assets_dir__: str = None
-    LOGGER = Logger.logger
-    thumbnail_size = 256
-    overview_size = 1024
-    alternative_asset_href_field: str = None
+class EnrichDriver(AbstractDriver):
+
+    def __init__(self):
+        super().__init__()        
+        self.thumbnail_size = 256
+        self.overview_size = 1024
+        self.alternative_asset_href_field: str = None
+
+    def init(self, configuration: dict) -> None:
+        self.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
@@ -24,9 +26,9 @@ class Driver(ABC):
             str: the directory for storing the assets
         """
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
-        dir = os.path.sep.join([self.__assets_dir__, unique])
-        if not os.path.exists(self.__assets_dir__):
-            os.makedirs(self.__assets_dir__)
+        dir = os.path.sep.join([self.assets_dir, unique])
+        if not os.path.exists(self.assets_dir):
+            os.makedirs(self.assets_dir)
         if not os.path.exists(dir):
             os.makedirs(dir)
         return dir
@@ -44,35 +46,11 @@ class Driver(ABC):
         dir = self.get_assets_dir(url)
         return os.path.sep.join([dir, asset.name])
 
-    @staticmethod
-    def get_asset_href(item: Item) -> str | None:
-        if Driver.alternative_asset_href_field:
-            return item.properties[Driver.alternative_asset_href_field]
+    def get_asset_href(self, item: Item) -> str | None:
+        if self.alternative_asset_href_field:
+            return item.properties[self.alternative_asset_href_field]
         data = item.assets.get(Role.data.value)
         return data.href if data else None
-
-    @staticmethod
-    @abstractmethod
-    def init(configuration: dict) -> None:
-        """Method called at init time by the service.
-
-        Args:
-            configuration (dict): Driver's configuration
-        """
-        ...
-
-    @staticmethod
-    @abstractmethod
-    def supports(url: str) -> bool:
-        """Return True if the provided url points to an archive supported by this driver.
-
-        Args:
-            url (str): archive's url
-
-        Returns:
-            bool: True if the driver supports the archive format, False otherwise
-        """
-        ...
 
     @abstractmethod
     def create_asset(self, item: Item, asset_type: str) -> tuple[Asset, str]:

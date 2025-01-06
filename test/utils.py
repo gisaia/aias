@@ -7,7 +7,10 @@ import unicodedata
 import requests
 from airs.core.models import mapper
 from airs.core.models.model import Item
-from extensions.aproc.proc.ingest.drivers.drivers import Drivers
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestProcess, summary
+
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX", "airs")
 s3_access_key_id = os.getenv("AIRS_S3_ACCESS_KEY_ID", "airs")
@@ -40,7 +43,8 @@ BBOX = "Polygon ((0.56676570458404063 17.18722410865874295, 1.71124787775891329 
 SENTINEL_2_ITEM = "test/inputs/e3229ea8-a7f8-4c88-a3ca-265cea2f6862.json"
 SENTINEL_2_ID = "e3229ea8-a7f8-4c88-a3ca-265cea2f6862"
 
-Drivers.init('./conf/drivers.yaml')
+IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
+DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
 
 
 def get_client():

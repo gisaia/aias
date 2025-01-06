@@ -49,16 +49,19 @@ drivers:
     name: simple_copy
     class_name: extensions.aproc.proc.download.drivers.impl.simple_copy
     configuration:
+    assets_dir: /tmp/aproc/download
     priority: 4
   -
     name: met_file
     class_name: extensions.aproc.proc.download.drivers.impl.met_file
     configuration:
+    assets_dir: /tmp/aproc/download
     priority: 2
   -
     name: image_file
     class_name: extensions.aproc.proc.download.drivers.impl.image_file
     configuration:
+    assets_dir: /tmp/aproc/download
     priority: 3
   -
     name: zarr_download
@@ -76,4 +79,5 @@ drivers:
         headers: $APROC_INPUT_STORAGE_HEADERS
         domain: $APROC_INPUT_STORAGE_DOMAIN
         force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD
+    assets_dir: /tmp/aproc/download
     priority: 1

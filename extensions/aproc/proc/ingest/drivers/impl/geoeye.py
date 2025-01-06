@@ -6,34 +6,35 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeTy
                                     ObservationType, Properties, ResourceType,
                                     Role)
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.drivers.impl.utils import \
     get_file_size, get_geom_bbox_centroid, get_hash_url, get_epsg
 
 
-class Driver(ProcDriver):
-    quicklook_path = None
-    thumbnail_path = None
-    tif_path = None
-    tfw_path = None
-    file_name = None
-    met_path = None
-    component_id = None
+class Driver(IngestDriver):
+
+    def __init__(self):
+        super().__init__()
+        self.quicklook_path = None
+        self.thumbnail_path = None
+        self.tif_path = None
+        self.tfw_path = None
+        self.file_name = None
+        self.met_path = None
+        self.component_id = None
 
     # Implements drivers method
-    @staticmethod
-    def init(configuration: Configuration):
+    def init(self, configuration: Configuration):
         return
 
     # Implements drivers method
-    @staticmethod
-    def supports(url: str) -> bool:
+    def supports(self, url: str) -> bool:
         # url variable must be a folder path begining with a /
         try:
-            result = Driver.__check_path__(url)
+            result = self.__check_path__(url)
             return result
         except Exception as e:
-            Driver.LOGGER.warn(e)
+            self.LOGGER.warn(e)
             return False
 
     # Implements drivers method
@@ -53,7 +54,7 @@ class Driver(ProcDriver):
         assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.txt.value, asset_type=ResourceType.other.value))
-        if Driver.tfw_path:
+        if self.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
@@ -107,7 +108,6 @@ class Driver(ProcDriver):
                         break
                 if line_1.find('Component ID: ' + self.component_id) >= 0:
                     inside_component_section = True
-
 
         with open(self.met_path) as f_2:
             for line_2 in f_2:
@@ -166,64 +166,58 @@ class Driver(ProcDriver):
         )
         return item
 
-    @staticmethod
-    def __check_path__(file_path: str):
-        Driver.tif_path = None
-        Driver.met_path = None
-        Driver.quicklook_path = None
-        Driver.thumbnail_path = None
-        Driver.component_id = None
+    def __check_path__(self, file_path: str):
+        self.tif_path = None
+        self.met_path = None
+        self.quicklook_path = None
+        self.thumbnail_path = None
+        self.component_id = None
         valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
         file_name = os.path.basename(file_path)
         path = os.path.dirname(file_path)
         if valid_and_exist is True and file_name.endswith(".tif"):
-            Driver.tif_path = file_path
-            tfw_path = Path(Driver.tif_path).with_suffix(".tfw")
+            self.tif_path = file_path
+            tfw_path = Path(self.tif_path).with_suffix(".tfw")
             if tfw_path.exists():
-                Driver.tfw_path = str(tfw_path)
-            Driver.file_name = file_name
+                self.tfw_path = str(tfw_path)
+            self.file_name = file_name
             parts_of_file_name = file_name.replace('.tif', '').split("_")
             if len(parts_of_file_name) >= 4:
-                Driver.component_id = parts_of_file_name[3]
+                self.component_id = parts_of_file_name[3]
                 for file in os.listdir(path):
                     # check if current file is a file
                     if os.path.isfile(os.path.join(path, file)):
                         if file.endswith('.jpg'):
                             if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
-                                Driver.thumbnail_path = os.path.join(path, file)
-                                Driver.quicklook_path = os.path.join(path, file)
+                                self.thumbnail_path = os.path.join(path, file)
+                                self.quicklook_path = os.path.join(path, file)
                         if file.endswith('_metadata.txt'):
-                            Driver.met_path = os.path.join(path, file)
-                return Driver.met_path is not None and Driver.tif_path is not None
+                            self.met_path = os.path.join(path, file)
+                return self.met_path is not None and self.tif_path is not None
         return False
 
-    @staticmethod
-    def __get_date_field__(data, line):
+    def __get_date_field__(self, data, line):
         field = 'Acquisition Date/Time'
         if line.find(field) >= 0:
             data[field] = line.split(':')[1].strip() + ':' + line.split(':')[2].strip()
 
-    @staticmethod
-    def __get_field__(data, line, field, isFloat=False):
+    def __get_field__(self, data, line, field, isFloat=False):
         if line.find(field) >= 0:
             if isFloat:
                 data[field] = float(line.split(':')[1].strip())
             else:
                 data[field] = line.split(':')[1].strip()
 
-    @staticmethod
-    def __get_latitude__(data, line, coord_number):
+    def __get_latitude__(self, data, line, coord_number):
         if line.find('Latitude') >= 0:
             data['lat_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
 
-    @staticmethod
-    def __get_longitude__(data, line, coord_number):
+    def __get_longitude__(self, data, line, coord_number):
         if line.find('Longitude') >= 0:
             data['lon_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
 
-    @staticmethod
-    def __set_lat_lon(data, line, inside_coord, coord_number):
+    def __set_lat_lon(self, data, line, inside_coord, coord_number):
         if inside_coord:
-            Driver.__get_latitude__(data, line, coord_number)
-            Driver.__get_longitude__(data, line, coord_number)
+            self.__get_latitude__(data, line, coord_number)
+            self.__get_longitude__(data, line, coord_number)
 

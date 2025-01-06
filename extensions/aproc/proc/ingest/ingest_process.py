@@ -12,11 +12,11 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
-from extensions.aproc.proc.ingest.drivers.driver import Driver
-from extensions.aproc.proc.ingest.drivers.drivers import Drivers
-from extensions.aproc.proc.ingest.drivers.exceptions import (
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.drivers.exceptions import (
     ConnectionException, DriverException, RegisterException)
-
+from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -66,7 +66,9 @@ class AprocProcess(Process):
     @staticmethod
     def init(configuration: dict):
         if configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME):
-            Drivers.init(configuration_file=configuration[DRIVERS_CONFIGURATION_FILE_PARAM_NAME])
+            IngestConfiguration.init(configuration_file=configuration.get(DRIVERS_CONFIGURATION_FILE_PARAM_NAME))
+            IngestConfiguration.raise_if_not_valid()
+            DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
         else:
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
         AprocProcess.input_model = InputIngestProcess
@@ -81,7 +83,7 @@ class AprocProcess(Process):
 
     def get_resource_id(inputs: BaseModel):
         url = InputIngestProcess(**inputs.model_dump()).url
-        driver = Drivers.solve(url)
+        driver: IngestDriver = DriverManager.solve(summary.id, url)
         if driver is not None:
             return driver.get_item_id(url)
         raise DriverException("No driver found for  {}".format(url))
@@ -108,7 +110,7 @@ class AprocProcess(Process):
         if not os.path.exists(url):
             msg = "File or directory {} not found".format(url)
             LOGGER.warning(msg)
-        driver: Driver = Drivers.solve(url)
+        driver: IngestDriver = DriverManager.solve(summary.id, url)
         if driver is not None:
             try:
                 LOGGER.info("Driver {} will be used".format(driver.name))
