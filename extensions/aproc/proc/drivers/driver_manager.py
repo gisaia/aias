@@ -29,13 +29,24 @@ class DriverManager():
             LOGGER.info("{}: {}".format(driver.priority, driver.name))
 
     @staticmethod
-    def solve(process: str, ressource) -> AbstractDriver:
+    def driver_names(process: str) -> list[str]:
+        return list(map(lambda p: p.name, DriverManager.drivers[process]))
+
+    @staticmethod
+    def solve(process: str, resource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
         DriverManager.__check_drivers(process)
-        for driver_class in DriverManager.drivers.get(process, []):
+        drivers = DriverManager.drivers.get(process, [])
+        if include_drivers and len(include_drivers) > 0:
+            LOGGER.debug("keep only {}".format(include_drivers))
+            drivers = list(filter(lambda driver_class: driver_class.name in include_drivers, drivers))
+        if exclude_drivers and len(exclude_drivers) > 0:
+            LOGGER.debug("exclude {}".format(exclude_drivers))
+            drivers = list(filter(lambda driver_class: driver_class.name not in exclude_drivers, drivers))
+        for driver_class in drivers:
             try:
                 LOGGER.debug("Test driver {}".format(driver_class.name))
                 driver: AbstractDriver = driver_class()
-                if driver.supports(ressource) is True:
+                if driver.supports(resource) is True:
                     return driver
             except Exception as e:
                 LOGGER.exception(e)

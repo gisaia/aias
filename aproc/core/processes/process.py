@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
+from celery import Task
 from pydantic import BaseModel
 
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
@@ -20,6 +21,13 @@ class Process(ABC):
             logger (logger): the driver's logger
         """
         cls.LOGGER = logger
+
+    @staticmethod
+    def update_task_status(LOGGER: logging.Logger, task: Task, state: str, meta: dict = {}):
+        if task.request.id is not None:
+            task.update_state(state=state, meta=meta)
+        else:
+            LOGGER.debug(task.name + " " + state + " " + str(meta))
 
     @staticmethod
     @abstractmethod

@@ -15,6 +15,7 @@ from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
@@ -25,13 +26,7 @@ DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-def __update_status__(task: Task, state: str, meta: dict = None):
-    LOGGER.info(task.name + " " + state + " " + str(meta))
-    if task.request.id is not None:
-        task.update_state(state=state, meta=meta)
-
-
-class InputEnrichProcess(BaseModel):
+class InputEnrichProcess(InputProcess):
     requests: list[dict[str, str]] = Field(default=[], title="The list of items (collection, item_id) to enrich")
     asset_type: str = Field(default=None, title="Name of the asset type to add (e.g. cog)")
 
@@ -70,6 +65,8 @@ class AprocProcess(Process):
         else:
             raise DriverException("Invalid configuration for enrich drivers ({})".format(configuration))
         AprocProcess.input_model = InputEnrichProcess
+        description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
+        description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
     @staticmethod
     def get_process_description() -> ProcessDescription:
@@ -80,7 +77,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], asset_type: str) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         return {}
 
     def get_resource_id(inputs: BaseModel):
@@ -89,7 +86,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], asset_type: str) -> dict:
+    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         item_locations = []
         for request in requests:
             collection: str = request.get("collection")
@@ -100,11 +97,11 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 raise DriverException(error_msg)
-            driver: EnrichDriver = DriverManager.solve(summary.id, item)
+            driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
             if driver is not None:
                 try:
                     LOGGER.info("ingestion: 1 - enrichment will be done by {}".format(driver.name))
-                    __update_status__(self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
                     LOGGER.info("Build asset {}".format(asset_type))
                     start = time()
                     asset, asset_location = driver.create_asset(
@@ -121,14 +118,14 @@ class AprocProcess(Process):
                     LOGGER.info("Enrichment success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "success", EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
 
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
-                    __update_status__(self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                     start = time()
                     IngestAprocProcess.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
                     end = time()
                     LOGGER.info("took {} ms".format(end - start))
 
                     LOGGER.debug("ingestion: 3 - update")
-                    __update_status__(self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})
                     item: Item = IngestAprocProcess.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
                     item_locations.append(os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id))
                 except Exception as e:

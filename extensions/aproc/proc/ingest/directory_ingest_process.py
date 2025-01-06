@@ -76,7 +76,7 @@ class AprocProcess(Process):
         return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str, annotations: str) -> dict:
+    def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         # self is a celery task because bind=True
         """ ingest the archives contained in the directory url. Every archive ingestion becomes a new process
 
@@ -93,7 +93,7 @@ class AprocProcess(Process):
         for archive in archives:
             LOGGER.info(archive.model_dump_json())
             try:
-                inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations)
+                inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
                 execute = Execute(inputs=inputs.model_dump())
                 r = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:

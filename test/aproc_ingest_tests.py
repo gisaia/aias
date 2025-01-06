@@ -19,8 +19,8 @@ class Tests(unittest.TestCase):
     def setUp(self):
         setUpTest()
 
-    def ingest(self, url, collection, catalog, expected=StatusCode.successful):
-        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
+    def ingest(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         execute = Execute(inputs=inputs.model_dump())
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
@@ -42,8 +42,8 @@ class Tests(unittest.TestCase):
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
 
-    def async_ingest(self, url, id, assets: list[str], archive=True):
-        status = self.ingest(url, COLLECTION, CATALOG)
+    def async_ingest(self, url, id, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+        status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
@@ -54,6 +54,22 @@ class Tests(unittest.TestCase):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
         id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
         self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
+    def test_async_ingest_dimap_driver_include(self):  # Driver DIMAP
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        self.ingest(url, COLLECTION, CATALOG, include_drivers=["dimap"])
+
+    def test_async_ingest_dimap_driver_include_fail(self):  # Driver DIMAP
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        self.ingest(url, COLLECTION, CATALOG, include_drivers=["spot5"], expected=StatusCode.failed)
+
+    def test_async_ingest_dimap_driver_exclude(self):  # Driver DIMAP
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["spot5"])
+
+    def test_async_ingest_dimap_driver_exclude_fail(self):  # Driver DIMAP
+        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["dimap"], expected=StatusCode.failed)
 
     def test_async_ingest_ikonos(self):  # Driver GEOEYE
         url = "/inputs/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
