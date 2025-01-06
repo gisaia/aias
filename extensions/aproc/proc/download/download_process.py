@@ -136,13 +136,13 @@ class AprocProcess(Process):
         send_to: str = "anonymous"
         user_id: str = "anonymous"
         try:
-            if not not authorization:
+            if authorization:
                 token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
-                if not not token_content.get("email"):
+                if token_content.get("email"):
                     send_to = token_content.get("email")
                 else:
                     LOGGER.error("email not found in token {}".format(token_content))
-                if not not token_content.get("sub"):
+                if token_content.get("sub"):
                     user_id = token_content.get("sub")
                 else:
                     LOGGER.error("subject not found in token {}".format(token_content))
@@ -294,7 +294,7 @@ class AprocProcess(Process):
     def __update_paths__(mail_context: dict[str, str]):
         try:
             if mail_context.get("target_directory"):
-                if not not DownloadConfiguration.settings.email_path_prefix_add:
+                if DownloadConfiguration.settings.email_path_prefix_add:
                     mail_context["target_directory"] = os.path.join(DownloadConfiguration.settings.email_path_prefix_add, mail_context["target_directory"].removeprefix(DownloadConfiguration.settings.outbox_directory).removeprefix("/"))
                 if DownloadConfiguration.settings.email_path_to_windows:
                     mail_context["target_directory"] = mail_context["target_directory"].replace("/", "\\")
