@@ -33,7 +33,7 @@ class DriverManager():
         return list(map(lambda p: p.name, DriverManager.drivers[process]))
 
     @staticmethod
-    def solve(process: str, ressource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
+    def solve(process: str, resource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
         DriverManager.__check_drivers(process)
         drivers = DriverManager.drivers.get(process, [])
         if include_drivers and len(include_drivers) > 0:
@@ -46,7 +46,7 @@ class DriverManager():
             try:
                 LOGGER.debug("Test driver {}".format(driver_class.name))
                 driver: AbstractDriver = driver_class()
-                if driver.supports(ressource) is True:
+                if driver.supports(resource) is True:
                     return driver
             except Exception as e:
                 LOGGER.exception(e)
