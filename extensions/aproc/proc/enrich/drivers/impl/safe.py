@@ -19,13 +19,15 @@ from extensions.aproc.proc.s3_configuration import S3Configuration
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower()]
+    configuration: S3Configuration = None
 
     def __init__(self):
         super().__init__()
 
     # Implements drivers method
-    def init(self, configuration: dict):
-        self.configuration = S3Configuration.model_validate(configuration)
+    def init(configuration: dict):
+        EnrichDriver.init(configuration)
+        Driver.configuration = S3Configuration.model_validate(configuration)
 
     # Implements drivers method
     def supports(self, item: Item) -> bool:
@@ -83,7 +85,7 @@ class Driver(EnrichDriver):
 
     def __download_TCI(self, href: str):
         storage_type = urlparse(href).scheme
-        transport_params = self.configuration.get_storage_parameters(href, self.LOGGER)
+        transport_params = Driver.configuration.get_storage_parameters(href, self.LOGGER)
 
         # With GS, it has been observed that performances for extracting a file directly from the zip remotely
         # Is far more slower than downloading the whole archive and then unzipping
@@ -101,7 +103,7 @@ class Driver(EnrichDriver):
 
             # Remove temporary archive
             os.remove(tmp_file)
-        elif self.configuration.is_download_required(href):
+        elif Driver.configuration.is_download_required(href):
             import requests
 
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
