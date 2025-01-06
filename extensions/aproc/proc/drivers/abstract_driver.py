@@ -3,15 +3,17 @@ from aproc.core.logger import Logger
 
 
 class AbstractDriver(ABC):
+    priority: int = 0
+    name: str = ""
+    LOGGER = Logger.logger
+    assets_dir: str = ""
 
     def __init__(self):
-        self.priority: int = 0
-        self.name: str = ""
-        self.LOGGER = Logger.logger
-        self.assets_dir: str = ""
-
+        ...
+        
+    @staticmethod
     @abstractmethod
-    def init(self, configuration: dict) -> None:
+    def init(configuration: dict) -> None:
         """Method called at init time by the service.
 
         Args:

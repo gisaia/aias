@@ -25,8 +25,8 @@ class Driver(IngestDriver):
         self.tfw_path = None
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        ...
+    def init(configuration: Configuration):
+        IngestDriver.init(configuration)
 
     # Implements drivers method
     def supports(self, url: str) -> bool:
@@ -134,10 +134,7 @@ class Driver(IngestDriver):
         return item
 
     def __check_path__(self, path: str):
-        self.thumbnail_path = None
-        self.quicklook_path = None
-        self.tif_path = None
-        self.xml_path = None
+        self.__init__()
         valid_and_exist = os.path.isdir(path) and os.path.exists(path)
         if valid_and_exist is True:
             for file in os.listdir(path):

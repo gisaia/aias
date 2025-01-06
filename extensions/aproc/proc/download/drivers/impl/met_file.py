@@ -13,8 +13,8 @@ class Driver(DownloadDriver):
         super().__init__()
 
     # Implements drivers method
-    def init(self, configuration: dict):
-        ...
+    def init(configuration: dict):
+        DownloadDriver.init(configuration)
 
     # Implements drivers method
     def supports(self, item: Item) -> bool:

@@ -13,24 +13,25 @@ import xml.etree.ElementTree as ET
 
 
 class Driver(IngestDriver):
+    output_folder: str = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
-        self.browse_path = None
-        self.quicklook_path = None
-        self.thumbnail_path = None
         self.tif_path = None
         self.tfw_path = None
-        self.h5_path = None
-        self.h5pdf_path = None
         self.met_path = None
         self.attr_path = None
+        self.browse_path = None
         self.prefix_key = None
-        self.output_folder = None
+        self.h5_path = None
+        self.h5pdf_path = None
+        self.quicklook_path = None
+        self.thumbnail_path = None
 
     # Implements drivers method
-    def init(self, configuration: Configuration):
-        self.output_folder = configuration['tmp_directory']
+    def init(configuration: Configuration):
+        IngestDriver.init(configuration)
+        Driver.output_folder = configuration['tmp_directory']
         return
 
     # Implements drivers method
@@ -47,14 +48,14 @@ class Driver(IngestDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
-            thumbnail_path = self.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
+            thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
             os.makedirs(thumbnail_path, exist_ok=True)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
             geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
-            quicklook_path = self.output_folder + '/' + self.get_item_id(url) + '/quicklook'
+            quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
@@ -148,15 +149,7 @@ class Driver(IngestDriver):
         return item
 
     def __check_path__(self, file_path: str):
-        self.tif_path = None
-        self.met_path = None
-        self.attr_path = None
-        self.browse_path = None
-        self.prefix_key = None
-        self.h5_path = None
-        self.h5pdf_path = None
-        self.quicklook_path = None
-        self.thumbnail_path = None
+        self.__init__()
         valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
         file_name = os.path.basename(file_path)
         path = os.path.dirname(file_path)

@@ -16,12 +16,12 @@ class DriverManager():
         DriverManager.drivers[process] = []
         for driver_configuration in drivers:
             try:
-                driver: AbstractDriver = importlib.import_module(driver_configuration.class_name).Driver()
-                driver.init(driver_configuration.configuration)
-                driver.priority = driver_configuration.priority
-                driver.name = driver_configuration.name
-                driver.assets_dir = driver_configuration.assets_dir
-                DriverManager.drivers[process].append(driver)
+                driver_class: AbstractDriver = importlib.import_module(driver_configuration.class_name).Driver
+                driver_class.init(driver_configuration.configuration)
+                driver_class.priority = driver_configuration.priority
+                driver_class.name = driver_configuration.name
+                driver_class.assets_dir = driver_configuration.assets_dir
+                DriverManager.drivers[process].append(driver_class)
             except ModuleNotFoundError:
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
         DriverManager.drivers[process].sort(key=lambda driver: driver.priority)
@@ -31,21 +31,14 @@ class DriverManager():
     @staticmethod
     def solve(process: str, ressource) -> AbstractDriver:
         DriverManager.__check_drivers(process)
-        for driver in DriverManager.drivers.get(process, []):
+        for driver_class in DriverManager.drivers.get(process, []):
             try:
-                LOGGER.debug("Test driver {}".format(driver.name))
+                LOGGER.debug("Test driver {}".format(driver_class.name))
+                driver: AbstractDriver = driver_class()
                 if driver.supports(ressource) is True:
                     return driver
             except Exception as e:
                 LOGGER.exception(e)
-        return None
-
-    @staticmethod
-    def get_driver_by_name(process: str, name_to_find: str) -> AbstractDriver:
-        DriverManager.__check_drivers(process)
-        for driver in DriverManager.drivers.get(process, []):
-            if driver.name == name_to_find:
-                return driver
         return None
 
     @staticmethod

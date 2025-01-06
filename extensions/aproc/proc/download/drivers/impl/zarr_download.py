@@ -21,12 +21,15 @@ class ZarrConfiguration(S3Configuration):
 
 
 class Driver(DownloadDriver):
+    configuration: ZarrConfiguration = None
+
     def __init__(self):
         super().__init__()
 
     # Implements drivers method
-    def init(self, configuration: dict):
-        self.configuration = ZarrConfiguration.model_validate(configuration)
+    def init(configuration: dict):
+        DownloadDriver.init(configuration)
+        Driver.configuration = ZarrConfiguration.model_validate(configuration)
 
     # Implements drivers method
     def supports(self, item: Item) -> bool:
@@ -55,13 +58,13 @@ class Driver(DownloadDriver):
         asset_href = self.get_asset_href(item)
         tmp_asset = None
 
-        if self.configuration.is_download_required(asset_href):
+        if Driver.configuration.is_download_required(asset_href):
             from urllib.parse import urlparse
 
             self.LOGGER.info("Downloading archive for Zarr creation.")
 
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            r = requests.get(asset_href, headers=self.configuration.get_storage_parameters(asset_href, self.LOGGER)["headers"],
+            r = requests.get(asset_href, headers=Driver.configuration.get_storage_parameters(asset_href, self.LOGGER)["headers"],
                              stream=True, verify=False)
 
             tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(asset_href).path.strip("/").split("/")[-1])
@@ -76,12 +79,12 @@ class Driver(DownloadDriver):
             asset_href = f"file://{tmp_asset}"
         else:
             self.LOGGER.info("Streaming archive for Zarr creation.")
-            with smart_open.open(asset_href, "rb", transport_params=self.configuration.get_storage_parameters(asset_href, self.LOGGER)) as fb:
+            with smart_open.open(asset_href, "rb", transport_params=Driver.configuration.get_storage_parameters(asset_href, self.LOGGER)) as fb:
                 raster_files = self.__find_raster_files(fb)
 
         zarr_res = self.__get_zarr_resolution()
 
-        session = self.configuration.get_rasterio_session(asset_href, self.LOGGER)
+        session = Driver.configuration.get_rasterio_session(asset_href, self.LOGGER)
         with rasterio.Env(session):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
@@ -134,7 +137,7 @@ class Driver(DownloadDriver):
         zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
 
-        chunk_size = self.configuration.chunk_size
+        chunk_size = Driver.configuration.chunk_size
         zarr_path = target_directory + "/" + zarr_name
         bands: xr.Dataset = None
         for b, r in zip(band_names, tmp_files):
