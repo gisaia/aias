@@ -12,6 +12,7 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (
@@ -69,6 +70,8 @@ class AprocProcess(Process):
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
+        AccessManager.init()
+
     @staticmethod
     def get_process_description() -> ProcessDescription:
         return description
@@ -77,6 +80,7 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
+    @staticmethod
     def get_resource_id(inputs: BaseModel):
         url = InputIngestProcess(**inputs.model_dump()).url
         driver: IngestDriver = DriverManager.solve(summary.id, url)

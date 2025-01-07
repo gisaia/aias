@@ -62,7 +62,7 @@ class Driver(DownloadDriver):
             images = list(map(lambda f: [f[0], os.path.splitext(f[1])[0] + extension], self.get_terrasarx_images(met_file, extension)))
         extract(images, crop_wkt, met_file, driver_target, target_projection, target_directory, target_file_name)
 
-    def get_dimap_images(self, href: str, extension: str):
+    def get_dimap_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
         dir_name = os.path.dirname(href)
         tree = ET.parse(href)
         root = tree.getroot()
@@ -76,7 +76,7 @@ class Driver(DownloadDriver):
                                     os.path.splitext(f.attrib["href"])[0] + georef_file_extension], files_elements))
         return files
 
-    def get_terrasarx_images(self, href: str, extension: str):
+    def get_terrasarx_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
         dir_name = os.path.dirname(href)
         tree = ET.parse(href)
         root = tree.getroot()
@@ -100,7 +100,7 @@ class Driver(DownloadDriver):
         files = self.get_terrasarx_images(href, extension)
         self.copy_from_met(files, target_directory)
 
-    def copy_from_met(self, files, target_directory):
+    def copy_from_met(self, files: list[tuple[str, str, str, str]], target_directory: str):
         for f in files:
             valid_and_exist = os.path.isfile(f[0]) and os.path.exists(f[0])
             if valid_and_exist:

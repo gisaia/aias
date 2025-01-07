@@ -1,8 +1,11 @@
 FROM python:3.10.13-alpine3.19
 RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
+
 COPY test/requirements.txt /app/requirements.txt
+COPY ./extensions/aproc/proc/access/requirements.txt /app/requirements.storage.txt
 
 WORKDIR /app
 
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
+RUN pip install -r requirements.storage.txt

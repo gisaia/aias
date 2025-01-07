@@ -113,7 +113,6 @@ def make_raw_archive_zip(href: str, target_directory: str):
     dir_name = os.path.dirname(href)
     target_file_name = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
     shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
-    return
 
 
 def writeWorldWidefrom_transform(affine, input):

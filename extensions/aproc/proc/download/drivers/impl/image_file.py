@@ -12,6 +12,7 @@ class Driver(DownloadDriver):
         super().__init__()
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: dict):
         DownloadDriver.init(configuration)
 
@@ -33,8 +34,8 @@ class Driver(DownloadDriver):
                             target_format: str, raw_archive: bool):
         href = self.get_asset_href(item)
         if raw_archive:
-            if item.properties.item_format and (
-                    item.properties.item_format == ItemFormat.geotiff.value or item.properties.item_format == ItemFormat.jpeg2000.value):
+            if item.properties.item_format and \
+                    item.properties.item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value]:
                 self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
                 shutil.copy(href, target_directory)
                 if item.assets and item.assets.get(Role.extent.value) and Path(
@@ -50,16 +51,13 @@ class Driver(DownloadDriver):
                 return
         # Default driver is GTiff
         driver_target = "GTiff"
+        extension = '.tif'
         if (not target_format) or (target_format == 'native'):
             if item.properties.main_asset_format == AssetFormat.jpg2000.value:
                 driver_target = "JP2OpenJPEG"
-            else:
-                driver_target = "GTiff"
+                extension = '.JP2'
         elif target_format == "Jpeg2000" or target_format == AssetFormat.jpg2000.value:
             driver_target = "JP2OpenJPEG"
-
-        extension = '.tif'
-        if driver_target == "JP2OpenJPEG":
             extension = '.JP2'
 
         if ((not target_projection or target_projection == 'native') and (
@@ -74,6 +72,7 @@ class Driver(DownloadDriver):
             return
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
+
         # Some transformation to be done ...
         from extensions.aproc.proc.download.drivers.impl.utils import extract
         target_file_name = Path(Path(href).stem).with_suffix(extension)

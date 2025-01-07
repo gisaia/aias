@@ -10,7 +10,7 @@ class AbstractDriver(ABC):
 
     def __init__(self):
         ...
-        
+
     @staticmethod
     @abstractmethod
     def init(configuration: dict) -> None:

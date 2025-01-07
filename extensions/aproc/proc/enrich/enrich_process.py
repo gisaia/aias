@@ -14,6 +14,7 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
@@ -68,6 +69,8 @@ class AprocProcess(Process):
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
+        AccessManager.init()
+
     @staticmethod
     def get_process_description() -> ProcessDescription:
         return description
@@ -80,8 +83,9 @@ class AprocProcess(Process):
     def before_execute(headers: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         return {}
 
+    @staticmethod
     def get_resource_id(inputs: BaseModel):
-        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump())        
+        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump())
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
@@ -141,6 +145,7 @@ class AprocProcess(Process):
                 raise DriverException(error_msg)
         return OutputEnrichProcess(item_locations=item_locations).model_dump()
 
+    @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):
         try:
             r = requests.get(url=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id))

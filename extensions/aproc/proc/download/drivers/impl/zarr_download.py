@@ -1,32 +1,33 @@
 import io
 import os
 import re
-import shutil
 import tarfile
 import tempfile
+from urllib.parse import urlparse
 import zipfile
 
-import requests
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat
-from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
-from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.download.drivers.download_driver import \
+    DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import extract
-from extensions.aproc.proc.s3_configuration import S3Configuration
+from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
-class ZarrConfiguration(S3Configuration):
-    chunk_size: int = Field(1000)
+class ZarrConfiguration(BaseModel):
+    chunk_size: int = Field(default=1000)
 
 
 class Driver(DownloadDriver):
-    configuration: ZarrConfiguration = None
+    configuration: ZarrConfiguration
 
     def __init__(self):
         super().__init__()
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: dict):
         DownloadDriver.init(configuration)
         Driver.configuration = ZarrConfiguration.model_validate(configuration)
@@ -58,34 +59,28 @@ class Driver(DownloadDriver):
         asset_href = self.get_asset_href(item)
         tmp_asset = None
 
-        if Driver.configuration.is_download_required(asset_href):
-            from urllib.parse import urlparse
-
+        if AccessManager.is_download_required(asset_href):
             self.LOGGER.info("Downloading archive for Zarr creation.")
+            storage = AccessManager.resolve_storage(asset_href)
 
-            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            r = requests.get(asset_href, headers=Driver.configuration.get_storage_parameters(asset_href, self.LOGGER)["headers"],
-                             stream=True, verify=False)
-
+            # Create tmp file where data will be downloaded
             tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(asset_href).path.strip("/").split("/")[-1])
             if (os.path.splitext(tmp_asset)[1] != ".zip"):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 
-            self.LOGGER.warning(tmp_asset)
-            with open(tmp_asset, "wb") as out_file:
-                shutil.copyfileobj(r.raw, out_file)
-
+            # Download archive then extract it
+            storage.pull(asset_href, tmp_asset)
             raster_files = self.__find_raster_files(tmp_asset)
+
             asset_href = f"file://{tmp_asset}"
         else:
             self.LOGGER.info("Streaming archive for Zarr creation.")
-            with smart_open.open(asset_href, "rb", transport_params=Driver.configuration.get_storage_parameters(asset_href, self.LOGGER)) as fb:
+            with smart_open.open(asset_href, "rb", transport_params=AccessManager.get_storage_parameters(asset_href)) as fb:
                 raster_files = self.__find_raster_files(fb)
 
         zarr_res = self.__get_zarr_resolution()
 
-        session = Driver.configuration.get_rasterio_session(asset_href, self.LOGGER)
-        with rasterio.Env(session):
+        with AccessManager.get_rasterio_session(asset_href):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
             for ri, rf in enumerate(raster_files):

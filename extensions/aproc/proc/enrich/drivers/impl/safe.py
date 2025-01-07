@@ -1,33 +1,30 @@
 import io
 import os
 import re
-import shutil
 import tempfile
 import zipfile
 from pathlib import Path
 from time import time
-from urllib.parse import urlparse
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
                                     ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
-from extensions.aproc.proc.s3_configuration import S3Configuration
 
 
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower()]
-    configuration: S3Configuration = None
 
     def __init__(self):
         super().__init__()
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: dict):
         EnrichDriver.init(configuration)
-        Driver.configuration = S3Configuration.model_validate(configuration)
 
     # Implements drivers method
     def supports(self, item: Item) -> bool:
@@ -84,45 +81,24 @@ class Driver(EnrichDriver):
             raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
 
     def __download_TCI(self, href: str):
-        storage_type = urlparse(href).scheme
-        transport_params = Driver.configuration.get_storage_parameters(href, self.LOGGER)
+        storage = AccessManager.resolve_storage(href)
 
         # With GS, it has been observed that performances for extracting a file directly from the zip remotely
         # Is far more slower than downloading the whole archive and then unzipping
-        if storage_type == "gs":
-            from google.cloud.storage import Client
-
-            storage_client: Client = transport_params["client"]
-            bucket = storage_client.bucket(urlparse(href).netloc)
-            blob = bucket.blob(urlparse(href).path[1:])
+        if storage.type == "gs" or AccessManager.is_download_required(href):
+            # Create tmp file where data will be downloaded
+            tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
 
             # Download archive then extract it
-            tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
-            blob.download_to_filename(tmp_file)
+            storage.pull(href, tmp_file)
             tci_file_path = self.__extract(tmp_file)
 
-            # Remove temporary archive
+            # Clean-up
             os.remove(tmp_file)
-        elif Driver.configuration.is_download_required(href):
-            import requests
-
-            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            r = requests.get(href, headers=transport_params["headers"],
-                             stream=True, verify=False)
-
-            tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(href).path.strip("/").split("/")[-1])
-            if (os.path.splitext(tmp_asset)[1] != ".zip"):
-                tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
-
-            with open(tmp_asset, "wb") as out_file:
-                shutil.copyfileobj(r.raw, out_file)
-
-            tci_file_path = self.__extract(tmp_asset)
-            os.remove(tmp_asset)
         else:
             import smart_open
 
-            with smart_open.open(href, "rb", transport_params=transport_params) as fb:
+            with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as fb:
                 tci_file_path = self.__extract(fb)
 
         return tci_file_path
@@ -137,7 +113,7 @@ class Driver(EnrichDriver):
             if len(raster_files) > 1:
                 self.LOGGER.warning("More than one TCI file found, using the first one.")
 
-            tci_file_path = os.path.join(tempfile.gettempdir(), raster_files[0])
-            raster_zip.extract(raster_files[0], tempfile.gettempdir())
+            tci_file_path = os.path.join(AccessManager.tmp_dir, raster_files[0])
+            raster_zip.extract(raster_files[0], AccessManager.tmp_dir)
 
         return tci_file_path

@@ -9,7 +9,7 @@ from airs.core.models import mapper
 from airs.core.models.model import Item
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
-from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestProcess, summary
+from extensions.aproc.proc.ingest.ingest_process import summary
 
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX", "airs")
