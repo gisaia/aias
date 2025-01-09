@@ -5,7 +5,6 @@ import tempfile
 from typing import Literal
 from urllib.parse import urlparse
 
-from google.api_core.exceptions import Forbidden, NotFound
 from google.cloud.storage import Client
 from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
@@ -99,10 +98,13 @@ class GoogleStorage(AbstractStorage, arbitrary_types_allowed=True):
 
         return rasterio.session.GSSession(credentials)
 
-    def pull(self, href, dst):
+    def pull(self, href: str, dst: str):
         super().pull(href, dst)
 
         bucket = self.__get_bucket()
         blob = bucket.blob(urlparse(href).path[1:])
 
+        if os.path.isdir(dst):
+            # If it is a directory, then add filename at the end of the path to match shutil.copy behaviour
+            dst = os.path.join(dst, os.path.basename(dst))
         blob.download_to_filename(dst)

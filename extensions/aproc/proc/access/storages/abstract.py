@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import os
+import tempfile
 from typing import Any
 from urllib.parse import urlparse
 
@@ -55,7 +57,7 @@ class AbstractStorage(BaseModel, ABC):
 
     @abstractmethod
     def pull(self, href: str, dst: str):
-        """Copies/Downloads the desired file from the file system to write it locally
+        """Copy/Download the desired file from the file system to write it locally
 
         Args:
             href (str): File to fetch
@@ -63,5 +65,19 @@ class AbstractStorage(BaseModel, ABC):
         """
         # Check that dst is local
         scheme = urlparse(dst).scheme
-        if not (scheme is None or scheme != "file"):
+        if scheme != "" and scheme != "file":
             raise ValueError("Destination must be on the local filesystem")
+
+    def prepare_for_local_process(self, href: str) -> str:
+        """Prepare the desired file, to then be able to process it locally
+
+        Args:
+            href(str): File to prepare
+
+        Returns:
+            str: The local path at which the file can be found
+        """
+        dst = os.path.join(tempfile.gettempdir(), os.path.basename(href))
+
+        self.pull(href, dst)
+        return dst

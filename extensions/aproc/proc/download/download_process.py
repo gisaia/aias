@@ -5,7 +5,7 @@ import shutil
 from datetime import datetime
 
 import requests
-from celery import Task, shared_task
+from celery import shared_task
 from pydantic import BaseModel, Field
 
 import airs.core.s3 as s3
@@ -154,7 +154,7 @@ class AprocProcess(Process):
         return (send_to, user_id)
 
     @staticmethod
-    def __get_download_location__(item: Item, send_to: str) -> str:
+    def __get_download_location__(item: Item, send_to: str) -> tuple[str, str]:
         if send_to is None:
             send_to = "anonymous"
         relative_target_directory = os.path.join(send_to.split("@")[0].replace(".", "_").replace("-", "_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
@@ -164,6 +164,7 @@ class AprocProcess(Process):
             os.makedirs(target_directory)
         return (target_directory, relative_target_directory)
 
+    @staticmethod
     def get_resource_id(inputs: BaseModel):
         inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
@@ -239,6 +240,7 @@ class AprocProcess(Process):
                 raise DriverException(error_msg)
         return OutputDownloadProcess(download_locations=download_locations).model_dump()
 
+    @staticmethod
     def __dir2s3(directory: str, s3_dir: str, s3_conf: S3Configuration):
         s3_client = s3.get_client_from_configuration(s3_conf)
 

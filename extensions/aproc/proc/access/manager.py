@@ -1,4 +1,7 @@
 from contextlib import contextmanager
+from datetime import datetime
+import os
+import shutil
 import tempfile
 from typing import Annotated, Union
 
@@ -95,3 +98,29 @@ class AccessManager:
 
         return storage.type in ["http", "https"] \
             and AccessManager.storage.force_download
+
+    @staticmethod
+    def prepare(href: str):
+        """Prepare the file to be processed locally
+
+        Args:
+            href (str): Href (local or not) of the file
+
+        Returns:
+            str: The local path at which the file can be found
+        """
+        storage = AccessManager.resolve_storage(href)
+
+        href = storage.prepare_for_local_process(href)
+        return href
+
+    @staticmethod
+    def zip(href: str, target_directory: str):
+        # For all storages but FileStorage, files need to be pulled before being processed
+        href = AccessManager.prepare(href)
+
+        file_name = os.path.basename(href)
+        # Get direct parent folder of href_file to zip
+        dir_name = os.path.dirname(href)
+        target_file_name = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+        shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)

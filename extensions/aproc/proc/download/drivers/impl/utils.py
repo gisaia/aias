@@ -1,12 +1,11 @@
 import hashlib
 import os
-import shutil
 import time
 from contextlib import contextmanager
-from datetime import datetime
 
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
+from extensions.aproc.proc.access.manager import AccessManager
 
 LOGGER = Logger.logger
 
@@ -36,22 +35,27 @@ def prepare_wkt_extract(wkt: str, target_crs):
 
 def extract(images, crop_wkt, file, driver_target, target_projection, target_directory, target_file_name):
     import pyproj
+    import rasterio
     import rasterio.mask
-    if crop_wkt:
-        with rasterio.open(file) as src:
-            geom = prepare_wkt_extract(crop_wkt, src.crs)
-            out_image, out_transform = rasterio.mask.mask(src, [geom], crop=True)
 
-            out_meta = src.meta.copy()
-            update_params = {"height": out_image.shape[1],
-                             "width": out_image.shape[2],
-                             "transform": out_transform,
-                             "driver": driver_target
-                             }
-            out_meta.update(update_params)
-            writeWorldWidefrom_transform(out_transform, target_directory + "/" + target_file_name)
-            with rasterio.open(target_directory + "/" + target_file_name, "w", **out_meta, quality=100, reversible=True) as dest:
-                dest.write(out_image)
+    if crop_wkt:
+        with AccessManager.get_rasterio_session(file):
+            with rasterio.open(file) as src:
+                geom = prepare_wkt_extract(crop_wkt, src.crs)
+                out_image, out_transform = rasterio.mask.mask(src, [geom], crop=True)
+
+                out_meta = src.meta.copy()
+                update_params = {
+                    "height": out_image.shape[1],
+                    "width": out_image.shape[2],
+                    "transform": out_transform,
+                    "driver": driver_target
+                }
+
+                out_meta.update(update_params)
+                writeWorldWidefrom_transform(out_transform, target_directory + "/" + target_file_name)
+                with rasterio.open(target_directory + "/" + target_file_name, "w", **out_meta, quality=100, reversible=True) as dest:
+                    dest.write(out_image)
     else:
         epsg_target = pyproj.Proj(target_projection)
         if images and len(images) > 1:
@@ -71,48 +75,42 @@ def extract(images, crop_wkt, file, driver_target, target_projection, target_dir
 
 @contextmanager
 def reproject_raster(in_path, crs, driver_target):
+    import rasterio
     import rasterio.mask
     from rasterio.io import MemoryFile
     from rasterio.warp import (Resampling, calculate_default_transform,
                                reproject)
 
     # reproject raster to project crs
-    with rasterio.open(in_path) as src:
-        src_crs = src.crs
-        transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
-        kwargs = src.meta.copy()
+    with AccessManager.get_rasterio_session(in_path):
+        with rasterio.open(in_path) as src:
+            src_crs = src.crs
+            transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
+            kwargs = src.meta.copy()
 
-        kwargs.update({
-            "driver": driver_target,
-            'crs': crs,
-            'transform': transform,
-            'width': width,
-            'height': height})
+            kwargs.update({
+                "driver": driver_target,
+                'crs': crs,
+                'transform': transform,
+                'width': width,
+                'height': height})
 
-        with MemoryFile() as memfile:
-            with memfile.open(**kwargs) as dst:
-                if src.crs != crs:
-                    for i in range(1, src.count + 1):
-                        reproject(
-                            source=rasterio.band(src, i),
-                            destination=rasterio.band(dst, i),
-                            src_transform=src.transform,
-                            src_crs=src.crs,
-                            dst_transform=transform,
-                            dst_crs=crs,
-                            resampling=Resampling.nearest)
-                else:
-                    dst.write(src.read())
-            with memfile.open() as dataset:  # Reopen as DatasetReader
-                yield dataset  # Note yield not return as we're a contextmanager
-
-
-def make_raw_archive_zip(href: str, target_directory: str):
-    file_name = os.path.basename(href)
-    # Get direct parent folder of href_file to zip
-    dir_name = os.path.dirname(href)
-    target_file_name = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
-    shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
+            with MemoryFile() as memfile:
+                with memfile.open(**kwargs) as dst:
+                    if src.crs != crs:
+                        for i in range(1, src.count + 1):
+                            reproject(
+                                source=rasterio.band(src, i),
+                                destination=rasterio.band(dst, i),
+                                src_transform=src.transform,
+                                src_crs=src.crs,
+                                dst_transform=transform,
+                                dst_crs=crs,
+                                resampling=Resampling.nearest)
+                    else:
+                        dst.write(src.read())
+                with memfile.open() as dataset:  # Reopen as DatasetReader
+                    yield dataset  # Note yield not return as we're a contextmanager
 
 
 def writeWorldWidefrom_transform(affine, input):

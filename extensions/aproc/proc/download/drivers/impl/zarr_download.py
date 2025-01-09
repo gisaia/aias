@@ -3,7 +3,6 @@ import os
 import re
 import tarfile
 import tempfile
-from urllib.parse import urlparse
 import zipfile
 
 from pydantic import BaseModel, Field
@@ -64,7 +63,7 @@ class Driver(DownloadDriver):
             storage = AccessManager.resolve_storage(asset_href)
 
             # Create tmp file where data will be downloaded
-            tmp_asset = os.path.join(tempfile.gettempdir(), urlparse(asset_href).path.strip("/").split("/")[-1])
+            tmp_asset = os.path.join(tempfile.gettempdir(), os.path.basename(asset_href))
             if (os.path.splitext(tmp_asset)[1] != ".zip"):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 

@@ -3,7 +3,7 @@ import os
 from time import time
 
 import requests
-from celery import Task, shared_task
+from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models import mapper
