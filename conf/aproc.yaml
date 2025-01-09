@@ -23,15 +23,18 @@ processes:
     configuration:
       drivers: conf/enrich_drivers.yaml
 
-storage:
-  type: $APROC_INPUT_STORAGE_TYPE
-  # Google Storage
-  bucket: $APROC_INPUT_STORAGE_BUCKET
-  # api_key:
-  #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
-  #   private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
-  #   private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
-  # # HTTPS
-  # headers: $APROC_INPUT_STORAGE_HEADERS
-  # domain: $APROC_INPUT_STORAGE_DOMAIN
-  # force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD
+storages:
+  -
+    type: file
+  -
+    type: gs
+    bucket: gisaia-public
+    # api_key:
+    #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
+    #   private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
+    #   private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
+  # -
+  #   type: https
+  #   headers: $APROC_INPUT_STORAGE_HEADERS
+  #   domain: $APROC_INPUT_STORAGE_DOMAIN
+  #   force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD

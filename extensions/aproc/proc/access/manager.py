@@ -20,34 +20,36 @@ LOGGER = Logger.logger
 
 
 class AccessManager:
-    storage: AnyStorage | None = Field(None)
+    storages: list[AnyStorage]
     tmp_dir = tempfile.gettempdir()
 
     @staticmethod
     def init():
         LOGGER.info("Initializing APROC storages")
-        storage_settings = Configuration.settings.storage.model_dump()
+        AccessManager.storages = []
 
-        match Configuration.settings.storage.type:
-            case "file":
-                AccessManager.storage = FileStorage(**storage_settings)
-            case "gs":
-                AccessManager.storage = GoogleStorage(**storage_settings)
-            case "http":
-                AccessManager.storage = HttpStorage(**storage_settings)
-            case "https":
-                AccessManager.storage = HttpsStorage(**storage_settings)
-            case _:
-                raise NotImplementedError(f"Specified storage {Configuration.settings.storage.type} is not implemented")
+        for s in Configuration.settings.storages:
+            match s.type:
+                case "file":
+                    AccessManager.storages.append(FileStorage(**s.model_dump()))
+                case "gs":
+                    AccessManager.storages.append(GoogleStorage(**s.model_dump()))
+                case "http":
+                    AccessManager.storages.append(HttpStorage(**s.model_dump()))
+                case "https":
+                    AccessManager.storages.append(HttpsStorage(**s.model_dump()))
+                case _:
+                    raise NotImplementedError(f"Specified storage {s.type} is not implemented")
 
     @staticmethod
     def resolve_storage(href: str) -> AnyStorage:
         """
-        Based on the defined storages (TODO), returns the one matching the input href
+        Based on the defined storages, returns the one matching the input href
         """
 
-        if AccessManager.storage.supports(href):
-            return AccessManager.storage
+        for s in AccessManager.storages:
+            if s.supports(href):
+                return s
 
         raise NotImplementedError(f"Storage for {href} is not configured")
 
@@ -97,7 +99,7 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         return storage.type in ["http", "https"] \
-            and AccessManager.storage.force_download
+            and storage.force_download
 
     @staticmethod
     def prepare(href: str):
