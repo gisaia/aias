@@ -20,7 +20,7 @@ class HttpStorage(AbstractStorage):
         scheme = urlparse(href).scheme
         netloc = urlparse(href).netloc
 
-        return scheme == "http" and netloc == self.domain
+        return scheme == self.type and netloc == self.domain
 
     def exists(self, href: str):
         return requests_exists(href, self.headers)
