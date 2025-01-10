@@ -29,6 +29,12 @@ class HttpStorage(AbstractStorage):
         # Might not work
         return None
 
-    def pull(self, href: str, dst: str):
-        super().pull(href, dst)
-        requests_get(href, dst, self.headers)
+    def pull(self, href: str, dst: str, is_dst_dir: bool):
+        super().pull(href, dst, is_dst_dir)
+        requests_get(href, dst, is_dst_dir, self.headers)
+
+    def is_file(self, href: str):
+        return self.exists(href)
+
+    def is_dir(self, href: str):
+        return False

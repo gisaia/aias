@@ -56,12 +56,13 @@ class AbstractStorage(BaseModel, ABC):
         ...
 
     @abstractmethod
-    def pull(self, href: str, dst: str):
+    def pull(self, href: str, dst: str, is_dst_dir: bool):
         """Copy/Download the desired file from the file system to write it locally
 
         Args:
             href (str): File to fetch
             dst (str): Destination of the file
+            is_dst_dir (bool): Whether the destination is a directory
         """
         # Check that dst is local
         scheme = urlparse(dst).scheme
@@ -81,3 +82,27 @@ class AbstractStorage(BaseModel, ABC):
 
         self.pull(href, dst)
         return dst
+
+    @abstractmethod
+    def is_file(self, href: str) -> bool:
+        """Returns whether the specified href is a file
+
+        Args:
+            href(str): The href to test
+
+        Returns:
+            bool: Whether the input is a file
+        """
+        ...
+
+    @abstractmethod
+    def is_dir(self, href: str) -> bool:
+        """Returns whether the specified href is a directory
+
+        Args:
+            href(str): The href to test
+
+        Returns:
+            bool: Whether the input is a directory
+        """
+        ...

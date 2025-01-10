@@ -60,7 +60,6 @@ class Driver(DownloadDriver):
 
         if AccessManager.is_download_required(asset_href):
             self.LOGGER.info("Downloading archive for Zarr creation.")
-            storage = AccessManager.resolve_storage(asset_href)
 
             # Create tmp file where data will be downloaded
             tmp_asset = os.path.join(tempfile.gettempdir(), os.path.basename(asset_href))
@@ -68,7 +67,7 @@ class Driver(DownloadDriver):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 
             # Download archive then extract it
-            storage.pull(asset_href, tmp_asset)
+            AccessManager.pull(asset_href, tmp_asset, False)
             raster_files = self.__find_raster_files(tmp_asset)
 
             asset_href = f"file://{tmp_asset}"

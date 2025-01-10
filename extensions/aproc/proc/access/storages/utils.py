@@ -4,13 +4,13 @@ import shutil
 import requests
 
 
-def requests_get(href: str, dst: str, headers: dict):
+def requests_get(href: str, dst: str, is_dst_dir: bool, headers: dict):
     requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
     r = requests.get(href, headers=headers, stream=True, verify=False)
 
-    if os.path.isdir(dst):
+    if is_dst_dir:
         # If it is a directory, then add filename at the end of the path to match shutil.copy behaviour
-        dst = os.path.join(dst, os.path.basename(dst))
+        dst = os.path.join(dst, os.path.basename(href))
 
     with open(dst, "wb") as out_file:
         shutil.copyfileobj(r.raw, out_file)

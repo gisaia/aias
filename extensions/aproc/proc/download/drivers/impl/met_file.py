@@ -111,8 +111,7 @@ class Driver(DownloadDriver):
 
     def copy_from_met(self, files: list[tuple[str, str, str, str]], target_directory: str):
         for f in files:
-            storage = AccessManager.resolve_storage(f[0])
-            if AccessManager.exists(f[0]) and (os.path.isfile(f[0]) if storage.type == "file" else True):
-                AccessManager.pull(f[0], target_directory + "/" + f[1])
-            if AccessManager.exists(f[2]) and (os.path.isfile(f[2]) if storage.type == "file" else True):
-                AccessManager.pull(f[2], target_directory + "/" + f[3])
+            if AccessManager.exists(f[0]) and AccessManager.is_file(f[0]):
+                AccessManager.pull(f[0], target_directory + "/" + f[1], False)
+            if AccessManager.exists(f[2]) and AccessManager.is_file(f[2]):
+                AccessManager.pull(f[2], target_directory + "/" + f[3], False)

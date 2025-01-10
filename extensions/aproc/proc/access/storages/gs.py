@@ -98,13 +98,21 @@ class GoogleStorage(AbstractStorage, arbitrary_types_allowed=True):
 
         return rasterio.session.GSSession(credentials)
 
-    def pull(self, href: str, dst: str):
-        super().pull(href, dst)
+    def pull(self, href: str, dst: str, is_dst_dir: bool):
+        super().pull(href, dst, is_dst_dir)
 
         bucket = self.__get_bucket()
         blob = bucket.blob(urlparse(href).path[1:])
 
-        if os.path.isdir(dst):
+        if is_dst_dir:
             # If it is a directory, then add filename at the end of the path to match shutil.copy behaviour
-            dst = os.path.join(dst, os.path.basename(dst))
+            dst = os.path.join(dst, os.path.basename(href))
         blob.download_to_filename(dst)
+
+    def is_file(self, href: str):
+        return self.exists(href)
+
+    def is_dir(self, href: str):
+        # Does not handle empty folders
+        blobs = list(self.__get_bucket().list_blobs(prefix=href.removesuffix("/") + "/"))
+        return len(blobs) > 1

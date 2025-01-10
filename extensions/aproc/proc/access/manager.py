@@ -48,9 +48,11 @@ class AccessManager:
         """
 
         for s in AccessManager.storages:
-            if s.supports(href):
-                return s
-
+            try:
+                if s.supports(href):
+                    return s
+            except Exception:
+                ...
         raise NotImplementedError(f"Storage for {href} is not configured")
 
     @staticmethod
@@ -60,13 +62,13 @@ class AccessManager:
         return storage.get_storage_parameters()
 
     @staticmethod
-    def pull(href: str, dst: str):
+    def pull(href: str, dst: str, is_dst_dir: bool):
         """
         Pulls a file from a storage to write it in the local storage.
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
         storage = AccessManager.resolve_storage(href)
-        storage.pull(href, dst)
+        storage.pull(href, dst, is_dst_dir)
 
     # Will return a yield
     @staticmethod
@@ -126,3 +128,15 @@ class AccessManager:
         dir_name = os.path.dirname(href)
         target_file_name = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
         shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
+
+    @staticmethod
+    def is_file(href: str):
+        storage = AccessManager.resolve_storage(href)
+
+        return storage.is_file(href)
+
+    @staticmethod
+    def is_dir(href: str):
+        storage = AccessManager.resolve_storage(href)
+
+        return storage.is_dir(href)

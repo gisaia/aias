@@ -1,3 +1,4 @@
+import os
 import shutil
 from pathlib import Path
 from typing import Literal
@@ -23,11 +24,17 @@ class FileStorage(AbstractStorage):
     def get_rasterio_session(self):
         return None
 
-    def pull(self, href: str, dst: str):
-        super().pull(href, dst)
+    def pull(self, href: str, dst: str, is_dst_dir: bool):
+        super().pull(href, dst, is_dst_dir)
         shutil.copy(href, dst)
 
     # @override method of AbstractStorage
     def prepare_for_local_process(self, href: str):
         # Skip pull as file is already present locally
         return href
+
+    def is_file(self, href: str):
+        return os.path.isfile(href)
+
+    def is_dir(self, href: str):
+        return os.path.isdir(href)

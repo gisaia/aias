@@ -90,7 +90,7 @@ class Driver(EnrichDriver):
             tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
 
             # Download archive then extract it
-            storage.pull(href, tmp_file)
+            storage.pull(href, tmp_file, False)
             tci_file_path = self.__extract(tmp_file)
 
             # Clean-up
