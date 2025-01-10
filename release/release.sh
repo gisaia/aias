@@ -20,6 +20,17 @@ build_and_publish_docker (){
     docker push gisaia/${IMAGE}:${VERSION}
 }
 
+send_chat_message(){
+    MESSAGE=$1
+    if [ -z "$GOOGLE_CHAT_RELEASE_CHANEL" ] ; then
+        echo "Environement variable GOOGLE_CHAT_RELEASE_CHANEL is not definied ... skipping message publishing"
+    else
+        DATA='{"text":"'${MESSAGE}'"}'
+        echo $DATA
+        curl -X POST --header "Content-Type:application/json" $GOOGLE_CHAT_RELEASE_CHANEL -d "${DATA}"
+    fi
+}
+
 #---------------    FAM    ----------------
 
 build_and_publish_docker fam
@@ -64,3 +75,4 @@ git push origin
 git tag -a ${VERSION} -m "ARLAS Item Registration Services Model ${VERSION}"
 git push origin ${VERSION}
 
+send_chat_message "Release of AIAS, version ${VERSION}"
