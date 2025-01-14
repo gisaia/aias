@@ -61,13 +61,13 @@ class AccessManager:
         return storage.get_storage_parameters()
 
     @staticmethod
-    def pull(href: str, dst: str, is_dst_dir: bool):
+    def pull(href: str, dst: str):
         """
         Pulls a file from a storage to write it in the local storage.
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
         storage = AccessManager.resolve_storage(href)
-        storage.pull(href, dst, is_dst_dir)
+        storage.pull(href, dst)
 
     # Will return a yield
     @staticmethod

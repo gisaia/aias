@@ -1,6 +1,5 @@
 import enum
 import json
-import os
 import tempfile
 from typing import Literal
 from urllib.parse import urlparse
@@ -109,15 +108,12 @@ class GoogleStorage(AbstractStorage):
 
         return params
 
-    def pull(self, href: str, dst: str, is_dst_dir: bool):
-        super().pull(href, dst, is_dst_dir)
+    def pull(self, href: str, dst: str):
+        super().pull(href, dst)
 
         bucket = self.__get_bucket()
         blob = bucket.blob(urlparse(href).path[1:])
 
-        if is_dst_dir:
-            # If it is a directory, then add filename at the end of the path to match shutil.copy behaviour
-            dst = os.path.join(dst, os.path.basename(href))
         blob.download_to_filename(dst)
 
     def is_file(self, href: str):

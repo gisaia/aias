@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
@@ -36,15 +37,15 @@ class Driver(DownloadDriver):
             if item.properties.item_format and \
                     item.properties.item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value]:
                 self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
-                AccessManager.pull(href, target_directory, True)
+                AccessManager.pull(href, os.path.join(target_directory, os.path.basename(href)))
                 if item.assets and item.assets.get(Role.extent.value) and AccessManager.exists(
                         item.assets.get(Role.extent.value).href):
                     self.LOGGER.debug("Geo file {} detected and copied".format(item.assets.get(Role.extent.value).href))
-                    AccessManager.pull(item.assets.get(Role.extent.value).href, target_directory, True)
+                    AccessManager.pull(item.assets.get(Role.extent.value).href, os.path.join(target_directory, os.path.basename(item.assets.get(Role.extent.value).href)))
                 if item.assets and item.assets.get(Role.metadata.value) and AccessManager.exists(
                         item.assets.get(Role.metadata.value).href):
                     self.LOGGER.debug("Metadata {} detected and copied".format(item.assets.get(Role.metadata.value).href))
-                    AccessManager.pull(item.assets.get(Role.metadata.value).href, target_directory, True)
+                    AccessManager.pull(item.assets.get(Role.metadata.value).href, os.path.join(target_directory, os.path.basename(item.assets.get(Role.metadata.value).href)))
             else:
                 AccessManager.zip(href, target_directory)
                 return
@@ -65,9 +66,9 @@ class Driver(DownloadDriver):
             if item.assets and item.assets.get(Role.extent.value) is not None and AccessManager.exists(item.assets.get(Role.extent.value).href):
                 geo_ext_file = item.assets.get(Role.extent.value).href
                 self.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
-                AccessManager.pull(geo_ext_file, target_directory, True)
+                AccessManager.pull(geo_ext_file, os.path.join(target_directory, os.path.basename(geo_ext_file)))
             self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
-            AccessManager.pull(href, target_directory, True)
+            AccessManager.pull(href, os.path.join(target_directory, os.path.basename(href)))
             return
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg

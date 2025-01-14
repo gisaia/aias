@@ -67,7 +67,7 @@ class Driver(DownloadDriver):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 
             # Download archive then extract it
-            AccessManager.pull(asset_href, tmp_asset, False)
+            AccessManager.pull(asset_href, tmp_asset)
             raster_files = self.__find_raster_files(tmp_asset)
 
             asset_href = f"file://{tmp_asset}"

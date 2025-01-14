@@ -24,8 +24,12 @@ class FileStorage(AbstractStorage):
     def get_rasterio_session(self):
         return {}
 
-    def pull(self, href: str, dst: str, is_dst_dir: bool):
-        super().pull(href, dst, is_dst_dir)
+    def pull(self, href: str, dst: str):
+        super().pull(href, dst)
+
+        if not self.__is_path_authorized(dst):
+            raise ValueError('The desired output path is not authorized')
+
         shutil.copy(href, dst)
 
     # @override method of AbstractStorage

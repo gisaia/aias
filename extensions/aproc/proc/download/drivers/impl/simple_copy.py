@@ -26,4 +26,4 @@ class Driver(DownloadDriver):
         href = self.get_asset_href(item)
         file_name = get_file_name(item.id)
 
-        AccessManager.pull(href, os.path.join(target_directory, file_name), False)
+        AccessManager.pull(href, os.path.join(target_directory, file_name))
