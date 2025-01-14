@@ -78,7 +78,7 @@ class Driver(DownloadDriver):
 
         zarr_res = self.__get_zarr_resolution()
 
-        with AccessManager.get_rasterio_session(asset_href):
+        with rasterio.Env(**AccessManager.get_rasterio_session(asset_href)):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
             for ri, rf in enumerate(raster_files):

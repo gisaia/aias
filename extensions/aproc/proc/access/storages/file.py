@@ -22,7 +22,7 @@ class FileStorage(AbstractStorage):
         return Path(href).exists()
 
     def get_rasterio_session(self):
-        return None
+        return {}
 
     def pull(self, href: str, dst: str, is_dst_dir: bool):
         super().pull(href, dst, is_dst_dir)

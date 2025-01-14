@@ -1,8 +1,7 @@
-from contextlib import contextmanager
-from datetime import datetime
 import os
 import shutil
 import tempfile
+from datetime import datetime
 from typing import Annotated, Union
 
 from pydantic import Field
@@ -78,14 +77,11 @@ class AccessManager:
         """
         ...
 
-    @contextmanager
     @staticmethod
     def get_rasterio_session(href: str):
-        import rasterio
-
         storage = AccessManager.resolve_storage(href)
 
-        yield rasterio.Env(storage.get_rasterio_session())
+        return storage.get_rasterio_session()
 
     @staticmethod
     def exists(href: str) -> bool:

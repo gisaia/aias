@@ -1,6 +1,5 @@
 -r aproc/requirements.txt
 -r extensions/requirements.txt
--r extensions/aproc/proc/access/requirements.txt
 -r airs/requirements.txt
 -r agate/requirements.txt
 -r fam/requirements.txt

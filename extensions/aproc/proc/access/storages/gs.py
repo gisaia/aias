@@ -43,7 +43,7 @@ class GoogleStorageApiKey(BaseModel):
         return f"{self.project_id}@appspot.gserviceaccount.com"
 
 
-class GoogleStorage(AbstractStorage, arbitrary_types_allowed=True):
+class GoogleStorage(AbstractStorage):
     type: Literal["gs"] = "gs"
     bucket: str
     api_key: GoogleStorageApiKey | None = Field(default=None)
@@ -52,6 +52,18 @@ class GoogleStorage(AbstractStorage, arbitrary_types_allowed=True):
     @property
     def is_anon_client(self) -> bool:
         return self.api_key is None
+
+    @computed_field
+    @property
+    def credentials_file(self) -> str:
+        if not self.is_anon_client:
+            with tempfile.NamedTemporaryFile("w+", delete=False) as f:
+                json.dump(self.api_key.model_dump(), f)
+                f.close()
+            credentials = f.name
+        else:
+            credentials = None
+        return credentials
 
     def get_storage_parameters(self):
         if self.is_anon_client:
@@ -85,18 +97,17 @@ class GoogleStorage(AbstractStorage, arbitrary_types_allowed=True):
     def get_rasterio_session(self):
         import rasterio.session
 
+        params = {
+            "session": rasterio.session.GSSession(self.credentials_file),
+        }
+
         if self.api_key is None:
             LOGGER.warning("No api_key is configured for this Google Storage bucket. Using anonymous credentials")
-            os.environ["GS_NO_SIGN_REQUEST"] = "YES"
-            credentials = None
+            params["GS_NO_SIGN_REQUEST"] = "YES"
         else:
-            os.environ["GS_NO_SIGN_REQUEST"] = "NO"
-            with tempfile.NamedTemporaryFile("w+", delete=False) as f:
-                json.dump(self.api_key.model_dump(), f)
-                f.close()
-            credentials = f.name
+            params["GS_NO_SIGN_REQUEST"] = "NO"
 
-        return rasterio.session.GSSession(credentials)
+        return params
 
     def pull(self, href: str, dst: str, is_dst_dir: bool):
         super().pull(href, dst, is_dst_dir)

@@ -44,14 +44,14 @@ class AbstractStorage(BaseModel, ABC):
         ...
 
     @abstractmethod
-    def get_rasterio_session(self):
-        """Return a rasterio Session to access data remotely
+    def get_rasterio_session(self) -> dict:
+        """Return a rasterio Session and potential variables to access data remotely
 
         Args:
             href (str): Href od the file to stream
 
         Returns:
-            rasterio.Session | None
+            dict
         """
         ...
 

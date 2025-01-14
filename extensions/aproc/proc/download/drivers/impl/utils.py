@@ -39,7 +39,7 @@ def extract(images, crop_wkt, file, driver_target, target_projection, target_dir
     import rasterio.mask
 
     if crop_wkt:
-        with AccessManager.get_rasterio_session(file):
+        with rasterio.Env(**AccessManager.get_rasterio_session(file)):
             with rasterio.open(file) as src:
                 geom = prepare_wkt_extract(crop_wkt, src.crs)
                 out_image, out_transform = rasterio.mask.mask(src, [geom], crop=True)
@@ -82,7 +82,7 @@ def reproject_raster(in_path, crs, driver_target):
                                reproject)
 
     # reproject raster to project crs
-    with AccessManager.get_rasterio_session(in_path):
+    with rasterio.Env(**AccessManager.get_rasterio_session(in_path)):
         with rasterio.open(in_path) as src:
             src_crs = src.crs
             transform, width, height = calculate_default_transform(src_crs, crs, src.width, src.height, *src.bounds)
