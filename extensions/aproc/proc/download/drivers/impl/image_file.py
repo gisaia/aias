@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from pathlib import Path
 
@@ -47,7 +48,9 @@ class Driver(DownloadDriver):
                     self.LOGGER.debug("Metadata {} detected and copied".format(item.assets.get(Role.metadata.value).href))
                     AccessManager.pull(item.assets.get(Role.metadata.value).href, os.path.join(target_directory, os.path.basename(item.assets.get(Role.metadata.value).href)))
             else:
-                AccessManager.zip(href, target_directory)
+                file_name = os.path.basename(href)
+                zip_path = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+                AccessManager.zip(href, zip_path)
                 return
         # Default driver is GTiff
         driver_target = "GTiff"

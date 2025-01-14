@@ -9,7 +9,7 @@ from extensions.aproc.proc.access.storages.abstract import AbstractStorage
 
 class FileStorage(AbstractStorage):
     type: Literal["file"] = "file"
-    # TODO: add authorised paths
+    authorized_paths: list[str]
 
     def get_storage_parameters(self):
         return {}
@@ -24,18 +24,16 @@ class FileStorage(AbstractStorage):
     def get_rasterio_session(self):
         return {}
 
+    def is_path_authorized(self, href: str) -> bool:
+        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, self.authorized_paths)))
+
     def pull(self, href: str, dst: str):
         super().pull(href, dst)
 
-        if not self.__is_path_authorized(dst):
+        if not self.is_path_authorized(dst):
             raise ValueError('The desired output path is not authorized')
 
         shutil.copy(href, dst)
-
-    # @override method of AbstractStorage
-    def prepare_for_local_process(self, href: str):
-        # Skip pull as file is already present locally
-        return href
 
     def is_file(self, href: str):
         return os.path.isfile(href)

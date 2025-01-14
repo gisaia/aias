@@ -62,7 +62,7 @@ class Driver(DownloadDriver):
             self.LOGGER.info("Downloading archive for Zarr creation.")
 
             # Create tmp file where data will be downloaded
-            tmp_asset = os.path.join(tempfile.gettempdir(), os.path.basename(asset_href))
+            tmp_asset = os.path.join(AccessManager.tmp_dir, os.path.basename(asset_href))
             if (os.path.splitext(tmp_asset)[1] != ".zip"):
                 tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
 

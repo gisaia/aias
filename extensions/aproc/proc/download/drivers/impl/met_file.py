@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import xml.etree.ElementTree as ET
 
@@ -30,7 +31,9 @@ class Driver(DownloadDriver):
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         met_file = self.get_asset_href(item)
         if raw_archive:
-            AccessManager.zip(met_file, target_directory)
+            file_name = os.path.basename(met_file)
+            zip_path = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+            AccessManager.zip(met_file, zip_path)
             return
         met_file_name = os.path.basename(met_file)
         # Default driver is GTiff

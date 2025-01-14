@@ -26,6 +26,9 @@ processes:
 storages:
   -
     type: file
+    authorized_paths:
+      - /tmp
+      - /outbox
   -
     type: gs
     bucket: gisaia-public

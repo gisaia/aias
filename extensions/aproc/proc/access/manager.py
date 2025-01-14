@@ -1,7 +1,6 @@
 import os
 import shutil
 import tempfile
-from datetime import datetime
 from typing import Annotated, Union
 
 from pydantic import Field
@@ -67,6 +66,12 @@ class AccessManager:
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
         storage = AccessManager.resolve_storage(href)
+
+        # Check that the destination is an authorized path for at least one of the file storages
+        is_dst_authorized = any(map(lambda s: s.is_path_authorized(dst), filter(lambda s: s.type == "file", AccessManager.storages)))
+        if not is_dst_authorized:
+            raise ValueError("Destination path is not authorized")
+
         storage.pull(href, dst)
 
     # Will return a yield
@@ -111,19 +116,22 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
 
-        href = storage.prepare_for_local_process(href)
+        # If the storage is nit local, pull it
+        if storage.type != "file":
+            dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+            storage.pull(href, dst)
+            return dst
+
         return href
 
     @staticmethod
-    def zip(href: str, target_directory: str):
+    def zip(href: str, zip_path: str):
         # For all storages but FileStorage, files need to be pulled before being processed
         href = AccessManager.prepare(href)
 
-        file_name = os.path.basename(href)
         # Get direct parent folder of href_file to zip
         dir_name = os.path.dirname(href)
-        target_file_name = os.path.splitext(file_name)[0] + datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
-        shutil.make_archive(target_directory + "/" + target_file_name, 'zip', dir_name)
+        shutil.make_archive(zip_path, 'zip', dir_name)
 
     @staticmethod
     def is_file(href: str):
