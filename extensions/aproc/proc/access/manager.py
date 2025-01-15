@@ -7,7 +7,7 @@ from pydantic import Field
 
 from aproc.core.logger import Logger
 from aproc.core.settings import Configuration
-from extensions.aproc.proc.access.storages.file import FileStorage
+from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
 from extensions.aproc.proc.access.storages.https import HttpsStorage
@@ -68,7 +68,7 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         # Check that the destination is an authorized path for at least one of the file storages
-        is_dst_authorized = any(map(lambda s: s.is_path_authorized(dst), filter(lambda s: s.type == "file", AccessManager.storages)))
+        is_dst_authorized = any(map(lambda s: s.is_path_authorized(dst, AccessType.WRITE), filter(lambda s: s.type == "file", AccessManager.storages)))
         if not is_dst_authorized:
             raise ValueError("Destination path is not authorized")
 

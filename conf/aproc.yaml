@@ -29,6 +29,7 @@ storages:
     authorized_paths:
       - /tmp
       - /outbox
+    writable: True
   -
     type: gs
     bucket: gisaia-public
