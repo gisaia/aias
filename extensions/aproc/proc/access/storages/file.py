@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlparse
 
+from pydantic import Field
+
 from extensions.aproc.proc.access.storages.abstract import AbstractStorage
 
 
@@ -15,15 +17,15 @@ class AccessType(enum.Enum):
 
 class FileStorage(AbstractStorage):
     type: Literal["file"] = "file"
-    authorized_paths: list[str]
-    writable: bool
+    writable_paths: list[str] = Field(default=[])
+    readable_paths: list[str] = Field(default=[])
 
     def get_storage_parameters(self):
         return {}
 
     def supports(self, href: str):
         scheme = urlparse(href).scheme
-        return scheme == "" or scheme == "file"
+        return (scheme == "" or scheme == "file") and self.is_path_authorized(href, AccessType.READ)
 
     def exists(self, href: str):
         return Path(href).exists()
@@ -32,9 +34,11 @@ class FileStorage(AbstractStorage):
         return {}
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if action == AccessType.WRITE and not self.writable:
-            return False
-        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, self.authorized_paths)))
+        if action == AccessType.WRITE:
+            paths = self.writable_paths
+        if action == AccessType.READ:
+            paths = list([*self.readable_paths, *self.writable_paths])
+        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, paths)))
 
     def pull(self, href: str, dst: str):
         super().pull(href, dst)

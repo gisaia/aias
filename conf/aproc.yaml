@@ -26,10 +26,11 @@ processes:
 storages:
   -
     type: file
-    authorized_paths:
+    writable_paths:
       - /tmp
       - /outbox
-    writable: True
+    readable_paths:
+      - /inputs
   -
     type: gs
     bucket: gisaia-public
