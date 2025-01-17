@@ -126,7 +126,7 @@ class Processes:
             return res.result
         else:
             return None
-        
+
     @staticmethod
     def inerrupt(task_id: str):
         res = AsyncResult(task_id, app=APROC_CELERY_APP)

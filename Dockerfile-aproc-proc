@@ -15,6 +15,7 @@ WORKDIR $HOME
 
 COPY ./aproc/requirements.txt $APP_HOME/requirements.txt
 COPY ./extensions/requirements.txt $APP_HOME/requirements-ext.txt
+COPY ./extensions/requirements.storage.txt $APP_HOME/requirements.storage.txt
 
 # Install python 3.10
 RUN apt install python3.10 -y

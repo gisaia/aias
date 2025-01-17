@@ -9,7 +9,7 @@ from airs.core.models import mapper
 from airs.core.models.model import Item
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
-from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestProcess, summary
+from extensions.aproc.proc.ingest.ingest_process import summary
 
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX", "airs")
@@ -33,15 +33,21 @@ ARLAS_COLLECTION = "digitalearth.africa"
 ID = "077cb463-1f68-5532-aa8b-8df0b510231a"
 ID_MANAGED = "077cb463-1f68-5532-aa8b-8df0b510231a_managed"
 ASSET = "data"
-ASSET_PATH = "test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif"
-ITEM_PATH = "test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a.json"
-ITEM_PATH_MANAGED = "test/inputs/077cb463-1f68-5532-aa8b-8df0b510231a_managed.json"
+ASSET_NAME = "ESA_WorldCover_10m_2021_v200_N15E000_Map"
+ASSET_PATH = f"test/inputs/{ASSET_NAME}.tif"
+ITEM_PATH = f"test/inputs/{ID}.json"
+ITEM_PATH_MANAGED = f"test/inputs/{ID_MANAGED}.json"
 TOKEN = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMWU3ZDI3ZC05MWM4LTRjYTEtOGU4My04MWI1ODBkOTZkMDUiLCJodHRwOi8vYXJsYXMuaW8vbG9jYWxlIjoiZW4iLCJpc3MiOiJhcmxhcy5jcnRzLXN0YWZmLmxvY2FsIiwiZXhwIjoxNjk2ODYxMTU4LCJodHRwOi8vYXJsYXMuaW8vdGltZXpvbmUiOiJFdXJvcGUvUGFyaXMiLCJpYXQiOjE2OTY4NjEwOTgsImVtYWlsIjoidGVjaEBnaXNhaWEuY29tIn0.bonAysbuUeqU3gWVjA7H-WXGI-JXGAgbZNDyWfiq4VY"
 
 BBOX = "Polygon ((0.56676570458404063 17.18722410865874295, 1.71124787775891329 17.2246604414261455, 1.6631154499151104 16.48128183361629695, 0.49189303904923587 16.49197792869269819, 0.49189303904923587 16.49197792869269819, 0.56676570458404063 17.18722410865874295))"
 
-SENTINEL_2_ITEM = "test/inputs/e3229ea8-a7f8-4c88-a3ca-265cea2f6862.json"
 SENTINEL_2_ID = "e3229ea8-a7f8-4c88-a3ca-265cea2f6862"
+SENTINEL_2_ITEM = f"test/inputs/{SENTINEL_2_ID}.json"
+
+CLOUD_ID = "619d7a94-c85e-4e6d-938c-50a043b51036"
+CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"
+
+EPSG_27572 = "EPSG:27572"
 
 IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)

@@ -4,10 +4,12 @@ RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
 
 COPY ./aproc/requirements.txt /app/requirements.txt
+COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
 WORKDIR /app
 
 RUN pip install -r requirements.txt
+RUN pip install -r requirements.storage.txt
 
 ENV APP_HOME=/app
 

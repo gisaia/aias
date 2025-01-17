@@ -4,16 +4,4 @@ drivers:
     class_name: extensions.aproc.proc.enrich.drivers.impl.safe
     assets_dir: /tmp/aproc/safe
     configuration:
-      input:
-        type: $APROC_INPUT_STORAGE_TYPE
-        # Google Storage
-        bucket: $APROC_INPUT_STORAGE_BUCKET
-        api_key:
-          project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
-          private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
-          private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
-        # HTTPS
-        headers: $APROC_INPUT_STORAGE_HEADERS
-        domain: $APROC_INPUT_STORAGE_DOMAIN
-        force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD
     priority: 1

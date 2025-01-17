@@ -7,11 +7,12 @@ from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 class DownloadDriver(AbstractDriver):
     """ Driver for exporting files for download
     """
-    alternative_asset_href_field: str = None
+    alternative_asset_href_field: str | None = None
 
     def __init__(self):
         super().__init__()
 
+    @staticmethod
     def init(configuration: dict) -> None:
         if configuration:
             DownloadDriver.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
