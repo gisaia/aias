@@ -2,13 +2,13 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ObservationType, Properties, ResourceType,
-                                    Role)
-from aproc.core.settings import Configuration
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    get_epsg, get_geom_bbox_centroid, get_hash_url)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_file_size, get_geom_bbox_centroid, get_hash_url, get_epsg
 
 
 class Driver(IngestDriver):
@@ -24,7 +24,8 @@ class Driver(IngestDriver):
         self.component_id = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
 
     # Implements drivers method
@@ -43,19 +44,19 @@ class Driver(IngestDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
+        assets.append(Asset(href=self.met_path, size=AccessManager.get_file_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.txt.value, asset_type=ResourceType.other.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
@@ -81,7 +82,10 @@ class Driver(IngestDriver):
         inside_coord_2 = False
         inside_coord_3 = False
         inside_coord_4 = False
-        with open(self.met_path) as f:
+
+        # TODO: replace by file streaming
+        met_path = AccessManager.prepare(self.met_path)
+        with open(met_path) as f:
             for line_1 in f:
                 if inside_component_section:
                     self.__set_lat_lon(d, line_1, inside_coord_1, 1)
@@ -109,7 +113,7 @@ class Driver(IngestDriver):
                 if line_1.find('Component ID: ' + self.component_id) >= 0:
                     inside_component_section = True
 
-        with open(self.met_path) as f_2:
+        with open(met_path) as f_2:
             for line_2 in f_2:
                 self.__get_field__(d, line_2, 'Sensor Type')
                 self.__get_field__(d, line_2, 'Processing Level')
@@ -121,6 +125,7 @@ class Driver(IngestDriver):
                     self.__get_date_field__(d, line_2)
                 if line_2.find('Product Image ID: ' + d['Product Image ID']) >= 0:
                     inside_product_image_section = True
+
         geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'], d['lat_1'], d['lon_2'], d['lat_2'], d['lon_3'], d['lat_3'], d['lon_4'], d['lat_4'])
         x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
         y_pixel_size = float(d['Pixel Size Y'].split(' ')[0])
@@ -135,9 +140,11 @@ class Driver(IngestDriver):
         view__azimuth = float(d['Scan Azimuth'].split(' ')[0])
         view__sun_azimuth = float(d['Sun Angle Azimuth'].split(' ')[0])
         view__sun_elevation = float(d['Sun Angle Elevation'].split(' ')[0])
+
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
+        tif_path = AccessManager.prepare(self.tif_path)
+        src_ds = gdal.Open(tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -164,25 +171,30 @@ class Driver(IngestDriver):
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
+
+        if tif_path != self.tif_path:
+            os.remove(tif_path)
+        if met_path != self.met_path:
+            os.remove(met_path)
+
         return item
 
     def __check_path__(self, file_path: str):
         self.__init__()
-        valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
         file_name = os.path.basename(file_path)
-        path = os.path.dirname(file_path)
-        if valid_and_exist is True and file_name.endswith(".tif"):
+        path = AccessManager.dirname(file_path)
+        if AccessManager.is_file(file_path) and file_name.endswith(".tif"):
             self.tif_path = file_path
-            tfw_path = Path(self.tif_path).with_suffix(".tfw")
-            if tfw_path.exists():
-                self.tfw_path = str(tfw_path)
+            tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+            if AccessManager.exists(tfw_path):
+                self.tfw_path = tfw_path
             self.file_name = file_name
             parts_of_file_name = file_name.replace('.tif', '').split("_")
             if len(parts_of_file_name) >= 4:
                 self.component_id = parts_of_file_name[3]
-                for file in os.listdir(path):
+                for file in AccessManager.listdir(path):
                     # check if current file is a file
-                    if os.path.isfile(os.path.join(path, file)):
+                    if AccessManager.is_file(os.path.join(path, file)):
                         if file.endswith('.jpg'):
                             if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
                                 self.thumbnail_path = os.path.join(path, file)
@@ -197,9 +209,9 @@ class Driver(IngestDriver):
         if line.find(field) >= 0:
             data[field] = line.split(':')[1].strip() + ':' + line.split(':')[2].strip()
 
-    def __get_field__(self, data, line, field, isFloat=False):
+    def __get_field__(self, data, line, field, is_float=False):
         if line.find(field) >= 0:
-            if isFloat:
+            if is_float:
                 data[field] = float(line.split(':')[1].strip())
             else:
                 data[field] = line.split(':')[1].strip()
@@ -216,4 +228,3 @@ class Driver(IngestDriver):
         if inside_coord:
             self.__get_latitude__(data, line, coord_number)
             self.__get_longitude__(data, line, coord_number)
-

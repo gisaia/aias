@@ -66,7 +66,6 @@ class GoogleStorage(AbstractStorage):
 
     def get_storage_parameters(self):
         if self.is_anon_client:
-            LOGGER.warning("No api_key is configured for this Google Storage. Using anonymous credentials")
             client = Client.create_anonymous_client()
         else:
             credentials = service_account.Credentials.from_service_account_info(self.api_key)
@@ -89,9 +88,12 @@ class GoogleStorage(AbstractStorage):
             # Try to retrieve a bucket (this makes an API request)
             return client.get_bucket(self.bucket)
 
-    def exists(self, href: str):
+    def __get_blob(self, href: str):
         bucket = self.__get_bucket()
-        return bucket.blob(href).exists()
+        return bucket.get_blob(urlparse(href).path[1:])
+
+    def exists(self, href: str):
+        return self.is_file(href) or self.is_dir(href)
 
     def get_rasterio_session(self):
         import rasterio.session
@@ -101,7 +103,6 @@ class GoogleStorage(AbstractStorage):
         }
 
         if self.api_key is None:
-            LOGGER.warning("No api_key is configured for this Google Storage bucket. Using anonymous credentials")
             params["GS_NO_SIGN_REQUEST"] = "YES"
         else:
             params["GS_NO_SIGN_REQUEST"] = "NO"
@@ -111,15 +112,49 @@ class GoogleStorage(AbstractStorage):
     def pull(self, href: str, dst: str):
         super().pull(href, dst)
 
-        bucket = self.__get_bucket()
-        blob = bucket.blob(urlparse(href).path[1:])
+        blob = self.__get_blob(href)
+        if blob is None:
+            raise LookupError(f"Can't find {href}")
 
         blob.download_to_filename(dst)
 
     def is_file(self, href: str):
-        return self.exists(href)
+        prefix = urlparse(href).path.removeprefix("/")
+        files, _ = self.__list_blobs(prefix=prefix)
+
+        return len(files) == 1 and files[0] == prefix
+
+    def __list_blobs(self, prefix: str) -> tuple[list[str], list[str]]:
+        """
+        Return a list of files contained in the specified folder, as well as subfolders
+        """
+        blobs = self.__get_bucket().list_blobs(prefix=prefix, delimiter="/")
+        return list(map(lambda b: b.name, blobs)), list(blobs.prefixes)
 
     def is_dir(self, href: str):
-        # Does not handle empty folders
-        blobs = list(self.__get_bucket().list_blobs(prefix=href.removesuffix("/") + "/"))
-        return len(blobs) > 1
+        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
+        files, dirs = self.__list_blobs(prefix)
+
+        return len(files) > 1 or len(dirs) > 0
+
+    def get_file_size(self, href: str):
+        return self.__get_blob(href).size
+
+    def listdir(self, href: str):
+        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
+        files, dirs = self.__list_blobs(prefix)
+
+        return list(map(lambda b: b.split(prefix)[1], files))[1:] + \
+            list(map(lambda b: b.split(prefix)[1].strip("/"), dirs))
+
+    def get_last_modification_time(self, href: str):
+        mod_time = self.__get_blob(href).updated
+        return mod_time.timestamp() if mod_time is not None else None
+
+    def get_creation_time(self, href: str):
+        creation_time = self.__get_blob(href).time_created
+        return creation_time.timestamp() if creation_time is not None else None
+
+    def makedir(self, href, strict=False):
+        if strict:
+            raise NotImplementedError("It is not possible to create the folder on Google Storage")

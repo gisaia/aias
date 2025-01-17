@@ -12,11 +12,11 @@ def setup_gdal():
     gdal.VSICurlClearCache()
 
 
-def get_id(url):
-    id = str(url.replace("/", "-").replace(" ","_"))
-    if id[0] == "-":
-        return id[1:]
-    return id
+def get_id(url: str):
+    url_id = str(url.replace("/", "-").replace(" ", "_"))
+    if url_id[0] == "-":
+        return url_id[1:]
+    return url_id
 
 
 def get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat):
@@ -70,20 +70,11 @@ def geotiff_to_jpg(input_path, widthPct, heightPct, output_path=None):
         gdal.Translate(output_path, dataset, options=options)
 
 
-def get_file_size(file: str):
-    try:
-        if file and os.path.exists(file) and os.path.isfile(file):
-            return os.stat(file).st_size
-    except:
-        ...
-    return None
-
-
 def get_epsg(src):
     try:
         from osgeo import osr
         proj = osr.SpatialReference(wkt=src.GetProjection())
-        return int(proj.GetAttrValue('AUTHORITY',1))
-    except:
+        return int(proj.GetAttrValue('AUTHORITY', 1))
+    except Exception:
         ...
     return None

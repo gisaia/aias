@@ -3,15 +3,13 @@ import os
 import re
 import tempfile
 import zipfile
-from pathlib import Path
 from time import time
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ResourceType, Role)
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ResourceType, Role)
 from extensions.aproc.proc.access.manager import AccessManager
-from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
+from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 
 
 class Driver(EnrichDriver):
@@ -50,9 +48,8 @@ class Driver(EnrichDriver):
                 )
                 asset_location = self.get_asset_filepath(item.id, asset)
                 asset.href = asset_location
-                Path(asset_location).touch()
                 self.__build_asset(item, asset_type, asset_location)
-                asset.size = get_file_size(asset_location)
+                asset.size = AccessManager.get_file_size(asset_location)
                 return asset, asset_location
             else:
                 raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))

@@ -2,6 +2,7 @@ from abc import abstractmethod
 import hashlib
 import os
 from airs.core.models.model import Asset, Item, Role
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
@@ -28,12 +29,12 @@ class EnrichDriver(AbstractDriver):
             str: the directory for storing the assets
         """
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
-        dir = os.path.sep.join([self.assets_dir, unique])
-        if not os.path.exists(self.assets_dir):
-            os.makedirs(self.assets_dir)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        return dir
+        assets_dir = os.path.sep.join([self.assets_dir, unique])
+
+        # No need to create the dirs in
+        AccessManager.makedir(self.assets_dir)
+        AccessManager.makedir(assets_dir)
+        return assets_dir
 
     def get_asset_filepath(self, url: str, asset: Asset) -> str:
         """Provides the name of the file for storing the asset

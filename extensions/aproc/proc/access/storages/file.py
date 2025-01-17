@@ -53,3 +53,23 @@ class FileStorage(AbstractStorage):
 
     def is_dir(self, href: str):
         return os.path.isdir(href)
+
+    def get_file_size(self, href: str):
+        return os.stat(href).st_size
+
+    def listdir(self, href: str):
+        return os.listdir(href)
+
+    def get_last_modification_time(self, href: str):
+        return os.path.getmtime(href)
+
+    def get_creation_time(self, href: str):
+        return os.path.getctime(href)
+
+    def makedir(self, href: str, strict=False):
+        if not self.exists(href) or strict:
+            os.makedirs(href)
+
+    # @override
+    def dirname(self, href: str):
+        return os.path.dirname(os.path.abspath(href))

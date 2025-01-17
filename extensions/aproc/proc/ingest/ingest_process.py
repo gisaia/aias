@@ -1,7 +1,7 @@
 import os
 
 import requests
-from celery import Task, shared_task
+from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
@@ -13,12 +13,15 @@ from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.access.manager import AccessManager
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.drivers.exceptions import (
-    ConnectionException, DriverException, RegisterException)
-from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
+                                                      DriverException,
+                                                      RegisterException)
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.ingest.settings import \
+    Configuration as IngestConfiguration
 from extensions.aproc.proc.processes.process_model import InputProcess
+
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -107,7 +110,7 @@ class AprocProcess(Process):
         Returns:
             object: an dict pointing towards the registered item (OutputIngestProcess)
         """
-        if not os.path.exists(url):
+        if not AccessManager.exists(url):
             msg = "File or directory {} not found".format(url)
             LOGGER.warning(msg)
         driver: IngestDriver = DriverManager.solve(summary.id, url, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
@@ -172,7 +175,7 @@ class AprocProcess(Process):
             if asset.roles is None:
                 raise DriverException("Invalid asset {} for {} : no roles provided".format(asset.name, url))
             if file_exists:
-                if asset.airs__managed is True and not os.path.exists(asset.href):
+                if asset.airs__managed is True and not AccessManager.exists(asset.href):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
     @staticmethod

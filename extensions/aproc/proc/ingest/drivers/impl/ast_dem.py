@@ -2,27 +2,15 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-
-from airs.core.models.model import (
-    Asset,
-    AssetFormat,
-    Item,
-    ItemFormat,
-    MimeType,
-    ObservationType,
-    Properties,
-    ResourceType,
-    Role,
-)
-from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_geom_bbox_centroid,
-    get_hash_url,
-    get_file_size,
-    get_epsg,
-)
-from .image_driver_helper import ImageDriverHelper
+    get_epsg, get_geom_bbox_centroid, get_hash_url)
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
@@ -44,6 +32,7 @@ class Driver(IngestDriver):
         self.tfw_path = None
 
     # Implements drivers method
+    @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
 
@@ -62,7 +51,7 @@ class Driver(IngestDriver):
         assets.append(
             Asset(
                 href=self.tif_path,
-                size=get_file_size(self.tif_path),
+                size=AccessManager.get_file_size(self.tif_path),
                 roles=[Role.data.value],
                 name=Role.data.value,
                 type=MimeType.TIFF.value,
@@ -75,7 +64,7 @@ class Driver(IngestDriver):
         assets.append(
             Asset(
                 href=self.met_path,
-                size=get_file_size(self.met_path),
+                size=AccessManager.get_file_size(self.met_path),
                 roles=[Role.metadata.value],
                 name=Role.metadata.value,
                 type=MimeType.PVL.value,
@@ -89,7 +78,7 @@ class Driver(IngestDriver):
             assets.append(
                 Asset(
                     href=self.tfw_path,
-                    size=get_file_size(self.tfw_path),
+                    size=AccessManager.get_file_size(self.tfw_path),
                     roles=[Role.extent.value],
                     name=Role.extent.value,
                     type=MimeType.TEXT.value,
@@ -123,7 +112,9 @@ class Driver(IngestDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         import pvl
 
-        data = pvl.load(self.met_path)
+        met_path = AccessManager.prepare(self.met_path)
+        data = pvl.load(met_path)
+
         ul_lat = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLATITUDE"))
         ul_lon = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLONGITUDE"))
         ur_lat = float(self.__get_corner_coord__(data, "UPPERRIGHTCORNERLATITUDE"))
@@ -156,25 +147,25 @@ class Driver(IngestDriver):
         )
         if eo__cloud_cover:
             eo__cloud_cover = float(eo__cloud_cover)
-        gsdRow = (
+        gsd_row = (
             data["INVENTORYMETADATA"]
             .get("SWATHSTRUCTUREINFO", {})
             .get("CROSSTRACKPIXELRESOLUTION", {})
             .get("VALUE", None)
         )
-        if gsdRow:
-            gsdRow = float(gsdRow)
-        gsdCol = (
+        if gsd_row:
+            gsd_row = float(gsd_row)
+        gsd_col = (
             data["INVENTORYMETADATA"]
             .get("SWATHSTRUCTUREINFO", {})
             .get("ALONGTRACKPIXELRESOLUTION", {})
             .get("VALUE", None)
         )
-        if gsdCol:
-            gsdCol = float(gsdCol)
+        if gsd_col:
+            gsd_col = float(gsd_col)
         gsd = None
-        if gsdCol and gsdRow:
-            gsd = (gsdCol + gsdRow) / 2
+        if gsd_col and gsd_row:
+            gsd = (gsd_col + gsd_row) / 2
         constellation = (
             data["INVENTORYMETADATA"]
             .get("PLATFORMINSTRUMENTSENSOR", {})
@@ -209,10 +200,13 @@ class Driver(IngestDriver):
         )
         if view__sun_elevation:
             view__sun_elevation = float(view__sun_elevation)
+
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
 
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
+        tif_path = AccessManager.prepare(self.tif_path)
+        src_ds = gdal.Open(tif_path, GA_ReadOnly)
+
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -237,22 +231,27 @@ class Driver(IngestDriver):
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets)),
         )
+
+        if met_path != self.met_path:
+            os.remove(met_path)
+        if tif_path != self.tif_path:
+            os.remove(tif_path)
+
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
-        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        if valid_and_exist:
-            for f in os.listdir(path):
-                self.tif_path = os.path.join(path, f)
-                if Path(self.tif_path).is_file() and self.tif_path.lower().endswith((".tif", ".tiff")):
-                    tfw_path = Path(self.tif_path).with_suffix(".tfw")
-                    if tfw_path.exists():
-                        self.tfw_path = str(tfw_path)
-                    met_path = Path(self.tif_path).with_suffix(".tif.met")
-                    if met_path.exists():
-                        self.met_path = str(met_path)
-                    return self.tif_path is not None and self.met_path is not None
+
+        for f in AccessManager.listdir(path):
+            self.tif_path = os.path.join(path, f)
+            if AccessManager.is_file(self.tif_path) and self.tif_path.lower().endswith((".tif", ".tiff")):
+                tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+                if AccessManager.exists(tfw_path):
+                    self.tfw_path = tfw_path
+                met_path = str(Path(self.tif_path).with_suffix(".tif.met"))
+                if AccessManager.exists(met_path):
+                    self.met_path = met_path
+                return self.tif_path is not None and self.met_path is not None
         return False
 
     def __get_corner_coord__(self, data, corner):

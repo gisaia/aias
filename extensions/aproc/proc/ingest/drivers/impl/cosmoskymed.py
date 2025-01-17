@@ -1,19 +1,19 @@
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ObservationType, Properties, ResourceType,
-                                    Role)
-from aproc.core.settings import Configuration
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, get_hash_url)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
-import xml.etree.ElementTree as ET
 
 
 class Driver(IngestDriver):
-    output_folder: str = None  # todo: this should use self.get_asset_filepath instead
+    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
@@ -29,10 +29,10 @@ class Driver(IngestDriver):
         self.thumbnail_path = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
         Driver.output_folder = configuration['tmp_directory']
-        return
 
     # Implements drivers method
     def supports(self, url: str) -> bool:
@@ -48,38 +48,45 @@ class Driver(IngestDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
+            # Prepare file to retrieve to proceed in local storage
+            browse_path = AccessManager.prepare(self.browse_path)
             thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
             os.makedirs(thumbnail_path, exist_ok=True)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
+            geotiff_to_jpg(browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+
             quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
+            geotiff_to_jpg(browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+
+            if browse_path != self.browse_path:
+                os.remove(browse_path)
+
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
+        assets.append(Asset(href=self.met_path, size=AccessManager.get_file_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.attr_path, size=get_file_size(self.attr_path),
+        assets.append(Asset(href=self.attr_path, size=AccessManager.get_file_size(self.attr_path),
                             roles=[Role.metadata.value], name="attributes", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.h5_path, size=get_file_size(self.h5_path),
+        assets.append(Asset(href=self.h5_path, size=AccessManager.get_file_size(self.h5_path),
                             roles=[Role.metadata.value], name="h5", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         if self.h5pdf_path:
-            assets.append(Asset(href=self.h5pdf_path, size=get_file_size(self.h5pdf_path),
+            assets.append(Asset(href=self.h5pdf_path, size=AccessManager.get_file_size(self.h5pdf_path),
                                 roles=[Role.metadata.value], name=Role.metadata.value + "_pdf", type=MimeType.PDF.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pdf.value, asset_type=ResourceType.other.value))
         return assets
@@ -98,7 +105,8 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        tree = ET.parse(self.met_path)
+        met_path = AccessManager.prepare(self.met_path)
+        tree = ET.parse(met_path)
         root = tree.getroot()
         ul_lat = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 0)
         ul_lon = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 1)
@@ -121,9 +129,11 @@ class Driver(IngestDriver):
         h5_tree = ET.parse(self.h5_path)
         h5_root = h5_tree.getroot()
         processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
+
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
+        tif_path = AccessManager.prepare(self.tif_path)
+        src_ds = gdal.Open(tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -146,34 +156,40 @@ class Driver(IngestDriver):
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
+
+        if tif_path != self.tif_path:
+            os.remove(tif_path)
+        if met_path != self.met_path:
+            os.remove(met_path)
+
         return item
 
     def __check_path__(self, file_path: str):
         self.__init__()
-        valid_and_exist = os.path.isfile(file_path) and os.path.exists(file_path)
         file_name = os.path.basename(file_path)
-        path = os.path.dirname(file_path)
-        if valid_and_exist is True and file_name.endswith(".tif") and file_name.find(".QLK.") < 0:
+        path = AccessManager.dirname(file_path)
+        if AccessManager.is_file(file_path) and file_name.endswith(".tif") and file_name.find(".QLK.") < 0:
             self.tif_path = file_path
-            if os.path.isfile(file_path + '.aux.xml') and os.path.exists(file_path + '.aux.xml'):
-                self.met_path = file_path + '.aux.xml'
+            met_path = file_path + '.aux.xml'
+            if AccessManager.is_file(met_path):
+                self.met_path = met_path
             attr_path = path + '/' + file_name.split(".")[0] + ".attribs.xml"
-            if os.path.isfile(attr_path) and os.path.exists(attr_path):
+            if AccessManager.is_file(attr_path):
                 self.attr_path = attr_path
             browse_path = path + '/' + file_name.split(".")[0] + "." + file_name.split(".")[1] + '.QLK.tif'
-            if os.path.isfile(browse_path) and os.path.exists(browse_path):
+            if AccessManager.is_file(browse_path):
                 self.browse_path = browse_path
             if len(file_name.split(".")) > 2:
                 self.prefix_key = file_name.split(".")[1] + "_" + file_name.split(".")[2] + "_"
             h5_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.xml"
-            if os.path.isfile(h5_path) and os.path.exists(h5_path):
+            if AccessManager.is_file(h5_path):
                 self.h5_path = h5_path
             h5pdf_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.pdf"
-            if os.path.isfile(h5pdf_path) and os.path.exists(h5pdf_path):
+            if AccessManager.is_file(h5pdf_path):
                 self.h5pdf_path = h5pdf_path
-            tfw_path = Path(self.tif_path).with_suffix(".tfw")
-            if tfw_path.exists():
-                self.tfw_path = str(tfw_path)
+            tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+            if AccessManager.exists(tfw_path):
+                self.tfw_path = tfw_path
             return (
                 self.met_path is not None
                 and self.tif_path is not None

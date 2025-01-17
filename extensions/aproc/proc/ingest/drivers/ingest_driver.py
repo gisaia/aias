@@ -1,10 +1,11 @@
 import hashlib
 import os
 from abc import abstractmethod
+
 from airs.core.models.model import Asset, Item
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
-from aproc.core.settings import Configuration
 
 
 class IngestDriver(AbstractDriver):
@@ -15,7 +16,8 @@ class IngestDriver(AbstractDriver):
         self.overview_size = 1024
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         return
 
     def get_assets_dir(self, url: str) -> str:
@@ -30,12 +32,10 @@ class IngestDriver(AbstractDriver):
         if not url:
             raise DriverException("Url can not be None")
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
-        dir = os.path.sep.join([self.assets_dir, unique])
-        if not os.path.exists(self.assets_dir):
-            os.makedirs(self.assets_dir)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        return dir
+        assets_dir = os.path.sep.join([self.assets_dir, unique])
+        AccessManager.makedir(self.assets_dir)
+        AccessManager.makedir(assets_dir)
+        return assets_dir
 
     def get_asset_filepath(self, url: str, asset: Asset) -> str:
         """Provides the name of the file for storing the asset

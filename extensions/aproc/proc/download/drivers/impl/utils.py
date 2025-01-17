@@ -142,6 +142,7 @@ def get_file_name(item: Item, target_format: str):
     file_name = os.path.basename(
         item.id.replace("-", "_").replace(" ", "_")
             .replace("/", "_").replace("\\", "_").replace("@", "_")) + "." + target_format
+    # No need for AccessManager as file_name will be local
     if os.path.exists(file_name):
         file_name = hashlib.md5(str(time.time_ns()).encode("utf-8")).hexdigest() + file_name
     return file_name

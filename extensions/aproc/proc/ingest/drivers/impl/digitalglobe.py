@@ -1,15 +1,15 @@
 import os
-from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from pathlib import Path
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ObservationType, Properties, ResourceType,
-                                    Role)
-from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_file_size, get_geom_bbox_centroid, setup_gdal, get_hash_url, get_epsg)
+    get_epsg, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
@@ -25,7 +25,8 @@ class Driver(IngestDriver):
         self.tfw_path = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
 
     # Implements drivers method
@@ -43,25 +44,25 @@ class Driver(IngestDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
+        assets.append(Asset(href=self.xml_path, size=AccessManager.get_file_size(self.xml_path),
                       roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.til_path, size=get_file_size(self.til_path),
+        assets.append(Asset(href=self.til_path, size=AccessManager.get_file_size(self.til_path),
                       roles=[Role.metadata.value], name=Role.metadata.value + "_imd", type=MimeType.PVL.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.imd_path, size=get_file_size(self.imd_path),
+        assets.append(Asset(href=self.imd_path, size=AccessManager.get_file_size(self.imd_path),
                       roles=[Role.metadata.value], name=Role.metadata.value + "_til", type=MimeType.PVL.value,
                       description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pvl.value, asset_type=ResourceType.other.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
@@ -81,8 +82,10 @@ class Driver(IngestDriver):
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         from osgeo import ogr
-        tree = ET.parse(self.xml_path)
+        xml_path = AccessManager.prepare(self.xml_path)
+        tree = ET.parse(xml_path)
         root = tree.getroot()
+
         # Calculate bbox
         ul_lat = float(root.find("./TIL/TILE/ULLAT").text)
         ul_lon = float(root.find("./TIL/TILE/ULLON").text)
@@ -93,14 +96,14 @@ class Driver(IngestDriver):
         ll_lat = float(root.find("./TIL/TILE/LLLAT").text)
         ll_lon = float(root.find("./TIL/TILE/LLLON").text)
         geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+
         # Overwrite geometry and centroid if GIS_FILE is present with order shape file
-        from os.path import abspath, dirname
-        d = (dirname(abspath(url)))
-        if os.path.isdir(os.path.join(d, "GIS_FILE")):
-            for file in os.listdir(os.path.join(d, "GIS_FILES")):
+        d = AccessManager.dirname(url)
+        if AccessManager.is_dir(os.path.join(d, "GIS_FILE")):
+            for file in AccessManager.listdir(os.path.join(d, "GIS_FILES")):
                 if file.endswith("_ORDER_SHAPE.shp"):
                     setup_gdal()
-                    order_shape_file = os.path.join(d, "GIS_FILES", file)
+                    order_shape_file = AccessManager.prepare(os.path.join(d, "GIS_FILES", file))
                     ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
                     component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
                     layer = component_source.GetLayer()
@@ -110,6 +113,9 @@ class Driver(IngestDriver):
                     centroid_geom = component_geometry.Centroid()
                     centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
                     centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
+
+                    if order_shape_file != os.path.join(d, "GIS_FILES", file):
+                        os.remove(order_shape_file)
                     break
 
         date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
@@ -130,9 +136,11 @@ class Driver(IngestDriver):
             view__sun_elevation = float(root.find("./IMD/IMAGE/SUNEL").text)
         else:
             view__sun_elevation = float(root.find("./IMD/IMAGE/MEANSUNEL").text)
+
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
+        tif_path = AccessManager.prepare(self.tif_path)
+        src_ds = gdal.Open(tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -159,14 +167,19 @@ class Driver(IngestDriver):
         )
         if eo__cloud_cover != -999000.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
+
+        if xml_path != self.xml_path:
+            os.remove(xml_path)
+        if tif_path != self.tif_path:
+            os.remove(tif_path)
+
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
-        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        if valid_and_exist is True:
-            for file in os.listdir(path):
-                if os.path.isfile(os.path.join(path, file)):
+        if AccessManager.is_dir(path):
+            for file in AccessManager.listdir(path):
+                if AccessManager.is_file(os.path.join(path, file)):
                     if file.endswith('-BROWSE.JPG'):
                         self.thumbnail_path = os.path.join(path, file)
                         self.quicklook_path = os.path.join(path, file)
@@ -179,8 +192,8 @@ class Driver(IngestDriver):
                     if file.endswith('.IMD'):
                         self.imd_path = os.path.join(path, file)
             if self.tif_path:
-                tfw_path = Path(self.tif_path).with_suffix(".TFW")
-                if tfw_path.exists():
-                    self.tfw_path = str(tfw_path)
+                tfw_path = str(Path(self.tif_path).with_suffix(".TFW"))
+                if AccessManager.exists(tfw_path):
+                    self.tfw_path = tfw_path
             return self.tif_path is not None and self.xml_path is not None and self.til_path is not None and self.imd_path is not None
         return False

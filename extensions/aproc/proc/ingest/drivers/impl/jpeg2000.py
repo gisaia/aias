@@ -1,9 +1,8 @@
-import os
-
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat
-from aproc.core.settings import Configuration
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from .image_driver_helper import ImageDriverHelper
 
 
 class Driver(IngestDriver):
@@ -12,7 +11,8 @@ class Driver(IngestDriver):
         super().__init__()
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
 
     # Implements drivers method
@@ -26,7 +26,7 @@ class Driver(IngestDriver):
                     or url.lower().endswith(".j2c")
                     or url.lower().endswith(".jpc")
                     or url.lower().endswith(".jpx")
-                    or url.lower().endswith(".jpc")) and os.path.isfile(url) and os.path.exists(url)
+                    or url.lower().endswith(".jpc")) and AccessManager.is_file(url)
         except Exception as e:
             self.LOGGER.warn(e)
             return False

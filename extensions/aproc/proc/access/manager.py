@@ -144,3 +144,48 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         return storage.is_dir(href)
+
+    @staticmethod
+    def get_file_size(href: str):
+        try:
+            storage = AccessManager.resolve_storage(href)
+            if href and AccessManager.exists(href) and AccessManager.is_file(href):
+                return storage.get_file_size(href)
+        except Exception:
+            ...
+        return None
+
+    @staticmethod
+    def listdir(href: str):
+        storage = AccessManager.resolve_storage(href)
+
+        if not storage.is_dir(href):
+            raise ValueError("Given href does not point to a directory")
+
+        return storage.listdir(href)
+
+    @staticmethod
+    def get_last_modification_time(href: str):
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_last_modification_time(href)
+
+    @staticmethod
+    def get_creation_time(href: str):
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_creation_time(href)
+
+    @staticmethod
+    def makedir(href: str, strict=False):
+        """
+        Create if needed (and possible) the specified dir
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.makedir(href, strict=strict)
+
+    @staticmethod
+    def dirname(href: str):
+        """
+        Wraps os.path.dirname to allow for absolute path to be determined if needed
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.dirname(href)

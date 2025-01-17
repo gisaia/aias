@@ -1,15 +1,15 @@
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ObservationType, Properties, ResourceType,
-                                    Role)
-from aproc.core.settings import Configuration
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, get_hash_url)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.ingest.drivers.impl.utils import \
-    get_geom_bbox_centroid, get_hash_url, geotiff_to_jpg, get_file_size, get_epsg
-import xml.etree.ElementTree as ET
 
 
 class Driver(IngestDriver):
@@ -25,7 +25,8 @@ class Driver(IngestDriver):
         self.met_path = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
         Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
@@ -43,28 +44,33 @@ class Driver(IngestDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
+            browse_path = AccessManager.prepare(self.browse_path)
             thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
             os.makedirs(thumbnail_path, exist_ok=True)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
+            geotiff_to_jpg(browse_path, 50, 50, self.thumbnail_path)
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
             quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
             os.makedirs(quicklook_path, exist_ok=True)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
+            geotiff_to_jpg(browse_path, 250, 250, self.quicklook_path)
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-        assets.append(Asset(href=self.met_path, size=get_file_size(self.met_path),
+                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+
+            if browse_path != self.browse_path:
+                os.remove(browse_path)
+
+        assets.append(Asset(href=self.met_path, size=AccessManager.get_file_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
@@ -83,7 +89,8 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        tree = ET.parse(self.met_path)
+        met_path = AccessManager.prepare(self.met_path)
+        tree = ET.parse(met_path)
         root = tree.getroot()
         # Some data dont have this balise in xml metadata
         if root.find("productSpecific/geocodedImageInfo") is not None:
@@ -117,9 +124,11 @@ class Driver(IngestDriver):
         sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
         view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
         date_time = int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
+
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
+        tif_path = AccessManager.prepare(self.tif_path)
+        src_ds = gdal.Open(tif_path, GA_ReadOnly)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -143,27 +152,31 @@ class Driver(IngestDriver):
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
+
+        if met_path != self.met_path:
+            os.remove(met_path)
+        if tif_path != self.tif_path:
+            os.remove(tif_path)
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
-        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        if valid_and_exist:
-            for f in os.listdir(path):
+        if AccessManager.is_dir(path):
+            for f in AccessManager.listdir(path):
                 if f.endswith(".xml"):
                     self.met_path = os.path.join(path, f)
-                    for folder in os.listdir(path):
+                    for folder in AccessManager.listdir(path):
                         # check if current folder is a folder
-                        if os.path.isdir(os.path.join(path, folder)):
+                        if AccessManager.is_dir(os.path.join(path, folder)):
                             if folder == "PREVIEW":
                                 self.browse_path = os.path.join(path, folder, "BROWSE.tif")
                             if folder == "IMAGEDATA":
-                                for file in os.listdir(os.path.join(path, folder)):
+                                for file in AccessManager.listdir(os.path.join(path, folder)):
                                     if file.endswith(".tif"):
                                         self.tif_path = os.path.join(path, folder, file)
-                                        tfw_path = Path(self.tif_path).with_suffix(".tfw")
-                                        if tfw_path.exists():
-                                            self.tfw_path = str(tfw_path)
+                                        tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+                                        if AccessManager.exists(tfw_path):
+                                            self.tfw_path = tfw_path
                     return self.met_path is not None and self.tif_path is not None and self.browse_path is not None
         return False
 
