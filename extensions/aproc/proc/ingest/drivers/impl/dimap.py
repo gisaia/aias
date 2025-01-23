@@ -100,6 +100,25 @@ class Driver(IngestDriver):
         dim_path = AccessManager.prepare(self.dim_path)
         tree = ET.parse(dim_path)
         root = tree.getroot()
+
+        # If we get the archive NOT locally, then we need to retrieve the files referenced and put them in the right spot
+        storage = AccessManager.resolve_storage(self.dim_path)
+        if storage.type != "file":
+            def download_needed_files(node: str):
+                for vertex in root.iter(node):
+                    path = vertex.attrib["href"]
+                    dst = os.path.join(AccessManager.tmp_dir, path)
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+
+                    AccessManager.prepare(
+                        os.path.join(AccessManager.dirname(self.dim_path), path), dst)
+                    self.LOGGER.debug(f"Downloaded {path}")
+
+            download_needed_files("COMPONENT_PATH")
+            download_needed_files("DATASET_TN_PATH")
+            download_needed_files("DATASET_QL_PATH")
+            download_needed_files("DATA_FILE_PATH")
+
         coords = []
         # Calculate bbox
         for vertex in root.iter('Vertex'):

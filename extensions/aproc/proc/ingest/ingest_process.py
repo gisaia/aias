@@ -5,7 +5,7 @@ from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
-from airs.core.models.model import Asset, Item, Properties
+from airs.core.models.model import Asset, Item, MimeType, Properties
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -181,7 +181,7 @@ class AprocProcess(Process):
     @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
-            with open(asset.href, 'rb') as filedesc:
+            with AccessManager.stream(asset.href) as filedesc:
                 file = {'file': (asset.name, filedesc, asset.type)}
                 try:
                     r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
@@ -202,7 +202,7 @@ class AprocProcess(Process):
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": MimeType.JSON.value})
             if r.ok:
                 LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -215,10 +215,10 @@ class AprocProcess(Process):
         try:
             if item_already_exists:
                 LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
             else:
                 LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
             if r.ok:
                 LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return item_from_json(r.content)

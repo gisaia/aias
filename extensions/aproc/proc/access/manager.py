@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import os
 import shutil
 import tempfile
@@ -11,6 +12,7 @@ from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
 from extensions.aproc.proc.access.storages.https import HttpsStorage
+import smart_open
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
 
@@ -76,11 +78,13 @@ class AccessManager:
 
     # Will return a yield
     @staticmethod
-    def stream():
+    @contextmanager
+    def stream(href: str):
         """
         Reads the content of a file in a storage without downloading it.
         """
-        ...
+        with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as f:
+            yield f
 
     @staticmethod
     def get_rasterio_session(href: str):
@@ -105,7 +109,7 @@ class AccessManager:
             and storage.force_download
 
     @staticmethod
-    def prepare(href: str):
+    def prepare(href: str, dst: str | None = None):
         """Prepare the file to be processed locally
 
         Args:
@@ -116,10 +120,12 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
 
-        # If the storage is nit local, pull it
+        # If the storage is not local, pull it
         if storage.type != "file":
-            dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
-            storage.pull(href, dst)
+            if dst is None:
+                dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+
+            AccessManager.pull(href, dst)
             return dst
 
         return href
