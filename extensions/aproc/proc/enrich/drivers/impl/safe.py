@@ -93,9 +93,7 @@ class Driver(EnrichDriver):
             # Clean-up
             os.remove(tmp_file)
         else:
-            import smart_open
-
-            with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as fb:
+            with AccessManager.stream(href) as fb:
                 tci_file_path = self.__extract(fb)
 
         return tci_file_path

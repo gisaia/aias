@@ -46,7 +46,6 @@ class ImageDriverHelper:
             local_url = AccessManager.prepare(url)
             image = Image.open(local_url)
             image.thumbnail([size, size])
-            # TODO: might not work if href is not on local file storage
             image.save(asset.href, 'PNG')
             asset.size = AccessManager.get_file_size(asset.href)
             to_assets.append(asset)

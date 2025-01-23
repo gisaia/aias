@@ -82,7 +82,6 @@ class Driver(IngestDriver):
         inside_coord_3 = False
         inside_coord_4 = False
 
-        # TODO: replace by file streaming
         met_path = AccessManager.prepare(self.met_path)
         with open(met_path) as f:
             for line_1 in f:

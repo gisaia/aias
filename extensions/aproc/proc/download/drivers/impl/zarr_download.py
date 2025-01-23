@@ -73,7 +73,7 @@ class Driver(DownloadDriver):
             asset_href = f"file://{tmp_asset}"
         else:
             self.LOGGER.info("Streaming archive for Zarr creation.")
-            with smart_open.open(asset_href, "rb", transport_params=AccessManager.get_storage_parameters(asset_href)) as fb:
+            with AccessManager.stream(asset_href) as fb:
                 raster_files = self.__find_raster_files(fb)
 
         zarr_res = self.__get_zarr_resolution()
