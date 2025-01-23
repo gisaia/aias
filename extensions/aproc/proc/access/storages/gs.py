@@ -120,9 +120,9 @@ class GoogleStorage(AbstractStorage):
 
     def is_file(self, href: str):
         prefix = urlparse(href).path.removeprefix("/")
-        files, _ = self.__list_blobs(prefix=prefix)
+        files, dirs = self.__list_blobs(prefix=prefix)
 
-        return len(files) == 1 and files[0] == prefix
+        return len(files) > 0 and files[0] == prefix and len(dirs) == 0
 
     def __list_blobs(self, prefix: str) -> tuple[list[str], list[str]]:
         """
@@ -135,7 +135,7 @@ class GoogleStorage(AbstractStorage):
         prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
         files, dirs = self.__list_blobs(prefix)
 
-        return len(files) > 1 or len(dirs) > 0
+        return len(files) > 0 or len(dirs) > 0
 
     def get_file_size(self, href: str):
         return self.__get_blob(href).size
@@ -144,7 +144,7 @@ class GoogleStorage(AbstractStorage):
         prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
         files, dirs = self.__list_blobs(prefix)
 
-        return list(map(lambda b: b.split(prefix)[1], files))[1:] + \
+        return list(map(lambda b: b.split(prefix)[1], files)) + \
             list(map(lambda b: b.split(prefix)[1].strip("/"), dirs))
 
     def get_last_modification_time(self, href: str):

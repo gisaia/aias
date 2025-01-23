@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -245,10 +244,10 @@ class Driver(IngestDriver):
         for f in AccessManager.listdir(path):
             self.tif_path = os.path.join(path, f)
             if AccessManager.is_file(self.tif_path) and self.tif_path.lower().endswith((".tif", ".tiff")):
-                tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+                tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
                 if AccessManager.exists(tfw_path):
                     self.tfw_path = tfw_path
-                met_path = str(Path(self.tif_path).with_suffix(".tif.met"))
+                met_path = os.path.splitext(self.tif_path)[0] + ".tif.met"
                 if AccessManager.exists(met_path):
                     self.met_path = met_path
                 return self.tif_path is not None and self.met_path is not None

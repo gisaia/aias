@@ -4,10 +4,12 @@ RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
 
 COPY ./fam/requirements.txt /app/requirements.txt
+COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
 WORKDIR /app
 
 RUN pip install -r requirements.txt
+RUN pip install -r requirements.storage.txt
 
 COPY ./aproc /app/aproc
 COPY ./extensions /app/extensions

@@ -1,7 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -153,7 +152,7 @@ class Driver(IngestDriver):
                         self.thumbnail_path = os.path.join(path, file)
                     if file.endswith(".tif") and file.find("browse") < 0 and file.find("_udm") < 0:
                         self.tif_path = os.path.join(path, file)
-                        tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+                        tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
                         if AccessManager.exists(tfw_path):
                             self.tfw_path = tfw_path
                     if file.endswith("_metadata.xml"):

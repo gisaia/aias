@@ -12,7 +12,6 @@ from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
 from extensions.aproc.proc.access.storages.https import HttpsStorage
-import smart_open
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
 
@@ -83,6 +82,8 @@ class AccessManager:
         """
         Reads the content of a file in a storage without downloading it.
         """
+        import smart_open
+
         with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as f:
             yield f
 

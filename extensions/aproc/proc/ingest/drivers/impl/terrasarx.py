@@ -1,7 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -174,7 +173,7 @@ class Driver(IngestDriver):
                                 for file in AccessManager.listdir(os.path.join(path, folder)):
                                     if file.endswith(".tif"):
                                         self.tif_path = os.path.join(path, folder, file)
-                                        tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+                                        tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
                                         if AccessManager.exists(tfw_path):
                                             self.tfw_path = tfw_path
                     return self.met_path is not None and self.tif_path is not None and self.browse_path is not None

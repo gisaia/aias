@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -185,7 +184,7 @@ class Driver(IngestDriver):
         path = AccessManager.dirname(file_path)
         if AccessManager.is_file(file_path) and file_name.endswith(".tif"):
             self.tif_path = file_path
-            tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+            tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
             if AccessManager.exists(tfw_path):
                 self.tfw_path = tfw_path
             self.file_name = file_name

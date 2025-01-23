@@ -1,7 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from pathlib import Path
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -187,7 +186,7 @@ class Driver(IngestDriver):
             h5pdf_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.pdf"
             if AccessManager.is_file(h5pdf_path):
                 self.h5pdf_path = h5pdf_path
-            tfw_path = str(Path(self.tif_path).with_suffix(".tfw"))
+            tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
             if AccessManager.exists(tfw_path):
                 self.tfw_path = tfw_path
             return (
