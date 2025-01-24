@@ -196,3 +196,8 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
         return storage.dirname(href)
+
+
+LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
+Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
+AccessManager.init()

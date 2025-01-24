@@ -14,7 +14,6 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
-from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
@@ -68,8 +67,6 @@ class AprocProcess(Process):
         AprocProcess.input_model = InputEnrichProcess
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
-
-        AccessManager.init()
 
     @staticmethod
     def get_process_description() -> ProcessDescription:

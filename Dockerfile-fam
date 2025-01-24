@@ -19,10 +19,12 @@ COPY ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
 COPY ./common /app/common
 COPY ./conf/fam.yaml /app/conf/
 COPY ./conf/drivers.yaml /app/conf/
+COPY ./conf/aproc.yaml /app/conf/
 
 COPY ./scripts/fam/start.sh /app/
 
 EXPOSE 8005
 
+ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:/app
 ENTRYPOINT ["./start.sh"]

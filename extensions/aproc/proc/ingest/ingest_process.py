@@ -73,8 +73,6 @@ class AprocProcess(Process):
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
-        AccessManager.init()
-
     @staticmethod
     def get_process_description() -> ProcessDescription:
         return description
