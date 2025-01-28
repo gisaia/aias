@@ -114,7 +114,7 @@ class AprocProcess(Process):
             Notifications.report(None, DownloadConfiguration.settings.email_request_subject_admin, DownloadConfiguration.settings.email_request_content_admin, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context)
             Notifications.report(None, DownloadConfiguration.settings.email_request_subject_user, DownloadConfiguration.settings.email_request_content_user, to=[send_to], context=mail_context)
             # RGPD : log level is info
-            LOGGER.debug("checking for download request {}/{} for {}".format(collection, item_id, send_to))
+            LOGGER.debug("checking for item access {}/{} for {}".format(collection, item_id, send_to))
             item: Item = AprocProcess.__get_item_from_arlas__(collection=collection, item_id=item_id, headers=headers)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
