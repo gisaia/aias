@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 class AbstractStorage(BaseModel, ABC):
     type: Any
+    is_local: bool
 
     @abstractmethod
     def get_storage_parameters(self) -> dict:
@@ -150,3 +151,12 @@ class AbstractStorage(BaseModel, ABC):
             href(str): The href to examine
         """
         return os.path.dirname(href)
+
+    @abstractmethod
+    def clean(self, href: str):
+        """If authorized, remove the given file
+
+        Args:
+            href(str): The href to delete
+        """
+        ...

@@ -97,59 +97,30 @@ class Driver(IngestDriver):
         from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         setup_gdal()
 
-        dim_path = AccessManager.prepare(self.dim_path)
-        tree = ET.parse(dim_path)
-        root = tree.getroot()
-
-        # If we get the archive NOT locally, then we need to retrieve the files referenced and put them in the right spot
-        storage = AccessManager.resolve_storage(self.dim_path)
-        if storage.type != "file":
-            def download_needed_files(node: str):
-                for vertex in root.iter(node):
-                    path = vertex.attrib["href"]
-                    dst = os.path.join(AccessManager.tmp_dir, path)
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-
-                    AccessManager.prepare(
-                        os.path.join(AccessManager.dirname(self.dim_path), path), dst)
-                    self.LOGGER.debug(f"Downloaded {path}")
-
-            download_needed_files("COMPONENT_PATH")
-            download_needed_files("DATASET_TN_PATH")
-            download_needed_files("DATASET_QL_PATH")
-            download_needed_files("DATA_FILE_PATH")
-
-        coords = []
-        # Calculate bbox
-        for vertex in root.iter('Vertex'):
-            coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
-            coords.append(coord)
-        geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
-                                                          coords[2][0], coords[2][1], coords[3][0], coords[3][1])
-
         # Open ROI GML file to find the real footprint of the product
-        roi_path = AccessManager.prepare(self.roi_path)
-        ogr_d = ogr.GetDriverByName("GML")
-        component_source = ogr_d.Open(roi_path, 0)  # read-only
-        layer = component_source.GetLayer()
-        component_feature = layer.GetNextFeature()
-        geo_ref = component_feature.GetGeometryRef()
-        in_spatial_ref_code = None
-        if geo_ref is not None and geo_ref.GetSpatialReference() is not None:
-            if geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS") is not None:
-                in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS")
-            elif geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS") is not None:
-                in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS")
-        else:
-            # Find epsg in reading directly the GML File
-            tree_gml = ET.parse(roi_path)
-            root_gml = tree_gml.getroot()
-            for srs in root_gml.iter():
-                if len(srs.items()) > 0 and srs.items()[0][0] == "srsName":
-                    # We suppose to the first word in the srs expression is the EPSG code
-                    # Because the string in the GML is not a classic SRS expression
-                    in_spatial_ref_code = srs.items()[0][1].split(" ")[0]
-                    break
+        with AccessManager.make_local(self.roi_path) as local_roi_path:
+            ogr_d = ogr.GetDriverByName("GML")
+            component_source = ogr_d.Open(local_roi_path, 0)  # read-only
+            layer = component_source.GetLayer()
+            component_feature = layer.GetNextFeature()
+            geo_ref = component_feature.GetGeometryRef()
+            in_spatial_ref_code = None
+            if geo_ref is not None and geo_ref.GetSpatialReference() is not None:
+                if geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS") is not None:
+                    in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("PROJCS")
+                elif geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS") is not None:
+                    in_spatial_ref_code = geo_ref.GetSpatialReference().GetAuthorityCode("GEOGCS")
+            else:
+                # Find epsg in reading directly the GML File
+                tree_gml = ET.parse(local_roi_path)
+                root_gml = tree_gml.getroot()
+                for srs in root_gml.iter():
+                    if len(srs.items()) > 0 and srs.items()[0][0] == "srsName":
+                        # We suppose to the first word in the srs expression is the EPSG code
+                        # Because the string in the GML is not a classic SRS expression
+                        in_spatial_ref_code = srs.items()[0][1].split(" ")[0]
+                        break
+
         component_geometry = component_feature.geometry()
         # output SpatialReference
         if in_spatial_ref_code is not None and in_spatial_ref_code.isdigit() and int(in_spatial_ref_code) != 4326:
@@ -167,9 +138,45 @@ class Driver(IngestDriver):
             centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
             centroid = [float(centroid_geom_list[2]), float(centroid_geom_list[1])]
 
-        # Open the XML dimap file with gdal to retrieve the metadata
-        src_ds = gdal.Open(dim_path, GA_ReadOnly)
-        metadata = src_ds.GetMetadata()
+        with AccessManager.make_local(self.dim_path) as local_dim_path:
+            tree = ET.parse(local_dim_path)
+            root = tree.getroot()
+
+            coords = []
+            # Calculate bbox
+            for vertex in root.iter('Vertex'):
+                coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
+                coords.append(coord)
+            geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
+                                                              coords[2][0], coords[2][1], coords[3][0], coords[3][1])
+
+            # If we get the archive NOT locally, then we need to retrieve the files referenced and put them in the right spot
+            # In order for GDAL to be able to properly open the dim file
+            files_to_make_local = []
+            desired_local_path = []
+
+            storage = AccessManager.resolve_storage(self.dim_path)
+            if not storage.is_local:
+                def list_needed_files(node: str):
+                    for vertex in root.iter(node):
+                        path = vertex.attrib["href"]
+
+                        dst = os.path.join(AccessManager.tmp_dir, path)
+                        # Makedir to prepare for AccessManager.make_local
+                        os.makedirs(os.path.dirname(dst), exist_ok=True)
+
+                        files_to_make_local.append(os.path.join(AccessManager.dirname(self.dim_path), path))
+                        desired_local_path.append(dst)
+
+                list_needed_files("COMPONENT_PATH")
+                list_needed_files("DATASET_TN_PATH")
+                list_needed_files("DATASET_QL_PATH")
+                list_needed_files("DATA_FILE_PATH")
+
+            # Open the XML dimap file with gdal to retrieve the metadata
+            with AccessManager.make_local_list(files_to_make_local, desired_local_path):
+                src_ds = gdal.Open(local_dim_path, GA_ReadOnly)
+                metadata = src_ds.GetMetadata()
         # We retrieve the time
         if "IMAGING_DATE" in metadata and "IMAGING_TIME" in metadata:
             date = metadata["IMAGING_DATE"]
@@ -233,11 +240,6 @@ class Driver(IngestDriver):
             item.properties.sensor = metadata["DATASET_PRODUCER_NAME"]
         if "MISSION_INDEX" in metadata:
             item.properties.sensor_type = metadata["MISSION_INDEX"]
-
-        if dim_path != self.dim_path:
-            os.remove(dim_path)
-        if roi_path != self.roi_path:
-            os.remove(roi_path)
 
         return item
 

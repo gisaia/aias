@@ -47,26 +47,22 @@ class Driver(IngestDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
-            # Prepare file to retrieve to proceed in local storage
-            browse_path = AccessManager.prepare(self.browse_path)
-            thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
-            os.makedirs(thumbnail_path, exist_ok=True)
-            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-            geotiff_to_jpg(browse_path, 50, 50, self.thumbnail_path)
-            assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+            with AccessManager.make_local(self.browse_path) as local_browse_path:
+                thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
+                os.makedirs(thumbnail_path, exist_ok=True)
+                self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+                geotiff_to_jpg(local_browse_path, 50, 50, self.thumbnail_path)
+                assets.append(Asset(href=self.thumbnail_path,
+                                    roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
+                                    description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
 
-            quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
-            os.makedirs(quicklook_path, exist_ok=True)
-            self.quicklook_path = quicklook_path + '/quicklook.jpg'
-            geotiff_to_jpg(browse_path, 250, 250, self.quicklook_path)
-            assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-
-            if browse_path != self.browse_path:
-                os.remove(browse_path)
+                quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
+                os.makedirs(quicklook_path, exist_ok=True)
+                self.quicklook_path = quicklook_path + '/quicklook.jpg'
+                geotiff_to_jpg(local_browse_path, 250, 250, self.quicklook_path)
+                assets.append(Asset(href=self.quicklook_path,
+                                    roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
+                                    description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
 
         assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
@@ -104,9 +100,9 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        met_path = AccessManager.prepare(self.met_path)
-        tree = ET.parse(met_path)
-        root = tree.getroot()
+        with AccessManager.make_local(self.met_path) as local_met_path:
+            tree = ET.parse(local_met_path)
+            root = tree.getroot()
         ul_lat = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 0)
         ul_lon = self.__get_coord__(root, self.prefix_key, "Top_Left_Geodetic_Coordinates", 1)
         ur_lat = self.__get_coord__(root, self.prefix_key, "Top_Right_Geodetic_Coordinates", 0)
@@ -131,35 +127,31 @@ class Driver(IngestDriver):
 
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        tif_path = AccessManager.prepare(self.tif_path)
-        src_ds = gdal.Open(tif_path, GA_ReadOnly)
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=instrument,
-                constellation="COSMO-SkyMed",
-                sensor=sensor,
-                sensor_type="SAR",
-                view__incidence_angle=view__incidence_angle,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.csk.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                observation_type=ObservationType.radar.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
 
-        if tif_path != self.tif_path:
-            os.remove(tif_path)
-        if met_path != self.met_path:
-            os.remove(met_path)
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    processing__level=processing__level,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=instrument,
+                    constellation="COSMO-SkyMed",
+                    sensor=sensor,
+                    sensor_type="SAR",
+                    view__incidence_angle=view__incidence_angle,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.csk.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    observation_type=ObservationType.radar.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
 
         return item
 

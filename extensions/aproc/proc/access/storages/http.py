@@ -12,6 +12,7 @@ from extensions.aproc.proc.access.storages.utils import (requests_exists,
 
 class HttpStorage(AbstractStorage):
     type: Literal["http"] = "http"
+    is_local: Literal[False] = False
     headers: dict[str, str] = Field(default={})
     domain: str
     force_download: bool = Field(default=False)
@@ -57,6 +58,9 @@ class HttpStorage(AbstractStorage):
         # There is no difference in HTTP(S) between last update and creation date
         return self.get_last_modification_time(href)
 
-    def makedir(self, href, strict=False):
+    def makedir(self, href: str, strict=False):
         if strict:
             raise NotImplementedError(f"It is not possible to create the folder with {self.type} protocol")
+
+    def clean(self, href: str):
+        raise NotImplementedError(f"It is not possible to delete a file with {self.type} protocol")

@@ -82,47 +82,47 @@ class Driver(IngestDriver):
         inside_coord_3 = False
         inside_coord_4 = False
 
-        met_path = AccessManager.prepare(self.met_path)
-        with open(met_path) as f:
-            for line_1 in f:
-                if inside_component_section:
-                    self.__set_lat_lon(d, line_1, inside_coord_1, 1)
-                    self.__set_lat_lon(d, line_1, inside_coord_2, 2)
-                    self.__set_lat_lon(d, line_1, inside_coord_3, 3)
-                    self.__set_lat_lon(d, line_1, inside_coord_4, 4)
-                    self.__get_field__(d, line_1, 'Product Image ID')
-                    self.__get_field__(d, line_1, 'Pixel Size X')
-                    self.__get_field__(d, line_1, 'Pixel Size Y')
-                    self.__get_field__(d, line_1, 'Percent Component Cloud Cover', True)
-                    if line_1.find('Coordinate: 1') >= 0:
-                        inside_coord_1 = True
-                        inside_coord_4 = False
-                    if line_1.find('Coordinate: 2') >= 0:
-                        inside_coord_2 = True
-                        inside_coord_1 = False
-                    if line_1.find('Coordinate: 3') >= 0:
-                        inside_coord_3 = True
-                        inside_coord_2 = False
-                    if line_1.find('Coordinate: 4') >= 0:
-                        inside_coord_4 = True
-                        inside_coord_3 = False
-                    if line_1.find('Percent Component Cloud Cover') >= 0:
-                        break
-                if line_1.find('Component ID: ' + self.component_id) >= 0:
-                    inside_component_section = True
+        with AccessManager.make_local(self.met_path) as local_met_path:
+            with open(local_met_path) as f:
+                for line_1 in f:
+                    if inside_component_section:
+                        self.__set_lat_lon(d, line_1, inside_coord_1, 1)
+                        self.__set_lat_lon(d, line_1, inside_coord_2, 2)
+                        self.__set_lat_lon(d, line_1, inside_coord_3, 3)
+                        self.__set_lat_lon(d, line_1, inside_coord_4, 4)
+                        self.__get_field__(d, line_1, 'Product Image ID')
+                        self.__get_field__(d, line_1, 'Pixel Size X')
+                        self.__get_field__(d, line_1, 'Pixel Size Y')
+                        self.__get_field__(d, line_1, 'Percent Component Cloud Cover', True)
+                        if line_1.find('Coordinate: 1') >= 0:
+                            inside_coord_1 = True
+                            inside_coord_4 = False
+                        if line_1.find('Coordinate: 2') >= 0:
+                            inside_coord_2 = True
+                            inside_coord_1 = False
+                        if line_1.find('Coordinate: 3') >= 0:
+                            inside_coord_3 = True
+                            inside_coord_2 = False
+                        if line_1.find('Coordinate: 4') >= 0:
+                            inside_coord_4 = True
+                            inside_coord_3 = False
+                        if line_1.find('Percent Component Cloud Cover') >= 0:
+                            break
+                    if line_1.find('Component ID: ' + self.component_id) >= 0:
+                        inside_component_section = True
 
-        with open(met_path) as f_2:
-            for line_2 in f_2:
-                self.__get_field__(d, line_2, 'Sensor Type')
-                self.__get_field__(d, line_2, 'Processing Level')
-                if inside_product_image_section:
-                    self.__get_field__(d, line_2, 'Sensor')
-                    self.__get_field__(d, line_2, 'Scan Azimuth')
-                    self.__get_field__(d, line_2, 'Sun Angle Azimuth')
-                    self.__get_field__(d, line_2, 'Sun Angle Elevation')
-                    self.__get_date_field__(d, line_2)
-                if line_2.find('Product Image ID: ' + d['Product Image ID']) >= 0:
-                    inside_product_image_section = True
+            with open(local_met_path) as f_2:
+                for line_2 in f_2:
+                    self.__get_field__(d, line_2, 'Sensor Type')
+                    self.__get_field__(d, line_2, 'Processing Level')
+                    if inside_product_image_section:
+                        self.__get_field__(d, line_2, 'Sensor')
+                        self.__get_field__(d, line_2, 'Scan Azimuth')
+                        self.__get_field__(d, line_2, 'Sun Angle Azimuth')
+                        self.__get_field__(d, line_2, 'Sun Angle Elevation')
+                        self.__get_date_field__(d, line_2)
+                    if line_2.find('Product Image ID: ' + d['Product Image ID']) >= 0:
+                        inside_product_image_section = True
 
         geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'], d['lat_1'], d['lon_2'], d['lat_2'], d['lon_3'], d['lat_3'], d['lon_4'], d['lat_4'])
         x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
@@ -141,39 +141,35 @@ class Driver(IngestDriver):
 
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        tif_path = AccessManager.prepare(self.tif_path)
-        src_ds = gdal.Open(tif_path, GA_ReadOnly)
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                processing__level=processing__level,
-                eo__cloud_cover=eo__cloud_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=instrument,
-                constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.geoeye.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
 
-        if tif_path != self.tif_path:
-            os.remove(tif_path)
-        if met_path != self.met_path:
-            os.remove(met_path)
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    processing__level=processing__level,
+                    eo__cloud_cover=eo__cloud_cover,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=instrument,
+                    constellation=constellation,
+                    sensor=sensor,
+                    sensor_type=sensor_type,
+                    view__azimuth=view__azimuth,
+                    view__sun_azimuth=view__sun_azimuth,
+                    view__sun_elevation=view__sun_elevation,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.geoeye.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.image.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
 
         return item
 

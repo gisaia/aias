@@ -77,54 +77,52 @@ class Driver(IngestDriver):
         from osgeo.gdalconst import GA_ReadOnly
         setup_gdal()
 
-        dim_path = self.dim_path
-        tree = ET.parse(dim_path)
-        root = tree.getroot()
-        coords = []
-        # Get geometry, bbox, centroid
-        for vertex in root.iter('Vertex'):
-            coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
-            coords.append(coord)
-        geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
-                                                          coords[2][0], coords[2][1], coords[3][0], coords[3][1])
-        if root.find('./Geoposition/Geoposition_Insert/XDIM') and root.find('./Geoposition/Geoposition_Insert/YDIM'):
-            gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
-        else:
-            gsd = None
-        src_ds = gdal.Open(dim_path, GA_ReadOnly)
-        metadata = src_ds.GetMetadata()
-        # We retrieve the time
-        date = metadata["IMAGING_DATE"]
-        time = metadata["IMAGING_TIME"]
-        date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                processing__level=metadata.get("PROCESSING_LEVEL"),
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=metadata.get("INSTRUMENT"),
-                constellation=metadata.get("MISSION"),
-                sensor=metadata.get("MISSION"),
-                sensor_type=metadata.get("MISSION_INDEX"),
-                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
-                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
-                view__sun_elevation=metadata.get("SUN_ELEVATION"),
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.spot5.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
+        with AccessManager.make_local(self.dim_path) as local_dim_path:
+            tree = ET.parse(local_dim_path)
+            root = tree.getroot()
+            coords = []
+            # Get geometry, bbox, centroid
+            for vertex in root.iter('Vertex'):
+                coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
+                coords.append(coord)
+            geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
+                                                              coords[2][0], coords[2][1], coords[3][0], coords[3][1])
+            if root.find('./Geoposition/Geoposition_Insert/XDIM') and root.find('./Geoposition/Geoposition_Insert/YDIM'):
+                gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
+            else:
+                gsd = None
+            src_ds = gdal.Open(local_dim_path, GA_ReadOnly)
+            metadata = src_ds.GetMetadata()
+            # We retrieve the time
+            date = metadata["IMAGING_DATE"]
+            time = metadata["IMAGING_TIME"]
+            date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    processing__level=metadata.get("PROCESSING_LEVEL"),
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=metadata.get("INSTRUMENT"),
+                    constellation=metadata.get("MISSION"),
+                    sensor=metadata.get("MISSION"),
+                    sensor_type=metadata.get("MISSION_INDEX"),
+                    view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
+                    view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
+                    view__sun_elevation=metadata.get("SUN_ELEVATION"),
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.spot5.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.image.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
 
-        if dim_path != self.dim_path:
-            os.remove(dim_path)
         return item
 
     def __check_path__(self, path: str):

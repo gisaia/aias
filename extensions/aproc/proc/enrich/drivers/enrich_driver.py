@@ -31,7 +31,6 @@ class EnrichDriver(AbstractDriver):
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
         assets_dir = os.path.sep.join([self.assets_dir, unique])
 
-        # No need to create the dirs in
         AccessManager.makedir(self.assets_dir)
         AccessManager.makedir(assets_dir)
         return assets_dir
@@ -46,8 +45,8 @@ class EnrichDriver(AbstractDriver):
         Returns:
             str: the path to the file for storing the asset's file
         """
-        dir = self.get_assets_dir(url)
-        return os.path.sep.join([dir, asset.name])
+        assets_dir = self.get_assets_dir(url)
+        return os.path.sep.join([assets_dir, asset.name])
 
     def get_asset_href(self, item: Item) -> str | None:
         if self.alternative_asset_href_field:

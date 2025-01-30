@@ -71,7 +71,7 @@ class Driver(EnrichDriver):
                 kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
                 gdal.Warp(asset_location, tci_file_path, **kwargs)
                 self.LOGGER.info("Creating COG took {} s".format(time() - start))
-                os.remove(tci_file_path)
+                os.remove(tci_file_path)  # !DELETE!
             else:
                 raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
         else:
@@ -91,7 +91,7 @@ class Driver(EnrichDriver):
             tci_file_path = self.__extract(tmp_file)
 
             # Clean-up
-            os.remove(tmp_file)
+            os.remove(tmp_file)  # !DELETE!
         else:
             with AccessManager.stream(href) as fb:
                 tci_file_path = self.__extract(fb)

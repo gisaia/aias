@@ -52,7 +52,6 @@ class Driver(DownloadDriver):
         import rasterio.enums
         import rasterio.warp
         import rioxarray
-        import smart_open
         import xarray as xr
 
         asset_href = self.get_asset_href(item)
@@ -125,7 +124,7 @@ class Driver(DownloadDriver):
                     extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
                             target_projection, "/".join(tmp_files[ri].split("/")[:-1]),
                             tmp_files[ri].split("/")[-1])
-                os.remove(temporary_raster.name)
+                os.remove(temporary_raster.name)  # !DELETE!
 
         zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
@@ -146,9 +145,9 @@ class Driver(DownloadDriver):
             .close()
 
         for f in tmp_files:
-            os.remove(f)
+            os.remove(f)  # !DELETE!
         if tmp_asset:
-            os.remove(tmp_asset)
+            os.remove(tmp_asset)  # !DELETE!
 
         archive_path = zarr_path + ".tar"
         with tarfile.open(archive_path, "w") as tar:

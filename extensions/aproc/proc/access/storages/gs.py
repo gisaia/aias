@@ -44,6 +44,7 @@ class GoogleStorageApiKey(BaseModel):
 
 class GoogleStorage(AbstractStorage):
     type: Literal["gs"] = "gs"
+    is_local: Literal[False] = False
     bucket: str
     api_key: GoogleStorageApiKey | None = Field(default=None)
 
@@ -155,6 +156,9 @@ class GoogleStorage(AbstractStorage):
         creation_time = self.__get_blob(href).time_created
         return creation_time.timestamp() if creation_time is not None else None
 
-    def makedir(self, href, strict=False):
+    def makedir(self, href: str, strict=False):
         if strict:
             raise NotImplementedError("It is not possible to create the folder on Google Storage")
+
+    def clean(self, href: str):
+        raise NotImplementedError("It is not possible to delete a file on Google Storage")

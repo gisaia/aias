@@ -111,8 +111,8 @@ class Driver(IngestDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         import pvl
 
-        met_path = AccessManager.prepare(self.met_path)
-        data = pvl.load(met_path)
+        with AccessManager.make_local(self.met_path) as local_met_path:
+            data = pvl.load(local_met_path)
 
         ul_lat = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLATITUDE"))
         ul_lon = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLONGITUDE"))
@@ -203,38 +203,33 @@ class Driver(IngestDriver):
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
 
-        tif_path = AccessManager.prepare(self.tif_path)
-        src_ds = gdal.Open(tif_path, GA_ReadOnly)
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
 
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=instrument,
-                constellation=constellation,
-                sensor=sensor,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.ast_dem.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.dem.value,
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets)),
-        )
-
-        if met_path != self.met_path:
-            os.remove(met_path)
-        if tif_path != self.tif_path:
-            os.remove(tif_path)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    eo__cloud_cover=eo__cloud_cover,
+                    processing__level=processing__level,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=instrument,
+                    constellation=constellation,
+                    sensor=sensor,
+                    view__sun_azimuth=view__sun_azimuth,
+                    view__sun_elevation=view__sun_elevation,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.ast_dem.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.dem.value,
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets)),
+            )
 
         return item
 

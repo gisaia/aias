@@ -81,9 +81,9 @@ class Driver(IngestDriver):
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         from osgeo import ogr
-        xml_path = AccessManager.prepare(self.xml_path)
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
+        with AccessManager.make_local(self.xml_path) as local_xml_path:
+            tree = ET.parse(local_xml_path)
+            root = tree.getroot()
 
         # Calculate bbox
         ul_lat = float(root.find("./TIL/TILE/ULLAT").text)
@@ -102,19 +102,18 @@ class Driver(IngestDriver):
             for file in AccessManager.listdir(os.path.join(d, "GIS_FILES")):
                 if file.endswith("_ORDER_SHAPE.shp"):
                     setup_gdal()
-                    order_shape_file = AccessManager.prepare(os.path.join(d, "GIS_FILES", file))
-                    ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
-                    component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
-                    layer = component_source.GetLayer()
-                    component_feature = layer.GetNextFeature()
-                    component_geometry = component_feature.geometry()
-                    geometry = component_feature.ExportToJson(as_object=True)["geometry"]
-                    centroid_geom = component_geometry.Centroid()
+
+                    with AccessManager.make_local(os.path.join(d, "GIS_FILES", file)) as order_shape_file:
+                        ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
+                        component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
+                        layer = component_source.GetLayer()
+                        component_feature = layer.GetNextFeature()
+                        component_geometry = component_feature.geometry()
+                        geometry = component_feature.ExportToJson(as_object=True)["geometry"]
+                        centroid_geom = component_geometry.Centroid()
+
                     centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
                     centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
-
-                    if order_shape_file != os.path.join(d, "GIS_FILES", file):
-                        os.remove(order_shape_file)
                     break
 
         date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
@@ -138,39 +137,35 @@ class Driver(IngestDriver):
 
         from osgeo import gdal
         from osgeo.gdalconst import GA_ReadOnly
-        tif_path = AccessManager.prepare(self.tif_path)
-        src_ds = gdal.Open(tif_path, GA_ReadOnly)
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=constellation,
-                constellation=constellation,
-                sensor=constellation,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.digitalglobe.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
+
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    processing__level=processing__level,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=constellation,
+                    constellation=constellation,
+                    sensor=constellation,
+                    view__azimuth=view__azimuth,
+                    view__sun_azimuth=view__sun_azimuth,
+                    view__sun_elevation=view__sun_elevation,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.digitalglobe.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.image.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
         if eo__cloud_cover != -999000.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
-
-        if xml_path != self.xml_path:
-            os.remove(xml_path)
-        if tif_path != self.tif_path:
-            os.remove(tif_path)
 
         return item
 

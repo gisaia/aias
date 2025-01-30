@@ -17,6 +17,7 @@ class AccessType(enum.Enum):
 
 class FileStorage(AbstractStorage):
     type: Literal["file"] = "file"
+    is_local: Literal[True] = True
     writable_paths: list[str] = Field(default=[])
     readable_paths: list[str] = Field(default=[])
 
@@ -73,3 +74,9 @@ class FileStorage(AbstractStorage):
     # @override
     def dirname(self, href: str):
         return os.path.dirname(os.path.abspath(href))
+
+    def clean(self, href: str):
+        if self.is_path_authorized(href, AccessType.WRITE):
+            os.remove(href)  # !DELETE!
+        else:
+            raise ValueError("The given path is read-only")

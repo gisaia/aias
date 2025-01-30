@@ -77,9 +77,9 @@ class Driver(IngestDriver):
               "eop": "http://earth.esa.int/eop",
               "opt": "http://earth.esa.int/opt"}
 
-        xml_path = AccessManager.prepare(self.xml_path)
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
+        with AccessManager.make_local(self.xml_path) as local_xml_path:
+            tree = ET.parse(local_xml_path)
+            root = tree.getroot()
         ul_lat = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topLeft/re:latitude", ns).text)
         ul_lon = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topLeft/re:longitude", ns).text)
         ur_lat = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topRight/re:latitude", ns).text)
@@ -106,40 +106,36 @@ class Driver(IngestDriver):
         gsd_row = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", ns).text)
         gsd = (gsd_col + gsd_row) / 2
 
-        tif_path = AccessManager.prepare(self.tif_path)
-        src_ds = gdal.Open(tif_path, GA_ReadOnly)
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=instrument,
-                constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__azimuth=view__azimuth,
-                view__incidence_angle=view__incidence_angle,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.rapideye.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    eo__cloud_cover=eo__cloud_cover,
+                    processing__level=processing__level,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=instrument,
+                    constellation=constellation,
+                    sensor=sensor,
+                    sensor_type=sensor_type,
+                    view__azimuth=view__azimuth,
+                    view__incidence_angle=view__incidence_angle,
+                    view__sun_azimuth=view__sun_azimuth,
+                    view__sun_elevation=view__sun_elevation,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.rapideye.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.image.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
 
-        if xml_path != self.xml_path:
-            os.remove(xml_path)
-        if tif_path != self.tif_path:
-            os.remove(tif_path)
         return item
 
     def __check_path__(self, path: str):

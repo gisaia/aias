@@ -68,30 +68,29 @@ class Driver(DownloadDriver):
         extract(images, crop_wkt, met_file, driver_target, target_projection, target_directory, target_file_name)
 
     def get_dimap_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
-        href = AccessManager.prepare(href)
+        with AccessManager.make_local(href) as local_href:
+            dir_name = os.path.dirname(local_href)
+            tree = ET.parse(local_href)
+            root = tree.getroot()
+            files_elements = root.findall('./Raster_Data/Data_Access/Data_Files/Data_File/DATA_FILE_PATH')
 
-        dir_name = os.path.dirname(href)
-        tree = ET.parse(href)
-        root = tree.getroot()
-        files_elements = root.findall('./Raster_Data/Data_Access/Data_Files/Data_File/DATA_FILE_PATH')
+            georef_file_extension = '.TFW'
+            if extension == '.JP2':
+                georef_file_extension = '.J2W'
 
-        georef_file_extension = '.TFW'
-        if extension == '.JP2':
-            georef_file_extension = '.J2W'
+            files = list(map(lambda f: [os.path.join(dir_name, f.attrib["href"]),
+                                        f.attrib["href"],
+                                        os.path.join(dir_name, os.path.splitext(f.attrib["href"])[0] + georef_file_extension),
+                                        os.path.splitext(f.attrib["href"])[0] + georef_file_extension], files_elements))
 
-        files = list(map(lambda f: [os.path.join(dir_name, f.attrib["href"]),
-                                    f.attrib["href"],
-                                    os.path.join(dir_name, os.path.splitext(f.attrib["href"])[0] + georef_file_extension),
-                                    os.path.splitext(f.attrib["href"])[0] + georef_file_extension], files_elements))
         return files
 
     def get_terrasarx_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
-        href = AccessManager.prepare(href)
-
-        dir_name = os.path.dirname(href)
-        tree = ET.parse(href)
-        root = tree.getroot()
-        files_elements = root.findall('.productComponents/imageData/file/location')
+        with AccessManager.make_local(href) as local_href:
+            dir_name = os.path.dirname(local_href)
+            tree = ET.parse(local_href)
+            root = tree.getroot()
+            files_elements = root.findall('.productComponents/imageData/file/location')
 
         georef_file_extension = '.TFW'
         if extension == '.JP2':
@@ -102,6 +101,7 @@ class Driver(DownloadDriver):
             files.append([os.path.join(dir_name, f[0], f[1]), f[1],
                           os.path.join(dir_name, f[0], os.path.splitext(f[1])[0] + georef_file_extension),
                           os.path.splitext(f[1])[0] + georef_file_extension])
+
         return files
 
     def copy_from_dimap(self, href: str, target_directory: str, extension: str):

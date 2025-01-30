@@ -1,7 +1,6 @@
-from contextlib import contextmanager
 import os
 import shutil
-import tempfile
+from contextlib import contextmanager
 from typing import Annotated, Union
 
 from pydantic import Field
@@ -77,7 +76,6 @@ class AccessManager:
 
         storage.pull(href, dst)
 
-    # Will return a yield
     @staticmethod
     @contextmanager
     def stream(href: str):
@@ -112,8 +110,9 @@ class AccessManager:
             and storage.force_download
 
     @staticmethod
-    def prepare(href: str, dst: str | None = None):
-        """Prepare the file to be processed locally
+    @contextmanager
+    def make_local(href: str, dst: str | None = None):
+        """Prepare the file to be processed locally. Once the file has been used, if it has been pulled, deletes it.
 
         Args:
             href (str): Href (local or not) of the file
@@ -124,23 +123,70 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         # If the storage is not local, pull it
-        if storage.type != "file":
+        if not storage.is_local:
             if dst is None:
                 dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
 
             AccessManager.pull(href, dst)
-            return dst
+            try:
+                yield dst
+            finally:
+                AccessManager.clean(dst)  # !DELETE!
+        else:
+            yield href
 
-        return href
+    @staticmethod
+    @contextmanager
+    def make_local_list(href_list: list[str], dst_list: list[str | None] | None = None):
+        """Prepare a list of files to make them available locally for further processing.
+           Once used, the file is deleted if it has been pulled
+        """
+        # Check that the input lists match each other length
+        if dst_list is not None and len(href_list) != len(dst_list):
+            raise ValueError("Input href and dst must have the same length")
+        if dst_list is None:
+            dst_list = [None for _ in href_list]
+
+        # For each of the input pair of (href, dst), check if the corresponding storage is local
+        # If not, pull it, store dst and tag the iteration as pulled. Otherwise, store href and tag as not pulled.
+        # Once all local, will yield the list of local paths
+        # Cleanup will only remove the files that were pulled
+        local_href_list = []
+        was_pulled = []
+        try:
+            for href, dst in zip(href_list, dst_list):
+                storage = AccessManager.resolve_storage(href)
+
+                if not storage.is_local:
+                    if dst is None:
+                        dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+
+                    AccessManager.pull(href, dst)
+                    local_href_list.append(dst)
+                    was_pulled.append(True)
+                else:
+                    local_href_list.append(href)
+                    was_pulled.append(False)
+            yield local_href_list
+        finally:
+            for pulled, local_href in zip(was_pulled, local_href_list):
+                if pulled:
+                    AccessManager.clean(local_href)  # !DELETE!
+
+    @staticmethod
+    def clean(href: str):
+        try:
+            storage = AccessManager.resolve_storage(href)
+            storage.clean(href)  # !DELETE!
+        except Exception:
+            LOGGER.warning(f"Unable to remove file {href}")
 
     @staticmethod
     def zip(href: str, zip_path: str):
-        # For all storages but FileStorage, files need to be pulled before being processed
-        href = AccessManager.prepare(href)
-
-        # Get direct parent folder of href_file to zip
-        dir_name = os.path.dirname(href)
-        shutil.make_archive(zip_path, 'zip', dir_name)
+        with AccessManager.make_local(href) as local_href:
+            # Get direct parent folder of href_file to zip
+            dir_name = os.path.dirname(local_href)
+            shutil.make_archive(zip_path, 'zip', dir_name)
 
     @staticmethod
     def is_file(href: str):
@@ -156,13 +202,13 @@ class AccessManager:
 
     @staticmethod
     def get_file_size(href: str):
-        try:
-            storage = AccessManager.resolve_storage(href)
-            if href and AccessManager.exists(href) and AccessManager.is_file(href):
+        storage = AccessManager.resolve_storage(href)
+        if href and AccessManager.exists(href):
+            if AccessManager.is_file(href):
                 return storage.get_file_size(href)
-        except Exception:
-            ...
-        return None
+            else:
+                raise ValueError(f"Given href is a directory {href}")
+        raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
     def listdir(href: str):
