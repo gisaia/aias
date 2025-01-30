@@ -20,14 +20,16 @@ LOGGER = Logger.logger
 
 class AccessManager:
     storages: list[AnyStorage]
-    tmp_dir = tempfile.gettempdir()
+    tmp_dir: str
 
     @staticmethod
     def init():
+        AccessManager.tmp_dir = Configuration.settings.access_manager.tmp_dir
+
         LOGGER.info("Initializing APROC storages")
         AccessManager.storages = []
 
-        for s in Configuration.settings.storages:
+        for s in Configuration.settings.access_manager.storages:
             match s.type:
                 case "file":
                     AccessManager.storages.append(FileStorage(**s.model_dump()))
