@@ -23,8 +23,6 @@ class AccessManager:
 
     @staticmethod
     def init():
-        AccessManager.tmp_dir = Configuration.settings.access_manager.tmp_dir
-
         LOGGER.info("Initializing APROC storages")
         AccessManager.storages = []
 
@@ -40,6 +38,15 @@ class AccessManager:
                     AccessManager.storages.append(HttpsStorage(**s.model_dump()))
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
+
+        tmp_dir = Configuration.settings.access_manager.tmp_dir
+        is_tmp_dir_authorized = any(
+            map(lambda s: s.is_path_authorized(tmp_dir, AccessType.WRITE),
+                filter(lambda s: s.type == "file", AccessManager.storages)))
+        if not is_tmp_dir_authorized:
+            raise ValueError("The given tmp_dir is not part of any defined FileStorage with WRITE authorization")
+
+        AccessManager.tmp_dir = tmp_dir
 
     @staticmethod
     def resolve_storage(href: str) -> AnyStorage:
@@ -170,6 +177,7 @@ class AccessManager:
             yield local_href_list
         finally:
             for pulled, local_href in zip(was_pulled, local_href_list):
+                # Only pulled files (files downloaded by this process) are deleted, as a clean up procedure.
                 if pulled:
                     AccessManager.clean(local_href)  # !DELETE!
 
