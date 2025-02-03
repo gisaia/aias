@@ -273,6 +273,8 @@ services:
     image: fam:latest
     container_name: 'fam-service'
     environment:
+      # To test FAM on google storage
+      # - INGESTED_FOLDER=gs://gisaia-public/
       - INGESTED_FOLDER=/inputs
       - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
       - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}

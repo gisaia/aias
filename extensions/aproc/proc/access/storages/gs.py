@@ -91,7 +91,7 @@ class GoogleStorage(AbstractStorage):
 
     def __get_blob(self, href: str):
         bucket = self.__get_bucket()
-        return bucket.get_blob(urlparse(href).path[1:])
+        return bucket.get_blob(urlparse(href).path[1:] or "/")
 
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
@@ -129,6 +129,9 @@ class GoogleStorage(AbstractStorage):
         """
         Return a list of files contained in the specified folder, as well as subfolders
         """
+        # If requesting the root folder, prefix needs to be empty
+        if prefix == "/":
+            prefix = ""
         blobs = self.__get_bucket().list_blobs(prefix=prefix, delimiter="/")
         return list(map(lambda b: b.name, blobs)), list(blobs.prefixes)
 
@@ -149,12 +152,18 @@ class GoogleStorage(AbstractStorage):
             list(map(lambda b: b.split(prefix)[1].strip("/"), dirs))
 
     def get_last_modification_time(self, href: str):
-        mod_time = self.__get_blob(href).updated
-        return mod_time.timestamp() if mod_time is not None else None
+        blob = self.__get_blob(href)
+        if blob:
+            mod_time = blob.updated
+            return mod_time.timestamp() if mod_time is not None else 0
+        return 0
 
     def get_creation_time(self, href: str):
-        creation_time = self.__get_blob(href).time_created
-        return creation_time.timestamp() if creation_time is not None else None
+        blob = self.__get_blob(href)
+        if blob:
+            creation_time = blob.time_created
+            return creation_time.timestamp() if creation_time is not None else 0
+        return 0
 
     def makedir(self, href: str, strict=False):
         if strict:
