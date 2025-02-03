@@ -336,7 +336,7 @@ def reindex(collection: str):
             item = item_from_json_file(f)
             LOGGER.debug(item)
             register_item(item)
-        os.remove(tmp_file)
+        os.remove(tmp_file)  # !DELETE!
     LOGGER.info("Done with reindexing collection {}".format(collection))
 
 
