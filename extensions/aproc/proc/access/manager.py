@@ -1,6 +1,6 @@
 import os
 import shutil
-import tempfile
+from contextlib import contextmanager
 from typing import Annotated, Union
 
 from pydantic import Field
@@ -19,14 +19,14 @@ LOGGER = Logger.logger
 
 class AccessManager:
     storages: list[AnyStorage]
-    tmp_dir = tempfile.gettempdir()
+    tmp_dir: str
 
     @staticmethod
     def init():
         LOGGER.info("Initializing APROC storages")
         AccessManager.storages = []
 
-        for s in Configuration.settings.storages:
+        for s in Configuration.settings.access_manager.storages:
             match s.type:
                 case "file":
                     AccessManager.storages.append(FileStorage(**s.model_dump()))
@@ -38,6 +38,15 @@ class AccessManager:
                     AccessManager.storages.append(HttpsStorage(**s.model_dump()))
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
+
+        tmp_dir = Configuration.settings.access_manager.tmp_dir
+        is_tmp_dir_authorized = any(
+            map(lambda s: s.is_path_authorized(tmp_dir, AccessType.WRITE),
+                filter(lambda s: s.type == "file", AccessManager.storages)))
+        if not is_tmp_dir_authorized:
+            raise ValueError("The given tmp_dir is not part of any defined FileStorage with WRITE authorization")
+
+        AccessManager.tmp_dir = tmp_dir
 
     @staticmethod
     def resolve_storage(href: str) -> AnyStorage:
@@ -74,13 +83,16 @@ class AccessManager:
 
         storage.pull(href, dst)
 
-    # Will return a yield
     @staticmethod
-    def stream():
+    @contextmanager
+    def stream(href: str):
         """
         Reads the content of a file in a storage without downloading it.
         """
-        ...
+        import smart_open
+
+        with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as f:
+            yield f
 
     @staticmethod
     def get_rasterio_session(href: str):
@@ -105,8 +117,9 @@ class AccessManager:
             and storage.force_download
 
     @staticmethod
-    def prepare(href: str):
-        """Prepare the file to be processed locally
+    @contextmanager
+    def make_local(href: str, dst: str | None = None):
+        """Prepare the file to be processed locally. Once the file has been used, if it has been pulled, deletes it.
 
         Args:
             href (str): Href (local or not) of the file
@@ -116,22 +129,72 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
 
-        # If the storage is nit local, pull it
-        if storage.type != "file":
-            dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
-            storage.pull(href, dst)
-            return dst
+        # If the storage is not local, pull it
+        if not storage.is_local:
+            if dst is None:
+                dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
 
-        return href
+            AccessManager.pull(href, dst)
+            try:
+                yield dst
+            finally:
+                AccessManager.clean(dst)  # !DELETE!
+        else:
+            yield href
+
+    @staticmethod
+    @contextmanager
+    def make_local_list(href_list: list[str], dst_list: list[str | None] | None = None):
+        """Prepare a list of files to make them available locally for further processing.
+           Once used, the file is deleted if it has been pulled
+        """
+        # Check that the input lists match each other length
+        if dst_list is not None and len(href_list) != len(dst_list):
+            raise ValueError("Input href and dst must have the same length")
+        if dst_list is None:
+            dst_list = [None for _ in href_list]
+
+        # For each of the input pair of (href, dst), check if the corresponding storage is local
+        # If not, pull it, store dst and tag the iteration as pulled. Otherwise, store href and tag as not pulled.
+        # Once all local, will yield the list of local paths
+        # Cleanup will only remove the files that were pulled
+        local_href_list = []
+        was_pulled = []
+        try:
+            for href, dst in zip(href_list, dst_list):
+                storage = AccessManager.resolve_storage(href)
+
+                if not storage.is_local:
+                    if dst is None:
+                        dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+
+                    AccessManager.pull(href, dst)
+                    local_href_list.append(dst)
+                    was_pulled.append(True)
+                else:
+                    local_href_list.append(href)
+                    was_pulled.append(False)
+            yield local_href_list
+        finally:
+            for pulled, local_href in zip(was_pulled, local_href_list):
+                # Only pulled files (files downloaded by this process) are deleted, as a clean up procedure.
+                if pulled:
+                    AccessManager.clean(local_href)  # !DELETE!
+
+    @staticmethod
+    def clean(href: str):
+        try:
+            storage = AccessManager.resolve_storage(href)
+            storage.clean(href)  # !DELETE!
+        except Exception:
+            LOGGER.warning(f"Unable to remove file {href}")
 
     @staticmethod
     def zip(href: str, zip_path: str):
-        # For all storages but FileStorage, files need to be pulled before being processed
-        href = AccessManager.prepare(href)
-
-        # Get direct parent folder of href_file to zip
-        dir_name = os.path.dirname(href)
-        shutil.make_archive(zip_path, 'zip', dir_name)
+        with AccessManager.make_local(href) as local_href:
+            # Get direct parent folder of href_file to zip
+            dir_name = os.path.dirname(local_href)
+            shutil.make_archive(zip_path, 'zip', dir_name)
 
     @staticmethod
     def is_file(href: str):
@@ -144,3 +207,53 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         return storage.is_dir(href)
+
+    @staticmethod
+    def get_file_size(href: str):
+        storage = AccessManager.resolve_storage(href)
+        if href and AccessManager.exists(href):
+            if AccessManager.is_file(href):
+                return storage.get_file_size(href)
+            else:
+                raise ValueError(f"Given href is a directory {href}")
+        raise ValueError(f"Given href does not exist {href}")
+
+    @staticmethod
+    def listdir(href: str):
+        storage = AccessManager.resolve_storage(href)
+
+        if not storage.is_dir(href):
+            raise ValueError("Given href does not point to a directory")
+
+        return storage.listdir(href)
+
+    @staticmethod
+    def get_last_modification_time(href: str):
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_last_modification_time(href)
+
+    @staticmethod
+    def get_creation_time(href: str):
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_creation_time(href)
+
+    @staticmethod
+    def makedir(href: str, strict=False):
+        """
+        Create if needed (and possible) the specified dir
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.makedir(href, strict=strict)
+
+    @staticmethod
+    def dirname(href: str):
+        """
+        Wraps os.path.dirname to allow for absolute path to be determined if needed
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.dirname(href)
+
+
+LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
+Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
+AccessManager.init()

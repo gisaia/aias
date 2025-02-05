@@ -23,23 +23,25 @@ processes:
     configuration:
       drivers: conf/enrich_drivers.yaml
 
-storages:
-  -
-    type: file
-    writable_paths:
-      - /tmp
-      - /outbox
-    readable_paths:
-      - /inputs
-  -
-    type: gs
-    bucket: gisaia-public
-    # api_key:
-    #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
-    #   private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
-    #   private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
-  # -
-  #   type: https
-  #   headers: $APROC_INPUT_STORAGE_HEADERS
-  #   domain: $APROC_INPUT_STORAGE_DOMAIN
-  #   force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD
+access_manager:
+  tmp_dir: /tmp/
+  storages:
+    -
+      type: file
+      writable_paths:
+        - /tmp
+        - /outbox
+      readable_paths:
+        - /inputs
+    -
+      type: gs
+      bucket: gisaia-public
+      # api_key:
+      #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
+      #   private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
+      #   private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
+    # -
+    #   type: https
+    #   headers: $APROC_INPUT_STORAGE_HEADERS
+    #   domain: $APROC_INPUT_STORAGE_DOMAIN
+    #   force_download: $APROC_INPUT_STORAGE_FORCE_DOWNLOAD

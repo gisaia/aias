@@ -3,15 +3,13 @@ import os
 import re
 import tempfile
 import zipfile
-from pathlib import Path
 from time import time
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ResourceType, Role)
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ResourceType, Role)
 from extensions.aproc.proc.access.manager import AccessManager
-from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
+from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 
 
 class Driver(EnrichDriver):
@@ -50,9 +48,8 @@ class Driver(EnrichDriver):
                 )
                 asset_location = self.get_asset_filepath(item.id, asset)
                 asset.href = asset_location
-                Path(asset_location).touch()
                 self.__build_asset(item, asset_type, asset_location)
-                asset.size = get_file_size(asset_location)
+                asset.size = AccessManager.get_file_size(asset_location)
                 return asset, asset_location
             else:
                 raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
@@ -74,7 +71,7 @@ class Driver(EnrichDriver):
                 kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
                 gdal.Warp(asset_location, tci_file_path, **kwargs)
                 self.LOGGER.info("Creating COG took {} s".format(time() - start))
-                os.remove(tci_file_path)
+                os.remove(tci_file_path)  # !DELETE!
             else:
                 raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
         else:
@@ -94,11 +91,9 @@ class Driver(EnrichDriver):
             tci_file_path = self.__extract(tmp_file)
 
             # Clean-up
-            os.remove(tmp_file)
+            os.remove(tmp_file)  # !DELETE!
         else:
-            import smart_open
-
-            with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as fb:
+            with AccessManager.stream(href) as fb:
                 tci_file_path = self.__extract(fb)
 
         return tci_file_path

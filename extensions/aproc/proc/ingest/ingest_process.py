@@ -1,11 +1,11 @@
 import os
 
 import requests
-from celery import Task, shared_task
+from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
-from airs.core.models.model import Asset, Item, Properties
+from airs.core.models.model import Asset, Item, MimeType, Properties
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -13,12 +13,15 @@ from aproc.core.processes.process import Process as Process
 from aproc.core.settings import Configuration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.access.manager import AccessManager
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.drivers.exceptions import (
-    ConnectionException, DriverException, RegisterException)
-from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
+                                                      DriverException,
+                                                      RegisterException)
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.ingest.settings import \
+    Configuration as IngestConfiguration
 from extensions.aproc.proc.processes.process_model import InputProcess
+
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -70,8 +73,6 @@ class AprocProcess(Process):
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
 
-        AccessManager.init()
-
     @staticmethod
     def get_process_description() -> ProcessDescription:
         return description
@@ -107,7 +108,7 @@ class AprocProcess(Process):
         Returns:
             object: an dict pointing towards the registered item (OutputIngestProcess)
         """
-        if not os.path.exists(url):
+        if not AccessManager.exists(url):
             msg = "File or directory {} not found".format(url)
             LOGGER.warning(msg)
         driver: IngestDriver = DriverManager.solve(summary.id, url, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
@@ -172,13 +173,13 @@ class AprocProcess(Process):
             if asset.roles is None:
                 raise DriverException("Invalid asset {} for {} : no roles provided".format(asset.name, url))
             if file_exists:
-                if asset.airs__managed is True and not os.path.exists(asset.href):
+                if asset.airs__managed is True and not AccessManager.exists(asset.href):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
     @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
-            with open(asset.href, 'rb') as filedesc:
+            with AccessManager.stream(asset.href) as filedesc:
                 file = {'file': (asset.name, filedesc, asset.type)}
                 try:
                     r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
@@ -199,7 +200,7 @@ class AprocProcess(Process):
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": MimeType.JSON.value})
             if r.ok:
                 LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -212,10 +213,10 @@ class AprocProcess(Process):
         try:
             if item_already_exists:
                 LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
             else:
                 LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
             if r.ok:
                 LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return item_from_json(r.content)

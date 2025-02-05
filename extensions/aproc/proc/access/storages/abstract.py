@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Any
 from urllib.parse import urlparse
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 
 class AbstractStorage(BaseModel, ABC):
     type: Any
+    is_local: bool
 
     @abstractmethod
     def get_storage_parameters(self) -> dict:
@@ -87,5 +89,74 @@ class AbstractStorage(BaseModel, ABC):
 
         Returns:
             bool: Whether the input is a directory
+        """
+        ...
+
+    @abstractmethod
+    def get_file_size(self, href: str) -> int | None:
+        """Returns the size of the specified href
+
+        Args:
+            href(str): The href to examine
+        """
+        ...
+
+    @abstractmethod
+    def listdir(self, href: str) -> list[str]:
+        """Returns the list of files and folders in the specified directory
+
+        Args:
+            href(str): The directory to examine
+        """
+        ...
+
+    @abstractmethod
+    def get_last_modification_time(self, href: str) -> float:
+        """Returns the last modification time of the specified href
+
+        Args:
+            href(str): The href to examine
+
+        Returns:
+            float: the timestamp in seconds of last modification time
+        """
+        ...
+
+    @abstractmethod
+    def get_creation_time(self, href: str) -> float:
+        """Returns the creation time of the specified href
+
+        Args:
+            href(str): The href to examine
+
+        Returns:
+            float: the timestamp in seconds of creation time
+        """
+        ...
+
+    @abstractmethod
+    def makedir(self, href: str, strict=False):
+        """Create if needed (and possible) the specified dir
+
+        Args:
+            href(str): The href to the dir to create
+            strict(bool): Whether to force the creation
+        """
+        ...
+
+    def dirname(self, href: str):
+        """Return the name of the directory containing the specified href
+
+        Args:
+            href(str): The href to examine
+        """
+        return os.path.dirname(href)
+
+    @abstractmethod
+    def clean(self, href: str):
+        """If authorized, remove the given file
+
+        Args:
+            href(str): The href to delete
         """
         ...

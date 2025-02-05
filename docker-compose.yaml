@@ -273,11 +273,14 @@ services:
     image: fam:latest
     container_name: 'fam-service'
     environment:
+      # To test FAM on google storage
+      # - INGESTED_FOLDER=gs://gisaia-public/
       - INGESTED_FOLDER=/inputs
       - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
       - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}
       - FAM_CORS_METHODS=${FAM_CORS_METHODS:-*}
       - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
+      - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
     volumes:
       - ./test/inputs:/inputs:ro
     ports:

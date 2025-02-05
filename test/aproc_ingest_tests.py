@@ -52,8 +52,13 @@ class Tests(unittest.TestCase):
 
     def test_async_ingest_dimap(self):  # Driver DIMAP
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-        id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
-        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
+    def test_async_ingest_dimap_cloud(self):  # Driver DIMAP
+        url = "gs://gisaia-public/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        item_id = "7fb3088260c163c8bdf37f9b56b35b0232ab8adbb556f9fbfd8d547d26bc20d1"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_dimap_driver_include(self):  # Driver DIMAP
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
@@ -73,38 +78,73 @@ class Tests(unittest.TestCase):
 
     def test_async_ingest_ikonos(self):  # Driver GEOEYE
         url = "/inputs/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
-        id = "0e73667ac0bd10b5f18bcb5ee40518db973b2946fe8b40d2b4cb988724ac9507"
-        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        item_id = "0e73667ac0bd10b5f18bcb5ee40518db973b2946fe8b40d2b4cb988724ac9507"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
+    def test_async_ingest_ikonos_cloud(self):  # Driver GEOEYE
+        url = "gs://gisaia-public/test-aias/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+        item_id = "26fc0091ed9d5b0f53769ecaf2a0cef26b0007e477be9b4c94f198a26b2e00d1"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_wv(self):  # Driver DIGITALGLOBE
         url = "/inputs/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
-        id = "4bd829d461af55d10d3cf98ae2f5014e1945b8d42c60fa36b76245e167fc35ba"
-        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        item_id = "4bd829d461af55d10d3cf98ae2f5014e1945b8d42c60fa36b76245e167fc35ba"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_wv_cloud(self):  # Driver DIGITALGLOBE
+        url = "gs://gisaia-public/test-aias/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
+        item_id = "4738b485dd8612c2b204db983a46d13579ec5a90e19db4c097853908281c12e1"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast(self):  # Driver AST
         url = "/inputs/ast"
-        id = "7edf8f5a9df6fff49398ae628eb4b158eea85c9cab65dc5e34fc3b8481261892"
-        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        item_id = "7edf8f5a9df6fff49398ae628eb4b158eea85c9cab65dc5e34fc3b8481261892"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_ast_cloud(self):  # Driver AST
+        url = "gs://gisaia-public/test-aias/ast"
+        item_id = "4ef019190200980a8ccea4004f769631b33491048d094bfc22be75efc3bfbd4e"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx(self):  # Driver TERRASRX
         url = "/inputs/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
-        id = "5502f3e969a505f45143da8a6a7da6a96dcf6a46800afbe75f845eb0a7e90438"
-        self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        item_id = "5502f3e969a505f45143da8a6a7da6a96dcf6a46800afbe75f845eb0a7e90438"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
+        url = "gs://gisaia-public/test-aias/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
+        item_id = "9038632fa643fb2ddb29fd688eb756684a7d456f951c7a25f81509f0553aadbb"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = "/inputs/3159120_2020-03-11_RE1_3A"
-        id = "f07bc337f2c904f7d23007b0d9c868872036162dc48f954ccd46f55198de530e"
-        self.async_ingest(url, id, ["data", "metadata", "extent", "airs_item"], archive=False)
+        item_id = "f07bc337f2c904f7d23007b0d9c868872036162dc48f954ccd46f55198de530e"
+        self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
+        url = "gs://gisaia-public/test-aias/3159120_2020-03-11_RE1_3A"
+        item_id = "dc89e2cd6533bec0cb56a1a5c3f3662783de0b1f6d8ca73ece4de00eca54d8dd"
+        self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_tif(self):  # Driver TIF
         url = "/inputs/cog.tiff"
-        id = "36f978ad9fe1e9b4ea8064c893140012a967e1a7a5d1ac65a589a16566f03ccd"
-        self.async_ingest(url, id, ["data", "airs_item"], archive=False)
+        item_id = "36f978ad9fe1e9b4ea8064c893140012a967e1a7a5d1ac65a589a16566f03ccd"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
+
+    def test_async_ingest_tif_cloud(self):  # Driver TIF
+        url = "gs://gisaia-public/test-aias/cog.tiff"
+        item_id = "03bc217a7894c34abc42d292a270a3f194096507d2a86a3365092631769ff525"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
     def test_async_ingest_jpg2000(self):  # Driver JPEG2000
         url = "/inputs/jpeg2000.jpg2"
-        id = "e2614a12233e3f859a4083b54d2b7e4e4615055013af13c73b6c7e427548785c"
-        self.async_ingest(url, id, ["data", "airs_item"], archive=False)
+        item_id = "e2614a12233e3f859a4083b54d2b7e4e4615055013af13c73b6c7e427548785c"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
+
+    def test_async_ingest_jpg2000_cloud(self):  # Driver JPEG2000
+        url = "gs://gisaia-public/test-aias/jpeg2000.jpg2"
+        item_id = "95d6803989b40dd72fc642e51477cd9ed0cb4432218711246aaa447c1a3bc046"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
     def test_async_ingest_invalid_tif(self):  # Test Driver error handling
         url = "/inputs/empty.tiff"
@@ -118,6 +158,8 @@ class Tests(unittest.TestCase):
 
     def test_ingest_folder(self):  # Test Folder ingestion
         self.ingest_directory("", collection=COLLECTION, catalog=CATALOG)
+
+    # TODO: test folder cloud
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
@@ -168,16 +210,16 @@ class Tests(unittest.TestCase):
 
     def test_job_by_id(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-        id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
-        status: StatusInfo = self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
+        status: StatusInfo = self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         status2: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.jobID, status2.jobID)
         self.assertEqual(status2.processID, "ingest")
 
     def test_get_jobs_by_resource_id(self):
         url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-        id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
-        status: StatusInfo = self.async_ingest(url, id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
+        status: StatusInfo = self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         resource_status: list = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs/resources", status.resourceID])).content)
         self.assertGreaterEqual(len(resource_status), 1)
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)

@@ -12,12 +12,15 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
 from aproc.core.processes.process import Process as Process
 from aproc.core.utils import base_model2description
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
-from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from extensions.aproc.proc.ingest.settings import \
+    Configuration as IngestConfiguration
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
@@ -72,6 +75,7 @@ class AprocProcess(Process):
     def get_process_summary() -> ProcessSummary:
         return summary
 
+    @staticmethod
     def get_resource_id(inputs: BaseModel):
         return InputDirectoryIngestProcess(**inputs.model_dump()).directory
 
@@ -95,7 +99,7 @@ class AprocProcess(Process):
             try:
                 inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
                 execute = Execute(inputs=inputs.model_dump())
-                r = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
+                r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
                     msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))
                     LOGGER.error(msg)
@@ -112,25 +116,25 @@ class AprocProcess(Process):
     @staticmethod
     def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
         full_path = os.path.join(prefix, path)
-        if not os.path.exists(full_path):
+        if not AccessManager.exists(full_path):
             LOGGER.error("{} does not exist, directory/file can no be scanned to find archives")
             return []
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
-        driver = DriverManager.solve(summary.id, full_path)
+        driver: IngestDriver = DriverManager.solve(summary.id, full_path)
         if driver is not None:
             archive = Archive(id=driver.get_item_id(full_path),
                               name=os.path.basename(path),
                               driver_name=driver.name,
                               path=path,
-                              is_dir=os.path.isdir(full_path),
-                              last_modification_date=datetime.datetime.fromtimestamp(os.path.getmtime(full_path)),
-                              creation_date=datetime.datetime.fromtimestamp(os.path.getctime(full_path)))
+                              is_dir=AccessManager.is_dir(full_path),
+                              last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(full_path)),
+                              creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(full_path)))
             return [archive]
         else:
-            if os.path.isdir(full_path):
+            if AccessManager.is_dir(full_path):
                 archives: list[Archive] = []
-                for file in os.listdir(full_path):
+                for file in AccessManager.listdir(full_path):
                     sub_archives = AprocProcess.list_archives(prefix, os.path.join(path, file), size=size, max_size=max_size)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives

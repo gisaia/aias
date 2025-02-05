@@ -1,17 +1,16 @@
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from pathlib import Path
 
-from .image_driver_helper import ImageDriverHelper
-
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ObservationType, Properties, ResourceType,
-                                    Role)
-from aproc.core.settings import Configuration
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
+from extensions.aproc.proc.access.manager import AccessManager
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_file_size, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+    get_epsg, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
@@ -25,7 +24,8 @@ class Driver(IngestDriver):
         self.tfw_path = None
 
     # Implements drivers method
-    def init(configuration: Configuration):
+    @staticmethod
+    def init(configuration: dict):
         IngestDriver.init(configuration)
 
     # Implements drivers method
@@ -43,14 +43,14 @@ class Driver(IngestDriver):
         if self.quicklook_path is None:
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets)
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
-        assets.append(Asset(href=self.xml_path, size=get_file_size(self.xml_path),
+        assets.append(Asset(href=self.xml_path, size=AccessManager.get_file_size(self.xml_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
-        assets.append(Asset(href=self.tif_path, size=get_file_size(self.tif_path),
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         return assets
@@ -76,8 +76,10 @@ class Driver(IngestDriver):
               "re": "http://schemas.rapideye.de/products/productMetadataGeocorrected",
               "eop": "http://earth.esa.int/eop",
               "opt": "http://earth.esa.int/opt"}
-        tree = ET.parse(self.xml_path)
-        root = tree.getroot()
+
+        with AccessManager.make_local(self.xml_path) as local_xml_path:
+            tree = ET.parse(local_xml_path)
+            root = tree.getroot()
         ul_lat = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topLeft/re:latitude", ns).text)
         ul_lon = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topLeft/re:longitude", ns).text)
         ur_lat = float(root.find("gml:target/re:Footprint/re:geographicLocation/re:topRight/re:latitude", ns).text)
@@ -100,53 +102,55 @@ class Driver(IngestDriver):
         instrument = root.find("gml:using/eop:EarthObservationEquipment/eop:instrument/eop:Instrument/eop:shortName", ns).text
         processing__level = root.find("gml:metaDataProperty/re:EarthObservationMetaData/eop:productType", ns).text
         eo__cloud_cover = float(root.find("gml:resultOf/re:EarthObservationResult/opt:cloudCoverPercentage", ns).text)
-        gsdCol = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd", ns).text)
-        gsdRow = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", ns).text)
-        gsd = (gsdCol + gsdRow) / 2
-        src_ds = gdal.Open(self.tif_path, GA_ReadOnly)
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
-                instrument=instrument,
-                constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__azimuth=view__azimuth,
-                view__incidence_angle=view__incidence_angle,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.rapideye.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
-            ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
-        )
+        gsd_col = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd", ns).text)
+        gsd_row = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", ns).text)
+        gsd = (gsd_col + gsd_row) / 2
+
+        with AccessManager.make_local(self.tif_path) as local_tif_path:
+            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
+            item = Item(
+                id=self.get_item_id(url),
+                geometry=geometry,
+                bbox=bbox,
+                centroid=centroid,
+                properties=Properties(
+                    datetime=date_time,
+                    eo__cloud_cover=eo__cloud_cover,
+                    processing__level=processing__level,
+                    gsd=gsd,
+                    proj__epsg=get_epsg(src_ds),
+                    instrument=instrument,
+                    constellation=constellation,
+                    sensor=sensor,
+                    sensor_type=sensor_type,
+                    view__azimuth=view__azimuth,
+                    view__incidence_angle=view__incidence_angle,
+                    view__sun_azimuth=view__sun_azimuth,
+                    view__sun_elevation=view__sun_elevation,
+                    item_type=ResourceType.gridded.value,
+                    item_format=ItemFormat.rapideye.value,
+                    main_asset_format=AssetFormat.geotiff.value,
+                    main_asset_name=Role.data.value,
+                    observation_type=ObservationType.image.value
+                ),
+                assets=dict(map(lambda asset: (asset.name, asset), assets))
+            )
+
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
-        valid_and_exist = os.path.isdir(path) and os.path.exists(path)
-        if valid_and_exist is True:
-            for file in os.listdir(path):
-                if os.path.isfile(os.path.join(path, file)):
+        if AccessManager.is_dir(path):
+            for file in AccessManager.listdir(path):
+                if AccessManager.is_file(os.path.join(path, file)):
                     if file.endswith("_browse.tif"):
                         self.quicklook_path = os.path.join(path, file)
                         self.thumbnail_path = os.path.join(path, file)
                     if file.endswith(".tif") and file.find("browse") < 0 and file.find("_udm") < 0:
                         self.tif_path = os.path.join(path, file)
-                        tfw_path = Path(self.tif_path).with_suffix(".tfw")
-                        if tfw_path.exists():
-                            self.tfw_path = str(tfw_path)
+                        tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
+                        if AccessManager.exists(tfw_path):
+                            self.tfw_path = tfw_path
                     if file.endswith("_metadata.xml"):
                         self.xml_path = os.path.join(path, file)
             return self.tif_path is not None and self.xml_path is not None
