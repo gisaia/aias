@@ -29,13 +29,13 @@ class AccessManager:
         for s in Configuration.settings.access_manager.storages:
             match s.type:
                 case "file":
-                    AccessManager.storages.append(FileStorage(**s.model_dump()))
+                    AccessManager.storages.append(FileStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case "gs":
-                    AccessManager.storages.append(GoogleStorage(**s.model_dump()))
+                    AccessManager.storages.append(GoogleStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case "http":
-                    AccessManager.storages.append(HttpStorage(**s.model_dump()))
+                    AccessManager.storages.append(HttpStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case "https":
-                    AccessManager.storages.append(HttpsStorage(**s.model_dump()))
+                    AccessManager.storages.append(HttpsStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
 

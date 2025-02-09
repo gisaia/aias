@@ -45,8 +45,8 @@ class Tests(unittest.TestCase):
     def test_incorrect_download(self):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": "item_that_deos_not_exist"}], crop_wkt="", target_format="", target_projection="")
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
         self.assertFalse(r.ok, str(r.status_code) + ": " + str(r.content))
         # REQUEST MAILS AND ERROR MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER + "?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
@@ -151,8 +151,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(status.status, StatusCode.dismissed, status.message)
 
     def send_download_request(self, inputs: InputDownloadProcess):
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
         self.assertTrue(r.ok)
         return r
 

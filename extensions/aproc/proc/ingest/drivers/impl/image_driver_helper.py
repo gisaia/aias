@@ -101,7 +101,7 @@ class ImageDriverHelper:
 
             with rasterio.open(local_url) as dataset:
                 for v in zip(dataset.indexes, dataset.descriptions):
-                    bands.append(Band(name="Band " + str(v[0]), common_name="Band " + str(v[0]), description=v[1] if v[1] else "Band " + str(v[0])))
+                    bands.append(Band(name="Band " + str(v[0]), eo__common_name="Band " + str(v[0]), description=v[1] if v[1] else "Band " + str(v[0])))
                 # GET THE GEO EXTENT
                 # Read the dataset's valid data mask as a ndarray.
                 mask = dataset.dataset_mask()

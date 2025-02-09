@@ -44,7 +44,7 @@ class DriverManager():
             drivers = list(filter(lambda driver_class: driver_class.name not in exclude_drivers, drivers))
         for driver_class in drivers:
             try:
-                LOGGER.debug("Test driver {}".format(driver_class.name))
+                LOGGER.debug("Test if driver {} supports the resource".format(driver_class.name))
                 driver: AbstractDriver = driver_class()
                 if driver.supports(resource) is True:
                     return driver

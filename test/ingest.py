@@ -13,8 +13,8 @@ Drivers.init(os.getenv("DRIVERS_CONFIGURATION_FILE"))
 
 def ingest(url, collection, catalog):
     inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="")
-    execute = Execute(inputs=inputs.model_dump())
-    r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()),
+    execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+    r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)),
                       headers={"Content-Type": "application/json"})
 
 def ingest_folders(data, collection, catalog, writer):

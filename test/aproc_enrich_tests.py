@@ -20,8 +20,8 @@ class Tests(unittest.TestCase):
     def test_enrich_cog(self):
         self.ingest_sentinel()
         inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": COLLECTION, "item_id": SENTINEL_2_ID}], asset_type="cog")
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/enrich/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/enrich/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:

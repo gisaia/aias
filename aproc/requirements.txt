@@ -1,4 +1,4 @@
-pydantic==2.1
+pydantic==2.10.6
 envyaml==1.10.211231
 celery==5.3.1
 requests==2.31.0

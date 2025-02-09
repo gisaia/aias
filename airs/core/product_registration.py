@@ -450,7 +450,7 @@ def __add_generated_fields(item: Item) -> Item:
     item.properties.generated__band_common_names = list(
         filter(
             lambda common_name: common_name is not None,
-            map(lambda band: band.common_name, item.properties.eo__bands),
+            map(lambda band: band.eo__common_name, item.properties.eo__bands),
         )
     )
     return item
