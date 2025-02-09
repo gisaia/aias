@@ -1,21 +1,16 @@
 import hashlib
-import mimetypes
 import os
 import shutil
 from datetime import datetime
 
-import requests
 from celery import shared_task
 from pydantic import BaseModel, Field
 
-import airs.core.s3 as s3
-from airs.core.models import mapper
 from airs.core.models.model import Item
-from airs.core.settings import S3 as S3Configuration
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.processes.process import Process as Process
+from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.download.drivers.download_driver import \
@@ -26,6 +21,7 @@ from extensions.aproc.proc.download.settings import \
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (DriverException,
                                                       RegisterException)
+from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
 from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
@@ -65,7 +61,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(),
+    **summary.model_dump(exclude_none=True, exclude_unset=True),
     inputs=base_model2description(InputDownloadProcess),
     outputs=base_model2description(OutputDownloadProcess)
 )
@@ -96,7 +92,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
-        (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
+        (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
@@ -115,7 +111,7 @@ class AprocProcess(Process):
             Notifications.report(None, DownloadConfiguration.settings.email_request_subject_user, DownloadConfiguration.settings.email_request_content_user, to=[send_to], context=mail_context)
             # RGPD : log level is info
             LOGGER.debug("checking for item access {}/{} for {}".format(collection, item_id, send_to))
-            item: Item = AprocProcess.__get_item_from_arlas__(collection=collection, item_id=item_id, headers=headers)
+            item: Item = ARLASServicesHelper.get_item_from_arlas(arlas_url_search=DownloadConfiguration.settings.arlas_url_search, collection=collection, item_id=item_id, headers=headers)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
@@ -126,29 +122,6 @@ class AprocProcess(Process):
             else:
                 LOGGER.debug("{} can access {}/{}".format(send_to, collection, item_id))
         return {}
-
-    @staticmethod
-    def __get_user_email__(authorization: str):
-        import jwt
-        send_to: str = "anonymous"
-        user_id: str = "anonymous"
-        try:
-            if authorization:
-                token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
-                if token_content.get("email"):
-                    send_to = token_content.get("email")
-                else:
-                    LOGGER.error("email not found in token {}".format(token_content))
-                if token_content.get("sub"):
-                    user_id = token_content.get("sub")
-                else:
-                    LOGGER.error("subject not found in token {}".format(token_content))
-            else:
-                LOGGER.error("no token in header")
-        except Exception as e:
-            LOGGER.error("Can not open token from header")
-            LOGGER.exception(e)
-        return (send_to, user_id)
 
     @staticmethod
     def __get_download_location__(item: Item, send_to: str) -> tuple[str, str]:
@@ -163,13 +136,13 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel):
-        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump())
+        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
-        (send_to, user_id) = AprocProcess.__get_user_email__(headers.get("authorization"))
+        (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
         for request in requests:
@@ -185,7 +158,7 @@ class AprocProcess(Process):
                 "error": None,
                 "arlas-user-email": send_to
             }
-            item: Item = AprocProcess.__get_item_from_airs__(collection=collection, item_id=item_id)
+            item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AprocConfiguration.settings.airs_endpoint, collection=collection, item_id=item_id)
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
@@ -211,7 +184,7 @@ class AprocProcess(Process):
                         target_format=target_format,
                         raw_archive=raw_archive)
                     if DownloadConfiguration.settings.outbox_s3 and DownloadConfiguration.settings.outbox_s3.bucket:
-                        AprocProcess.__dir2s3(target_directory, relative_target_directory, DownloadConfiguration.settings.outbox_s3)
+                        ARLASServicesHelper.dir2s3(target_directory, relative_target_directory, DownloadConfiguration.settings.outbox_s3)
                         if DownloadConfiguration.settings.clean_outbox_directory:
                             LOGGER.debug("clean {}".format(target_directory))
                             shutil.rmtree(target_directory)
@@ -235,59 +208,7 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(item, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
-        return OutputDownloadProcess(download_locations=download_locations).model_dump()
-
-    @staticmethod
-    def __dir2s3(directory: str, s3_dir: str, s3_conf: S3Configuration):
-        s3_client = s3.get_client_from_configuration(s3_conf)
-
-        uploadFileNames = []
-        for (sourceDir, dirname, files) in os.walk(directory):
-            for file in files:
-                uploadFileNames.append(os.path.join(sourceDir, file)[len(directory):])
-
-        for key in uploadFileNames:
-            local_path = os.path.join(directory, key.strip("/"))
-            destpath = os.path.join(s3_dir, key.strip("/"))
-            type, encpoding = mimetypes.guess_type(local_path, strict=False)
-            if type:
-                extra = {"ContentType": type}
-            else:
-                extra = None
-            LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, type, s3_conf.bucket, destpath))
-            with open(local_path, 'rb') as file:
-                s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
-
-    @staticmethod
-    def __get_item_from_arlas__(collection: str, item_id: str, headers: dict[str, str] = {}):
-        try:
-            url = DownloadConfiguration.settings.arlas_url_search.format(collection=collection, item=item_id)
-            r = requests.get(url=url, headers={"authorization": headers.get("authorization"), "arlas-org-filter": headers.get("arlas-org-filter")})
-            if r.ok:
-                result = r.json()
-                if result.get("hits") and len(result.get("hits")) > 0:
-                    return mapper.item_from_dict(result.get("hits")[0]["data"])
-                else:
-                    LOGGER.warn("No result found for {}/{}".format(collection, item_id))
-                    return None
-            else:
-                LOGGER.error("Error while retrieving {}/{} ({})".format(collection, item_id, r.content))
-                return None
-        except Exception as e:
-            LOGGER.error("Exception while retrieving {}/{}".format(collection, item_id))
-            LOGGER.exception(e)
-            return None
-
-    @staticmethod
-    def __get_item_from_airs__(collection: str, item_id: str):
-        try:
-            r = requests.get(url=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id))
-            if r.ok:
-                return mapper.item_from_json(r.content)
-            else:
-                return None
-        except Exception:
-            return None
+        return OutputDownloadProcess(download_locations=download_locations).model_dump(exclude_none=True, exclude_unset=True)
 
     @staticmethod
     def __update_paths__(mail_context: dict[str, str]):

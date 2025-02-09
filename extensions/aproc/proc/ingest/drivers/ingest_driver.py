@@ -7,7 +7,6 @@ from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 
-
 class IngestDriver(AbstractDriver):
 
     def __init__(self):
@@ -52,7 +51,7 @@ class IngestDriver(AbstractDriver):
         if not asset:
             raise DriverException("Asset can not be None")
         if not asset.name:
-            raise DriverException("Asset name is undefined for {}".format(asset.model_dump_json()))
+            raise DriverException("Asset name is undefined for {}".format(asset.model_dump_json(exclude_none=True, exclude_unset=True)))
         return os.path.sep.join([self.get_assets_dir(url), asset.name])
 
     @abstractmethod

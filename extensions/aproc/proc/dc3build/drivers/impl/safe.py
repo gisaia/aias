@@ -1,22 +1,16 @@
-import io
+import json
 import os
-import re
-import tempfile
-import zipfile
-from pathlib import Path
-from time import time
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    ResourceType, Role)
-from extensions.aproc.proc.access.manager import AccessManager
-from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.drivers.exceptions import DriverException
+
+from airs.core.models import mapper
+from airs.core.models.model import (Asset, AssetFormat, Indicators, Item, ItemFormat, MimeType, Properties,
+                                    ResourceType, Role, VariableType)
+from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
+from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
 
 
-class Driver(EnrichDriver):
-
-    SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower()]
+class Driver(DC3Driver):
 
     def __init__(self):
         super().__init__()
@@ -24,96 +18,100 @@ class Driver(EnrichDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        EnrichDriver.init(configuration)
+        DC3Driver.init(configuration)
 
     # Implements drivers method
     def supports(self, item: Item) -> bool:
         return item.properties.item_format and item.properties.item_format.lower() == ItemFormat.safe.value.lower()
 
+    def __flat_items__(items: dict[str, dict[str, Item]]) -> list[Item]:
+        its = list(map(lambda v: list(v.values()), items.values()))
+        return [x for xs in its for x in xs]
+
     # Implements drivers method
-    def create_asset(self, item: Item, asset_type: str) -> tuple[Asset, str]:
-        if asset_type:
-            if asset_type.lower() in Driver.SUPPORTED_ASSET_TYPES:
-                self.LOGGER.info("adding {} to item {}".format(asset_type, item.id))
-                asset = Asset(
-                    name=Role.cog.value,
-                    size=0,     # set once asset created
-                    href=None,  # set below
-                    asset_type=ResourceType.gridded.value,
-                    asset_format=AssetFormat.geotiff.value,
-                    roles=[Role.cog.value],
-                    type=MimeType.TIFF.value,
-                    title="{} for {}/{}".format(asset_type, item.collection, item.id),
-                    description="{} for {}/{}".format(asset_type, item.collection, item.id),
-                    proj__epsg=3857,
-                    airs__managed=True
-                )
-                asset_location = self.get_asset_filepath(item.id, asset)
-                asset.href = asset_location
-                Path(asset_location).touch()
-                self.__build_asset(item, asset_type, asset_location)
-                asset.size = get_file_size(asset_location)
-                return asset, asset_location
-            else:
-                raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
-        else:
-            raise DriverException("Asset type must be provided.")
+    def create_cube(self, dc3_request: InputDC3BuildProcess, items: dict[str, dict[str, Item]], target_directory: str) -> Item:
+        CUBE_ASSET_NAME = "cube"
+        first_item: Item = items.get(dc3_request.composition[0].dc3__references[0].dc3__collection).get(dc3_request.composition[0].dc3__references[0].dc3__id)
+        # item.collection, item.catalog and item.id are managed by the process, no need to set it!
+        item = Item()
+        item.properties = Properties()
+        item.properties.start_datetime = min(list(map(lambda group: group.dc3__datetime, dc3_request.composition)))
+        item.properties.end_datetime = max(list(map(lambda group: group.dc3__datetime, dc3_request.composition)))
+        item.properties.datetime = item.properties.start_datetime
+        item.properties.keywords = dc3_request.keywords
+        item.properties.gsd = dc3_request.target_resolution
+        item.properties.item_type = ResourceType.cube.name
+        item.properties.item_format = ItemFormat.adc3.name
+        item.properties.main_asset_format = AssetFormat.zarr.name
+        item.properties.main_asset_name = CUBE_ASSET_NAME
+        item.properties.observation_type = first_item.properties.observation_type
+        if dc3_request.keywords is None:
+            dc3_request.keywords = []
+        if first_item.properties.programme:
+            item.properties.keywords.append(first_item.properties.programme)
+        if first_item.properties.constellation:
+            item.properties.keywords.append(first_item.properties.constellation)
+        if first_item.properties.satellite:
+            item.properties.keywords.append(first_item.properties.satellite)
+        if first_item.properties.platform:
+            item.properties.keywords.append(first_item.properties.platform)
+        if first_item.properties.instrument:
+            item.properties.keywords.append(first_item.properties.instrument)
+        if first_item.properties.sensor:
+            item.properties.keywords.append(first_item.properties.sensor)
+        item.properties.annotations = " ".join(dc3_request.keywords)
+        item.properties.locations = []
+        for it in Driver.__flat_items__(items):
+            if it.properties.locations:
+                item.properties.locations = item.properties.locations + it.properties.locations
+        item.properties.eo__bands = dc3_request.bands  # The cube bands should be the same as the requested bands, asset tracability is added.
+        item.properties.cube__variables = {}
+        for band in dc3_request.bands:
+            item.properties.cube__variables[band.name] = VariableType.data
+        item.properties.proj__epsg = dc3_request.target_projection
 
-    def __build_asset(self, item: Item, asset_type: str, asset_location: str):
-        if asset_type.lower() == "cog":
-            href = self.get_asset_href(item)
-            if href:
-                self.LOGGER.info("Building cog for {}".format(item.id))
+        # SECTION TO IMPLEMENT
+        item.bbox = [1, 1, 3, 3]
+        item.geometry = json.loads(dc3_request.roi)  # TODO
+        item.centroid = [0, 0]  # TODO
+        i = 1
+        for band in item.properties.eo__bands:
+            band.index = i
+            i = 1 + 1
+            band.asset = CUBE_ASSET_NAME
+            band.dc3__quality_indicators = Indicators(
+                dc3__time_compacity=0,  # TODO
+                dc3__group_lightness=0,  # TODO
+                dc3__spatial_coverage=0,  # TODO
+                dc3__time_regularity=0)  # TODO
+        item.properties.dc3__quality_indicators = Indicators(
+            dc3__time_compacity=0,  # TODO
+            dc3__group_lightness=0,  # TODO
+            dc3__spatial_coverage=0,  # TODO
+            dc3__time_regularity=0)  # TODO
+        item.properties.dc3__composition = dc3_request.composition  # TODO set the dc3__quality_indicators of the groups
+        item.properties.dc3__number_of_chunks = 0   # TODO compute the number of chunks
+        item.properties.dc3__chunk_weight = 0   # TODO compute the chunk weight
+        item.properties.dc3__fill_ratio = 0   # TODO compute the fill ratio
+        item.properties.cube__dimensions = {}   # TODO set the dimensiosn
+        item.properties.cube__variables = {}   # TODO set the variables
 
-                from osgeo import gdal
-                start = time()
-                tci_file_path = self.__download_TCI(href)
-                self.LOGGER.info("Fetching the data took {} s".format(time() - start))
-
-                start = time()
-                kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
-                gdal.Warp(asset_location, tci_file_path, **kwargs)
-                self.LOGGER.info("Creating COG took {} s".format(time() - start))
-                os.remove(tci_file_path)
-            else:
-                raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
-        else:
-            raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
-
-    def __download_TCI(self, href: str):
-        storage = AccessManager.resolve_storage(href)
-
-        # With GS, it has been observed that performances for extracting a file directly from the zip remotely
-        # Is far more slower than downloading the whole archive and then unzipping
-        if storage.type == "gs" or AccessManager.is_download_required(href):
-            # Create tmp file where data will be downloaded
-            tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
-
-            # Download archive then extract it
-            storage.pull(href, tmp_file)
-            tci_file_path = self.__extract(tmp_file)
-
-            # Clean-up
-            os.remove(tmp_file)
-        else:
-            import smart_open
-
-            with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as fb:
-                tci_file_path = self.__extract(fb)
-
-        return tci_file_path
-
-    def __extract(self, zip_file: str | io.TextIOWrapper):
-        with zipfile.ZipFile(zip_file) as raster_zip:
-            file_names = raster_zip.namelist()
-            raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI.jp2", f), file_names))
-
-            if len(raster_files) == 0:
-                raise DriverException("No TCI file found in the SAFE archive.")
-            if len(raster_files) > 1:
-                self.LOGGER.warning("More than one TCI file found, using the first one.")
-
-            tci_file_path = os.path.join(AccessManager.tmp_dir, raster_files[0])
-            raster_zip.extract(raster_files[0], AccessManager.tmp_dir)
-
-        return tci_file_path
+        cube_file = os.path.join(target_directory, "cube.zarr")
+        with open(cube_file, "wb") as out:
+            out.truncate(1024 * 1024 * 10)
+        item.assets = {
+            CUBE_ASSET_NAME: Asset(
+                name=CUBE_ASSET_NAME,
+                size=get_file_size(cube_file),
+                type=MimeType.ZARR.name,
+                href=cube_file,
+                asset_type=ResourceType.cube.name,
+                asset_format=AssetFormat.zarr.name,
+                airs__managed=True,
+                title=dc3_request.description,
+                description=dc3_request.description,
+                roles=[Role.datacube, Role.data, Role.zarr]
+            )
+        }
+        Driver.LOGGER.debug("Cube STAC Item: {}".format(mapper.to_json(item)))
+        return item

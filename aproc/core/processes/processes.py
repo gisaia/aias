@@ -40,6 +40,7 @@ class Processes:
             try:
                 state.event(event)
                 task_id = event.get('uuid', None)
+                LOGGER.debug(event)
                 if task_id:
                     status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:
@@ -52,14 +53,10 @@ class Processes:
                         status_info.updated = round(datetime.now().timestamp())
                         if status_info.status.is_final():
                             status_info.finished = round(datetime.now().timestamp())
-                        if event.get('state') == states.STARTED:
-                            status_info.started = round(datetime.now().timestamp())
-                        next_msg = event.get('result', event.get('exception', None))
-                        if next_msg:
-                            if status_info.message:
-                                status_info.message = status_info.message + "\n" + next_msg
-                            else:
-                                status_info.message = next_msg
+                            status_info.message = json.dumps(AsyncResult(task_id).result)
+                        else:
+                            if event.get('state') == states.STARTED:
+                                status_info.started = round(datetime.now().timestamp())
                         Processes.__save_status_info__(status_info)
                 else:
                     LOGGER.warn("Task id not found in event {}".format(event))
@@ -138,7 +135,7 @@ class Processes:
     def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
-        kwargs = input.model_dump()
+        kwargs = input.model_dump(exclude_none=True, exclude_unset=True)
         kwargs["headers"] = headers
         LOGGER.debug("before_execute {}".format(process_name))
         extra = process.before_execute(**kwargs)
@@ -151,7 +148,7 @@ class Processes:
             type=JobType.process,
             jobID=job_id,
             resourceID=process.get_resource_id(input),
-            status=StatusCode.accepted.value,
+            status=StatusCode.accepted,
             message="",
             created=round(datetime.now().timestamp()),
             updated=round(datetime.now().timestamp()),

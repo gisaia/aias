@@ -1,10 +1,7 @@
 from pydantic import Field
 
+from airs.core.models.model import Band, ChunkingStrategy, ItemGroup
 from extensions.aproc.proc.processes.process_model import InputProcess
-
-from .enums import ChunkingStrategy as CStrat
-from .band import Band
-from .item_group import ItemGroup
 
 COMPOSITION_DESCRIPTION = "The composition is an array of item groups " + \
                           "that each represent a temporal slice of " + \
@@ -17,10 +14,11 @@ ALIASES_DESCRIPTION = "The list of aliases for this datacube. " + \
                       "product bands used to compute the datacube bands."
 ROI_DESCRIPTION = "The Region Of Interest to extract. " + \
                   "Accepted formats are BBOX or WKT POLYGON."
+ANNOTATIONS_DESCRIPTION = "Textual annotations of the result."
 RESOLUTION_DESCRIPTION = "The requested spatial resolution in meters. " + \
                          "By default uses the best resolution of the " + \
                          "given products."
-PROJECTION_DESCRIPTION = "The targeted projection. Default: 'EPSG:4326'."
+PROJECTION_DESCRIPTION = "The targeted projection. Default: 4326."
 CHUNKING_DESCRIPTION = "Defines how the datacube must be chunked, " + \
                        "to facilitate further data processing. Three " + \
                        "strategies are available: 'carrot', 'potato' and " + \
@@ -37,16 +35,18 @@ OVERVIEW_DESCRIPTION = "Build an overview of the resulting cube."
 
 
 class InputDC3BuildProcess(InputProcess):
-    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION)
+    target_collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
+    target_catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
+    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION, min_length=1)
     overview: bool = Field(default=False, description=COMPOSITION_DESCRIPTION)
-    bands: list[Band] = Field(description=BANDS_DESCRIPTION)
-    extra_params: dict[str, str] = Field(description=EXTRA_PARAMS_DESCRIPTION)
+    bands: list[Band] = Field(description=BANDS_DESCRIPTION, min_length=1)
+    #driver_params: dict[str, str] = Field(default={}, description=EXTRA_PARAMS_DESCRIPTION)
     roi: str = Field(description=ROI_DESCRIPTION)
     target_resolution: int = Field(default=10,
                                    description=RESOLUTION_DESCRIPTION, gt=0)
-    target_projection: str = Field(default="EPSG:4326",
+    target_projection: int = Field(default=4326,
                                    description=PROJECTION_DESCRIPTION)
-    chunking_strategy: CStrat = Field(default=CStrat.POTATO,
-                                      description=CHUNKING_DESCRIPTION)
-    description: str | None = Field(description=DESCRIPTION_DESCRIPTION)
-    keywords: list[str] | None = Field(description=THEMATICS_DESCRIPTION)
+    chunking_strategy: ChunkingStrategy = Field(default=ChunkingStrategy.POTATO, description=CHUNKING_DESCRIPTION)
+    title: str = Field(default=None, description=DESCRIPTION_DESCRIPTION)
+    description: str = Field(default=None, description=DESCRIPTION_DESCRIPTION)
+    keywords: list[str] = Field(default=[], description=THEMATICS_DESCRIPTION)

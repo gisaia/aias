@@ -22,6 +22,12 @@ processes:
     class_name: extensions.aproc.proc.enrich.enrich_process
     configuration:
       drivers: conf/enrich_drivers.yaml
+  -
+    name: dc3build
+    class_name: extensions.aproc.proc.dc3build.dc3build_process
+    configuration:
+      drivers: conf/dc3build_drivers.yaml
+
 
 access_manager:
   tmp_dir: /tmp/

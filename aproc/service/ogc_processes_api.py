@@ -104,7 +104,7 @@ def get_jobs_by_resource_id(resourceId: str):
     if results is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
-        return JSONResponse(list(map(lambda s: s.model_dump(), results)))
+        return JSONResponse(list(map(lambda s: s.model_dump(exclude_none=True, exclude_unset=True), results)))
 
 
 @ROUTER.get("/",
@@ -218,13 +218,13 @@ def post_process_execute(process_id: str, execute: Execute, request: Request):
     process = __get_process(process_id)
     try:
         if hasattr(process, "input_model"):
-            inputs = execute.model_dump().get("inputs")
+            inputs = execute.model_dump(exclude_none=True, exclude_unset=True).get("inputs")
             context = dict(map(lambda v: v, request.headers.items()))
             job: StatusInfo = Processes.execute(process_name=process_id, headers=context, input=process.input_model(**inputs))
             job.processID = process_id
-            return JSONResponse(content=job.model_dump(), status_code=status.HTTP_201_CREATED)
-        return JSONResponse(content=process.execute().model_dump(), status_code=status.HTTP_200_OK)
+            return JSONResponse(content=job.model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_201_CREATED)
+        return JSONResponse(content=process.execute().model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_200_OK)
     except Exception as e:
         LOGGER.exception(e)
         error = RESTException(type="Exception", status=500, title="Can not execute {} with inputs {}".format(process_id, execute), detail=str(e), )
-        return JSONResponse(content=error.model_dump(), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JSONResponse(content=error.model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
