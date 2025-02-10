@@ -7,6 +7,7 @@ from airs.core.models import mapper
 from airs.core.models.model import Asset, Item
 from aproc.core.processes.process import Process
 from airs.core.settings import S3 as S3Configuration
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import ConnectionException, RegisterException
 
 
@@ -101,7 +102,7 @@ class ARLASServicesHelper(ABC):
     @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
-            with open(asset.href, 'rb') as filedesc:
+            with AccessManager.stream(asset.href) as filedesc:
                 file = {'file': (asset.name, filedesc, asset.type)}
                 try:
                     r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)

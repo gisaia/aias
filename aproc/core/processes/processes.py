@@ -14,6 +14,7 @@ from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
+from airs.core.models.mapper import serialize_datetime
 from aproc.core.logger import Logger
 from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
                                        StatusInfoList)
@@ -53,7 +54,10 @@ class Processes:
                         status_info.updated = round(datetime.now().timestamp())
                         if status_info.status.is_final():
                             status_info.finished = round(datetime.now().timestamp())
-                            status_info.message = json.dumps(AsyncResult(task_id).result)
+                            if event.get('state') == states.SUCCESS:
+                                status_info.message = json.dumps(AsyncResult(task_id).result, default=serialize_datetime)
+                            else:
+                                status_info.message = str(AsyncResult(task_id).result)
                         else:
                             if event.get('state') == states.STARTED:
                                 status_info.started = round(datetime.now().timestamp())
@@ -61,6 +65,7 @@ class Processes:
                 else:
                     LOGGER.warn("Task id not found in event {}".format(event))
             except Exception as e:
+                LOGGER.error("STATUS UPDATE ERROR !!!")
                 LOGGER.exception(e)
 
         sleep_time = 0

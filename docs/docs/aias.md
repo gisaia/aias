@@ -216,6 +216,7 @@ List of processes:
 - `directory_ingest` : it ingests archives found in a directory.
 - `download` : it ingests an archive.
 - `enrich` : it enriches an item (like adding a cog).
+- `dc3build` : it builds an new "cube" item based on groups of items, each group representing a time slice.
 
 #### Ingest process
 
@@ -236,7 +237,7 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 - transform the assets
 - create an AIRS Item
 
-A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest/drivers/driver.py).
+A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest/drivers/ingest_driver.py).
 
 !!! warning
     The name of the class within the module __must be__ `Driver`.
@@ -262,12 +263,40 @@ The `enrich` process takes a list of tuple collection/item id. The process runs 
 - upload the asset
 - update the item
 
-A driver must implement the abstract class [Driver](extensions/aproc/proc/enrich/drivers/driver.py).
+A driver must implement the abstract class [Driver](extensions/aproc/proc/enrich/drivers/enrich_driver.py).
 The following drivers are available in the `extensions` directory:
 
 - `safe` for sentinel 2 products
 
 The drivers are configured in [enrich_drivers.yaml](conf/enrich_drivers.yaml)
+
+### Dc3build process
+
+The `dc3build` process takes groups of items for building a data cube. Each item group is used for building a time slice of the cube. The process runs the following steps:
+
+- identify the driver for building the cube
+- check that the items exist with ARLAS Server
+- collects the item from AIRS
+- build the cube based on the items (done by the driver)
+- register the cube's assets in AIRS
+- register the cube item in AIRS
+
+The process is "driver" based. Each data source must have a compliant driver in order to be able to build a cube. A driver has to
+
+- say whether it supports a given archive or not
+- build the cube based on the items and place it in the specified directory
+
+A driver must implement the abstract class [Driver](extensions/aproc/proc/dc3build/drivers/dc3_driver.py).
+
+!!! warning
+    The name of the class within the module __must be__ `Driver`.
+
+The following drivers are available in the `extensions` directory:
+
+- safe
+
+The drivers are configured in [dc3build_drivers.yaml](conf/dc3build_drivers.yaml)
+
 
 ### Prerequisites
 
