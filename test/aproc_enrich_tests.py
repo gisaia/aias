@@ -4,7 +4,7 @@ import unittest
 from airs.core.models import mapper
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
-from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, SENTINEL_2_ID,
+from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, SENTINEL_2_ID, MAX_ITERATIONS,
                         SENTINEL_2_ITEM, setUpTest, add_item)
 
 import requests
@@ -24,8 +24,10 @@ class Tests(unittest.TestCase):
         r = requests.post("/".join([APROC_ENDPOINT, "processes/enrich/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
 

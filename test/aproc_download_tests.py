@@ -2,7 +2,7 @@ import json
 import os
 import unittest
 from airs.core.models.model import AssetFormat, MimeType
-from test.utils import (APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, ASSET_NAME,
+from test.utils import (APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, ASSET_NAME, MAX_ITERATIONS,
                         BBOX, CLOUD_ID, CLOUD_ITEM, COLLECTION, EPSG_27572, ID, ITEM_PATH, SENTINEL_2_ID,
                         SENTINEL_2_ITEM, SMTP_SERVER, TOKEN, add_item,
                         index_collection_prefix, setUpTest)
@@ -127,26 +127,26 @@ class Tests(unittest.TestCase):
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection=EPSG_27572, raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.dismissed, status.message)
 
         # test 2 : cancel while it's running
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection=EPSG_27572, raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.dismissed, status.message)
 
@@ -164,8 +164,10 @@ class Tests(unittest.TestCase):
         return result
 
     def wait_for_success(self, status: StatusInfo):
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful, status.message)
         return status

@@ -48,6 +48,7 @@ CLOUD_ID = "619d7a94-c85e-4e6d-938c-50a043b51036"
 CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"
 
 EPSG_27572 = "EPSG:27572"
+MAX_ITERATIONS = 600
 
 IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)

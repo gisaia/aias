@@ -180,26 +180,6 @@ class AprocProcess(Process):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
     @staticmethod
-    def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
-        if asset.airs__managed is True:
-            with open(asset.href, 'rb') as filedesc:
-                file = {'file': (asset.name, filedesc, asset.type)}
-                try:
-                    r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
-                    if r.ok:
-                        LOGGER.debug("asset uploaded successfully")
-                    else:
-                        msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, airs_endpoint)
-                        LOGGER.error(msg)
-                        raise RegisterException(msg)
-                except requests.exceptions.ConnectionError:
-                    msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
-                    LOGGER.error(msg)
-                    raise ConnectionException(msg)
-        else:
-            LOGGER.info("{} not managed".format(asset.name))
-
-    @staticmethod
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:

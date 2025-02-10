@@ -19,6 +19,7 @@ from test.utils import (
     SENTINEL_2_ID,
     SENTINEL_2_ITEM,
     TOKEN,
+    MAX_ITERATIONS,
     setUpTest,
     add_item,
 )
@@ -79,12 +80,14 @@ class Tests(unittest.TestCase):
         )
         self.assertTrue(r.ok)
         status = StatusInfo(**json.loads(r.content))
+        i: int = 0
         while status.status not in [
             StatusCode.failed,
             StatusCode.dismissed,
             StatusCode.successful,
-        ]:
+        ] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status = StatusInfo(
                 **json.loads(
                     requests.get(
