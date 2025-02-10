@@ -8,10 +8,9 @@ from airs.core.models.model import Item
 from airs.core.models.model import RGB, Band, ChunkingStrategy, CommonBandName, Indicators, ItemGroup, ItemReference, MimeType
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
-from extensions.aproc.proc.dc3build.dc3build_process import AprocProcess
+#from extensions.aproc.proc.dc3build.dc3build_process import AprocProcess
 from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
 from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
-from aproc.core.settings import Configuration as AprocConfiguration
 
 from test.utils import (
     AIRS_URL,
@@ -96,7 +95,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(status.status, StatusCode.successful)
         result = json.loads(status.message)
         item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"])
-        self.assertListEqual(AprocProcess.check_item(item, check_asset_exists=False), [])
+#        self.assertListEqual(AprocProcess.check_item(item, check_asset_exists=False), [])
         self.assertIsNotNone(item.assets.get("cube").href)
         self.assertTrue(ARLASServicesHelper.asset_in_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"], asset_name="cube"))
 

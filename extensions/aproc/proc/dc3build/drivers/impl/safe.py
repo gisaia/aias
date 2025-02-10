@@ -5,9 +5,9 @@ import os
 from airs.core.models import mapper
 from airs.core.models.model import (Asset, AssetFormat, Indicators, Item, ItemFormat, MimeType, Properties,
                                     ResourceType, Role, VariableType)
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_file_size
 
 
 class Driver(DC3Driver):
@@ -102,7 +102,7 @@ class Driver(DC3Driver):
         item.assets = {
             CUBE_ASSET_NAME: Asset(
                 name=CUBE_ASSET_NAME,
-                size=get_file_size(cube_file),
+                size=AccessManager.get_file_size(cube_file),
                 type=MimeType.ZARR.name,
                 href=cube_file,
                 asset_type=ResourceType.cube.name,
