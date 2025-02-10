@@ -50,7 +50,29 @@ class Tests(unittest.TestCase):
                         )
                     ],
                     dc3__quality_indicators=Indicators()
-                )
+                ),
+                ItemGroup(
+                    dc3__datetime=datetime.date(2022, 9, 25),
+                    dc3__references=[
+                        ItemReference(
+                            dc3__alias="s2",
+                            dc3__collection=COLLECTION,
+                            dc3__id=SENTINEL_2_ID,
+                        )
+                    ],
+                    dc3__quality_indicators=Indicators()
+                ),
+                ItemGroup(
+                    dc3__datetime=datetime.date(2022, 10, 25),
+                    dc3__references=[
+                        ItemReference(
+                            dc3__alias="s2",
+                            dc3__collection=COLLECTION,
+                            dc3__id=SENTINEL_2_ID,
+                        )
+                    ],
+                    dc3__quality_indicators=Indicators()
+                ),
             ],
             overview=True,
             bands=[Band(
