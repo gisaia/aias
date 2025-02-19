@@ -4,17 +4,21 @@
 mkdir -p target/generated-docs
 rm -rf target/generated-docs/*
 
-# Generate model schema json file
-docker run -v `pwd`:/app  python:3 /bin/bash -c  "cd /app/; pip3 install pydantic ; python3 -m airs.core.models.utils > /app/docs/docs/model/model.schema.json"
-# Generate model documentation
-docker run --rm -v `pwd`/docs/docs/model:/schema/ gisaia/jsonschema2md:latest -d /schema/ -o /schema/ -x -
-# sed -i'' 's/# /## /' docs/docs/model/model.md
+# Generate AIRS docs
+## Get AIRS api json file
+mkdir -p docs/docs/api
+docker run -d --name airs -e AIRS_HOST="0.0.0.0" -p 8000:8000 gisaia/airs
+i=1; until curl -XGET http://0.0.0.0:8000/openapi.json -o docs/docs/api/openapi.json; do if [ $i -lt 60 ]; then sleep 1; else break; fi; i=$(($i + 1)); done
+docker stop airs
+docker rm airs
 
-# Overwrite generated model README
-cp docs/docs/model/model.md docs/docs/model/README.md
+## Generate AIRS docs as docs/docs/api/reference.md file
+docker run --rm \
+    --mount dst=/input/api.json,src="$PWD/docs/docs/api/openapi.json",type=bind,ro \
+    --mount dst=/input/env.json,src="$PWD/conf/doc/widdershins.json",type=bind,ro \
+    --mount dst=/output,src="$PWD/docs/docs/api",type=bind \
+	gisaia/widdershins:4.0.1
+rm docs/docs/api/openapi.json
 
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
-
-cat release/materials/README_head.md > target/README.md
-cat docs/docs/model/README.md >> target/README.md
