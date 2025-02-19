@@ -29,27 +29,27 @@ At least 8Go of RAM is needed.
 
 This stack relies on the docker compose configuration files. The available endpoints are:
 
-- [AIRS](http://localhost:8000/docs)
-- [APROC](http://localhost:8001/docs)
-- [AGATE](http://localhost:8004/docs)
-- [FAM](http://localhost:8005/docs)
-- [minio](http://localhost:9001/browser)
-- [elasticsearch](http://localhost:8200)
-- [rabbitmq](http://localhost:15672/)
+- [AIRS](http://localhost:8000/docs){:target="_blank"}
+- [APROC](http://localhost:8001/docs){:target="_blank"}
+- [AGATE](http://localhost:8004/docs){:target="_blank"}
+- [FAM](http://localhost:8005/docs){:target="_blank"}
+- [minio](http://localhost:9001/browser){:target="_blank"}
+- [elasticsearch](http://localhost:8200){:target="_blank"}
+- [rabbitmq](http://localhost:15672/){:target="_blank"}
 - redis on port 6379
-- [SMTP4DEV](http://localhost:3000/) for email testing
+- [SMTP4DEV](http://localhost:3000/){:target="_blank"} for email testing
 
 Health checks are available for all non-third party services:
 
-- [AIRS](http://localhost:8000/arlas/airs/healthcheck)
-- [APROC](http://localhost:8001/arlas/aproc/healthcheck)
-- [AGATE](http://localhost:8004/arlas/agate/healthcheck)
-- [FAM](http://localhost:8005/arlas/fam/healthcheck)
+- [AIRS](http://localhost:8000/arlas/airs/healthcheck){:target="_blank"}
+- [APROC](http://localhost:8001/arlas/aproc/healthcheck){:target="_blank"}
+- [AGATE](http://localhost:8004/arlas/agate/healthcheck){:target="_blank"}
+- [FAM](http://localhost:8005/arlas/fam/healthcheck){:target="_blank"}
 
 
 ## ARLAS Item Registration Services (AIRS)
 
-ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The service exposes the STAC-T methods (https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
+ARLAS Item Registration Services offers registration services for Spatio-temporal assets. It manages Items as well as Assets (e.g. raster files, cogs, etc.). The service exposes the STAC-T methods [github.com/stac-api-extensions/transaction](https://github.com/stac-api-extensions/transaction) as well as a set of methods for handling the assets.
 
 By default, the service manages the assets. When an item is registered, the service checks that the managed asset exists: the asset must be added before the item. Deleting an item is cascaded on the managed assets. An asset can be unmanaged by setting `asset.airs:managed=False` (or `asset.airs__managed=False`).
 
@@ -68,9 +68,12 @@ The AIRS Model is based on the STAC specifications. It supports the following ex
 
 Also, metadata are enriched by the service and placed in the `generated` namespace.
 
-Namespaces are prefixes in the key names of the JSON. The `:` is used for separating the namespace and the field name. Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation.
+Namespaces are prefixes in the key names of the JSON. The `:` is used for separating the namespace and the field name. 
 
-For more details, see the [model documentation](docs/model/model.md)
+!!! warning
+    Since ARLAS does not support the `:` in field names, the character is replaced by `__` for storage and indexation.
+
+For more details, see the [AIRS API documentation](api/reference.md)
 
 ### Prerequisites
 
@@ -78,7 +81,7 @@ For more details, see the [model documentation](docs/model/model.md)
 - elasticsearch
 - docker
 
-See [here](https://hub.docker.com/r/gisaia/airs/tags) for the available versions of airs.
+See [here](https://hub.docker.com/r/gisaia/airs/tags){:target="_blank"} for the available versions of airs.
 
 #### AIRS Configuration
 
@@ -236,7 +239,7 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 - transform the assets
 - create an AIRS Item
 
-A driver must implement the abstract class [Driver](extensions/aproc/proc/ingest/drivers/driver.py).
+A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/extensions/aproc/proc/ingest/drivers/ingest_driver.py){:target="_blank"}.
 
 !!! warning
     The name of the class within the module __must be__ `Driver`.
@@ -252,7 +255,7 @@ The following drivers are available in the `extensions` directory:
 - terrasarx
 - geotif and jpeg2000
 
-The drivers are configured in [drivers.yaml](conf/drivers.yaml)
+The drivers are configured in [drivers.yaml](https://github.com/gisaia/aias/blob/develop/conf/drivers.yaml){:target="_blank"}
 
 #### Enrich process
 The `enrich` process takes a list of tuple collection/item id. The process runs the following step for each item:
@@ -262,12 +265,12 @@ The `enrich` process takes a list of tuple collection/item id. The process runs 
 - upload the asset
 - update the item
 
-A driver must implement the abstract class [Driver](extensions/aproc/proc/enrich/drivers/driver.py).
+A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/extensions/aproc/proc/enrich/drivers/enrich_driver.py){:target="_blank"}.
 The following drivers are available in the `extensions` directory:
 
 - `safe` for sentinel 2 products
 
-The drivers are configured in [enrich_drivers.yaml](conf/enrich_drivers.yaml)
+The drivers are configured in [enrich_drivers.yaml](https://github.com/gisaia/aias/blob/develop/conf/enrich_drivers.yaml){:target="_blank"}
 
 ### Prerequisites
 
@@ -277,7 +280,7 @@ The drivers are configured in [enrich_drivers.yaml](conf/enrich_drivers.yaml)
 - celery brocker (rabbitmq)
 - docker
 
-See [here](https://hub.docker.com/r/gisaia/aproc-service/tags) for the available versions of aproc-service and [here](https://hub.docker.com/r/gisaia/aproc-proc/tags) for the available versions of aproc-processes
+See [here](https://hub.docker.com/r/gisaia/aproc-service/tags){:target="_blank"} for the available versions of aproc-service and [here](https://hub.docker.com/r/gisaia/aproc-proc/tags){:target="_blank"} for the available versions of aproc-processes
 
 #### APROC Configuration
 
@@ -384,7 +387,7 @@ Result:
 
 #### Download process
 
-The `download` and `directory_download` relies on a driver mechanism. A driver must implement the abstract class [Driver](extensions/aproc/proc/download/drivers/driver.py). 
+The `download` and `directory_download` relies on a driver mechanism. A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/extensions/aproc/proc/download/drivers/download_driver.py){:target="_blank"}. 
 
 Available drivers are
 
@@ -608,7 +611,7 @@ Returns
 
 The following synchronisations are available:
 
-- [GEODES](https://geodes.cnes.fr/)
+- [GEODES](https://geodes.cnes.fr/){:target="_blank"}
 
 
 ### GEODES
