@@ -5,20 +5,24 @@ mkdir -p target/generated-docs
 rm -rf target/generated-docs/*
 
 # Generate AIRS docs
-## Get AIRS api json file
-mkdir -p docs/docs/api
-docker run -d --name airs -e AIRS_HOST="0.0.0.0" -p 8000:8000 gisaia/airs
-i=1; until curl -XGET http://0.0.0.0:8000/openapi.json -o docs/docs/api/openapi.json; do if [ $i -lt 60 ]; then sleep 1; else break; fi; i=$(($i + 1)); done
-docker stop airs
-docker rm airs
+mkdir -p docs/docs/api/airs
+mkdir -p docs/docs/api/fam
+mkdir -p docs/docs/api/aproc_service
 
-## Generate AIRS docs as docs/docs/api/reference.md file
-docker run --rm \
-    --mount dst=/input/api.json,src="$PWD/docs/docs/api/openapi.json",type=bind,ro \
-    --mount dst=/input/env.json,src="$PWD/conf/doc/widdershins.json",type=bind,ro \
-    --mount dst=/output,src="$PWD/docs/docs/api",type=bind \
-	gisaia/widdershins:4.0.1
-rm docs/docs/api/openapi.json
+## Run AIAS stack
+./test/start_stack.sh
+
+## Get AIRS api json file
+i=1; until curl -XGET http://0.0.0.0:8000/openapi.json -o docs/docs/airs/openapi.json; do if [ $i -lt 60 ]; then sleep 1; else break; fi; i=$(($i + 1)); done
+
+## Get FAM api json file
+i=1; until curl -XGET http://0.0.0.0:8005/openapi.json -o docs/docs/fam/openapi.json; do if [ $i -lt 60 ]; then sleep 1; else break; fi; i=$(($i + 1)); done
+
+## Fet APROC service api file
+i=1; until curl -XGET http://0.0.0.0:8001/openapi.json -o docs/docs/aproc_service/openapi.json; do if [ $i -lt 60 ]; then sleep 1; else break; fi; i=$(($i + 1)); done
+
+## Stop the AIAS stack
+./test/stop_stack.sh
 
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
