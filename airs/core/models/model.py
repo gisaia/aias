@@ -1,6 +1,5 @@
 from datetime import datetime as Datetime
 from enum import Enum
-import enum
 from typing import Any, Dict, List
 
 from pydantic import BaseModel, Extra, Field
@@ -16,19 +15,19 @@ RGB_DESCRIPTION = "Which RGB channel the band is used for the preview. " + \
 CMAP_DESCRIPTION = "The matplotlib color map to use for the preview."
 
 
-class RGB(str, enum.Enum):
+class RGB(str, Enum):
     RED = 'RED'
     GREEN = 'GREEN'
     BLUE = 'BLUE'
 
 
-class ChunkingStrategy(str, enum.Enum):
+class ChunkingStrategy(str, Enum):
     CARROT = 'carrot'
     POTATO = 'potato'
     SPINACH = 'spinach'
 
 
-class SensorFamily(str, enum.Enum):
+class SensorFamily(str, Enum):
     OPTIC = "OPTIC"
     RADAR = "RADAR"
     MULTI = "MULTI"
@@ -202,16 +201,16 @@ class DimensionType(Enum):
 
 
 class Indicators(BaseModel):
-    dc3__time_compacity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extend of the temporal slices (groups) are compact or not compared to the cube temporal extend. Computed as follow: 1-range(group rasters) / range(cube rasters).")
+    dc3__time_compacity: float | None = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extent of the temporal slices (groups) are compact or not compared to the cube temporal extent. Computed as follow: 1-range(group rasters) / range(cube rasters).")
     dc3__spatial_coverage: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))")
     dc3__group_lightness: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of non overlapping regions between the different input rasters. Computed as follow: area(intersection(union(rasters),roi)) / sum(area(intersection(raster, roi)))")
-    dc3__time_regularity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the regularity of the extends between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps)")
+    dc3__time_regularity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the regularity of the extents between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps)")
 
 
 class ItemReference(BaseModel):
-    dc3__collection: str = Field(description="Name of the collection containing the item")
-    dc3__id: str = Field(description="Item's identifer")
-    dc3__alias: str = Field(default=None, description="Product alias (e.g. s2_l2)")
+    dc3__collection: str = Field(description="[ARLAS, extension dc3] Name of the collection containing the item")
+    dc3__id: str = Field(description="[ARLAS, extension dc3] Item's identifer")
+    dc3__alias: str = Field(default=None, description="[ARLAS, extension dc3] Product alias (e.g. s2_l2)")
 
 
 class ItemGroup(BaseModel):
@@ -241,7 +240,7 @@ class Band(BaseModel, extra=Extra.allow):
 
 
 class Asset(BaseModel, extra=Extra.allow):
-    name: str | None = Field(default=None, title="[ARLAS] Asset's name. But be the same as the key in the `assets` dictionary.", max_length=300)
+    name: str | None = Field(default=None, title="[ARLAS] Asset's name. Must be the same as the key in the `assets` dictionary.", max_length=300)
     size: int | None = Field(default=None, title="[ARLAS] Asset's size in Bytes.")
     href: str | None = Field(default=None, title="[STAC] Absolute link to the asset object.")
     asset_type: str | None = Field(default=None, title="[ARLAS] Type of data (ResourceType)")
@@ -317,7 +316,7 @@ class Properties(BaseModel, extra=Extra.allow):
     view__incidence_angle: float | None = Field(default=None, title="[STAC, extension view] The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).")
     view__azimuth: float | None = Field(default=None, title="[STAC, extension view] Viewing azimuth angle. The angle measured from the sub-satellite point (point on the ground below the platform) between the scene center and true north. Measured clockwise from north in degrees (0-360).")
     view__sun_azimuth: float | None = Field(default=None, title="[STAC, extension view] Sun azimuth angle. From the scene center point on the ground, this is the angle between truth north and the sun. Measured clockwise in degrees (0-360).")
-    view__sun_elevation: float | None = Field(default=None, title="S[STAC, extension view] un elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° means the data was captured during nautical twilight.")
+    view__sun_elevation: float | None = Field(default=None, title="[STAC, extension view] Sun elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° means the data was captured during nautical twilight.")
     storage__requester_pays: bool | None = Field(default=None, title="[STAC, extension storage] Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets")
     storage__tier: str | None = Field(default=None, title="[STAC, extension storage] Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
     storage__platform: str | None = Field(default=None, title="[STAC, extension storage] PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")

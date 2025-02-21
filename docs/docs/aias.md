@@ -216,7 +216,7 @@ List of processes:
 - `directory_ingest` : it ingests archives found in a directory.
 - `download` : it ingests an archive.
 - `enrich` : it enriches an item (like adding a cog).
-- `dc3build` : it builds an new "cube" item based on groups of items, each group representing a time slice.
+- `dc3build` : it builds a new "cube" item based on groups of items, each group representing a time slice.
 
 #### Ingest process
 
@@ -274,7 +274,7 @@ The drivers are configured in [enrich_drivers.yaml](conf/enrich_drivers.yaml)
 
 The `dc3build` process takes groups of items for building a data cube. Each item group is used for building a time slice of the cube. The process runs the following steps:
 
-- identify the driver for building the cube
+- identify the driver to build the cube
 - check that the items exist with ARLAS Server
 - collects the item from AIRS
 - build the cube based on the items (done by the driver)

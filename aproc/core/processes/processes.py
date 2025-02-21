@@ -41,7 +41,6 @@ class Processes:
             try:
                 state.event(event)
                 task_id = event.get('uuid', None)
-                LOGGER.debug(event)
                 if task_id:
                     status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:

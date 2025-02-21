@@ -19,7 +19,7 @@ class Configuration:
 
     @staticmethod
     def raise_if_not_valid():
-        MSG = "Enrich driver configuration exception: {}"
+        MSG = "Dc3build driver configuration exception: {}"
         if Configuration.settings is None or Configuration.settings.drivers is None or len(Configuration.settings.drivers) == 0:
             raise DriverException(MSG.format("No driver configured"))
         for driver in Configuration.settings.drivers:

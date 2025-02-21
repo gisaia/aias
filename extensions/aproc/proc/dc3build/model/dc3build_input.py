@@ -40,7 +40,6 @@ class InputDC3BuildProcess(InputProcess):
     composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION, min_length=1)
     overview: bool = Field(default=False, description=COMPOSITION_DESCRIPTION)
     bands: list[Band] = Field(description=BANDS_DESCRIPTION, min_length=1)
-    #driver_params: dict[str, str] = Field(default={}, description=EXTRA_PARAMS_DESCRIPTION)
     roi: str = Field(description=ROI_DESCRIPTION)
     target_resolution: int = Field(default=10,
                                    description=RESOLUTION_DESCRIPTION, gt=0)
