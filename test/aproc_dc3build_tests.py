@@ -1,32 +1,26 @@
 import datetime
 import json
-from time import sleep
 import time
 import unittest
-from airs.core.models import mapper
-from airs.core.models.model import Item
-from airs.core.models.model import RGB, Band, ChunkingStrategy, CommonBandName, Indicators, ItemGroup, ItemReference, MimeType
-from aproc.core.models.ogc.enums import StatusCode
-from aproc.core.models.ogc.job import StatusInfo
-#from extensions.aproc.proc.dc3build.dc3build_process import AprocProcess
-from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
-
-from test.utils import (
-    AIRS_URL,
-    APROC_ENDPOINT,
-    COLLECTION,
-    SENTINEL_2_ID,
-    SENTINEL_2_ITEM,
-    TOKEN,
-    MAX_ITERATIONS,
-    setUpTest,
-    add_item,
-)
+from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, MAX_ITERATIONS,
+                        SENTINEL_2_ID, SENTINEL_2_ITEM, TOKEN, add_item,
+                        setUpTest)
+from time import sleep
 
 import requests
 
+from airs.core.models import mapper
+from airs.core.models.model import (RGB, Band, ChunkingStrategy,
+                                    CommonBandName, Indicators, Item,
+                                    ItemGroup, ItemReference, MimeType)
 from aproc.core.models.ogc import Execute
+from aproc.core.models.ogc.enums import StatusCode
+from aproc.core.models.ogc.job import StatusInfo
+#from extensions.aproc.proc.dc3build.dc3build_process import AprocProcess
+from extensions.aproc.proc.dc3build.model.dc3build_input import \
+    InputDC3BuildProcess
+from extensions.aproc.proc.processes.arlas_services_helper import \
+    ARLASServicesHelper
 
 
 class Tests(unittest.TestCase):

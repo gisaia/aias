@@ -11,7 +11,6 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process
-from aproc.core.settings import Configuration
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.access.manager import AccessManager
@@ -46,7 +45,7 @@ class OutputDC3BuildProcess(BaseModel):
 
 summary: ProcessSummary = ProcessSummary(
     title="Build a cube based on catalog items, then register the result in ARLAS.",
-    description="Build a data cube (time serie of ) based on groups of items, each group representing a time slice. The result is register in ARLAS",
+    description="Build a data cube (time serie of observations) based on groups of items, each group representing a time slice. The result is registered in ARLAS",
     keywords=["cube", "build", "datacube", "dc3build"],
     id="dc3build",
     version="0.1",
@@ -72,7 +71,7 @@ class AprocProcess(Process):
             InputDC3BuildConfiguration.raise_if_not_valid()
             DriverManager.init(summary.id, InputDC3BuildConfiguration.settings.drivers)
         else:
-            raise DriverException("Invalid configuration for enrich drivers ({})".format(configuration))
+            raise DriverException("Invalid configuration for dc3build drivers ({})".format(configuration))
         AprocProcess.input_model = InputDC3BuildProcess
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
@@ -90,7 +89,7 @@ class AprocProcess(Process):
     @staticmethod
     def __get_driver__(input: InputDC3BuildProcess) -> DC3Driver:
         driver: DC3Driver = None
-        if input.composition and len(input.composition) > 0 and len(input.composition[0].dc3__references):
+        if input.composition and len(input.composition) > 0 and len(input.composition[0].dc3__references) and input.composition[0].dc3__references[0]:
             reference = input.composition[0].dc3__references[0]
             item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AprocConfiguration.settings.airs_endpoint, collection=reference.dc3__collection, item_id=reference.dc3__id)
             driver = DriverManager.solve(summary.id, item, include_drivers=input.include_drivers, exclude_drivers=input.exclude_drivers)
@@ -116,7 +115,7 @@ class AprocProcess(Process):
                 if item is None:
                     error_msg = "{}/{} not found".format(reference.dc3__collection, reference.dc3__id)
                     LOGGER.error(error_msg)
-                    LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})
+                    LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "dc3build", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-dc3build", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})
                     raise RegisterException(error_msg)
                 else:
                     LOGGER.debug("{} can access {}/{}".format(send_to, reference.dc3__collection, reference.dc3__id))
@@ -142,7 +141,7 @@ class AprocProcess(Process):
             driver = DriverManager.solve(summary.id, item, include_drivers=input.include_drivers, exclude_drivers=input.exclude_drivers)
             if driver is None:
                 error_msg = "No driver found for {}/{}".format(reference.dc3__collection, reference.dc3__id)
-                LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})
+                LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "dc3build", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})
                 LOGGER.error(error_msg)
                 raise DriverException(error_msg)
         id = uuid.uuid4().hex
@@ -165,7 +164,7 @@ class AprocProcess(Process):
                     if asset.href.startswith(working_dir):
                         # updload asset
                         AprocProcess.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload_asset', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": item.id})
-                        ARLASServicesHelper.upload_asset_if_managed(item=item, asset=asset, airs_endpoint=Configuration.settings.airs_endpoint)
+                        ARLASServicesHelper.upload_asset_if_managed(item=item, asset=asset, airs_endpoint=AprocConfiguration.settings.airs_endpoint)
                         i += 1
                     else:
                         error_msg = "Failed to register asset: invalid asset location ({})".format(asset.href)
@@ -174,11 +173,11 @@ class AprocProcess(Process):
                 else:
                     LOGGER.warning("Asset {} is not managed. Its content ({}) will not be copied and could be lost.".format(asset_name, asset.href))
             AprocProcess.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": item.id})
-            item: Item = ARLASServicesHelper.insert_or_update_item(item, Configuration.settings.airs_endpoint)
-            return OutputDC3BuildProcess(collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id])).model_dump(exclude_none=True, exclude_unset=True)
+            item: Item = ARLASServicesHelper.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
+            return OutputDC3BuildProcess(collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id])).model_dump(exclude_none=True, exclude_unset=True)
         except Exception as e:
             error_msg = "Failed to build the cube. ({})".format(e.args)
-            LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich"})
+            LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build"})
             LOGGER.error(error_msg)
             LOGGER.exception(e)
             raise Exception(error_msg)
