@@ -73,52 +73,6 @@ The drivers are configured in [enrich_drivers.yaml](https://github.com/gisaia/ai
 
 See [here](https://hub.docker.com/r/gisaia/aproc-service/tags){:target="_blank"} for the available versions of aproc-service and [here](https://hub.docker.com/r/gisaia/aproc-proc/tags){:target="_blank"} for the available versions of aproc-processes
 
-### APROC Configuration
-
-The following environment variables must be set to run aproc-service and aproc-proc:
-
-| Variable                                               |
-| ------------------------------------------------------ |
-| APROC_ENDPOINT_FROM_APROC                              |
-| APROC_CONFIGURATION_FILE                               |
-| APROC_HOST                                             |
-| APROC_PORT                                             |
-| CELERY_BROKER_URL                                      |
-| CELERY_RESULT_BACKEND                                  |
-| AIRS_ENDPOINT                                          |
-| APROC_PREFIX                                           |
-| APROC_LOGGER_LEVEL                                     |
-| ARLAS_URL_SEARCH  |
-| APROC_CORS_ORIGINS  |
-| APROC_CORS_METHODS  |
-| APROC_CORS_HEADERS  |
-| AIRS_INDEX_COLLECTION_PREFIX  |
-| ARLAS_SMTP_ACTIVATED  |
-| ARLAS_SMTP_HOST  |
-| ARLAS_SMTP_PORT  |
-| ARLAS_SMTP_USERNAME  |
-| ARLAS_SMTP_PASSWORD  |
-| ARLAS_SMTP_FROM  |
-| APROC_DOWNLOAD_ADMIN_EMAILS  |
-| APROC_DOWNLOAD_OUTBOX_DIR  |
-| APROC_DOWNLOAD_CONTENT_USER  |
-| APROC_DOWNLOAD_SUBJECT_USER  |
-| APROC_DOWNLOAD_CONTENT_ERROR  |
-| APROC_DOWNLOAD_SUBJECT_ERROR  |
-| APROC_DOWNLOAD_CONTENT_ADMIN  |
-| APROC_DOWNLOAD_SUBJECT_ADMIN  |
-| APROC_EMAIL_PATH_PREFIX_ADD  |
-| APROC_PATH_TO_WINDOWS  |
-| APROC_DOWNLOAD_REQUEST_SUBJECT_USER  |
-| APROC_DOWNLOAD_REQUEST_CONTENT_USER  |
-| APROC_DOWNLOAD_REQUEST_SUBJECT_ADMIN  |
-| APROC_DOWNLOAD_REQUEST_CONTENT_ADMIN  |
-| APROC_INDEX_ENDPOINT_URL  |
-| APROC_INDEX_NAME  |
-| APROC_INDEX_LOGIN  |
-| APROC_INDEX_PWD  |
-| APROC_RESOURCE_ID_HASH_STARTS_AT  |
-
 ### Using `ingest` and `directory_ingest`
 
 #### Add an archive

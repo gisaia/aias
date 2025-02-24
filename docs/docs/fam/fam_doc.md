@@ -13,17 +13,7 @@ In the following examples, we will:
 - list archives in `DIMAP`
 
 !!! note
-    The service is deployed on `ARLAS_ENDPOINT` 
-
-### FAM Configuration
-
-The following environment variables must be set to run FAM:
-
-| Variable                                               |
-| ------------------------------------------------------ |
-|   INGESTED_FOLDER                                     |
-|   FAM_LOGGER_LEVEL                                         |
-|   FAM_PREFIX                                         |
+    The service is deployed on `ARLAS_ENDPOINT`
 
 ### Listing __files__ in `DIMAP`
 

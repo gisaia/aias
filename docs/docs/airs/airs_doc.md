@@ -50,35 +50,6 @@ See [here](https://hub.docker.com/r/gisaia/airs/tags){:target="_blank"} for the 
 !!! note
     The service is deployed on `ARLAS_ENDPOINT` 
 
-### AIRS Configuration
-
-The following environment variables must be set to run AIRS:
-
-| Variable                                               |
-| ------------------------------------------------------ |
-| AIRS_HOST  |
-| AIRS_PORT  |
-| AIRS_CORS_ORIGINS  |
-| AIRS_CORS_METHODS  |
-| AIRS_CORS_HEADERS  |
-| AIRS_ARLAS_COLLECTION_NAME                             |
-| AIRS_ARLAS_URL                                         |
-| AIRS_INDEX_ENDPOINT_URL                                |
-| AIRS_INDEX_COLLECTION_PREFIX                           |
-| AIRS_INDEX_LOGIN                                       |
-| AIRS_INDEX_PWD                                       |
-| AIRS_S3_BUCKET                                         |
-| AIRS_S3_ACCESS_KEY_ID                                  |
-| AIRS_S3_SECRET_ACCESS_KEY                              |
-| AIRS_S3_REGION                                         |
-| AIRS_S3_TIER                                           |
-| AIRS_S3_PLATFORM                                       |
-| AIRS_S3_ASSET_HTTP_ENDPOINT_URL                        |
-| AIRS_S3_ENDPOINT_URL                                   |
-| ARLASEO_MAPPING_URL                                       |
-| AIRS_COLLECTION_URL                                    |
-| AIRS_PREFIX                                            |
-| AIRS_LOGGER_LEVEL                                      |
 
 ### Add an asset
 
