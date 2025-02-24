@@ -142,3 +142,21 @@ The following environment variables must be set to run FAM:
 |   INGESTED_FOLDER                                     |
 |   FAM_LOGGER_LEVEL                                         |
 |   FAM_PREFIX                                         |
+
+### AGATE Configuration
+
+The following environment variables must be set to run AGATE:
+
+| Variable                                               |
+| ------------------------------------------------------ |
+|   ARLAS_URL_SEARCH                                     |
+|   AGATE_PREFIX                                         |
+|   AGATE_HOST                                           |
+|   AGATE_PORT                                   |
+|   AGATE_ENDPOINT                                       |
+|   AGATE_URL_HEADER                                     |
+|   AGATE_URL_HEADER_PREFIX                              |
+|   AGATE_LOGGER_LEVEL                                   |
+|   AGATE_CORS_ORIGINS                                   |
+|   AGATE_CORS_METHODS                                   |
+|   AGATE_CORS_HEADERS                                   |

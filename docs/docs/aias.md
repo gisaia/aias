@@ -25,20 +25,6 @@ Functions for access:
 AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an object store such as minio. 
 It must be used as a forward authorisation service.
 
-| Variable                                               |
-| ------------------------------------------------------ |
-|   ARLAS_URL_SEARCH                                     |
-|   AGATE_PREFIX                                         |
-|   AGATE_HOST                                           |
-|   AGATE_PORT                                   |
-|   AGATE_ENDPOINT                                       |
-|   AGATE_URL_HEADER                                     |
-|   AGATE_URL_HEADER_PREFIX                              |
-|   AGATE_LOGGER_LEVEL                                   |
-|   AGATE_CORS_ORIGINS                                   |
-|   AGATE_CORS_METHODS                                   |
-|   AGATE_CORS_HEADERS                                   |
-
 
 ## STAC Synchronisation
 
