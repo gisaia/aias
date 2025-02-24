@@ -1,1 +1,1 @@
-<swagger-ui src="./openapi.json"/>
+<redoc src="./openapi.json"/>
