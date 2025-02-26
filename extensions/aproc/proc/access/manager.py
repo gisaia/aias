@@ -69,17 +69,22 @@ class AccessManager:
         return storage.get_storage_parameters()
 
     @staticmethod
+    def check_local_path_authorized(href: str):
+        """
+        Checks that the path is an authorized path for at least one of the file storages
+        """
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.type == "file", AccessManager.storages)))
+        if not is_authorized:
+            raise ValueError("Destination path is not authorized")
+
+    @staticmethod
     def pull(href: str, dst: str):
         """
         Pulls a file from a storage to write it in the local storage.
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
         storage = AccessManager.resolve_storage(href)
-
-        # Check that the destination is an authorized path for at least one of the file storages
-        is_dst_authorized = any(map(lambda s: s.is_path_authorized(dst, AccessType.WRITE), filter(lambda s: s.type == "file", AccessManager.storages)))
-        if not is_dst_authorized:
-            raise ValueError("Destination path is not authorized")
+        AccessManager.check_local_path_authorized(href)
 
         storage.pull(href, dst)
 
@@ -209,11 +214,16 @@ class AccessManager:
         return storage.is_dir(href)
 
     @staticmethod
-    def get_file_size(href: str):
+    def get_size(href: str):
         storage = AccessManager.resolve_storage(href)
         if href and AccessManager.exists(href):
             if AccessManager.is_file(href):
                 return storage.get_file_size(href)
+            elif AccessManager.is_dir(href):
+                folder_size = 0
+                for path in AccessManager.listdir(href):
+                    folder_size += AccessManager.get_size(os.path.join(href, path))
+                return folder_size
             else:
                 raise ValueError(f"Given href is a directory {href}")
         raise ValueError(f"Given href does not exist {href}")

@@ -1,9 +1,11 @@
-from abc import abstractmethod
 import os
-from airs.core.models.model import Item
-from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
-from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 import tempfile
+from abc import abstractmethod
+
+from airs.core.models.model import Item
+from extensions.aproc.proc.dc3build.model.dc3build_input import \
+    InputDC3BuildProcess
+from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
 class DC3Driver(AbstractDriver):
@@ -29,6 +31,11 @@ class DC3Driver(AbstractDriver):
     def init(configuration: dict) -> None:
         if configuration:
             DC3Driver.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
+
+    @staticmethod
+    def __flat_items__(items: dict[str, dict[str, Item]]) -> list[Item]:
+        its = list(map(lambda v: list(v.values()), items.values()))
+        return [x for xs in its for x in xs]
 
     @abstractmethod
     def create_cube(self, dc3_request: InputDC3BuildProcess, items: dict[str, dict[str, Item]], target_directory: str) -> Item:

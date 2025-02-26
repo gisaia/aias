@@ -1,8 +1,8 @@
 from datetime import datetime as Datetime
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Annotated, Any, Dict, List, Literal
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field, field_validator
 
 EXPRESSION_DESCRIPTION = "The expression to create the desired band. " + \
     "Can be a band of the data prefaced by its alias (ie 'S2.B05', " + \
@@ -39,6 +39,7 @@ class MimeType(Enum):
     XML = "text/xml"
     JPG = "image/jpg"
     PNG = "image/png"
+    GIF = "image/gif"
     JSON = "application/json"
     PDF = "application/pdf"
     PVL = "text/pvl"
@@ -126,6 +127,7 @@ class AssetFormat(Enum):
     geojson = "GEOJSON"
     cog = "COG"
     zarr = "ZARR"
+    gif = "GIF"
 
 
 class Role(Enum):
@@ -189,15 +191,45 @@ class CommonBandName(Enum):
     lwir12 = "lwir12"
 
 
-class VariableType(Enum):
+class DimensionType(str, Enum):
+    spatial = "spatial"
+    temporal = "temporal"
+    geometry = "geometry"
+
+
+class HorizontalSpatialDimension(BaseModel):
+    axis: str = Field()
+    description: str = Field()
+    type: Literal[DimensionType.spatial] = DimensionType.spatial.value
+    extent: list[float | int] = Field()
+    step: float | int | None = Field(default=None)
+    reference_system: str | int | Any = Field(default=4326)
+
+
+class TemporalDimension(BaseModel):
+    axis: str = Field()
+    description: str = Field()
+    type: Literal[DimensionType.temporal] = DimensionType.temporal.value
+    extent: list[str] | None = Field(default=None)
+    step: str | None = Field(default=None)
+
+
+Dimension = Annotated[HorizontalSpatialDimension | TemporalDimension,
+                      Field(discriminator="type")]
+
+
+class VariableType(str, Enum):
     data = "data"
     auxiliary = "auxiliary"
 
 
-class DimensionType(Enum):
-    spatial = "spatial"
-    temporal = "temporal"
-    geometry = "geometry"
+class Variable(BaseModel):
+    dimensions: list[str] = Field()
+    type: VariableType = Field()
+    description: str | None = Field(default=None)
+    extent: list[float | int | str] = Field()
+    unit: str | None = Field(default=None)
+    expression: str = Field()
 
 
 class Indicators(BaseModel):
@@ -210,15 +242,24 @@ class Indicators(BaseModel):
 class ItemReference(BaseModel):
     dc3__collection: str = Field(description="[ARLAS, extension dc3] Name of the collection containing the item")
     dc3__id: str = Field(description="[ARLAS, extension dc3] Item's identifer")
+    # TODO: if can be None, how am i going to reference it for the computation?
     dc3__alias: str = Field(default=None, description="[ARLAS, extension dc3] Product alias (e.g. s2_l2)")
 
 
 class ItemGroup(BaseModel):
-    dc3__references: list[ItemReference] = Field(default=[], title="[ARLAS, extension dc3] The rasters of this group.", min_length=1)
+    dc3__references: list[ItemReference] = Field(default=[], title="[ARLAS, extension dc3] The rasters of this group.")
     dc3__datetime: Datetime = Field(default=None, title="[ARLAS, extension dc3] The date time of this temporal group.")
     dc3__quality_indicators: Indicators = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
 
+    @field_validator('dc3__references', mode='after')
+    @classmethod
+    def is_not_empty(cls, value: list[ItemReference]) -> list[ItemReference]:
+        if len(value) == 0:
+            raise ValueError("dc3__references must not be empty")
+        return value
 
+
+# TODO: I would do a DC3Band that extends Band and maybe redefines some of the fields description, so that it matches better?
 class Band(BaseModel, extra=Extra.allow):
     index: int = Field(default=None, ge=1, title="[ARLAS] Band index within the asset, starting at 1")
     asset: str = Field(default=None, title="[ARLAS] Name of the asset, must be present in `item.assets`")
@@ -231,12 +272,12 @@ class Band(BaseModel, extra=Extra.allow):
     eo__full_width_half_max: float = Field(default=None, title="[STAC, extension eo] Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).")
     eo__solar_illumination: float = Field(default=None, title="[STAC, extension eo] The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.")
     dc3__quality_indicators: Indicators = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube variable (band).")
-    dc3_expression: str = Field(default=None, description=EXPRESSION_DESCRIPTION)
-    dc3_unit: str = Field(default=None, description=UNIT_DESCRIPTION)
-    dc3_min: float = Field(default=None, description=MIN_DESCRIPTION)
-    dc3_max: float = Field(default=None, description=MAX_DESCRIPTION)
-    dc3_rgb: RGB = Field(default=None, description=RGB_DESCRIPTION)
-    dc3_cmap: str = Field(default=None, description=CMAP_DESCRIPTION)
+    dc3__expression: str = Field(default=None, description=EXPRESSION_DESCRIPTION)
+    dc3__unit: str = Field(default=None, description=UNIT_DESCRIPTION)
+    dc3__min: float = Field(default=None, description=MIN_DESCRIPTION)
+    dc3__max: float = Field(default=None, description=MAX_DESCRIPTION)
+    dc3__rgb: RGB = Field(default=None, description=RGB_DESCRIPTION)
+    dc3__cmap: str = Field(default=None, description=CMAP_DESCRIPTION)
 
 
 class Asset(BaseModel, extra=Extra.allow):
@@ -298,7 +339,7 @@ class Properties(BaseModel, extra=Extra.allow):
     license: str | None = Field(default=None, title="[STAC] License(s) of the data as SPDX License identifier, SPDX License expression, or other.")
     annotations: str | None = Field(default=None, title="[ARLAS] Human annotations for the item")
     gsd: float | None = Field(default=None, title="[deprecated, use eo:gsd instead] Ground Sampling Distance (resolution)")
-    secondary_id: str | None = Field(default=None, title="[ARLAS] Secondary identifier") 
+    secondary_id: str | None = Field(default=None, title="[ARLAS] Secondary identifier")
     data_type: str | None = Field(default=None, title="[ARLAS] Type of data")
     item_type: str | None = Field(default=None, title="[ARLAS] Type of data (ResourceType)")
     item_format: str | None = Field(default=None, title="[ARLAS] Data format (ItemFormat)")
@@ -334,8 +375,9 @@ class Properties(BaseModel, extra=Extra.allow):
     dc3__number_of_chunks: int | None = Field(default=None, title="[STAC, extension dc3] Number of chunks (if zarr or similar partitioned format) within the cube.")
     dc3__chunk_weight: int | None = Field(default=None, title="[STAC, extension dc3] Weight of a chunk (number of bytes).")
     dc3__fill_ratio: float | None = Field(default=None, title="[STAC, extension dc3] 1: the cube is full, 0 the cube is empty, in between the cube is partially filled.")
-    cube__dimensions: Dict[str, DimensionType] | None = Field(default=None, title="[STAC, extension cube] Uniquely named dimensions of the datacube.")
-    cube__variables: Dict[str, VariableType] | None = Field(default=None, title="[STAC, extension cube] Uniquely named variables of the datacube.")
+    dc3__overview: dict[str, str] | dict[RGB, str] | None = Field(default=None, title="[STAC, extension dc3] Parameters used to generate the preview. Either contains the matplotlib colormap and the band used, or the mapping between RGB bands and the datacube's bands used.")
+    cube__dimensions: Dict[str, Dimension] | None = Field(default=None, title="[STAC, extension cube] Uniquely named dimensions of the datacube.")
+    cube__variables: Dict[str, Variable] | None = Field(default=None, title="[STAC, extension cube] Uniquely named variables of the datacube.")
     acq__acquisition_mode: str | None = Field(default=None, title="[STAC, extension acq] The name of the acquisition mode.")
     acq__acquisition_orbit_direction: str | None = Field(default=None, title="[STAC, extension acq] Acquisition orbit direction (ASCENDING or DESCENDING).")
     acq__acquisition_type: str | None = Field(default=None, title="[STAC, extension acq] Acquisition type (STRIP)")

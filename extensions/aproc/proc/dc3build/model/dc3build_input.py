@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Extra, Field
 
 from airs.core.models.model import Band, ChunkingStrategy, ItemGroup
 from extensions.aproc.proc.processes.process_model import InputProcess
@@ -34,18 +34,22 @@ TARGET_CATALOG = "The name of the catalog for the resulting cube."
 OVERVIEW_DESCRIPTION = "Build an overview of the resulting cube."
 
 
-class InputDC3BuildProcess(InputProcess):
+class InputDC3BuildProcess(InputProcess, extra=Extra.allow):
     target_collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
     target_catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
-    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION, min_length=1)
-    overview: bool = Field(default=False, description=COMPOSITION_DESCRIPTION)
-    bands: list[Band] = Field(description=BANDS_DESCRIPTION, min_length=1)
+    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION)
+    # TODO: overview description
+    overview: bool = Field(default=False, description="")
+    bands: list[Band] = Field(description=BANDS_DESCRIPTION)
     roi: str = Field(description=ROI_DESCRIPTION)
     target_resolution: int = Field(default=10,
                                    description=RESOLUTION_DESCRIPTION, gt=0)
     target_projection: int = Field(default=4326,
                                    description=PROJECTION_DESCRIPTION)
     chunking_strategy: ChunkingStrategy = Field(default=ChunkingStrategy.POTATO, description=CHUNKING_DESCRIPTION)
-    title: str = Field(default=None, description=DESCRIPTION_DESCRIPTION)
+    # TODO: title description
+    title: str = Field(default=None, description="")
     description: str = Field(default=None, description=DESCRIPTION_DESCRIPTION)
     keywords: list[str] = Field(default=[], description=THEMATICS_DESCRIPTION)
+
+    # TODO: add validation for dc3__rgb & dc3__cmap

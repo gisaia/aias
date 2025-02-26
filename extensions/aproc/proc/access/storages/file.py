@@ -77,6 +77,9 @@ class FileStorage(AbstractStorage):
 
     def clean(self, href: str):
         if self.is_path_authorized(href, AccessType.WRITE):
-            os.remove(href)  # !DELETE!
+            if self.is_dir(href):
+                shutil.rmtree(href)  # !DELETE!
+            else:
+                os.remove(href)  # !DELETE!
         else:
             raise ValueError("The given path is read-only")
