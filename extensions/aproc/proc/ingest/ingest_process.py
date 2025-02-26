@@ -18,11 +18,10 @@ from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       DriverException,
                                                       RegisterException)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.drivers.exceptions import (
-    ConnectionException, DriverException, RegisterException)
-from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
+from extensions.aproc.proc.ingest.settings import \
+    Configuration as IngestConfiguration
+from extensions.aproc.proc.processes.arlas_services_helper import \
+    ARLASServicesHelper
 from extensions.aproc.proc.processes.process_model import InputProcess
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"

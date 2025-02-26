@@ -13,4 +13,5 @@ xarray[io]==2024.9.0
 rioxarray==0.17.0
 numpy==1.26.4
 dask==2024.10.0
+matplotlib==3.5.2
 -r requirements.storage.txt

@@ -3,7 +3,6 @@ import os
 import re
 import tarfile
 import tempfile
-import zipfile
 
 from pydantic import BaseModel, Field
 
@@ -47,12 +46,13 @@ class Driver(DownloadDriver):
         if target_projection == 'native':
             target_projection = item.properties.proj__epsg
 
-        import numpy as np
         import rasterio
         import rasterio.enums
         import rasterio.warp
         import rioxarray
         import xarray as xr
+
+        from extensions.aproc.proc.dc3build.utils.numpy import resample_raster
 
         asset_href = self.get_asset_href(item)
         tmp_asset = None
@@ -86,32 +86,7 @@ class Driver(DownloadDriver):
                     if target_projection is None:
                         target_projection = src.crs
 
-                    repeats = src.res[0] / zarr_res
-
-                    if repeats != 1:
-                        align_transform, width, height = rasterio.warp.aligned_target(
-                            src.transform, src.height, src.width, (zarr_res, zarr_res))
-
-                        if int(repeats) == repeats:
-                            repeats = int(repeats)
-                            data = np.zeros((src.count, src.height * repeats, src.width * repeats), dtype=src.dtypes[0])
-                            for i in range(src.count):
-                                data[i] = np.repeat(np.repeat(src.read()[i], repeats, axis=1), repeats, axis=0)
-                            transform = align_transform
-                        else:
-                            # This method will create some differences with the original image
-                            data, transform = rasterio.warp.reproject(
-                                source=src.read(),
-                                destination=np.zeros((src.count, height, width)),
-                                src_transform=src.transform,
-                                dst_transform=align_transform,
-                                src_crs=src.crs,
-                                dst_crs=src.crs,
-                                dst_nodata=src.nodata,
-                                resampling=rasterio.enums.Resampling.nearest)
-                    else:
-                        transform, _, _ = src.transform, src.width, src.height
-                        data = src.read()
+                    data, transform = resample_raster(src, src.read(), zarr_res)
 
                     profile = src.profile
                     profile.update(transform=transform, driver="JP2OpenJPEG",
@@ -133,11 +108,11 @@ class Driver(DownloadDriver):
         zarr_path = target_directory + "/" + zarr_name
         bands: xr.Dataset = None
         for b, r in zip(band_names, tmp_files):
-            da = rioxarray.open_rasterio(r, default_name=b, chunks=(1, chunk_size, chunk_size), driver="JP2OpenJPEg")
-            if bands is None:
-                bands = da
-            else:
-                bands = xr.merge([bands, da])
+            with rioxarray.open_rasterio(r, default_name=b, chunks=(1, chunk_size, chunk_size), driver="JP2OpenJPEg") as da:
+                if bands is None:
+                    bands = da
+                else:
+                    bands = xr.merge([bands, da])
         bands \
             .squeeze("band").drop_vars("band") \
             .chunk(chunk_size) \
@@ -154,12 +129,10 @@ class Driver(DownloadDriver):
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
     def __find_raster_files(self, fb: str | io.TextIOWrapper):
-        with zipfile.ZipFile(fb) as raster_zip:
-            file_names = raster_zip.namelist()
-            raster_files = list(filter(
-                lambda f: re.match(r".*/IMG_DATA/.*" + r"\.jp2", f) and not re.match(r".*TCI.jp2", f), file_names))
+        from extensions.aproc.proc.dc3build.utils.utils import \
+            find_raster_files
 
-        return raster_files
+        return list(find_raster_files(fb, re.compile(r".*/IMG_DATA/.(B\d{2})\.jp2")).values())
 
     def __get_zarr_resolution(self):
         # TODO: with band selection, it will depend on the highest resolution SELECTED band

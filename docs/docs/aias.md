@@ -413,7 +413,7 @@ Result:
 
 #### Download process
 
-The `download` and `directory_download` relies on a driver mechanism. A driver must implement the abstract class [Driver](extensions/aproc/proc/download/drivers/driver.py). 
+The `download` and `directory_download` relies on a driver mechanism. A driver must implement the abstract class [Driver](extensions/aproc/proc/download/drivers/driver.py).
 
 Available drivers are
 
@@ -647,8 +647,8 @@ To ingest products from the GEODES catalogue into AIRS, the process needs to acc
 ```shell
 docker run --rm \
   -v `pwd`:/app/  \
-  --network arlas-net aias/stac-geodes:latest \
-  add https://geodes-portal.cnes.fr/api/stac/items http://airs-server:8000/airs geodes S2L1C \
+  --network aias_aias gisaia/stac-geodes:latest \
+  add https://geodes-portal.cnes.fr/api/stac http://localhost:8000/airs geodes S2L1C \
   --data-type PEPS_S2_L1C \
   --data-type MUSCATE_SENTINEL2_SENTINEL2_L2A \
   --data-type MUSCATE_Snow_SENTINEL2_L2B-SNOW \

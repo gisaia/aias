@@ -1,10 +1,10 @@
-from datetime import datetime
 import os
+import shutil
 import uuid
+from datetime import datetime
 
 from celery import shared_task
 from pydantic import BaseModel, Field
-import shutil
 
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
@@ -22,7 +22,8 @@ from extensions.aproc.proc.dc3build.settings import \
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (DriverException,
                                                       RegisterException)
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
+from extensions.aproc.proc.processes.arlas_services_helper import \
+    ARLASServicesHelper
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              CUBE_FAILED_MSG, EVENT_ACTION,
@@ -183,7 +184,7 @@ class AprocProcess(Process):
             raise Exception(error_msg)
         finally:
             if working_dir.startswith(DC3Driver.assets_dir):
-                shutil.rmtree(working_dir)
+                shutil.rmtree(working_dir)  # !DELETE!
 
     @staticmethod
     def check_item(item: Item, check_asset_exists: bool = True) -> list[str]:

@@ -41,20 +41,20 @@ class Driver(IngestDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
-        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
+                                description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         assets.append(
-            Asset(href=self.dim_path, size=AccessManager.get_file_size(self.dim_path),
+            Asset(href=self.dim_path, size=AccessManager.get_size(self.dim_path),
                   roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                   description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_size(self.tfw_path),
                                 roles=[Role.metadata.value], name="tfw", type=MimeType.TEXT.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         return assets

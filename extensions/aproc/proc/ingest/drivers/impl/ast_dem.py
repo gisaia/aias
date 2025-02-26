@@ -50,7 +50,7 @@ class Driver(IngestDriver):
         assets.append(
             Asset(
                 href=self.tif_path,
-                size=AccessManager.get_file_size(self.tif_path),
+                size=AccessManager.get_size(self.tif_path),
                 roles=[Role.data.value],
                 name=Role.data.value,
                 type=MimeType.TIFF.value,
@@ -63,7 +63,7 @@ class Driver(IngestDriver):
         assets.append(
             Asset(
                 href=self.met_path,
-                size=AccessManager.get_file_size(self.met_path),
+                size=AccessManager.get_size(self.met_path),
                 roles=[Role.metadata.value],
                 name=Role.metadata.value,
                 type=MimeType.PVL.value,
@@ -77,7 +77,7 @@ class Driver(IngestDriver):
             assets.append(
                 Asset(
                     href=self.tfw_path,
-                    size=AccessManager.get_file_size(self.tfw_path),
+                    size=AccessManager.get_size(self.tfw_path),
                     roles=[Role.extent.value],
                     name=Role.extent.value,
                     type=MimeType.TEXT.value,
