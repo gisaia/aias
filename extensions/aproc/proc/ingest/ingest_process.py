@@ -18,11 +18,10 @@ from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       DriverException,
                                                       RegisterException)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.drivers.exceptions import (
-    ConnectionException, DriverException, RegisterException)
-from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
+from extensions.aproc.proc.ingest.settings import \
+    Configuration as IngestConfiguration
+from extensions.aproc.proc.processes.arlas_services_helper import (
+    JSON_HEADER, ARLASServicesHelper)
 from extensions.aproc.proc.processes.process_model import InputProcess
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -183,7 +182,7 @@ class AprocProcess(Process):
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers=JSON_HEADER)
             if r.ok:
                 LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -196,10 +195,10 @@ class AprocProcess(Process):
         try:
             if item_already_exists:
                 LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers=JSON_HEADER)
             else:
                 LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers=JSON_HEADER)
             if r.ok:
                 LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return item_from_json(r.content)

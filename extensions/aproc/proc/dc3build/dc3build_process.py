@@ -20,7 +20,7 @@ from extensions.aproc.proc.dc3build.model.dc3build_input import \
 from extensions.aproc.proc.dc3build.settings import \
     Configuration as InputDC3BuildConfiguration
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.drivers.exceptions import (DriverException,
+from extensions.aproc.proc.drivers.exceptions import (APROCException, DriverException,
                                                       RegisterException)
 from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
@@ -51,7 +51,7 @@ summary: ProcessSummary = ProcessSummary(
     version="0.1",
     jobControlOptions=[JobControlOptions.async_execute],
     outputTransmission=[TransmissionMode.reference],
-    # TODO: provide the links if any => link could be the execute endpoint
+    # TODO: provide the links if any => link could be the execute endpoint  # NOSONAR
     links=[]
 )
 
@@ -105,10 +105,10 @@ class AprocProcess(Process):
     @staticmethod
     def before_execute(**kwargs) -> dict[str, str]:
         headers: dict[str, str] = kwargs.pop("headers")
-        input: InputDC3BuildProcess = InputDC3BuildProcess(**kwargs)
-        AprocProcess.__get_driver__(input=input)
+        dc3build_input: InputDC3BuildProcess = InputDC3BuildProcess(**kwargs)
+        AprocProcess.__get_driver__(input=dc3build_input)
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
-        for group in input.composition:
+        for group in dc3build_input.composition:
             for reference in group.dc3__references:
                 LOGGER.debug("checking for item access {}/{} for {}".format(reference.dc3__collection, reference.dc3__id, send_to))
                 item: Item = ARLASServicesHelper.get_item_from_arlas(arlas_url_search=InputDC3BuildConfiguration.settings.arlas_url_search, collection=reference.dc3__collection, item_id=reference.dc3__id, headers=headers)
@@ -125,34 +125,34 @@ class AprocProcess(Process):
     def execute(self, **kwargs) -> dict:
         headers: dict[str, str] = kwargs.pop("headers")
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
-        input: InputDC3BuildProcess = InputDC3BuildProcess(**kwargs)
+        dc3build_input: InputDC3BuildProcess = InputDC3BuildProcess(**kwargs)
         driver: DC3Driver = None
         items = {}
-        for group in input.composition:
+        for group in dc3build_input.composition:
             for reference in group.dc3__references:
                 LOGGER.debug("checking for item access {}/{} for {}".format(reference.dc3__collection, reference.dc3__id, send_to))
                 item = ARLASServicesHelper.get_item_from_arlas(arlas_url_search=InputDC3BuildConfiguration.settings.arlas_url_search, collection=reference.dc3__collection, item_id=reference.dc3__id, headers=headers)
                 id_to_item = items.get(item.collection, {})
                 id_to_item[item.id] = item
                 items[item.collection] = id_to_item
-        if input.composition and len(input.composition) > 0 and len(input.composition[0].dc3__references):
-            reference = input.composition[0].dc3__references[0]
+        if dc3build_input.composition and len(dc3build_input.composition) > 0 and len(dc3build_input.composition[0].dc3__references):
+            reference = dc3build_input.composition[0].dc3__references[0]
             item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AprocConfiguration.settings.airs_endpoint, collection=reference.dc3__collection, item_id=reference.dc3__id)
-            driver = DriverManager.solve(summary.id, item, include_drivers=input.include_drivers, exclude_drivers=input.exclude_drivers)
+            driver = DriverManager.solve(summary.id, item, include_drivers=dc3build_input.include_drivers, exclude_drivers=dc3build_input.exclude_drivers)
             if driver is None:
                 error_msg = "No driver found for {}/{}".format(reference.dc3__collection, reference.dc3__id)
                 LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "dc3build", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})
                 LOGGER.error(error_msg)
                 raise DriverException(error_msg)
-        id = uuid.uuid4().hex
-        working_dir = driver.get_working_dir(id)
+        item_id = uuid.uuid4().hex
+        working_dir = driver.get_working_dir(item_id)
         try:
-            item = driver.create_cube(dc3_request=input, items=items, target_directory=working_dir)
-            item.collection = input.target_collection
-            item.catalog = input.target_catalog
+            item = driver.create_cube(dc3_request=dc3build_input, items=items, target_directory=working_dir)
+            item.collection = dc3build_input.target_collection
+            item.catalog = dc3build_input.target_catalog
             item.properties.created = round(datetime.now().timestamp())
             item.properties.updated = round(datetime.now().timestamp())
-            item.id = id
+            item.id = item_id
             i: int = 0
             errors = AprocProcess.check_item(item)
             if len(errors) > 0:
@@ -180,7 +180,7 @@ class AprocProcess(Process):
             LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build"})
             LOGGER.error(error_msg)
             LOGGER.exception(e)
-            raise Exception(error_msg)
+            raise APROCException(error_msg)
         finally:
             if working_dir.startswith(DC3Driver.assets_dir):
                 shutil.rmtree(working_dir)

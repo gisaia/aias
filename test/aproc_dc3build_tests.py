@@ -16,7 +16,6 @@ from airs.core.models.model import (RGB, Band, ChunkingStrategy,
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
-#from extensions.aproc.proc.dc3build.dc3build_process import AprocProcess
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
 from extensions.aproc.proc.processes.arlas_services_helper import \

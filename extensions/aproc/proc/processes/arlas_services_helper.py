@@ -10,6 +10,9 @@ from airs.core.settings import S3 as S3Configuration
 from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import ConnectionException, RegisterException
 
+AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
+JSON_HEADER = {"Content-Type": "application/json"}
+
 
 class ARLASServicesHelper(ABC):
 
@@ -62,7 +65,7 @@ class ARLASServicesHelper(ABC):
         user_id: str = "anonymous"
         try:
             if authorization:
-                token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})
+                token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})  # NOSONAR
                 if token_content.get("email"):
                     send_to = token_content.get("email")
                 else:
@@ -82,20 +85,20 @@ class ARLASServicesHelper(ABC):
     def dir2s3(directory: str, s3_dir: str, s3_conf: S3Configuration):
         s3_client = s3.get_client_from_configuration(s3_conf)
 
-        uploadFileNames = []
-        for (sourceDir, dirname, files) in os.walk(directory):
+        upload_file_names = []
+        for (source_dir, dirname, files) in os.walk(directory):
             for file in files:
-                uploadFileNames.append(os.path.join(sourceDir, file)[len(directory):])
+                upload_file_names.append(os.path.join(source_dir, file)[len(directory):])
 
-        for key in uploadFileNames:
+        for key in upload_file_names:
             local_path = os.path.join(directory, key.strip("/"))
             destpath = os.path.join(s3_dir, key.strip("/"))
-            type, encpoding = mimetypes.guess_type(local_path, strict=False)
-            if type:
+            mime_type, __ = mimetypes.guess_type(local_path, strict=False)
+            if mime_type:
                 extra = {"ContentType": type}
             else:
                 extra = None
-            Process.LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, type, s3_conf.bucket, destpath))
+            Process.LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, mime_type, s3_conf.bucket, destpath))
             with open(local_path, 'rb') as file:
                 s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
 
@@ -113,7 +116,7 @@ class ARLASServicesHelper(ABC):
                         Process.LOGGER.error(msg)
                         raise RegisterException(msg)
                 except requests.exceptions.ConnectionError:
-                    msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
+                    msg = AIRS_CAN_NOT_BE_REACHED.format(airs_endpoint)
                     Process.LOGGER.error(msg)
                     raise ConnectionException(msg)
         else:
@@ -123,7 +126,7 @@ class ARLASServicesHelper(ABC):
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": "application/json"})
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers=JSON_HEADER)
             if r.ok:
                 Process.LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -136,10 +139,10 @@ class ARLASServicesHelper(ABC):
         try:
             if item_already_exists:
                 Process.LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=mapper.to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=mapper.to_json(item), headers=JSON_HEADER)
             else:
                 Process.LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=mapper.to_json(item), headers={"Content-Type": "application/json"})
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=mapper.to_json(item), headers=JSON_HEADER)
             if r.ok:
                 Process.LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return mapper.item_from_json(r.content)
@@ -148,6 +151,6 @@ class ARLASServicesHelper(ABC):
                 Process.LOGGER.error(mapper.to_json(item))
                 raise RegisterException("Item has not been registered: {} - {}".format(r.status_code, r.content))
         except requests.exceptions.ConnectionError:
-            msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
+            msg = AIRS_CAN_NOT_BE_REACHED.format(airs_endpoint)
             Process.LOGGER.error(msg)
             raise ConnectionException(msg)
