@@ -201,7 +201,7 @@ class DimensionType(Enum):
 
 
 class Indicators(BaseModel):
-    dc3__time_compacity: float | None = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extent of the temporal slices (groups) are compact or not compared to the cube temporal extent. Computed as follow: 1-range(group rasters) / range(cube rasters).")
+    dc3__time_compacity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extent of the temporal slices (groups) are compact or not compared to the cube temporal extent. Computed as follow: 1-range(group rasters) / range(cube rasters).")
     dc3__spatial_coverage: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))")
     dc3__group_lightness: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of non overlapping regions between the different input rasters. Computed as follow: area(intersection(union(rasters),roi)) / sum(area(intersection(raster, roi)))")
     dc3__time_regularity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the regularity of the extents between the temporal slices (groups). Computed as follow: 1-std(inter group temporal gaps)/avg(inter group temporal gaps)")
