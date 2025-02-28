@@ -95,7 +95,7 @@ class ARLASServicesHelper(ABC):
             destpath = os.path.join(s3_dir, key.strip("/"))
             mime_type, __ = mimetypes.guess_type(local_path, strict=False)
             if mime_type:
-                extra = {"ContentType": type}
+                extra = {"ContentType": mime_type}
             else:
                 extra = None
             Process.LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, mime_type, s3_conf.bucket, destpath))
