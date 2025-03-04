@@ -175,7 +175,8 @@ def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dic
     # For each alias, the indicator is the product of those of each group
     # of the desired alias
     alias_indicators: dict[str, Indicators] = {}
-    for alias in get_all_aliases(request):
+    aliases = get_all_aliases(request)
+    for alias in aliases:
         alias_indicators[alias] = Indicators(
             dc3__time_compacity=math.prod(
                 map(lambda g: g[alias].dc3__time_compacity if alias in g
@@ -190,7 +191,7 @@ def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dic
 
     for idx, band in enumerate(request.bands):
         # Find which product types constitute the band
-        aliases_in_band = re.findall(r'([a-zA-Z0-9]*)\.[a-zA-Z0-9]*',
+        aliases_in_band = re.findall(rf'({"|".join(aliases)})\.[a-zA-Z0-9]*',
                                      band.dc3__expression)
 
         # Compute the indicator as a product of the those of the products
@@ -318,7 +319,7 @@ def compute_time_regularity(composition: list[ItemGroup]) -> float:
 
     for i in range(len(composition) - 1):
         delta_times.append(
-            (composition[i + 1].dc3__datetime - composition[i].dc3__datetime).timestamp())
+            (composition[i + 1].dc3__datetime - composition[i].dc3__datetime).total_seconds())
     avg_delta_time = sum(delta_times) / len(delta_times)
 
     return 1 - math.sqrt(sum(

@@ -1,12 +1,13 @@
 import base64
 
+# Necessary for the .rio to work
 import rioxarray  # noqa F401
 import xarray as xr
 from matplotlib import cm
 from PIL import Image
 
-# Necessary for the .rio to work
-from airs.core.models.model import RGB, Properties
+from airs.core.models.model import RGB
+from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.utils.xarray import (
     MinMax, coarse_bands, get_approximate_quantile)
 
@@ -52,15 +53,13 @@ def __resize_band(dataset: xr.Dataset, band_name: str, time_slice: int,
     return band.transpose().reindex(y=band.y[::-1])
 
 
-def create_overview(datacube: xr.Dataset, properties: Properties, overview_path: str):
-    coarsed_datacube, clip_values = prepare_visualisation(
-        datacube, list(properties.dc3__overview.values()))
-
-    if len(properties.dc3__overview) == 3:
-        __create_rgb_overview(coarsed_datacube, properties.dc3__overview,
+def create_overview(datacube: xr.Dataset, overview: dict[str, str] | dict[RGB, str],
+                    overview_path: str, clip_values: dict[str, MinMax]):
+    if len(overview) == 3:
+        __create_rgb_overview(datacube, overview,
                               overview_path, clip_values)
     else:
-        __create_cmap_overview(coarsed_datacube, properties.dc3__overview,
+        __create_cmap_overview(datacube, overview,
                                overview_path, clip_values)
 
 
@@ -121,15 +120,3 @@ def __create_cmap_overview(datacube: xr.Dataset, preview: dict[str, str],
         img.save(preview_path)
     except OSError:
         img.convert('RGB').save(preview_path)
-
-    return image_to_base64(preview_path)
-
-
-def image_to_base64(img_path: str):
-    """
-    Return a base64 encoded string of the given image/gif
-    """
-    with open(img_path, 'rb') as fb:
-        b64_image = base64.b64encode(fb.read()).decode('utf-8')
-
-    return b64_image

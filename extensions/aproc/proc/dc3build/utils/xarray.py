@@ -1,6 +1,7 @@
 import enum
 import math
 
+from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 import numpy as np
 import xarray as xr
 from pydantic import BaseModel
@@ -60,9 +61,9 @@ def coarse_bands(datacube: xr.Dataset, bands: list[str],
     """
     Mean coarse the bands of a datacube
 
-    :param band A xarray data array
-    :param x_factor A coarsing factor along the x dimension
-    :param y_factor A coarsing factor along the y dimension
+    :param band: A xarray data array
+    :param x_factor: A coarsing factor along the x dimension
+    :param y_factor: A coarsing factor along the y dimension
     """
     return datacube.get(bands) \
         .coarsen({"x": x_factor, "y": y_factor}, boundary="pad").mean()
@@ -196,7 +197,7 @@ def create_common_grid(composition: dict[str, list[str]], roi_polygon: Polygon):
 def mosaick_list(datasets: list[xr.Dataset], lon: np.ndarray,
                  lat: np.ndarray, lon_step: float, lat_step: float) -> xr.Dataset:
 
-    merged_dataset = None
+    merged_dataset: xr.Dataset = None
     for ds in datasets:
         # Interpolate the granule with new grid on its extent
         with xr.open_zarr(ds) as dataset:

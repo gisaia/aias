@@ -26,7 +26,8 @@ def find_raster_files(fb: str | io.TextIOWrapper, regex: Pattern[str], alias=Non
     return bands
 
 
-def get_eval_formula(band_expression: str) -> str:
+def get_eval_formula(band_expression: str,
+                     aliases: set[str]) -> str:
     """
     Transform the requested expression of the band in a xarray operation
     """
@@ -34,7 +35,11 @@ def get_eval_formula(band_expression: str) -> str:
         for m in match.groups():
             return f"datacube.get('{m}')"
 
-    return re.sub(r"(\w*\.[a-zA-Z0-9]*)", repl, band_expression)
+    result = band_expression
+    for alias in aliases:
+        result = re.sub(rf"({alias}\.[a-zA-Z0-9]*)", repl, result)
+
+    return result
 
 
 def get_all_aliases(request: InputDC3BuildProcess) -> set[str]:

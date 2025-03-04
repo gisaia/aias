@@ -95,6 +95,13 @@ class Raster:
     def create_zarr_dir(self, zarr_root_path: str,
                         product_timestamp: int,
                         raster_timestamp: int) -> zarr.DirectoryStore:
+        """
+        Creates a zarr from the Raster file
+
+        :param zarr_root_path: Path for the zarr
+        :param product_timestamp: Timestamp of the product used for priority in mosaicking
+        :param raster_timestamp: Timestamp used for the slice of the datacube
+        """
 
         store = zarr.DirectoryStore(path.join(zarr_root_path, self.band))
 

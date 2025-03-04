@@ -1,15 +1,15 @@
 import json
 import os
 import unittest
-from airs.core.models.model import AssetFormat, MimeType
-from test.utils import (APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, ASSET_NAME, MAX_ITERATIONS,
-                        BBOX, CLOUD_ID, CLOUD_ITEM, COLLECTION, EPSG_27572, ID, ITEM_PATH, SENTINEL_2_ID,
-                        SENTINEL_2_ITEM, SMTP_SERVER, TOKEN, add_item,
-                        index_collection_prefix, setUpTest)
+from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
+                        COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
+                        SENTINEL_2_ID, SENTINEL_2_ITEM, SMTP_SERVER, TOKEN,
+                        add_item, create_arlas_collection, setUpTest)
 from time import sleep
 
 import requests
 
+from airs.core.models.model import AssetFormat, MimeType
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessList
@@ -25,14 +25,7 @@ class Tests(unittest.TestCase):
         add_item(self, ITEM_PATH, ID)
         sleep(3)
         # Create collection
-        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": MimeType.JSON.value}, data=json.dumps({
-                         "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
-                         "id_path": "id",
-                         "geometry_path": "geometry",
-                         "centroid_path": "centroid",
-                         "timestamp_path": "properties.datetime"
-                         }))
-        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+        create_arlas_collection(self)
 
     def test_download_exists(self):
         # CHECK THE DOWNLOAD PROCESS EXISTS

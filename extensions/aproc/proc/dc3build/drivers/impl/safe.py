@@ -37,10 +37,9 @@ class Driver(DC3Driver):
         from shapely import to_geojson
 
         from extensions.aproc.proc.dc3build.utils.geo import roi2geometry
+        from extensions.aproc.proc.dc3build.utils.gif import create_gif
         from extensions.aproc.proc.dc3build.utils.metadata import \
             create_datacube_metadata
-        from extensions.aproc.proc.dc3build.utils.overview import \
-            create_overview
         from extensions.aproc.proc.dc3build.utils.raster import Raster
         from extensions.aproc.proc.dc3build.utils.xarray import (
             create_common_grid, get_chunk_shape, mosaick_list)
@@ -96,12 +95,10 @@ class Driver(DC3Driver):
                                                 min_res, roi_polygon)
 
                                 # Create zarr store
-                                # TODO: add timestamp to avoid duplicata ?
                                 # TODO: add method to create a temporary file ? -> have a process id that is used
                                 zarr_tmp_root_path = os.path.join(AccessManager.tmp_dir, path + '.zarr')
                                 zarr_dir = raster.create_zarr_dir(
-                                    zarr_tmp_root_path, int(items[e.dc3__collection][e.dc3__id].properties.datetime.timestamp()),
-                                    timestamp)
+                                    zarr_tmp_root_path, int(items[e.dc3__collection][e.dc3__id].properties.datetime.timestamp()), timestamp)
 
                                 zarrs.append(zarr_dir)
                 except Exception:
@@ -122,7 +119,8 @@ class Driver(DC3Driver):
 
                 # Merge all bands
                 chunk_shape = get_chunk_shape(merged_bands.sizes, ChunkingStrategy.SPINACH)
-                merged_zarr_path = os.path.join(AccessManager.tmp_dir, os.path.basename(a.href) + '.zarr')
+                # There could be the same product in multiple slices, so we need to use the timestamp to discriminate them
+                merged_zarr_path = os.path.join(AccessManager.tmp_dir, f"{os.path.basename(a.href)}_{timestamp}.zarr")
                 composition[timestamp].append(merged_zarr_path)
 
                 merged_bands.chunk(chunk_shape) \
@@ -151,8 +149,8 @@ class Driver(DC3Driver):
 
         # Compute the bands given by the formulas
         for band in dc3_request.bands:
-            datacube[band.name] = eval(get_eval_formula(band.dc3__expression))
-            if band.dc3__min is not None and band.dc3__max is not None:
+            datacube[band.name] = eval(get_eval_formula(band.dc3__expression, aliases))
+            if (band.dc3__min is not None) or (band.dc3__max is not None):
                 datacube[band.name] = datacube[band.name].clip(band.dc3__min, band.dc3__max)
 
         # Keep requested bands
@@ -179,10 +177,6 @@ class Driver(DC3Driver):
         # The zipping of the file adds ane extra ".zip" at the end
         os.rename(zipped_cube_file + ".zip", zipped_cube_file)
 
-        # Create the preview
-        overview_file = os.path.join(target_directory, "overview.gif")
-        create_overview(datacube, properties, overview_file)
-
         # item.collection, item.catalog and item.id are managed by the process, no need to set it!
         item = Item(
             properties=properties,
@@ -203,8 +197,17 @@ class Driver(DC3Driver):
                 title=dc3_request.description,
                 description=dc3_request.description,
                 roles=[Role.datacube, Role.data, Role.zarr]
-            ),
-            Role.overview.value: Asset(
+            )
+        }
+
+        # Create the overview
+        if dc3_request.overview:
+            overview_file = os.path.join(target_directory, "overview.gif")
+
+            with xr.open_zarr(cube_file) as datacube:
+                create_gif(datacube, item, overview_file)
+
+            item.assets[Role.overview.value] = Asset(
                 name=Role.overview.value,
                 size=AccessManager.get_size(overview_file),
                 type=MimeType.GIF.value,
@@ -216,6 +219,6 @@ class Driver(DC3Driver):
                 description="",
                 roles=[Role.overview]
             )
-        }
+
         Driver.LOGGER.debug("Cube STAC Item: {}".format(mapper.to_json(item)))
         return item

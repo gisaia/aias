@@ -1,6 +1,7 @@
+import json
 import re
 
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon, shape
 from shapely.wkt import loads
 
 
@@ -46,12 +47,22 @@ def roi2geometry(roi: str) -> Polygon:
         if polygon.geom_type != "Polygon":
             raise TypeError("Only POLYGON geometry is supported for the ROI")
         return polygon
-    # Else is a BBOX
-    try:
-        corners = roi.split(",")
+    # Else if is a BBOX
+    if len(roi.split(",")) == 4:
+        try:
+            corners = roi.split(",")
 
-        return bbox2polygon(float(corners[0]), float(corners[1]),
-                            float(corners[2]), float(corners[3]))
+            return bbox2polygon(float(corners[0]), float(corners[1]),
+                                float(corners[2]), float(corners[3]))
+        except Exception:
+            raise TypeError("Only POLYGON geometry is supported for the ROI," +
+                            "in WKT or BBOX format")
+    # Else it is a geojson
+    try:
+        geom = shape(json.loads(roi))
+        if geom.geom_type != "Polygon":
+            raise TypeError("Only POLYGON geometry is supported for the ROI")
+        return geom
     except Exception:
         raise TypeError("Only POLYGON geometry is supported for the ROI," +
-                        "in WKT or BBOX format")
+                        "in WKT, geojson or BBOX format")
