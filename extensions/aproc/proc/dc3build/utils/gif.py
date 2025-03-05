@@ -23,20 +23,26 @@ def truncate_datetime(times: list[datetime]) -> list[str]:
     to get the shortest common representation
     """
     if any(t.second != times[0].second for t in times):
-        return map(lambda t: t.__str__(), times)
-    if any(t.minute != times[0].minute for t in times):
-        return map(lambda t: t.__str__()[:-3], times)
-    # Better to display minutes with hours
-    if any(t.hour != times[0].hour for t in times):
-        return map(lambda t: t.__str__()[:-3], times)
-    if any(t.day != times[0].day for t in times):
-        return map(lambda t: t.__str__()[:-9], times)
-    if any(t.month != times[0].month for t in times):
-        return map(lambda t: t.__str__()[:-12], times)
-    return map(lambda t: str(t.year), times)
+        def func(t: datetime):
+            return t.__str__()
+    elif any(t.minute != times[0].minute for t in times) \
+            or any(t.hour != times[0].hour for t in times):
+        # Better to display minutes with hours
+        def func(t: datetime):
+            return t.__str__()[:-3]
+    elif any(t.day != times[0].day for t in times):
+        def func(t: datetime):
+            return t.__str__()[:-9]
+    elif any(t.month != times[0].month for t in times):
+        def func(t: datetime):
+            return t.__str__()[:-12]
+    else:
+        def func(t: datetime):
+            return str(t.year)
+    return list(map(func, times))
 
 
-def add_text_on_image(imgPath: str, name: str,
+def add_text_on_image(img_path: str, name: str,
                       description: str, bottom_text: str):
 
     def get_text_size(text: str, font):
@@ -45,7 +51,7 @@ def add_text_on_image(imgPath: str, name: str,
         text_height = text_bbox[3] - text_bbox[1]
         return text_width, text_height
 
-    img = Image.open(imgPath)
+    img = Image.open(img_path)
     band_height = img.height // 10
     description_band_height = (1 if description else 0) * img.height // 20
 
@@ -82,12 +88,12 @@ def add_text_on_image(imgPath: str, name: str,
     img_edit.text(bottom_text_pos, bottom_text, TEXT_COLOR, font=font)
 
     # Add the credits
-    credits = "Powered by ARLAS (Gisaïa)"
-    credits_pos = (img.width - get_text_size(credits, small_font)[0],
-                   img_total_height - get_text_size(credits, small_font)[1])
-    img_edit.text(credits_pos, credits, TEXT_COLOR, font=small_font)
+    arlas_credits = "Powered by ARLAS (Gisaïa)"
+    credits_pos = (img.width - get_text_size(arlas_credits, small_font)[0],
+                   img_total_height - get_text_size(arlas_credits, small_font)[1])
+    img_edit.text(credits_pos, arlas_credits, TEXT_COLOR, font=small_font)
 
-    img_band.save(imgPath)
+    img_band.save(img_path)
 
 
 def create_gif(datacube: xr.Dataset, item: Item, gif_path: str):
@@ -120,8 +126,7 @@ def create_gif(datacube: xr.Dataset, item: Item, gif_path: str):
     shutil.rmtree(working_dir)  # !DELETE!
 
 
-def get_gif_size(datacube: xr.Dataset,
-                 max_gif_size=MAX_GIF_SIZE) -> tuple[int, int]:
+def get_gif_size(datacube: xr.Dataset, max_gif_size=MAX_GIF_SIZE) -> tuple[int, int]:
     """
     Returns the [length, width] in pixels of the gif to generate
     """
@@ -129,6 +134,5 @@ def get_gif_size(datacube: xr.Dataset,
         return len(datacube.x), len(datacube.y)
     else:
         if len(datacube.x) <= len(datacube.y):
-            return [max_gif_size,
-                    int(len(datacube.y) * max_gif_size / len(datacube.x))]
+            return max_gif_size, int(len(datacube.y) * max_gif_size / len(datacube.x))
         return int(len(datacube.x) * max_gif_size / len(datacube.y)), max_gif_size

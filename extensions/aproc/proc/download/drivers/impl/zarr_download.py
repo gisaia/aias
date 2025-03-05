@@ -132,7 +132,7 @@ class Driver(DownloadDriver):
         from extensions.aproc.proc.dc3build.utils.utils import \
             find_raster_files
 
-        return list(find_raster_files(fb, re.compile(r".*/IMG_DATA/.(B\d{2})\.jp2")).values())
+        return list(find_raster_files(fb, re.compile(r"IMG_DATA/.*(B\d{2})\.jp2")).values())
 
     def __get_zarr_resolution(self):
         # TODO: with band selection, it will depend on the highest resolution SELECTED band

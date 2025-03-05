@@ -1,6 +1,6 @@
 import math
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 import xarray as xr
 from shapely.geometry import Polygon
@@ -15,6 +15,7 @@ from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
 from extensions.aproc.proc.dc3build.utils.geo import bbox2polygon, roi2geometry
 from extensions.aproc.proc.dc3build.utils.utils import get_all_aliases
+from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dict[str, Item]],
@@ -91,10 +92,10 @@ def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dic
                      / (len(datacube.get("t")) - 1))
     properties.cube__dimensions["t"] = TemporalDimension(
         type=DimensionType.temporal.value, axis="t", description="",
-        extent=[datetime.utcfromtimestamp(
-                    datacube.get("t").values[0]).isoformat() + 'Z',
-                datetime.utcfromtimestamp(
-                    datacube.get("t").values[-1]).isoformat() + 'Z'],
+        extent=[datetime.fromtimestamp(
+                    datacube.get("t").values[0], timezone.utc).isoformat() + 'Z',
+                datetime.fromtimestamp(
+                    datacube.get("t").values[-1], timezone.utc).isoformat() + 'Z'],
         step=t_step
     )
 
@@ -140,7 +141,7 @@ def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dic
                 if timestamp > composition_end:
                     composition_end = timestamp
             else:
-                raise Exception(
+                raise DriverException(
                     f'Raster "{ref.dc3__id}" was not found in collection {ref.dc3__collection}')
         composition_by_alias.append(group_composition)
 
@@ -179,13 +180,13 @@ def create_datacube_metadata(request: InputDC3BuildProcess, items: dict[str, dic
     for alias in aliases:
         alias_indicators[alias] = Indicators(
             dc3__time_compacity=math.prod(
-                map(lambda g: g[alias].dc3__time_compacity if alias in g
+                map(lambda g, alias=alias: g[alias].dc3__time_compacity if alias in g
                     else 1, indicators_per_group_per_alias)),
             dc3__spatial_coverage=math.prod(
-                map(lambda g: g[alias].dc3__spatial_coverage if alias in g
+                map(lambda g, alias=alias: g[alias].dc3__spatial_coverage if alias in g
                     else 1, indicators_per_group_per_alias)),
             dc3__group_lightness=math.prod(
-                map(lambda g: g[alias].dc3__group_lightness if alias in g
+                map(lambda g, alias=alias: g[alias].dc3__group_lightness if alias in g
                     else 1, indicators_per_group_per_alias))
         )
 

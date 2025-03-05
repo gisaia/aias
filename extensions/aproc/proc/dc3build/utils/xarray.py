@@ -1,7 +1,6 @@
 import enum
 import math
 
-from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 import numpy as np
 import xarray as xr
 from pydantic import BaseModel
@@ -86,10 +85,10 @@ def get_approximate_quantile(band: xr.DataArray,
 
     dims = list(band.sizes.keys())
 
-    min, max = band.chunk({dim: -1 for dim in dims}) \
-                   .quantile([quantile, 1-quantile], dim=dims).values
+    qmin, qmax = band.chunk({dim: -1 for dim in dims}) \
+                     .quantile([quantile, 1-quantile], dim=dims).values
 
-    return MinMax(min=min, max=max)
+    return MinMax(min=qmin, max=qmax)
 
 
 def get_bounds(ds: xr.Dataset):
@@ -253,10 +252,10 @@ def merge_datasets(first_dataset: xr.Dataset,
 
     rest_second_ds = second_dataset[
         list(set(second_dataset.data_vars.keys()).difference(common_bands))]
-    commonSecondDS = second_dataset[common_bands]
+    common_second_ds = second_dataset[common_bands]
 
     return xr.merge(
-        (mosaick_pair(common_first_ds, commonSecondDS),
+        (mosaick_pair(common_first_ds, common_second_ds),
          rest_first_ds, rest_second_ds), combine_attrs="override")
 
 

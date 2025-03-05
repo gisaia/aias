@@ -34,6 +34,7 @@ class Driver(DC3Driver):
         import numpy as np
         import rasterio
         import xarray as xr
+        import zarr
         from shapely import to_geojson
 
         from extensions.aproc.proc.dc3build.utils.geo import roi2geometry
@@ -66,12 +67,11 @@ class Driver(DC3Driver):
             for e in group.dc3__references:
                 # Href of the zip containing all bands
                 a: Asset = items[e.dc3__collection][e.dc3__id].assets[Role.data.value]
-                # TODO: SRE or FRE ?
+                # TODO: SRE or FRE ? => Products for GEODES
                 # band_regex = re.compile(rf".*/.*SRE_({'|'.join(bands_per_alias[e.dc3__alias])})\.tif")
                 band_regex = re.compile(rf".*/IMG_DATA/.*({'|'.join(bands_per_alias[e.dc3__alias])})\.jp2")
 
-                # TODO: should I use path_within_asset ?
-                # TODO: create method in AccessManager
+                # TODO: should I use path_within_asset instead of regex ?
                 with AccessManager.stream(a.href) as ab:
                     bands = find_raster_files(ab, band_regex, e.dc3__alias)
 
@@ -84,9 +84,8 @@ class Driver(DC3Driver):
                                 if src.res[0] < min_res:
                                     min_res = src.res[0]
 
-                        zarrs = []
+                        zarrs: list[zarr.DirectoryStore] = []
 
-                        # TODO: concatenate with previous block as all processing can be done per band
                         # For each object, create a zarr
                         for band, path in bands.items():
                             with rasterio.open("zip+" + a.href + "!" + path, "r+") as src:
@@ -96,7 +95,7 @@ class Driver(DC3Driver):
 
                                 # Create zarr store
                                 # TODO: add method to create a temporary file ? -> have a process id that is used
-                                zarr_tmp_root_path = os.path.join(AccessManager.tmp_dir, path + '.zarr')
+                                zarr_tmp_root_path = os.path.join(AccessManager.tmp_dir, f"{e.dc3__collection}_{e.dc3__id}.zarr")
                                 zarr_dir = raster.create_zarr_dir(
                                     zarr_tmp_root_path, int(items[e.dc3__collection][e.dc3__id].properties.datetime.timestamp()), timestamp)
 
@@ -128,10 +127,11 @@ class Driver(DC3Driver):
                             .close()
 
                 # Clean up the temporary files created
+                for zarr_dir in zarrs:
+                    if AccessManager.exists(zarr_dir.path):
+                        AccessManager.clean(zarr_dir.path)  # !DELETE!
                 del zarrs
                 del merged_bands
-                if AccessManager.exists(zarr_tmp_root_path):
-                    AccessManager.clean(zarr_tmp_root_path)
 
         """ ATP: Composition of xr.Dataset """
 
@@ -187,7 +187,7 @@ class Driver(DC3Driver):
 
         item.assets = {
             Role.datacube.value: Asset(
-                name=Role.datacube.value,
+                name=Role.datacube.value,  # TODO: should we use request.title ?
                 size=AccessManager.get_size(cube_file),
                 type=MimeType.ZARR.value,
                 href=zipped_cube_file,  # Could be cube_file but won't work for upload with airs__managed

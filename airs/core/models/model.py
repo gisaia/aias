@@ -2,7 +2,7 @@ from datetime import datetime as Datetime
 from enum import Enum
 from typing import Annotated, Any, Dict, List, Literal
 
-from pydantic import BaseModel, Extra, Field, field_validator
+from pydantic import BaseModel, Extra, Field
 
 EXPRESSION_DESCRIPTION = "The expression to create the desired band. " + \
     "Can be a band of the data prefaced by its alias (ie 'S2.B05', " + \
@@ -13,6 +13,44 @@ MAX_DESCRIPTION = "A maximum value to clip the band values."
 RGB_DESCRIPTION = "Which RGB channel the band is used for the preview. " + \
     "Value can be 'RED', 'GREEN' or 'BLUE'."
 CMAP_DESCRIPTION = "The matplotlib color map to use for the preview."
+
+
+class ColorMap(str, Enum):
+    viridis = "viridis"
+    plasma = "plasma"
+    inferno = "inferno"
+    magma = "magma"
+    cividis = "cividis"
+    Greys = "Greys"
+    Purples = "Purples"
+    Blues = "Blues"
+    Greens = "Greens"
+    Oranges = "Oranges"
+    Reds = "Reds"
+    YlOrBr = "YlOrBr"
+    YlOrRd = "YlOrRd"
+    OrRd = "OrRd"
+    PuRd = "PuRd"
+    RdPu = "RdPu"
+    BuPu = "BuPu"
+    GnBu = "GnBu"
+    PuBu = "PuBu"
+    YlGnBu = "YlGnBu"
+    PuBuGn = "PuBuGn"
+    BuGn = "BuGn"
+    YlGn = "YlGn"
+    binary = "binary"
+    gray = "gray"
+    bone = "bone"
+    spring = "spring"
+    summer = "summer"
+    autumn = "autumn"
+    winter = "winter"
+    cool = "cool"
+    hot = "hot"
+    rainbow = "rainbow"
+    gist_rainbow = "gist_rainbow"
+    ocean = "ocean"
 
 
 class RGB(str, Enum):
@@ -242,21 +280,13 @@ class Indicators(BaseModel):
 class ItemReference(BaseModel):
     dc3__collection: str = Field(description="[ARLAS, extension dc3] Name of the collection containing the item")
     dc3__id: str = Field(description="[ARLAS, extension dc3] Item's identifer")
-    # TODO: if can be None, how am i going to reference it for the computation?
-    dc3__alias: str = Field(default=None, description="[ARLAS, extension dc3] Product alias (e.g. s2_l2)")
+    dc3__alias: str = Field(description="[ARLAS, extension dc3] Product alias (e.g. s2_l2)")
 
 
 class ItemGroup(BaseModel):
-    dc3__references: list[ItemReference] = Field(default=[], title="[ARLAS, extension dc3] The rasters of this group.")
-    dc3__datetime: Datetime = Field(default=None, title="[ARLAS, extension dc3] The date time of this temporal group.")
-    dc3__quality_indicators: Indicators = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
-
-    @field_validator('dc3__references', mode='after')
-    @classmethod
-    def is_not_empty(cls, value: list[ItemReference]) -> list[ItemReference]:
-        if len(value) == 0:
-            raise ValueError("dc3__references must not be empty")
-        return value
+    dc3__references: list[ItemReference] = Field(title="[ARLAS, extension dc3] The rasters of this group.", min_length=1)
+    dc3__datetime: Datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
+    dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
 
 
 # TODO: I would do a DC3Band that extends Band and maybe redefines some of the fields description, so that it matches better?
@@ -276,8 +306,8 @@ class Band(BaseModel, extra=Extra.allow):
     dc3__unit: str = Field(default=None, description=UNIT_DESCRIPTION)
     dc3__min: float = Field(default=None, description=MIN_DESCRIPTION)
     dc3__max: float = Field(default=None, description=MAX_DESCRIPTION)
-    dc3__rgb: RGB = Field(default=None, description=RGB_DESCRIPTION)
-    dc3__cmap: str = Field(default=None, description=CMAP_DESCRIPTION)
+    dc3__rgb: RGB | None = Field(default=None, description=RGB_DESCRIPTION)
+    dc3__cmap: ColorMap | None = Field(default=None, description=CMAP_DESCRIPTION)
 
 
 class Asset(BaseModel, extra=Extra.allow):

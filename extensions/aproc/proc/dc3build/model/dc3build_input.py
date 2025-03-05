@@ -1,4 +1,4 @@
-from pydantic import Extra, Field
+from pydantic import Extra, Field, field_validator
 
 from airs.core.models.model import Band, ChunkingStrategy, ItemGroup
 from extensions.aproc.proc.processes.process_model import InputProcess
@@ -9,12 +9,8 @@ COMPOSITION_DESCRIPTION = "The composition is an array of item groups " + \
                           "all the data requested across space and time."
 BANDS_DESCRIPTION = "The list of bands to extract. " + \
                     "The bands will be the variables of the datacube."
-ALIASES_DESCRIPTION = "The list of aliases for this datacube. " + \
-                      "They will allow to quickly reference the " + \
-                      "product bands used to compute the datacube bands."
 ROI_DESCRIPTION = "The Region Of Interest to extract. " + \
                   "Accepted formats are BBOX or WKT POLYGON."
-ANNOTATIONS_DESCRIPTION = "Textual annotations of the result."
 RESOLUTION_DESCRIPTION = "The requested spatial resolution in meters. " + \
                          "By default uses the best resolution of the " + \
                          "given products."
@@ -28,28 +24,36 @@ CHUNKING_DESCRIPTION = "Defines how the datacube must be chunked, " + \
                        "an equally sized chunk."
 DESCRIPTION_DESCRIPTION = "The datacube's description."
 THEMATICS_DESCRIPTION = "Thematics / keywords of the datacube."
-EXTRA_PARAMS_DESCRIPTION = "List of key/value driver specific parameters."
-TARGET_COLLECTION = "The name of the collection where the resulting cube should be referenced."
-TARGET_CATALOG = "The name of the catalog for the resulting cube."
-OVERVIEW_DESCRIPTION = "Build an overview of the resulting cube."
+OVERVIEW_DESCRIPTION = "Whether to build an overview of the resulting cube."
 
 
 class InputDC3BuildProcess(InputProcess, extra=Extra.allow):
-    target_collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
-    target_catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
-    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION)
-    # TODO: overview description
-    overview: bool = Field(default=False, description="")
-    bands: list[Band] = Field(description=BANDS_DESCRIPTION)
+    target_collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered")
+    target_catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered")
+    composition: list[ItemGroup] = Field(description=COMPOSITION_DESCRIPTION, min_length=1)
+    overview: bool = Field(default=False, description=OVERVIEW_DESCRIPTION)
+    bands: list[Band] = Field(description=BANDS_DESCRIPTION, min_length=1)
     roi: str = Field(description=ROI_DESCRIPTION)
     target_resolution: int = Field(default=10,
                                    description=RESOLUTION_DESCRIPTION, gt=0)
     target_projection: int = Field(default=4326,
                                    description=PROJECTION_DESCRIPTION)
     chunking_strategy: ChunkingStrategy = Field(default=ChunkingStrategy.POTATO, description=CHUNKING_DESCRIPTION)
-    # TODO: title description
-    title: str = Field(default=None, description="")
+    title: str = Field(default=None, description="The datacube's title")
     description: str = Field(default=None, description=DESCRIPTION_DESCRIPTION)
     keywords: list[str] = Field(default=[], description=THEMATICS_DESCRIPTION)
 
-    # TODO: add validation for dc3__rgb & dc3__cmap
+    @field_validator('bands', mode='after')
+    @classmethod
+    def check_overview_params(cls, value: list[Band]) -> list[Band]:
+        rgb = {}
+        for band in value:
+            if band.dc3__rgb is not None:
+                if band.dc3__rgb in rgb:
+                    raise ValueError(f"Band for {band.dc3__rgb.value} has been defined multiple times: {rgb[band.dc3__rgb]} & {band.name}")
+                rgb[band.dc3__rgb] = band.name
+
+        if len(rgb) != 3 and len(rgb) != 0:
+            raise ValueError("The request should either have no bands with 'dc3__rgb' specified, or each color should be assigned exactly once.")
+
+        return value

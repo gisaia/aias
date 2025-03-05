@@ -16,9 +16,9 @@ def find_raster_files(fb: str | io.TextIOWrapper, regex: Pattern[str], alias=Non
     with zipfile.ZipFile(fb) as zip:
         file_names = zip.namelist()
         for f_name in file_names:
-            match = re.match(regex, f_name)
-            if match:
-                key = match.group(1)
+            matches = re.findall(regex, f_name)
+            if len(matches) > 0:
+                key = matches[0]
                 if alias is not None:
                     key = alias + '.' + key
                 bands[key] = f_name

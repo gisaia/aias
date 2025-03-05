@@ -69,9 +69,9 @@ class AccessManager:
         return storage.get_storage_parameters()
 
     @staticmethod
-    def check_local_path_authorized(href: str):
+    def check_local_path_writable(href: str):
         """
-        Checks that the path is an authorized path for at least one of the file storages
+        Checks that the path is a writable path for at least one of the file storages
         """
         is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.type == "file", AccessManager.storages)))
         if not is_authorized:
@@ -84,7 +84,7 @@ class AccessManager:
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
         storage = AccessManager.resolve_storage(href)
-        AccessManager.check_local_path_authorized(href)
+        AccessManager.check_local_path_writable(dst)
 
         storage.pull(href, dst)
 
