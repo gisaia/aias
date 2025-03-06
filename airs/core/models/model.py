@@ -289,7 +289,6 @@ class ItemGroup(BaseModel):
     dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
 
 
-# TODO: I would do a DC3Band that extends Band and maybe redefines some of the fields description, so that it matches better?
 class Band(BaseModel, extra=Extra.allow):
     index: int = Field(default=None, ge=1, title="[ARLAS] Band index within the asset, starting at 1")
     asset: str = Field(default=None, title="[ARLAS] Name of the asset, must be present in `item.assets`")

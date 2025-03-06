@@ -14,7 +14,7 @@ from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
 from extensions.aproc.proc.dc3build.utils.geo import bbox2polygon, roi2geometry
-from extensions.aproc.proc.dc3build.utils.utils import get_all_aliases
+from extensions.aproc.proc.dc3build.utils.raster import get_all_aliases
 from extensions.aproc.proc.drivers.exceptions import DriverException
 
 

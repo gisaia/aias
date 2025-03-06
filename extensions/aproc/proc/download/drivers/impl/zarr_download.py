@@ -52,7 +52,7 @@ class Driver(DownloadDriver):
         import rioxarray
         import xarray as xr
 
-        from extensions.aproc.proc.dc3build.utils.numpy import resample_raster
+        from extensions.aproc.proc.dc3build.utils.raster import resample_raster
 
         asset_href = self.get_asset_href(item)
         tmp_asset = None
@@ -129,7 +129,7 @@ class Driver(DownloadDriver):
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
     def __find_raster_files(self, fb: str | io.TextIOWrapper):
-        from extensions.aproc.proc.dc3build.utils.utils import \
+        from extensions.aproc.proc.dc3build.utils.raster import \
             find_raster_files
 
         return list(find_raster_files(fb, re.compile(r"IMG_DATA/.*(B\d{2})\.jp2")).values())

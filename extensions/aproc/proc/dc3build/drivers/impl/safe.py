@@ -10,9 +10,6 @@ from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
-from extensions.aproc.proc.dc3build.utils.utils import (find_raster_files,
-                                                        get_all_aliases,
-                                                        get_eval_formula)
 
 
 class Driver(DC3Driver):
@@ -41,7 +38,10 @@ class Driver(DC3Driver):
         from extensions.aproc.proc.dc3build.utils.gif import create_gif
         from extensions.aproc.proc.dc3build.utils.metadata import \
             create_datacube_metadata
-        from extensions.aproc.proc.dc3build.utils.raster import Raster
+        from extensions.aproc.proc.dc3build.utils.raster import (
+            find_raster_files, get_all_aliases, get_eval_formula)
+        from extensions.aproc.proc.dc3build.utils.raster_to_zarr import \
+            RasterToZarr
         from extensions.aproc.proc.dc3build.utils.xarray import (
             create_common_grid, get_chunk_shape, mosaick_list)
 
@@ -90,8 +90,8 @@ class Driver(DC3Driver):
                         for band, path in bands.items():
                             with rasterio.open("zip+" + a.href + "!" + path, "r+") as src:
                                 # Create Raster object
-                                raster = Raster(band, src, dc3_request.target_projection,
-                                                min_res, roi_polygon)
+                                raster = RasterToZarr(band, src, dc3_request.target_projection,
+                                                      min_res, roi_polygon)
 
                                 # Create zarr store
                                 # TODO: add method to create a temporary file ? -> have a process id that is used
@@ -187,14 +187,14 @@ class Driver(DC3Driver):
 
         item.assets = {
             Role.datacube.value: Asset(
-                name=Role.datacube.value,  # TODO: should we use request.title ?
+                name=Role.datacube.value,
                 size=AccessManager.get_size(cube_file),
                 type=MimeType.ZARR.value,
                 href=zipped_cube_file,  # Could be cube_file but won't work for upload with airs__managed
                 asset_type=ResourceType.cube.value,
                 asset_format=AssetFormat.zarr.value,
                 airs__managed=True,
-                title=dc3_request.description,
+                title=dc3_request.title,
                 description=dc3_request.description,
                 roles=[Role.datacube, Role.data, Role.zarr]
             )

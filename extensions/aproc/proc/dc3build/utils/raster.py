@@ -1,161 +1,91 @@
-import math
-import os.path as path
+import io
+import re
+import zipfile
+from typing import Pattern
 
 import numpy as np
-import zarr
-from rasterio.coords import BoundingBox
-from rasterio.crs import CRS
+import rasterio.enums
+import rasterio.warp
 from rasterio.io import DatasetReader
-from rasterio.mask import mask
-from rasterio.transform import IDENTITY, from_gcps
-from rasterio.warp import (Resampling, calculate_default_transform, reproject,
-                           transform_bounds)
-from shapely.geometry import Polygon
 
-from airs.core.models.model import ChunkingStrategy
-from extensions.aproc.proc.dc3build.utils.geo import project_polygon
-from extensions.aproc.proc.dc3build.utils.numpy import resample_raster
-from extensions.aproc.proc.dc3build.utils.xarray import get_chunk_shape
+from extensions.aproc.proc.dc3build.model.dc3build_input import \
+    InputDC3BuildProcess
 
 
-class Raster:
+def resample_raster(src: DatasetReader, input_data: np.ndarray, target_resolution: int | float):
+    repeats = src.res[0] / target_resolution
 
-    def __init__(self, band: str, raster_reader: DatasetReader,
-                 target_projection, target_resolution: int | float,
-                 roi_polygon: Polygon):
-        self.band = band
-        self.dtype = raster_reader.dtypes[0].lower()
-        self.crs = target_projection
-        self.src_crs = raster_reader.crs
+    if repeats != 1:
+        align_transform, width, height = rasterio.warp.aligned_target(
+            src.transform, src.height, src.width, (target_resolution, target_resolution))
 
-        # Extract the ROI in local referential
-        if self.src_crs is None:
-            self.src_crs = CRS.from_epsg(4326)
-        local_proj_polygon = project_polygon(
-                roi_polygon, target_projection, self.src_crs)
+        if int(repeats) == repeats:
+            repeats = int(repeats)
+            height = input_data.shape[len(input_data.shape) - 2]
+            width = input_data.shape[len(input_data.shape) - 1]
+            data = np.zeros((src.count, height * repeats, width * repeats), dtype=src.dtypes[0])
+            for i in range(src.count):
+                data[i] = np.repeat(np.repeat(input_data[i], repeats, axis=1), repeats, axis=0)
+            transform = align_transform
+        else:
+            # This method will create some differences with the original image
+            data, transform = rasterio.warp.reproject(
+                source=input_data,
+                destination=np.zeros((src.count, height, width)),
+                src_transform=src.transform,
+                dst_transform=align_transform,
+                src_crs=src.crs,
+                dst_crs=src.crs,
+                dst_nodata=src.nodata,
+                resampling=rasterio.enums.Resampling.nearest)
+    else:
+        transform = src.transform
+        data = input_data
 
-        # Some raster files are not georeferenced with transform but with GCP
-        if raster_reader.transform == IDENTITY:
-            gcps = raster_reader.get_gcps()[0]
-            ul = gcps[0]
-            end_of_row = math.ceil(raster_reader.bounds.right / gcps[1].col)
-            ur = gcps[end_of_row]
-            ll = gcps[- 1 - end_of_row]
-            lr = gcps[-1]
+    return data, transform
 
-            raster_reader.transform = from_gcps([ul, ur, ll, lr])
 
-        self.data, raster_reader.transform = mask(
-            raster_reader, [local_proj_polygon], crop=True)
+def find_raster_files(fb: str | io.TextIOWrapper, regex: Pattern[str], alias=None) -> dict[str, str]:
+    """
+    From a zip archive, extract a dictionary of band -> path matching the input regex.
+    The regex must have exactly one capturing group
+    """
+    bands: dict[str, str] = {}
+    with zipfile.ZipFile(fb) as zip:
+        file_names = zip.namelist()
+        for f_name in file_names:
+            matches = re.findall(regex, f_name)
+            if len(matches) > 0:
+                key = matches[0]
+                if alias is not None:
+                    key = alias + '.' + key
+                bands[key] = f_name
 
-        self.data, raster_reader.transform = resample_raster(raster_reader, self.data, target_resolution)
+    return bands
 
-        self.data: np.ndarray = np.squeeze(self.data)
 
-        self.width = self.data.shape[1]
-        self.height = self.data.shape[0]
+def get_eval_formula(band_expression: str,
+                     aliases: set[str]) -> str:
+    """
+    Transform the requested expression of the band in a xarray operation
+    """
+    def repl(match: re.Match[str]) -> str:
+        for m in match.groups():
+            return f"datacube.get('{m}')"
 
-        # Find the new bounding box of the data
-        self.src_bounds = raster_reader.bounds
-        raster_polygon = Polygon([
-                (self.src_bounds.left, self.src_bounds.bottom),
-                (self.src_bounds.right, self.src_bounds.bottom),
-                (self.src_bounds.right, self.src_bounds.top),
-                (self.src_bounds.left, self.src_bounds.top),
-                (self.src_bounds.left, self.src_bounds.bottom)])
+    result = band_expression
+    for alias in aliases:
+        result = re.sub(rf"({alias}\.[a-zA-Z0-9]*)", repl, result)
 
-        intersection_bounds = local_proj_polygon.intersection(
-            raster_polygon).bounds
-        self.bounds = BoundingBox(*intersection_bounds)
+    return result
 
-        # Project the raster in the target projection
-        self.transform, self.width, self.height = calculate_default_transform(
-            self.src_crs, target_projection,
-            self.width, self.height, *self.bounds)
 
-        self.bounds = transform_bounds(
-            self.src_crs, target_projection, *self.bounds)
-
-        projected_data = np.zeros((self.height, self.width))
-        self.data = self.data.squeeze()
-
-        reproject(source=self.data,
-                  destination=projected_data,
-                  src_crs=self.src_crs,
-                  src_nodata=raster_reader.nodata,
-                  src_transform=raster_reader.transform,
-                  dst_transform=self.transform,
-                  dst_crs=target_projection,
-                  dst_nodata=None,
-                  resampling=Resampling.nearest)
-        self.data = projected_data
-
-        self.metadata = {}
-
-    def create_zarr_dir(self, zarr_root_path: str,
-                        product_timestamp: int,
-                        raster_timestamp: int) -> zarr.DirectoryStore:
-        """
-        Creates a zarr from the Raster file
-
-        :param zarr_root_path: Path for the zarr
-        :param product_timestamp: Timestamp of the product used for priority in mosaicking
-        :param raster_timestamp: Timestamp used for the slice of the datacube
-        """
-
-        store = zarr.DirectoryStore(path.join(zarr_root_path, self.band))
-
-        xmin, ymin, xmax, ymax = self.bounds
-        x = zarr.create(
-            shape=(self.width,),
-            dtype='float32',
-            store=store,
-            overwrite=True,
-            path="x"
-        )
-        x[:] = np.arange(xmin, xmax, (xmax - xmin) / self.width)
-        x.attrs['_ARRAY_DIMENSIONS'] = ['x']
-
-        y = zarr.create(
-            shape=(self.height,),
-            dtype='float32',
-            store=store,
-            overwrite=True,
-            path="y"
-        )
-        y[:] = np.arange(ymin, ymax, (ymax - ymin) / self.height)
-        y.attrs['_ARRAY_DIMENSIONS'] = ['y']
-
-        t = zarr.create(
-            shape=(1,),
-            dtype="int",
-            store=store,
-            overwrite=True,
-            path="t"
-        )
-        t[:] = [raster_timestamp]
-        t.attrs['_ARRAY_DIMENSIONS'] = ['t']
-
-        chunk_shape = get_chunk_shape(
-            {"x": self.width, "y": self.height, "t": 1}, ChunkingStrategy.SPINACH)
-
-        # Create zarr array for each band required
-        zarray = zarr.create(
-            shape=(self.width, self.height, 1),
-            chunks=tuple(chunk_shape.values()),
-            dtype=self.dtype,
-            store=store,
-            overwrite=True,
-            path=self.band
-        )
-
-        # Add band metadata to the zarr file
-        zarray.attrs['_ARRAY_DIMENSIONS'] = ['x', 'y', 't']
-        self.metadata['product_timestamp'] = product_timestamp
-
-        zarray[:, :, 0] = np.flip(np.transpose(self.data), 1)
-
-        # Consolidate the metadata into a single .zmetadata file
-        zarr.consolidate_metadata(store)
-
-        return store
+def get_all_aliases(request: InputDC3BuildProcess) -> set[str]:
+    """
+    Get all unique aliases nested in the request's composition
+    """
+    aliases: set[str] = set()
+    for g in request.composition:
+        for r in g.dc3__references:
+            aliases.add(r.dc3__alias)
+    return aliases
