@@ -1,4 +1,12 @@
 FROM python:3.10.13-alpine3.19
+
+ARG version="latest"
+ENV AIAS_VERSION=${version}
+
+LABEL io.arlas.agate.version=${version}
+LABEL vendor="Gisaïa"
+LABEL description="This container serves ARLAS AGATE"
+
 RUN apk update && apk add --upgrade libexpat
 
 COPY ./agate/requirements.txt /app/requirements.txt
@@ -11,6 +19,7 @@ COPY ./agate /app/agate
 COPY ./common /app/common
 COPY ./conf/agate.yaml /app/conf/
 COPY ./scripts/agate/start.sh /app/
+COPY ./scripts/version.env /app/
 
 EXPOSE 8004
 ENTRYPOINT ["./start.sh"]

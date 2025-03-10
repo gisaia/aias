@@ -21,10 +21,11 @@ RUN npm run build
 
 FROM nginx:1.25.3-alpine3.18-slim
 ARG version="latest"
+ENV AIAS_VERSION=${version}
 
 LABEL io.arlas.wui-fam.version=${version}
 LABEL vendor="Gisaïa"
-LABEL description="This container builds and serves the FAM-wui app"
+LABEL description="This container serves the FAM-wui app"
 
 RUN apk add --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
 

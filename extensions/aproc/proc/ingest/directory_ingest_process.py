@@ -22,6 +22,7 @@ from extensions.aproc.proc.ingest.settings import Configuration
 from extensions.aproc.proc.ingest.settings import \
     Configuration as IngestConfiguration
 
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -42,7 +43,7 @@ summary: ProcessSummary = ProcessSummary(
     description="Extract the items and assets information from the archives founbd in the directory and register the items and assets in ARLAS Item Registration Services.",
     keywords=["AIRS", "ARLAS Item Registration Services"],
     id="directory_ingest",
-    version="0.1",
+    version=AIAS_VERSION,
     jobControlOptions=[JobControlOptions.async_execute],
     outputTransmission=[TransmissionMode.reference],
     # TODO: provide the links if any => link could be the execute endpoint

@@ -33,6 +33,7 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              EVENT_TYPE_KEY, USER_ACTION_KEY,
                                              USER_EMAIL_KEY, USER_ID_KEY)
 
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -49,7 +50,7 @@ summary: ProcessSummary = ProcessSummary(
     description="Build a data cube (time serie of observations) based on groups of items, each group representing a time slice. The result is registered in ARLAS",
     keywords=["cube", "build", "datacube", "dc3build"],
     id="dc3build",
-    version="0.1",
+    version=AIAS_VERSION,
     jobControlOptions=[JobControlOptions.async_execute],
     outputTransmission=[TransmissionMode.reference],
     # TODO: provide the links if any => link could be the execute endpoint  # NOSONAR

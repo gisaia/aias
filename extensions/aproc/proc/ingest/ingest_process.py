@@ -24,6 +24,7 @@ from extensions.aproc.proc.processes.arlas_services_helper import (
     JSON_HEADER, ARLASServicesHelper)
 from extensions.aproc.proc.processes.process_model import InputProcess
 
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -47,7 +48,7 @@ summary: ProcessSummary = ProcessSummary(
     description="Extract the item and assets information from an archive and register the item and assets in ARLAS Item Registration Services.",
     keywords=["AIRS", "ARLAS Item Registration Services"],
     id="ingest",
-    version="0.1",
+    version=AIAS_VERSION,
     jobControlOptions=[JobControlOptions.async_execute],
     outputTransmission=[TransmissionMode.reference],
     # TODO: provide the links if any => link could be the execute endpoint
