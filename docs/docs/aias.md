@@ -22,7 +22,7 @@ Functions for access:
 
 ### AGATE
 
-AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an object store such as minio. 
+AGATE is ARLAS Asset Gateway. It is a service for protecting assets from an object store such as minio.
 It must be used as a forward authorisation service.
 
 
@@ -40,8 +40,8 @@ To ingest products from the GEODES catalogue into AIRS, the process needs to acc
 ```shell
 docker run --rm \
   -v `pwd`:/app/  \
-  --network arlas-net aias/stac-geodes:latest \
-  add https://geodes-portal.cnes.fr/api/stac/items http://airs-server:8000/airs geodes S2L1C \
+  --network arlas-net gisaia/stac-geodes:latest \
+  add https://geodes-portal.cnes.fr/api/stac http://airs-server:8000/airs geodes S2L1C \
   --data-type PEPS_S2_L1C \
   --data-type MUSCATE_SENTINEL2_SENTINEL2_L2A \
   --data-type MUSCATE_Snow_SENTINEL2_L2B-SNOW \

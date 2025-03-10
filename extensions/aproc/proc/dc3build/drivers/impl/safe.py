@@ -1,13 +1,15 @@
+import functools
 import json
 import os
-
+import re
 
 from airs.core.models import mapper
-from airs.core.models.model import (Asset, AssetFormat, Indicators, Item, ItemFormat, MimeType, Properties,
-                                    ResourceType, Role, VariableType)
+from airs.core.models.model import (Asset, AssetFormat, ChunkingStrategy, Item,
+                                    ItemFormat, MimeType, ResourceType, Role)
 from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
-from extensions.aproc.proc.dc3build.model.dc3build_input import InputDC3BuildProcess
+from extensions.aproc.proc.dc3build.model.dc3build_input import \
+    InputDC3BuildProcess
 
 
 class Driver(DC3Driver):
@@ -24,94 +26,199 @@ class Driver(DC3Driver):
     def supports(self, item: Item) -> bool:
         return item.properties.item_format and item.properties.item_format.lower() == ItemFormat.safe.value.lower()
 
-    def __flat_items__(items: dict[str, dict[str, Item]]) -> list[Item]:
-        its = list(map(lambda v: list(v.values()), items.values()))
-        return [x for xs in its for x in xs]
-
     # Implements drivers method
     def create_cube(self, dc3_request: InputDC3BuildProcess, items: dict[str, dict[str, Item]], target_directory: str) -> Item:
-        CUBE_ASSET_NAME = "cube"
-        first_item: Item = items.get(dc3_request.composition[0].dc3__references[0].dc3__collection).get(dc3_request.composition[0].dc3__references[0].dc3__id)
-        # item.collection, item.catalog and item.id are managed by the process, no need to set it!
-        item = Item()
-        item.properties = Properties()
-        item.properties.start_datetime = min(list(map(lambda group: group.dc3__datetime, dc3_request.composition)))
-        item.properties.end_datetime = max(list(map(lambda group: group.dc3__datetime, dc3_request.composition)))
-        item.properties.datetime = item.properties.start_datetime
-        item.properties.keywords = dc3_request.keywords
-        item.properties.gsd = dc3_request.target_resolution
-        item.properties.item_type = ResourceType.cube.name
-        item.properties.item_format = ItemFormat.adc3.name
-        item.properties.main_asset_format = AssetFormat.zarr.name
-        item.properties.main_asset_name = CUBE_ASSET_NAME
-        item.properties.observation_type = first_item.properties.observation_type
-        if dc3_request.keywords is None:
-            dc3_request.keywords = []
-        if first_item.properties.programme:
-            item.properties.keywords.append(first_item.properties.programme)
-        if first_item.properties.constellation:
-            item.properties.keywords.append(first_item.properties.constellation)
-        if first_item.properties.satellite:
-            item.properties.keywords.append(first_item.properties.satellite)
-        if first_item.properties.platform:
-            item.properties.keywords.append(first_item.properties.platform)
-        if first_item.properties.instrument:
-            item.properties.keywords.append(first_item.properties.instrument)
-        if first_item.properties.sensor:
-            item.properties.keywords.append(first_item.properties.sensor)
-        item.properties.annotations = " ".join(dc3_request.keywords)
-        item.properties.locations = []
-        for it in Driver.__flat_items__(items):
-            if it.properties.locations:
-                item.properties.locations = item.properties.locations + it.properties.locations
-        item.properties.eo__bands = dc3_request.bands  # The cube bands should be the same as the requested bands, asset tracability is added.
-        item.properties.cube__variables = {}
+        import numpy as np
+        import rasterio
+        import xarray as xr
+        import zarr
+        from shapely import to_geojson
+
+        from extensions.aproc.proc.dc3build.utils.geo import roi2geometry
+        from extensions.aproc.proc.dc3build.utils.gif import create_gif
+        from extensions.aproc.proc.dc3build.utils.metadata import \
+            create_datacube_metadata
+        from extensions.aproc.proc.dc3build.utils.raster import (
+            find_raster_files, get_all_aliases, get_eval_formula)
+        from extensions.aproc.proc.dc3build.utils.raster_to_zarr import \
+            RasterToZarr
+        from extensions.aproc.proc.dc3build.utils.xarray import (
+            create_common_grid, get_chunk_shape, mosaick_list)
+
+        """ ATP: Composition of href """
+        # What are the bands that are needed by alias?
+        bands_per_alias: dict[str, list[str]] = {}
+        aliases = get_all_aliases(dc3_request)
+
+        for alias in aliases:
+            for b in dc3_request.bands:
+                bands_per_alias[alias] = re.findall(rf"{alias}\.([a-zA-Z0-9]*)", b.dc3__expression)
+
+        # Sort composition groups by datetime
+        dc3_request.composition.sort(key=lambda g: g.dc3__datetime)
+
+        roi_polygon = roi2geometry(dc3_request.roi)
+        # Access all assets (only desired bands)
+        composition: dict[int, list[str]] = {}
+        for group in dc3_request.composition:
+            timestamp = int(group.dc3__datetime.timestamp())
+            composition[timestamp] = []
+
+            for e in group.dc3__references:
+                # Href of the zip containing all bands
+                a: Asset = items[e.dc3__collection][e.dc3__id].assets[Role.data.value]
+                # TODO: SRE or FRE ? => Products for GEODES
+                # band_regex = re.compile(rf".*/.*SRE_({'|'.join(bands_per_alias[e.dc3__alias])})\.tif")
+                band_regex = re.compile(rf".*/IMG_DATA/.*({'|'.join(bands_per_alias[e.dc3__alias])})\.jp2")
+
+                # TODO: should I use path_within_asset instead of regex ?
+                with AccessManager.stream(a.href) as ab:
+                    bands = find_raster_files(ab, band_regex, e.dc3__alias)
+
+                # Find the lowest resolution product among those required
+                min_res = np.Inf
+                try:
+                    with rasterio.Env(**AccessManager.get_rasterio_session(a.href)):
+                        for p in bands.values():
+                            with rasterio.open("zip+" + a.href + "!" + p) as src:
+                                if src.res[0] < min_res:
+                                    min_res = src.res[0]
+
+                        zarrs: list[zarr.DirectoryStore] = []
+
+                        # For each object, create a zarr
+                        for band, path in bands.items():
+                            with rasterio.open("zip+" + a.href + "!" + path, "r+") as src:
+                                # Create Raster object
+                                raster = RasterToZarr(band, src, dc3_request.target_projection,
+                                                      min_res, roi_polygon)
+
+                                # Create zarr store
+                                # TODO: add method to create a temporary file ? -> have a process id that is used
+                                zarr_tmp_root_path = os.path.join(AccessManager.tmp_dir, f"{e.dc3__collection}_{e.dc3__id}.zarr")
+                                zarr_dir = raster.create_zarr_dir(
+                                    zarr_tmp_root_path, int(items[e.dc3__collection][e.dc3__id].properties.datetime.timestamp()), timestamp)
+
+                                zarrs.append(zarr_dir)
+                except Exception:
+                    # Can raise a CPLE_AppDefinedError error
+                    ...
+
+                if len(zarrs) != len(bands):
+                    raise RuntimeError(f"Error while generating the zarr for the bands of {e.dc3__id}")
+
+                # Retrieve the zarr stores as xarray objects that are on a same grid
+                merged_bands: xr.Dataset = None
+                for zarr_dir in zarrs:
+                    with xr.open_zarr(zarr_dir) as xr_zarr:
+                        if merged_bands is None:
+                            merged_bands = xr_zarr
+                        else:
+                            merged_bands = xr.merge((merged_bands, xr_zarr))
+
+                # Merge all bands
+                chunk_shape = get_chunk_shape(merged_bands.sizes, ChunkingStrategy.SPINACH)
+                # There could be the same product in multiple slices, so we need to use the timestamp to discriminate them
+                merged_zarr_path = os.path.join(AccessManager.tmp_dir, f"{os.path.basename(a.href)}_{timestamp}.zarr")
+                composition[timestamp].append(merged_zarr_path)
+
+                merged_bands.chunk(chunk_shape) \
+                            .to_zarr(merged_zarr_path, mode="w") \
+                            .close()
+
+                # Clean up the temporary files created
+                for zarr_dir in zarrs:
+                    if AccessManager.exists(zarr_dir.path):
+                        AccessManager.clean(zarr_dir.path)  # !DELETE!
+                del zarrs
+                del merged_bands
+
+        """ ATP: Composition of xr.Dataset """
+
+        lon, lat, lon_step, lat_step = create_common_grid(composition, roi_polygon)
+
+        # Mosaicking of each of the group on the common grid
+        def merge_mosaicked(mosaick_a: xr.Dataset, mosaick_b: xr.Dataset) -> xr.Dataset:
+            return xr.combine_by_coords((mosaick_a, mosaick_b), combine_attrs="override")
+
+        datacube = functools.reduce(
+            merge_mosaicked, map(lambda datasets: mosaick_list(datasets, lon, lat, lon_step, lat_step),
+                                 composition.values()))
+
+        """ ATP: Datacube (single xr.Dataset) """
+
+        # Compute the bands given by the formulas
         for band in dc3_request.bands:
-            item.properties.cube__variables[band.name] = VariableType.data
-        item.properties.proj__epsg = dc3_request.target_projection
+            datacube[band.name] = eval(get_eval_formula(band.dc3__expression, aliases))
+            if (band.dc3__min is not None) or (band.dc3__max is not None):
+                datacube[band.name] = datacube[band.name].clip(band.dc3__min, band.dc3__max)
 
-        # SECTION TO IMPLEMENT
-        item.bbox = [1, 1, 3, 3]
-        item.geometry = json.loads(dc3_request.roi)  # TODO
-        item.centroid = [0, 0]  # TODO
-        i = 1
-        for band in item.properties.eo__bands:
-            band.index = i
-            i = 1 + 1
-            band.asset = CUBE_ASSET_NAME
-            band.dc3__quality_indicators = Indicators(
-                dc3__time_compacity=0,  # TODO
-                dc3__group_lightness=0,  # TODO
-                dc3__spatial_coverage=0,  # TODO
-                dc3__time_regularity=0)  # TODO
-        item.properties.dc3__quality_indicators = Indicators(
-            dc3__time_compacity=0,  # TODO
-            dc3__group_lightness=0,  # TODO
-            dc3__spatial_coverage=0,  # TODO
-            dc3__time_regularity=0)  # TODO
-        item.properties.dc3__composition = dc3_request.composition  # TODO set the dc3__quality_indicators of the groups
-        item.properties.dc3__number_of_chunks = 0   # TODO compute the number of chunks
-        item.properties.dc3__chunk_weight = 0   # TODO compute the chunk weight
-        item.properties.dc3__fill_ratio = 0   # TODO compute the fill ratio
-        item.properties.cube__dimensions = {}   # TODO set the dimensiosn
-        item.properties.cube__variables = {}   # TODO set the variables
+        # Keep requested bands
+        requested_bands = [band.name for band in dc3_request.bands]
+        datacube = datacube[requested_bands]
 
+        # Generate and add metadata to the datacube
+        properties = create_datacube_metadata(dc3_request, items, datacube, lon_step, lat_step)
+        datacube.attrs = properties.model_dump(exclude_none=True, exclude_unset=True, mode="json")
+        datacube.attrs.update({
+            "title": dc3_request.title,
+            "description": dc3_request.description
+        })
+
+        # Chunk the datacube
         cube_file = os.path.join(target_directory, "cube.zarr")
-        with open(cube_file, "wb") as out:
-            out.truncate(1024 * 1024 * 10)
+        zipped_cube_file = cube_file + ".zip"
+        datacube.chunk(get_chunk_shape(
+                    datacube.dims, dc3_request.chunking_strategy)) \
+                .to_zarr(cube_file, mode="w") \
+                .close()
+
+        AccessManager.zip(cube_file, zipped_cube_file)
+        # The zipping of the file adds ane extra ".zip" at the end
+        os.rename(zipped_cube_file + ".zip", zipped_cube_file)
+
+        # item.collection, item.catalog and item.id are managed by the process, no need to set it!
+        item = Item(
+            properties=properties,
+            bbox=roi_polygon.bounds,
+            geometry=json.loads(to_geojson(roi_polygon)),
+            centroid=roi_polygon.centroid.coords[0]
+        )
+
         item.assets = {
-            CUBE_ASSET_NAME: Asset(
-                name=CUBE_ASSET_NAME,
-                size=AccessManager.get_file_size(cube_file),
-                type=MimeType.ZARR.name,
-                href=cube_file,
-                asset_type=ResourceType.cube.name,
-                asset_format=AssetFormat.zarr.name,
+            Role.datacube.value: Asset(
+                name=Role.datacube.value,
+                size=AccessManager.get_size(cube_file),
+                type=MimeType.ZARR.value,
+                href=zipped_cube_file,  # Could be cube_file but won't work for upload with airs__managed
+                asset_type=ResourceType.cube.value,
+                asset_format=AssetFormat.zarr.value,
                 airs__managed=True,
-                title=dc3_request.description,
+                title=dc3_request.title,
                 description=dc3_request.description,
                 roles=[Role.datacube, Role.data, Role.zarr]
             )
         }
+
+        # Create the overview
+        if dc3_request.overview:
+            overview_file = os.path.join(target_directory, "overview.gif")
+
+            with xr.open_zarr(cube_file) as datacube:
+                create_gif(datacube, item, overview_file)
+
+            item.assets[Role.overview.value] = Asset(
+                name=Role.overview.value,
+                size=AccessManager.get_size(overview_file),
+                type=MimeType.GIF.value,
+                href=overview_file,
+                asset_type=ResourceType.other.value,
+                asset_format=AssetFormat.gif.value,
+                airs__managed=True,
+                title="",
+                description="",
+                roles=[Role.overview]
+            )
+
         Driver.LOGGER.debug("Cube STAC Item: {}".format(mapper.to_json(item)))
         return item

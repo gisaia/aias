@@ -4,15 +4,15 @@ import time
 import unittest
 from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, MAX_ITERATIONS,
                         SENTINEL_2_ID, SENTINEL_2_ITEM, TOKEN, add_item,
-                        setUpTest)
+                        create_arlas_collection, setUpTest)
 from time import sleep
 
 import requests
 
 from airs.core.models import mapper
-from airs.core.models.model import (RGB, Band, ChunkingStrategy,
-                                    CommonBandName, Indicators, Item,
-                                    ItemGroup, ItemReference, MimeType)
+from airs.core.models.model import (Band, ChunkingStrategy, CommonBandName,
+                                    Item, ItemGroup, ItemReference, MimeType,
+                                    Role)
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
@@ -41,8 +41,7 @@ class Tests(unittest.TestCase):
                             dc3__collection=COLLECTION,
                             dc3__id=SENTINEL_2_ID,
                         )
-                    ],
-                    dc3__quality_indicators=Indicators()
+                    ]
                 ),
                 ItemGroup(
                     dc3__datetime=datetime.date(2022, 9, 25),
@@ -52,8 +51,7 @@ class Tests(unittest.TestCase):
                             dc3__collection=COLLECTION,
                             dc3__id=SENTINEL_2_ID,
                         )
-                    ],
-                    dc3__quality_indicators=Indicators()
+                    ]
                 ),
                 ItemGroup(
                     dc3__datetime=datetime.date(2022, 10, 25),
@@ -63,28 +61,25 @@ class Tests(unittest.TestCase):
                             dc3__collection=COLLECTION,
                             dc3__id=SENTINEL_2_ID,
                         )
-                    ],
-                    dc3__quality_indicators=Indicators()
+                    ]
                 ),
             ],
             overview=True,
             bands=[Band(
                 index=1,
                 asset="data",
-                variable_value_alias={},
-                name="B01",
-                eo__common_name=CommonBandName.green.name,
-                description="Green band",
-                dc3_expression="B01/10.0",
-                dc3_rgb=RGB.GREEN
+                name="B02",
+                eo__common_name=CommonBandName.blue.name,
+                description="Blue band",
+                dc3__expression="s2.B02/10.0"
             )],
             roi=json.dumps(item.geometry),
             target_resolution=10,
             target_projection=4326,
             chunking_strategy=ChunkingStrategy.POTATO,
             title="My test cube",
-            description="My test cube with 5 temporal slices",
-            keywords=["cube", "sentinel 2", "5 slices"],
+            description="My test cube with 3 temporal slices",
+            keywords=["cube", "sentinel 2", "3 slices"],
         )
 
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
@@ -112,13 +107,17 @@ class Tests(unittest.TestCase):
             )
         self.assertEqual(status.status, StatusCode.successful)
         result = json.loads(status.message)
+
         item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"])
 #        self.assertListEqual(AprocProcess.check_item(item, check_asset_exists=False), [])
-        self.assertIsNotNone(item.assets.get("cube").href)
-        self.assertTrue(ARLASServicesHelper.asset_in_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"], asset_name="cube"))
+        self.assertIsNotNone(item.assets.get(Role.datacube.value).href)
+        self.assertTrue(ARLASServicesHelper.asset_in_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"], asset_name=Role.datacube.value))
 
     def ingest_sentinel(self) -> Item:
-        return add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
+        item = add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
+        time.sleep(3)
+        create_arlas_collection(self)
+        return item
 
 
 if __name__ == "__main__":

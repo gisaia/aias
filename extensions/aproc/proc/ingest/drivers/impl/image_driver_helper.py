@@ -21,13 +21,13 @@ class ImageDriverHelper:
                       description=Role.data.value, airs__managed=False))
         tfw_path = os.path.splitext(url)[0] + ".tfw"
         if AccessManager.exists(tfw_path):
-            assets.append(Asset(href=tfw_path, size=AccessManager.get_file_size(tfw_path),
+            assets.append(Asset(href=tfw_path, size=AccessManager.get_size(tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
 
         j2w_path = os.path.splitext(url)[0] + ".j2w"
         if AccessManager.exists(j2w_path):
-            assets.append(Asset(href=j2w_path, size=AccessManager.get_file_size(j2w_path),
+            assets.append(Asset(href=j2w_path, size=AccessManager.get_size(j2w_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
@@ -48,7 +48,7 @@ class ImageDriverHelper:
                 image = Image.open(local_url)
                 image.thumbnail([size, size])
                 image.save(asset.href, 'PNG')
-                asset.size = AccessManager.get_file_size(asset.href)
+                asset.size = AccessManager.get_size(asset.href)
                 to_assets.append(asset)
                 image.close()
         except Exception as e:

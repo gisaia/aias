@@ -1,5 +1,6 @@
 import importlib
 
+from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.drivers.driver_configuration import DriverConfiguration
@@ -24,6 +25,14 @@ class DriverManager():
                 DriverManager.drivers[process].append(driver_class)
             except ModuleNotFoundError:
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
+
+            try:
+                AccessManager.check_local_path_writable(driver_class.assets_dir)
+                if driver_class.assets_dir == "/":
+                    raise ValueError("Driver {} assets_dir is not authorized for writing".format(driver_configuration.class_name))
+            except ValueError as e:
+                raise DriverException(e)
+
         DriverManager.drivers[process].sort(key=lambda driver: driver.priority)
         for driver in DriverManager.drivers[process]:
             LOGGER.info("{}: {}".format(driver.priority, driver.name))
