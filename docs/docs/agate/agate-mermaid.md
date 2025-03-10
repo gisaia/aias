@@ -14,8 +14,8 @@ AGATE allows an access to a resource if the user is allowed to see the correspon
 
 A configuration per service must be provided. A service configuration provides:
 - a list of `url_patterns` to extract the collection name and the item id. At least one is needed.
-- a list of `url_patterns` for public resources: if matching, then AGATE authorizes the access
-- a `pattern_target` for telling AGATE where to look:
+- a list of `public_url_patterns` for public resources: if matching, then AGATE authorizes the access
+- a `pattern_target` to tell AGATE where to look:
     - if undefined, then the pattern is matched against the path
     - if `query.{param}` then the `{param}`* query parameter is used
     - if `query.{param}.url.path` then the path contained in the `{param}`* query parameter is used
