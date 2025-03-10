@@ -19,6 +19,7 @@ FAM_PREFIX = os.getenv("FAM_PREFIX", "/arlas/fam")
 FAM_CORS_ORIGINS = os.getenv("FAM_CORS_ORIGINS", "*")
 FAM_CORS_METHODS = os.getenv("FAM_CORS_METHODS", "*")
 FAM_CORS_HEADERS = os.getenv("FAM_CORS_HEADERS", "*")
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 
 
 @cli.command(help="Start the File and Archive Management Service.")
@@ -29,7 +30,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
     Configuration.init(configuration_file=configuration_file)
     IngestConfiguration.init(configuration_file=Configuration.settings.driver_configuration_file)
     DriverManager.init("ingest", IngestConfiguration.settings.drivers)
-    api = FastAPI(version='0.0', title='ARLAS File and Archive Management Service',
+    api = FastAPI(version=AIAS_VERSION, title='ARLAS File and Archive Management Service',
                   description='ARLAS File and Archive Management API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=FAM_CORS_ORIGINS.split(","),
                                          allow_methods=FAM_CORS_METHODS.split(","),

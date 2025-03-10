@@ -18,13 +18,14 @@ APROC_PREFIX = os.getenv("APROC_PREFIX", "/arlas/aproc")
 APROC_CORS_ORIGINS = os.getenv("APROC_CORS_ORIGINS", "*")
 APROC_CORS_METHODS = os.getenv("APROC_CORS_METHODS", "*")
 APROC_CORS_HEADERS = os.getenv("APROC_CORS_HEADERS", "*")
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 
 
 @cli.command(help="Start the ARLAS Processing Service.")
 def run(
         host: str = typer.Argument(default=APROC_HOST, help="host"),
         port: int = typer.Argument(default=APROC_PORT, help="port")):
-    api = FastAPI(version='0.0', title='ARLAS Processes',
+    api = FastAPI(version=AIAS_VERSION, title='ARLAS Processes',
                   description='ARLAS Processes',
                   middleware=[Middleware(CORSMiddleware, allow_origins=APROC_CORS_ORIGINS.split(","),
                                          allow_methods=APROC_CORS_METHODS.split(","),

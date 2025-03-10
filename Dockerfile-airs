@@ -1,7 +1,15 @@
 FROM python:3.10.13-alpine3.19
+ARG version="0.0"
+ENV AIAS_VERSION=${version}
+
+LABEL io.arlas.airs.version=${version}
+LABEL vendor="Gisaïa"
+LABEL description="This container serves ARLAS AIRS"
+
 RUN apk update && apk add --upgrade libexpat
 
 RUN apk --no-cache add curl
+
 COPY ./airs/requirements.txt /app/requirements.txt
 
 WORKDIR /app

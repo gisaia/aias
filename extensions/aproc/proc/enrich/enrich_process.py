@@ -15,14 +15,22 @@ from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
-from extensions.aproc.proc.processes.process_model import InputProcess
-from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.settings import Configuration as EnrichConfiguration
-from extensions.aproc.proc.ingest.ingest_process import AprocProcess as IngestAprocProcess
+from extensions.aproc.proc.enrich.settings import \
+    Configuration as EnrichConfiguration
+from extensions.aproc.proc.processes.arlas_services_helper import \
+    ARLASServicesHelper
+from extensions.aproc.proc.processes.process_model import InputProcess
+from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
+                                             ARLAS_ITEM_ID_KEY,
+                                             ENRICHMENT_FAILED_MSG,
+                                             EVENT_ACTION, EVENT_CATEGORY_KEY,
+                                             EVENT_KIND_KEY, EVENT_MODULE_KEY,
+                                             EVENT_OUTCOME_KEY, EVENT_REASON,
+                                             EVENT_TYPE_KEY, USER_ACTION_KEY)
 
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
@@ -41,7 +49,7 @@ summary: ProcessSummary = ProcessSummary(
     description="Enrich one or more items with assets.",
     keywords=["Enrich"],
     id="enrich",
-    version="0.1",
+    version=AIAS_VERSION,
     jobControlOptions=[JobControlOptions.async_execute],
     outputTransmission=[TransmissionMode.reference],
     # TODO: provide the links if any => link could be the execute endpoint

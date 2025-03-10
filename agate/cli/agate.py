@@ -13,11 +13,12 @@ cli = typer.Typer()
 AGATE_CORS_ORIGINS = os.getenv("AGATE_CORS_ORIGINS", "*")
 AGATE_CORS_METHODS = os.getenv("AGATE_CORS_METHODS", "*")
 AGATE_CORS_HEADERS = os.getenv("AGATE_CORS_HEADERS", "*")
+AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 
 
 @cli.command(help="Start the ARLAS Asset Gateway.")
 def run(configuration_file: str = typer.Argument(..., help="Configuration file")):
-    api = FastAPI(version='0.0', title='ARLAS Asset Gateway',
+    api = FastAPI(version=AIAS_VERSION, title='ARLAS Asset Gateway',
                   description='ARLAS Asset Gateway API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=AGATE_CORS_ORIGINS.split(","),
                                          allow_methods=AGATE_CORS_METHODS.split(","),
