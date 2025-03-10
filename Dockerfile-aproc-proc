@@ -1,5 +1,5 @@
 FROM osgeo/gdal:ubuntu-small-3.6.3
-ARG version="latest"
+ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
 LABEL io.arlas.aproc-proc.version=${version}

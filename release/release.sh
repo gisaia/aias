@@ -14,10 +14,10 @@ build_and_publish_docker (){
     echo "Building the image $IMAGE"
     docker build --build-arg version=${VERSION} --platform "linux/amd64" -f Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
 
-#    echo "Publishing the image $IMAGE"
-#    docker login
-#    docker push gisaia/${IMAGE}:latest
-#    docker push gisaia/${IMAGE}:${VERSION}
+    echo "Publishing the image $IMAGE"
+    docker login
+    docker push gisaia/${IMAGE}:latest
+    docker push gisaia/${IMAGE}:${VERSION}
 }
 
 send_chat_message(){
