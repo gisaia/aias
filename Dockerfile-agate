@@ -19,7 +19,6 @@ COPY ./agate /app/agate
 COPY ./common /app/common
 COPY ./conf/agate.yaml /app/conf/
 COPY ./scripts/agate/start.sh /app/
-COPY ./scripts/version.env /app/
 
 EXPOSE 8004
 ENTRYPOINT ["./start.sh"]
