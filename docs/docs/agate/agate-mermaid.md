@@ -2,7 +2,7 @@
 
 AGATE helps to protect resources hosted by HTTP(S) services, such as an endpoint serving an object store. It must be used as a [forward authorization](https://apisix.apache.org/docs/apisix/plugins/forward-auth/) service for APISIX. 
 
-AGATE allows an access to a resource if the user is allowed to see the corresponding item in ARLAS. To find the corresponding item, AGATE extracts the collection name and the item id from the resource url. In other word, AGATE authorizes a request on a resource if 
+AGATE allows an access to a resource if the user is allowed to see the corresponding item in ARLAS. To find the corresponding item, AGATE extracts the collection name and the item id from the resource url. In other word, AGATE authorizes a request on a resource if:
 
 - a collection name is found in the resource path
 - an item identifier is found in the resource path
