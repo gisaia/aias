@@ -1,6 +1,7 @@
 ARLAS_COLLECTION_KEY = "arlas.collection"
 ARLAS_ITEM_ID_KEY = "arlas.item.id"
 DOWNLOAD_FAILED_MSG = "Download failed"
+CUBE_FAILED_MSG = "Building cube failed"
 ENRICHMENT_FAILED_MSG = "Enrichment failed"
 EVENT_ACTION = "event.action"
 EVENT_CATEGORY_KEY = "event.category"

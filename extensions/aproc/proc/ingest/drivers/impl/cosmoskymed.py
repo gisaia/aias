@@ -54,7 +54,7 @@ class Driver(IngestDriver):
                 geotiff_to_jpg(local_browse_path, 50, 50, self.thumbnail_path)
                 assets.append(Asset(href=self.thumbnail_path,
                                     roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                    description=Role.thumbnail.value, size=AccessManager.get_file_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                    description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
 
                 quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
                 os.makedirs(quicklook_path, exist_ok=True)
@@ -62,26 +62,26 @@ class Driver(IngestDriver):
                 geotiff_to_jpg(local_browse_path, 250, 250, self.quicklook_path)
                 assets.append(Asset(href=self.quicklook_path,
                                     roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                    description=Role.overview.value, size=AccessManager.get_file_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+                                    description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
 
-        assets.append(Asset(href=self.tif_path, size=AccessManager.get_file_size(self.tif_path),
+        assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        assets.append(Asset(href=self.met_path, size=AccessManager.get_file_size(self.met_path),
+        assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.attr_path, size=AccessManager.get_file_size(self.attr_path),
+        assets.append(Asset(href=self.attr_path, size=AccessManager.get_size(self.attr_path),
                             roles=[Role.metadata.value], name="attributes", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
-        assets.append(Asset(href=self.h5_path, size=AccessManager.get_file_size(self.h5_path),
+        assets.append(Asset(href=self.h5_path, size=AccessManager.get_size(self.h5_path),
                             roles=[Role.metadata.value], name="h5", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if self.tfw_path:
-            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_file_size(self.tfw_path),
+            assets.append(Asset(href=self.tfw_path, size=AccessManager.get_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
         if self.h5pdf_path:
-            assets.append(Asset(href=self.h5pdf_path, size=AccessManager.get_file_size(self.h5pdf_path),
+            assets.append(Asset(href=self.h5pdf_path, size=AccessManager.get_size(self.h5pdf_path),
                                 roles=[Role.metadata.value], name=Role.metadata.value + "_pdf", type=MimeType.PDF.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pdf.value, asset_type=ResourceType.other.value))
         return assets

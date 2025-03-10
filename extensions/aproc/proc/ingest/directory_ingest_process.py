@@ -50,7 +50,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(),
+    **summary.model_dump(exclude_none=True, exclude_unset=True),
     inputs=base_model2description(InputDirectoryIngestProcess),
     outputs=base_model2description(OutputDirectoryIngestProcess)
 )
@@ -77,7 +77,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel):
-        return InputDirectoryIngestProcess(**inputs.model_dump()).directory
+        return InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
@@ -95,7 +95,7 @@ class AprocProcess(Process):
         archives: list[Archive] = AprocProcess.list_archives(Configuration.settings.inputs_directory, directory, max_size=Configuration.settings.max_number_of_archive_for_ingest)
         LOGGER.info("{} archives to be ingested from {}".format(len(archives), os.path.join(Configuration.settings.inputs_directory, directory)))
         for archive in archives:
-            LOGGER.info(archive.model_dump_json())
+            LOGGER.info(archive.model_dump_json(exclude_none=True, exclude_unset=True))
             try:
                 inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
                 execute = Execute(inputs=inputs.model_dump())
@@ -111,7 +111,7 @@ class AprocProcess(Process):
                 LOGGER.error(msg)
                 LOGGER.exception(e)
                 raise Exception(msg)
-        return list(map(lambda a: a.model_dump(), archives))
+        return list(map(lambda a: a.model_dump(exclude_none=True, exclude_unset=True), archives))
 
     @staticmethod
     def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:

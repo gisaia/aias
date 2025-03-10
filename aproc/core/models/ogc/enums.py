@@ -23,6 +23,7 @@ class ObjectType(str, enum.Enum):
     number = "number"
     object = "object"
     string = "string"
+    null = "null"
 
 
 class ExceptionType(str, enum.Enum):

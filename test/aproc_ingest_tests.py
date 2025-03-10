@@ -1,6 +1,6 @@
 import json
 import unittest
-from test.utils import APROC_ENDPOINT, COLLECTION, CATALOG, setUpTest
+from test.utils import APROC_ENDPOINT, COLLECTION, CATALOG, MAX_ITERATIONS, setUpTest
 from time import sleep
 
 import requests
@@ -21,24 +21,28 @@ class Tests(unittest.TestCase):
 
     def ingest(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, expected)
         return status
 
     def ingest_directory(self, url, collection, catalog):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": "application/json"})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful)
 

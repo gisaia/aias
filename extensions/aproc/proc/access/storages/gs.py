@@ -58,7 +58,7 @@ class GoogleStorage(AbstractStorage):
     def credentials_file(self) -> str:
         if not self.is_anon_client:
             with tempfile.NamedTemporaryFile("w+", delete=False) as f:
-                json.dump(self.api_key.model_dump(), f)
+                json.dump(self.api_key.model_dump(exclude_none=True, exclude_unset=True), f)
                 f.close()
             credentials = f.name
         else:

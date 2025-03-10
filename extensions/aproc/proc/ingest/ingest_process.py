@@ -5,7 +5,7 @@ from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models.mapper import item_from_json, to_json
-from airs.core.models.model import Asset, Item, MimeType, Properties
+from airs.core.models.model import Asset, Item, Properties
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -20,6 +20,8 @@ from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.settings import \
     Configuration as IngestConfiguration
+from extensions.aproc.proc.processes.arlas_services_helper import (
+    JSON_HEADER, ARLASServicesHelper)
 from extensions.aproc.proc.processes.process_model import InputProcess
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -53,7 +55,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(),
+    **summary.model_dump(exclude_none=True, exclude_unset=True),
     inputs=base_model2description(InputIngestProcess),
     outputs=base_model2description(OutputIngestProcess)
 )
@@ -83,7 +85,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel):
-        url = InputIngestProcess(**inputs.model_dump()).url
+        url = InputIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).url
         driver: IngestDriver = DriverManager.solve(summary.id, url)
         if driver is not None:
             return driver.get_item_id(url)
@@ -146,14 +148,14 @@ class AprocProcess(Process):
                 LOGGER.debug("ingestion: 5 - upload")
                 i: int = 0
                 for asset_name, asset in item.assets.items():
-                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
+                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload_asset', 'current': i, 'asset': asset_name, 'total': len(item.assets), "ACTION": "INGEST", "TARGET": url})
                     i += 1
                     asset: Asset = asset
-                    AprocProcess.upload_asset_if_managed(item, asset, Configuration.settings.airs_endpoint)
+                    ARLASServicesHelper.upload_asset_if_managed(item, asset, Configuration.settings.airs_endpoint)
                 LOGGER.debug("ingestion: 6 - register")
                 Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
-                item: Item = AprocProcess.insert_or_update_item(item, Configuration.settings.airs_endpoint)
-                return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump()
+                item: Item = ARLASServicesHelper.insert_or_update_item(item, Configuration.settings.airs_endpoint)
+                return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id)).model_dump(exclude_none=True, exclude_unset=True)
             except Exception as err:
                 msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)
@@ -177,30 +179,10 @@ class AprocProcess(Process):
                     raise DriverException("Invalid asset {} for {} : file {} not found".format(asset.name, url, asset.href))
 
     @staticmethod
-    def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
-        if asset.airs__managed is True:
-            with AccessManager.stream(asset.href) as filedesc:
-                file = {'file': (asset.name, filedesc, asset.type)}
-                try:
-                    r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
-                    if r.ok:
-                        LOGGER.debug("asset uploaded successfully")
-                    else:
-                        msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, airs_endpoint)
-                        LOGGER.error(msg)
-                        raise RegisterException(msg)
-                except requests.exceptions.ConnectionError:
-                    msg = "AIRS Service can not be reached ({})".format(airs_endpoint)
-                    LOGGER.error(msg)
-                    raise ConnectionException(msg)
-        else:
-            LOGGER.info("{} not managed".format(asset.name))
-
-    @staticmethod
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers={"Content-Type": MimeType.JSON.value})
+            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers=JSON_HEADER)
             if r.ok:
                 LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -213,10 +195,10 @@ class AprocProcess(Process):
         try:
             if item_already_exists:
                 LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
+                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=to_json(item), headers=JSON_HEADER)
             else:
                 LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers={"Content-Type": MimeType.JSON.value})
+                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=to_json(item), headers=JSON_HEADER)
             if r.ok:
                 LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return item_from_json(r.content)

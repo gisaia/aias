@@ -11,10 +11,11 @@ from airs.core.models.model import Asset, Item
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
-from aproc.core.processes.process import Process as Process
+from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
+from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
 from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import EVENT_KIND_KEY, EVENT_CATEGORY_KEY, EVENT_REASON, EVENT_TYPE_KEY, USER_ACTION_KEY, EVENT_ACTION, EVENT_OUTCOME_KEY, EVENT_MODULE_KEY, ARLAS_COLLECTION_KEY, ARLAS_ITEM_ID_KEY, ENRICHMENT_FAILED_MSG
 from extensions.aproc.proc.drivers.exceptions import DriverException
@@ -48,7 +49,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(),
+    **summary.model_dump(exclude_none=True, exclude_unset=True),
     inputs=base_model2description(InputEnrichProcess),
     outputs=base_model2description(OutputEnrichProcess)
 )
@@ -82,7 +83,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel):
-        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump())
+        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
 
@@ -121,13 +122,13 @@ class AprocProcess(Process):
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                     start = time()
-                    IngestAprocProcess.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
+                    ARLASServicesHelper.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
                     end = time()
                     LOGGER.info("took {} ms".format(end - start))
 
                     LOGGER.debug("ingestion: 3 - update")
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})
-                    item: Item = IngestAprocProcess.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
+                    item: Item = ARLASServicesHelper.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
                     item_locations.append(os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id))
                 except Exception as e:
                     error_msg = "Failed to enrich the item {}/{} ({})".format(collection, item_id, str(e))
@@ -140,7 +141,7 @@ class AprocProcess(Process):
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 raise DriverException(error_msg)
-        return OutputEnrichProcess(item_locations=item_locations).model_dump()
+        return OutputEnrichProcess(item_locations=item_locations).model_dump(exclude_none=True, exclude_unset=True)
 
     @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):

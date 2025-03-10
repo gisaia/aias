@@ -1,15 +1,15 @@
 import json
 import os
 import unittest
-from airs.core.models.model import AssetFormat, MimeType
-from test.utils import (APROC_ENDPOINT, ARLAS_COLLECTION, ARLAS_URL, ASSET_NAME,
-                        BBOX, CLOUD_ID, CLOUD_ITEM, COLLECTION, EPSG_27572, ID, ITEM_PATH, SENTINEL_2_ID,
-                        SENTINEL_2_ITEM, SMTP_SERVER, TOKEN, add_item,
-                        index_collection_prefix, setUpTest)
+from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
+                        COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
+                        SENTINEL_2_ID, SENTINEL_2_ITEM, SMTP_SERVER, TOKEN,
+                        add_item, create_arlas_collection, setUpTest)
 from time import sleep
 
 import requests
 
+from airs.core.models.model import AssetFormat, MimeType
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessList
@@ -25,14 +25,7 @@ class Tests(unittest.TestCase):
         add_item(self, ITEM_PATH, ID)
         sleep(3)
         # Create collection
-        r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": MimeType.JSON.value}, data=json.dumps({
-                         "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
-                         "id_path": "id",
-                         "geometry_path": "geometry",
-                         "centroid_path": "centroid",
-                         "timestamp_path": "properties.datetime"
-                         }))
-        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+        create_arlas_collection(self)
 
     def test_download_exists(self):
         # CHECK THE DOWNLOAD PROCESS EXISTS
@@ -45,8 +38,8 @@ class Tests(unittest.TestCase):
     def test_incorrect_download(self):
         # SEND INCORRECT DOWNLOAD REQUEST (no item yet)
         inputs = InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": "item_that_deos_not_exist"}], crop_wkt="", target_format="", target_projection="")
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
         self.assertFalse(r.ok, str(r.status_code) + ": " + str(r.content))
         # REQUEST MAILS AND ERROR MAILS HAVE BEEN SENT
         r = requests.get(SMTP_SERVER + "?page=1&pageSize=30", headers={'Accept': 'application/json, text/plain, */*'})
@@ -127,32 +120,32 @@ class Tests(unittest.TestCase):
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection=EPSG_27572, raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.dismissed, status.message)
 
         # test 2 : cancel while it's running
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection=EPSG_27572, raw_archive=False))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.running, StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "cancel"])).content))
-        tries = 0
-        while tries < 100 and (status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]):
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
-            tries = tries + 1
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.dismissed, status.message)
 
     def send_download_request(self, inputs: InputDownloadProcess):
-        execute = Execute(inputs=inputs.model_dump())
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump()), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/download/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN})
         self.assertTrue(r.ok)
         return r
 
@@ -164,8 +157,10 @@ class Tests(unittest.TestCase):
         return result
 
     def wait_for_success(self, status: StatusInfo):
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful]:
+        i: int = 0
+        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
             sleep(1)
+            i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
         self.assertEqual(status.status, StatusCode.successful, status.message)
         return status

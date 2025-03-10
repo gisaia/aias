@@ -1,3 +1,7 @@
+class APROCException(Exception):
+    ...
+
+
 class DriverException(Exception):
     ...
 

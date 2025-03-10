@@ -49,7 +49,7 @@ class Driver(EnrichDriver):
                 asset_location = self.get_asset_filepath(item.id, asset)
                 asset.href = asset_location
                 self.__build_asset(item, asset_type, asset_location)
-                asset.size = AccessManager.get_file_size(asset_location)
+                asset.size = AccessManager.get_size(asset_location)
                 return asset, asset_location
             else:
                 raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))

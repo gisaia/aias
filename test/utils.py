@@ -1,3 +1,4 @@
+import json
 import unittest
 import elasticsearch
 import os
@@ -6,7 +7,7 @@ import unicodedata
 
 import requests
 from airs.core.models import mapper
-from airs.core.models.model import Item
+from airs.core.models.model import Item, MimeType
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
 from extensions.aproc.proc.ingest.ingest_process import summary
@@ -48,6 +49,7 @@ CLOUD_ID = "619d7a94-c85e-4e6d-938c-50a043b51036"
 CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"
 
 EPSG_27572 = "EPSG:27572"
+MAX_ITERATIONS = 600
 
 IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
@@ -142,3 +144,17 @@ def add_item(calling_test: unittest.TestCase, item_path: str, id: str) -> Item:
     r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", id]))
     calling_test.assertTrue(r.ok, msg=r.content)
     return mapper.item_from_json(r.content)
+
+
+def create_arlas_collection(calling_test: unittest.TestCase):
+    print(f"Creating collection {ARLAS_COLLECTION}")
+    r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": MimeType.JSON.value},
+                     data=json.dumps({
+                        "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
+                        "id_path": "id",
+                        "geometry_path": "geometry",
+                        "centroid_path": "centroid",
+                        "timestamp_path": "properties.datetime"
+                     }))
+    calling_test.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+    print("Collection created")

@@ -29,7 +29,8 @@ RUN /bin/bash -c "source ~/.bashrc"
 # Install pip
 RUN apt install -y --no-install-recommends netcat
 RUN apt-get update
-RUN apt-get install -y g++ make libtiff-dev
+# imagemagick to make gifs
+RUN apt-get install -y g++ make libtiff-dev imagemagick
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 RUN pip install -r $APP_HOME/requirements.txt
@@ -41,6 +42,7 @@ COPY ./airs/core/ $APP_HOME/airs/core/
 COPY ./common $APP_HOME/common
 COPY ./conf $APP_HOME/conf
 COPY ./setup.py $APP_HOME/setup.py
+COPY ./assets $APP_HOME/assets
 
 RUN pip install -e $APP_HOME
 
