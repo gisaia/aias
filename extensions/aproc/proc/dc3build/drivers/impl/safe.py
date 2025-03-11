@@ -67,24 +67,36 @@ class Driver(DC3Driver):
             for e in group.dc3__references:
                 # Href of the zip containing all bands
                 a: Asset = items[e.dc3__collection][e.dc3__id].assets[Role.data.value]
-                # TODO: SRE or FRE ? => Products for GEODES
-                # band_regex = re.compile(rf".*/.*SRE_({'|'.join(bands_per_alias[e.dc3__alias])})\.tif")
-                band_regex = re.compile(rf".*/IMG_DATA/.*({'|'.join(bands_per_alias[e.dc3__alias])})\.jp2")
-
-                # TODO: should I use path_within_asset instead of regex ?
-                with AccessManager.stream(a.href) as ab:
-                    bands = find_raster_files(ab, band_regex, e.dc3__alias)
 
                 # Find the lowest resolution product among those required
                 min_res = np.Inf
+                zarrs: list[zarr.DirectoryStore] = []
+
+                if AccessManager.is_download_required(a.href):
+                    self.LOGGER.info("Downloading archive for datacube creation.")
+
+                    # Create tmp file where data will be downloaded
+                    tmp_asset = os.path.join(AccessManager.tmp_dir, os.path.basename(a.href))
+                    if (os.path.splitext(tmp_asset)[1] != ".zip"):
+                        tmp_asset = os.path.splitext(tmp_asset)[0] + ".zip"
+
+                    # Download archive then extract it
+                    AccessManager.pull(a.href, tmp_asset)
+
+                    a.href = f"file://{tmp_asset}"
+
+                # TODO: SRE or FRE ? => SOME products for GEODES
+                # band_regex = re.compile(rf".*/.*SRE_({'|'.join(bands_per_alias[e.dc3__alias])})\.tif")
+                # Works for L1C
+                band_regex = re.compile(rf".*/IMG_DATA/.*({'|'.join(bands_per_alias[e.dc3__alias])})\.jp2")
+                bands = find_raster_files(a, bands_per_alias[e.dc3__alias], band_regex, e.dc3__alias)
+
                 try:
                     with rasterio.Env(**AccessManager.get_rasterio_session(a.href)):
                         for p in bands.values():
                             with rasterio.open("zip+" + a.href + "!" + p) as src:
                                 if src.res[0] < min_res:
                                     min_res = src.res[0]
-
-                        zarrs: list[zarr.DirectoryStore] = []
 
                         # For each object, create a zarr
                         for band, path in bands.items():
@@ -100,7 +112,8 @@ class Driver(DC3Driver):
                                     zarr_tmp_root_path, int(items[e.dc3__collection][e.dc3__id].properties.datetime.timestamp()), timestamp)
 
                                 zarrs.append(zarr_dir)
-                except Exception:
+                except Exception as exception:
+                    self.LOGGER.debug(exception)
                     # Can raise a CPLE_AppDefinedError error
                     ...
 

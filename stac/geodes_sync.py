@@ -1,15 +1,20 @@
 import json
+import os
 import sys
 
 import requests
 import typer
+from prettytable import PrettyTable
 
 from airs.core.models.mapper import item_from_dict, to_json
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Role
-from prettytable import PrettyTable
+from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
+                                    Role)
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 app = typer.Typer(add_completion=False, no_args_is_help=True)
+
+
+BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12", "TCI"]
 
 
 def to_item(feature, extra_params={}) -> Item:
@@ -38,7 +43,7 @@ def to_item(feature, extra_params={}) -> Item:
     item.properties.sensor = feature.get("properties").get("spaceborne:satelliteSensor")
     item.properties.acq__acquisition_orbit = feature.get("properties").get("spaceborne:orbitID")
     item.properties.acq__acquisition_orbit_direction = feature.get("properties").get("spaceborne:orbitDirection")
-    item.properties.item_format = ItemFormat.safe.value
+    item.properties.item_format = ItemFormat.safe
     fields_to_keep["accessService:endpointURL"] = feature.get("properties").get("accessService:endpointURL")
 
     for name, asset in item.assets.items():
@@ -56,12 +61,12 @@ def to_item(feature, extra_params={}) -> Item:
             if asset.type == "application/xml":
                 name = Role.metadata.value + "-" + str(md_count)
                 md_count = md_count + 1
-                asset.asset_format = AssetFormat.xml.value
-                asset.roles = [Role.metadata.value]
+                asset.asset_format = AssetFormat.xml
+                asset.roles = [Role.metadata]
             if asset.type == "application/zip":
                 name = Role.data.value
-                asset.asset_format = AssetFormat.zip.value
-                asset.roles = [Role.data.value]
+                asset.asset_format = AssetFormat.zip
+                asset.roles = [Role.data]
         if name:
             asset.name = name
             assets[name] = asset
@@ -161,6 +166,7 @@ def list_collections(stac_url: str):
                 count
             ])
     return table
+
 
 @app.command(help="Add STAC features to ARLAS AIRS")
 def add(
