@@ -1,13 +1,13 @@
 import io
 import re
 import zipfile
-from typing import Pattern
 
 import numpy as np
 import rasterio.enums
 import rasterio.warp
 from rasterio.io import DatasetReader
 
+from airs.core.models.model import Asset
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
 
@@ -45,12 +45,35 @@ def resample_raster(src: DatasetReader, input_data: np.ndarray, target_resolutio
     return data, transform
 
 
-def find_raster_files(fb: str | io.TextIOWrapper, regex: Pattern[str], alias=None) -> dict[str, str]:
+def find_raster_files(a: Asset, bands: list[str], regex: re.Pattern[str], alias=None) -> dict[str, str]:
+    """
+    From an Asset, extract a dictionary of band -> path matching either the asset's description,
+    or if the bands are not found , explore the zip archive to find them
+    """
+    try:
+        from extensions.aproc.proc.access.manager import LOGGER
+
+        band_paths = __find_raster_files_in_item(a, bands, alias)
+        LOGGER.warning(band_paths)
+    except Exception:
+        from extensions.aproc.proc.access.manager import AccessManager
+
+        with AccessManager.stream(a.href) as fb:
+            band_paths = __find_raster_files_in_zip(fb, regex, alias)
+
+    if len(band_paths) != len(bands):
+        raise ValueError("Not all bands were found in the given asset")
+
+    return band_paths
+
+
+def __find_raster_files_in_zip(fb: str | io.TextIOWrapper, regex: re.Pattern[str], alias=None) -> dict[str, str]:
     """
     From a zip archive, extract a dictionary of band -> path matching the input regex.
     The regex must have exactly one capturing group
     """
-    bands: dict[str, str] = {}
+    band_paths: dict[str, str] = {}
+
     with zipfile.ZipFile(fb) as zip:
         file_names = zip.namelist()
         for f_name in file_names:
@@ -59,9 +82,27 @@ def find_raster_files(fb: str | io.TextIOWrapper, regex: Pattern[str], alias=Non
                 key = matches[0]
                 if alias is not None:
                     key = alias + '.' + key
-                bands[key] = f_name
+                band_paths[key] = f_name
 
-    return bands
+    return band_paths
+
+
+def __find_raster_files_in_item(a: Asset, bands: list[str], alias=None) -> dict[str, str]:
+    """
+    From a zip archive, extract a dictionary of band -> path according to the asset's description
+    """
+    band_paths: dict[str, str] = {}
+
+    for band in bands:
+        asset_band = list(filter(lambda b: b.name == band, a.eo__bands))
+        if len(asset_band) == 0:
+            raise ValueError(f"Expected to find band {band}, but it was not found")
+        key = band
+        if alias is not None:
+            key = alias + "." + key
+        band_paths[key] = asset_band[0].path_within_asset
+
+    return band_paths
 
 
 def get_eval_formula(band_expression: str,

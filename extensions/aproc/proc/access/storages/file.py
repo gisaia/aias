@@ -39,7 +39,7 @@ class FileStorage(AbstractStorage):
             paths = self.writable_paths
         if action == AccessType.READ:
             paths = list([*self.readable_paths, *self.writable_paths])
-        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, paths)))
+        return any(list(map(lambda p: os.path.commonpath([p, urlparse(href).path]) == p, paths)))
 
     def pull(self, href: str, dst: str):
         super().pull(href, dst)
