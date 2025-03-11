@@ -67,6 +67,23 @@ def to_item(feature, extra_params={}) -> Item:
                 name = Role.data.value
                 asset.asset_format = AssetFormat.zip
                 asset.roles = [Role.data]
+
+                # Get the name of the archive containing the bands. It is constitued following this pattern
+                # {satellite}_MSI{LEVEL}_{DATE}_{Processing baseline number}_{Relative orbit number}_{GRANULE}_{GENERATED_DATE}.zip
+                safe_archive: str = os.path.basename(fields_to_keep["accessService:endpointURL"]).removesuffix(".zip") + ".SAFE"
+                path_components = os.path.basename(fields_to_keep["accessService:endpointURL"]).split("_")
+                level = path_components[1].split("MSI")[1]
+                date = path_components[2]
+                granule = path_components[5]
+                orbit_number = str(feature.get("properties").get("spaceborne:absoluteOrbitID"))
+                orbit_number = "A" + "".join(["0" for _ in range(6 - len(orbit_number))]) + orbit_number
+
+                asset.eo__bands = []
+                for band in BANDS:
+                    asset.eo__bands.append(Band(
+                        path_within_asset=f"{safe_archive}/GRANULE/{level}_{granule}_{orbit_number}_{date}/IMG_DATA/{granule}_{date}_{band}.jp2",
+                        name=band
+                    ))
         if name:
             asset.name = name
             assets[name] = asset
