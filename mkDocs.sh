@@ -24,4 +24,6 @@ i=1; until curl -XGET http://localhost:8004/openapi.json -o docs/docs/agate/open
 
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
-mmdc -i target/generated-docs/agate/agate-mermaid.md -o target/generated-docs/agate/agate.md
+
+#mmdc -i target/generated-docs/agate/agate-mermaid.md -o target/generated-docs/agate/agate.md
+docker run --rm -u `id -u`:`id -g` -v `pwd`:/data minlag/mermaid-cli -i /data/target/generated-docs/agate/agate-mermaid.md -o /data/target/generated-docs/agate/agate_doc.md
