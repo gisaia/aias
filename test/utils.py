@@ -45,6 +45,9 @@ BBOX = "Polygon ((0.56676570458404063 17.18722410865874295, 1.71124787775891329 
 SENTINEL_2_ID = "e3229ea8-a7f8-4c88-a3ca-265cea2f6862"
 SENTINEL_2_ITEM = f"test/inputs/{SENTINEL_2_ID}.json"
 
+MINIO_ID = "a250b154-5080-4939-be2f-3baf6a386dab"
+MINIO_ITEM = f"test/inputs/{MINIO_ID}.json"
+
 CLOUD_ID = "619d7a94-c85e-4e6d-938c-50a043b51036"
 CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"
 
@@ -91,14 +94,14 @@ def dir_to_list(dirname, parent={}):
             dct['path'] = os.path.join(dirname, name)
             dct['modification_time'] = time.strftime('%d/%m/%Y %H:%M:%S', time.localtime(os.stat(dct['path']).st_mtime))
             if os.path.isfile(dct['path']):
-                driver = Drivers.solve(dct['path'])
+                driver = DriverManager.solve(summary.id, dct['path'])
                 if driver is not None:
                     dct['type'] = 'file'
                     dct["archive"] = True
                     dct["id"] = driver.get_item_id(dct['path'])
                     dct["archive_type"] = driver.name
             if os.path.isdir(dct['path']):
-                driver = Drivers.solve(dct['path'])
+                driver = DriverManager.solve(summary.id, dct['path'])
                 if driver is not None:
                     dct['type'] = 'folder'
                     dct["archive"] = True
