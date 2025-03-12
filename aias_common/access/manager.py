@@ -11,6 +11,9 @@ from aias_common.access.storages.http import HttpStorage
 from aias_common.access.storages.https import HttpsStorage
 from aias_common.access.logger import Logger
 from aias_common.access.configuration import AccessManagerSettings
+from aias_common.access.file import File
+
+
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
 
 LOGGER = Logger.logger
@@ -228,7 +231,7 @@ class AccessManager:
         raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
-    def listdir(href: str):
+    def listdir(href: str) -> list[File]:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):

@@ -5,6 +5,8 @@ from urllib.parse import urlparse
 
 from pydantic import BaseModel
 
+from aias_common.access.file import File
+
 
 class AbstractStorage(BaseModel, ABC):
     type: Any
@@ -102,7 +104,7 @@ class AbstractStorage(BaseModel, ABC):
         ...
 
     @abstractmethod
-    def listdir(self, href: str) -> list[str]:
+    def listdir(self, href: str) -> list[File]:
         """Returns the list of files and folders in the specified directory
 
         Args:

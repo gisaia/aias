@@ -188,13 +188,13 @@ class Driver(IngestDriver):
                 self.component_id = parts_of_file_name[3]
                 for file in AccessManager.listdir(path):
                     # check if current file is a file
-                    if AccessManager.is_file(os.path.join(path, file)):
-                        if file.endswith('.jpg'):
-                            if file == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
-                                self.thumbnail_path = os.path.join(path, file)
-                                self.quicklook_path = os.path.join(path, file)
-                        if file.endswith('_metadata.txt'):
-                            self.met_path = os.path.join(path, file)
+                    if not file.is_dir:
+                        if file.name.endswith('.jpg'):
+                            if file.name == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
+                                self.thumbnail_path = file.path
+                                self.quicklook_path = file.path
+                        if file.name.endswith('_metadata.txt'):
+                            self.met_path = file.path
                 return self.met_path is not None and self.tif_path is not None
         return False
 

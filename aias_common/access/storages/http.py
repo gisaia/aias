@@ -5,9 +5,8 @@ from urllib.parse import urlparse
 from pydantic import Field
 
 from aias_common.access.storages.abstract import AbstractStorage
-from aias_common.access.storages.utils import (requests_exists,
-                                                         requests_get,
-                                                         requests_head)
+from aias_common.access.storages.utils import (requests_exists, requests_get,
+                                               requests_head)
 
 
 class HttpStorage(AbstractStorage):

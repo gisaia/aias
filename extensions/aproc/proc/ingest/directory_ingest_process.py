@@ -136,7 +136,7 @@ class AprocProcess(Process):
             if AccessManager.is_dir(full_path):
                 archives: list[Archive] = []
                 for file in AccessManager.listdir(full_path):
-                    sub_archives = AprocProcess.list_archives(prefix, os.path.join(path, file), size=size, max_size=max_size)
+                    sub_archives = AprocProcess.list_archives(prefix, file.path, size=size, max_size=max_size)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives
                 return archives
