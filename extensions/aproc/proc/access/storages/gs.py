@@ -4,6 +4,8 @@ import tempfile
 from typing import Literal
 from urllib.parse import urlparse
 
+from common.utils import URLUtil
+from extensions.aproc.proc.access.file import File
 from google.cloud.storage import Client
 from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
@@ -121,11 +123,10 @@ class GoogleStorage(AbstractStorage):
 
     def is_file(self, href: str):
         prefix = urlparse(href).path.removeprefix("/")
-        files, dirs = self.__list_blobs(prefix=prefix)
+        files = self.__list_blobs(prefix)
+        return len(files) == 1 and files[0].name == prefix
 
-        return len(files) > 0 and files[0] == prefix and len(dirs) == 0
-
-    def __list_blobs(self, prefix: str) -> tuple[list[str], list[str]]:
+    def __list_blobs(self, prefix: str) -> list[File]:
         """
         Return a list of files contained in the specified folder, as well as subfolders
         """
@@ -133,21 +134,18 @@ class GoogleStorage(AbstractStorage):
         if prefix == "/":
             prefix = ""
         blobs = self.__get_bucket().list_blobs(prefix=prefix, delimiter="/")
-        return list(map(lambda b: b.name, blobs)), list(blobs.prefixes)
+        return list(map(lambda b: File(name=b.name, path=URLUtil.compose(prefix, b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs)) + list(map(lambda b: File(name=b, path=b, is_dir=True), blobs.prefixes))
 
     def is_dir(self, href: str):
         prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        files, dirs = self.__list_blobs(prefix)
-
-        return len(files) > 0 or len(dirs) > 0
+        return len(self.__list_blobs(prefix)) > 1
 
     def get_file_size(self, href: str):
         return self.__get_blob(href).size
 
     def listdir(self, href: str) -> list[str]:
         prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        files, dirs = self.__list_blobs(prefix)
-        return list(map(lambda s: s.removesuffix("/"), files + dirs))
+        return self.__list_blobs(prefix)
 
     def get_last_modification_time(self, href: str):
         blob = self.__get_blob(href)

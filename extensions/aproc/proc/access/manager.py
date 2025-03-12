@@ -7,6 +7,7 @@ from pydantic import Field
 
 from aproc.core.logger import Logger
 from aproc.core.settings import Configuration
+from extensions.aproc.proc.access.file import File
 from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
@@ -229,7 +230,7 @@ class AccessManager:
         raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
-    def listdir(href: str):
+    def listdir(href: str) -> list[File]:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):

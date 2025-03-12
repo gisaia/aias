@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 from pydantic import Field
 
+from extensions.aproc.proc.access.file import File
 from extensions.aproc.proc.access.storages.abstract import AbstractStorage
 
 
@@ -58,7 +59,7 @@ class FileStorage(AbstractStorage):
     def get_file_size(self, href: str):
         return os.stat(href).st_size
 
-    def listdir(self, href: str):
+    def listdir(self, href: str) -> list[File]:
         return os.listdir(href)
 
     def get_last_modification_time(self, href: str):
