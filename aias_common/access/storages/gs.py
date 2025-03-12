@@ -10,11 +10,7 @@ from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
 
 from aias_common.access.file import File
-from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
-from aias_common.rest.utils import URLUtil
-
-LOGGER = Logger.logger
 
 
 class GoogleStorageConstants(str, enum.Enum):

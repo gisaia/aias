@@ -3,6 +3,7 @@ import shutil
 from contextlib import contextmanager
 from typing import Annotated, Union
 
+from extensions.aproc.proc.access.storages.s3 import S3Storage
 from pydantic import Field
 
 from aias_common.access.storages.file import AccessType, FileStorage
@@ -14,7 +15,7 @@ from aias_common.access.configuration import AccessManagerSettings
 from aias_common.access.file import File
 
 
-AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
+AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage, S3Storage], Field(discriminator="type")]
 
 LOGGER = Logger.logger
 
@@ -38,6 +39,8 @@ class AccessManager:
                     AccessManager.storages.append(HttpStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case "https":
                     AccessManager.storages.append(HttpsStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                case "s3":
+                    AccessManager.storages.append(S3Storage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
 
@@ -217,16 +220,14 @@ class AccessManager:
     @staticmethod
     def get_size(href: str):
         storage = AccessManager.resolve_storage(href)
-        if href and AccessManager.exists(href):
+        if AccessManager.exists(href):
             if AccessManager.is_file(href):
                 return storage.get_file_size(href)
-            elif AccessManager.is_dir(href):
+            else:
                 folder_size = 0
                 for f in AccessManager.listdir(href):
                     folder_size += AccessManager.get_size(f.path)
                 return folder_size
-            else:
-                raise ValueError(f"Given href is a directory {href}")
         raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
