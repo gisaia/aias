@@ -226,5 +226,5 @@ def post_process_execute(process_id: str, execute: Execute, request: Request):
         return JSONResponse(content=process.execute().model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_200_OK)
     except Exception as e:
         LOGGER.exception(e)
-        error = RESTException(type="Exception", status=500, title="Can not execute {} with inputs {}".format(process_id, execute), detail=str(e), )
+        error = RESTException(type="Exception", status=500, title="Can not execute {} with inputs {}".format(process_id, execute.model_dump_json()), detail=str(e))
         return JSONResponse(content=error.model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

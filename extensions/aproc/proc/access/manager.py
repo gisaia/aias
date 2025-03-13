@@ -112,7 +112,6 @@ class AccessManager:
         Whether the file exists
         """
         storage = AccessManager.resolve_storage(href)
-
         return storage.exists(href)
 
     @staticmethod

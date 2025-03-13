@@ -1,8 +1,9 @@
 import enum
 import json
+import os
 import tempfile
 from typing import Literal
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from common.utils import URLUtil
 from extensions.aproc.proc.access.file import File
@@ -121,31 +122,35 @@ class GoogleStorage(AbstractStorage):
 
         blob.download_to_filename(dst)
 
-    def is_file(self, href: str):
-        prefix = urlparse(href).path.removeprefix("/")
-        files = self.__list_blobs(prefix)
-        return len(files) == 1 and files[0].name == prefix
-
-    def __list_blobs(self, prefix: str) -> list[File]:
+    def __list_blobs(self, source: str) -> list[File]:
         """
         Return a list of files contained in the specified folder, as well as subfolders
         """
-        # If requesting the root folder, prefix needs to be empty
-        if prefix == "/":
-            prefix = ""
-        blobs = self.__get_bucket().list_blobs(prefix=prefix, delimiter="/")
-        return list(map(lambda b: File(name=b.name, path=URLUtil.compose(prefix, b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs)) + list(map(lambda b: File(name=b, path=b, is_dir=True), blobs.prefixes))
+        url = urlparse(source)
+        blobs = self.__get_bucket().list_blobs(prefix=url.path.removeprefix("/"), delimiter="/")
+        return list(map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs)) + list(map(lambda b: File(name=os.path.basename(b.removesuffix("/")), path=self.__update_url__(source=source, path=b).removesuffix("/") + "/", is_dir=True), blobs.prefixes))
+
+    def __update_url__(self, source: str, path: str):
+        url = urlparse(source)
+        components = list(url[:])
+        if len(components) == 5:
+            components.append('')
+        components[2] = path
+        return urlunparse(tuple(components))
+
+    def is_file(self, href: str):
+        files = self.__list_blobs(href)
+        return len(list(filter(lambda f: f.path == href and not f.is_dir, files))) > 0
 
     def is_dir(self, href: str):
-        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        return len(self.__list_blobs(prefix)) > 1
+        files = self.__list_blobs(href)
+        return len(list(filter(lambda f: os.path.dirname(f.path).removesuffix("/") == href.removesuffix("/") and (f.is_dir or os.path.basename(f.path)), files))) > 0
 
     def get_file_size(self, href: str):
         return self.__get_blob(href).size
 
-    def listdir(self, href: str) -> list[str]:
-        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        return self.__list_blobs(prefix)
+    def listdir(self, href: str) -> list[File]:
+        return self.__list_blobs(href.removesuffix("/") + "/")
 
     def get_last_modification_time(self, href: str):
         blob = self.__get_blob(href)

@@ -166,9 +166,9 @@ class Driver(IngestDriver):
                                 for file in AccessManager.listdir(folder.path):
                                     if file.name.endswith(".tif"):
                                         self.tif_path = file.path
-                                        tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
-                                        if AccessManager.exists(tfw_path):
-                                            self.tfw_path = tfw_path
+                                    if file.name.endswith(".tfw"):
+                                        self.tfw_path = file.path
+
                     return self.met_path is not None and self.tif_path is not None and self.browse_path is not None
         return False
 
