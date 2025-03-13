@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from pydantic import Field
 
+from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
 from aias_common.access.storages.utils import (requests_exists, requests_get,
                                                requests_head)
@@ -46,7 +47,7 @@ class HttpStorage(AbstractStorage):
         r = requests_head(href, self.headers)
         return r.headers.get("Content-Length")
 
-    def listdir(self, href: str):
+    def listdir(self, href: str) -> list[File]:
         raise NotImplementedError(f"It is not possible to list the content of a directory with {self.type} protocol")
 
     def get_last_modification_time(self, href: str):

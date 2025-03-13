@@ -96,8 +96,8 @@ class Tests(unittest.TestCase):
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_wv_cloud(self):  # Driver DIGITALGLOBE
-        url = "gs://gisaia-public/test-aias/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
-        item_id = "4738b485dd8612c2b204db983a46d13579ec5a90e19db4c097853908281c12e1"
+        url = "gs://gisaia-public/test-aias/WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
+        item_id = "03f59a67eb3309e0a05135a8c047c364b469cae7691fa98f22026d18f5bf24d7"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast(self):  # Driver AST
@@ -106,8 +106,8 @@ class Tests(unittest.TestCase):
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast_cloud(self):  # Driver AST
-        url = "gs://gisaia-public/test-aias/ast"
-        item_id = "4ef019190200980a8ccea4004f769631b33491048d094bfc22be75efc3bfbd4e"
+        url = "gs://gisaia-public/test-aias/ast/"
+        item_id = "17e377bf0c44c3a7cc8ec70e1ff9c73852454bb1a86e64f3a61545138b89b08b"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx(self):  # Driver TERRASRX
@@ -116,8 +116,8 @@ class Tests(unittest.TestCase):
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
-        url = "gs://gisaia-public/test-aias/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
-        item_id = "9038632fa643fb2ddb29fd688eb756684a7d456f951c7a25f81509f0553aadbb"
+        url = "gs://gisaia-public/test-aias/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
+        item_id = "650cbc54a5554720fa3290473f0db93888ecae701c602539018927292277ab46"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
@@ -126,8 +126,8 @@ class Tests(unittest.TestCase):
         self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
-        url = "gs://gisaia-public/test-aias/3159120_2020-03-11_RE1_3A"
-        item_id = "dc89e2cd6533bec0cb56a1a5c3f3662783de0b1f6d8ca73ece4de00eca54d8dd"
+        url = "gs://gisaia-public/test-aias/3159120_2020-03-11_RE1_3A/"
+        item_id = "a4afb6d08ca248639d359ad529b84bea9afa58db4f68aab47995c46f81c3318c"
         self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_tif(self):  # Driver TIF

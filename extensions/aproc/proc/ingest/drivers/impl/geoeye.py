@@ -177,7 +177,7 @@ class Driver(IngestDriver):
         self.__init__()
         file_name = os.path.basename(file_path)
         path = AccessManager.dirname(file_path)
-        if AccessManager.is_file(file_path) and file_name.endswith(".tif"):
+        if file_name.endswith(".tif") and AccessManager.is_file(file_path):
             self.tif_path = file_path
             tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
             if AccessManager.exists(tfw_path):
