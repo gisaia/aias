@@ -128,7 +128,9 @@ class GoogleStorage(AbstractStorage):
         """
         url = urlparse(source)
         blobs = self.__get_bucket().list_blobs(prefix=url.path.removeprefix("/"), delimiter="/")
-        return list(map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs)) + list(map(lambda b: File(name=os.path.basename(b.removesuffix("/")), path=self.__update_url__(source=source, path=b).removesuffix("/") + "/", is_dir=True), blobs.prefixes))
+        files = list(map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs))
+        dirs = list(map(lambda b: File(name=os.path.basename(b.removesuffix("/")), path=self.__update_url__(source=source, path=b).removesuffix("/") + "/", is_dir=True), blobs.prefixes))
+        return files + dirs
 
     def __update_url__(self, source: str, path: str):
         url = urlparse(source)
@@ -140,7 +142,7 @@ class GoogleStorage(AbstractStorage):
 
     def is_file(self, href: str):
         files = self.__list_blobs(href)
-        return len(list(filter(lambda f: f.path == href and not f.is_dir, files))) > 0
+        return len(list(filter(lambda f: f.path == href and not f.is_dir, files))) == 1
 
     def is_dir(self, href: str):
         files = self.__list_blobs(href)
