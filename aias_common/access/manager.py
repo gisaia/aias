@@ -222,8 +222,8 @@ class AccessManager:
                 return storage.get_file_size(href)
             elif AccessManager.is_dir(href):
                 folder_size = 0
-                for path in AccessManager.listdir(href):
-                    folder_size += AccessManager.get_size(os.path.join(href, path))
+                for f in AccessManager.listdir(href):
+                    folder_size += AccessManager.get_size(f.path)
                 return folder_size
             else:
                 raise ValueError(f"Given href is a directory {href}")
