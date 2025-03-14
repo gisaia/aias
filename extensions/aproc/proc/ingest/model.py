@@ -1,18 +1,11 @@
 from pydantic import BaseModel
-from datetime import datetime
+
+from extensions.aproc.proc.access.file import File
 
 
 class PathRequest(BaseModel):
     path: str = ""
     size: int = 10
-
-
-class File(BaseModel):
-    name: str = ""
-    path: str = ""
-    is_dir: bool = False
-    last_modification_date: datetime
-    creation_date: datetime
 
 
 class Archive(File):
