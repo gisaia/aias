@@ -100,10 +100,10 @@ class Driver(IngestDriver):
         d = AccessManager.dirname(url)
         if AccessManager.is_dir(os.path.join(d, "GIS_FILE")):
             for file in AccessManager.listdir(os.path.join(d, "GIS_FILES")):
-                if file.endswith("_ORDER_SHAPE.shp"):
+                if file.name.endswith("_ORDER_SHAPE.shp"):
                     setup_gdal()
 
-                    with AccessManager.make_local(os.path.join(d, "GIS_FILES", file)) as order_shape_file:
+                    with AccessManager.make_local(os.path.join(d, "GIS_FILES", file.name)) as order_shape_file:
                         ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
                         component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
                         layer = component_source.GetLayer()
@@ -173,18 +173,18 @@ class Driver(IngestDriver):
         self.__init__()
         if AccessManager.is_dir(path):
             for file in AccessManager.listdir(path):
-                if AccessManager.is_file(os.path.join(path, file)):
-                    if file.endswith('-BROWSE.JPG'):
-                        self.thumbnail_path = os.path.join(path, file)
-                        self.quicklook_path = os.path.join(path, file)
-                    if file.endswith('.TIF'):
-                        self.tif_path = os.path.join(path, file)
-                    if file.endswith('.XML'):
-                        self.xml_path = os.path.join(path, file)
-                    if file.endswith('.TIL'):
-                        self.til_path = os.path.join(path, file)
-                    if file.endswith('.IMD'):
-                        self.imd_path = os.path.join(path, file)
+                if not file.is_dir:
+                    if file.name.endswith('-BROWSE.JPG'):
+                        self.thumbnail_path = file.path
+                        self.quicklook_path = file.path
+                    if file.name.endswith('.TIF'):
+                        self.tif_path = file.path
+                    if file.name.endswith('.XML'):
+                        self.xml_path = file.path
+                    if file.name.endswith('.TIL'):
+                        self.til_path = file.path
+                    if file.name.endswith('.IMD'):
+                        self.imd_path = file.path
             if self.tif_path:
                 tfw_path = os.path.splitext(self.tif_path)[0] + ".TFW"
                 if AccessManager.exists(tfw_path):

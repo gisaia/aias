@@ -7,6 +7,7 @@ from pydantic import Field
 
 from aproc.core.logger import Logger
 from aproc.core.settings import Configuration
+from extensions.aproc.proc.access.file import File
 from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
@@ -111,7 +112,6 @@ class AccessManager:
         Whether the file exists
         """
         storage = AccessManager.resolve_storage(href)
-
         return storage.exists(href)
 
     @staticmethod
@@ -221,15 +221,15 @@ class AccessManager:
                 return storage.get_file_size(href)
             elif AccessManager.is_dir(href):
                 folder_size = 0
-                for path in AccessManager.listdir(href):
-                    folder_size += AccessManager.get_size(os.path.join(href, path))
+                for f in AccessManager.listdir(href):
+                    folder_size += AccessManager.get_size(f.path)
                 return folder_size
             else:
                 raise ValueError(f"Given href is a directory {href}")
         raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
-    def listdir(href: str):
+    def listdir(href: str) -> list[File]:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):

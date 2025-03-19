@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 from pydantic import Field
 
+from extensions.aproc.proc.access.file import File
 from extensions.aproc.proc.access.storages.abstract import AbstractStorage
 
 
@@ -58,8 +59,12 @@ class FileStorage(AbstractStorage):
     def get_file_size(self, href: str):
         return os.stat(href).st_size
 
-    def listdir(self, href: str):
-        return os.listdir(href)
+    def listdir(self, href: str) -> list[File]:
+        return list(map(lambda f: self.__to_file__(base=href, name=f), os.listdir(href)))
+
+    def __to_file__(self, base: str, name: str):
+        path = os.sep.join([base, name])
+        return File(name=name, path=path, is_dir=os.path.isdir(path), last_modification_date=os.path.getmtime(path), creation_date=os.path.getctime(path))
 
     def get_last_modification_time(self, href: str):
         return os.path.getmtime(href)
