@@ -148,13 +148,11 @@ class S3Storage(AbstractStorage):
             last_modification_date=c["LastModified"]), objects["Contents"]))
 
         dirs = []
-        try:
+        if objects.get("CommonPrefixes"):
             dirs = list(map(lambda d: File(
                 name=os.path.basename(d["Prefix"].removesuffix("/")),
                 path=self.__update_url__(source, d["Prefix"]),
                 is_dir=True), objects["CommonPrefixes"]))
-        except Exception:
-            ...
 
         return files + dirs
 
