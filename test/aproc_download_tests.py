@@ -3,8 +3,9 @@ import os
 import unittest
 from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
                         COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
-                        SENTINEL_2_ID, SENTINEL_2_ITEM, SMTP_SERVER, TOKEN,
-                        add_item, create_arlas_collection, setUpTest)
+                        MINIO_ID, MINIO_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM,
+                        SMTP_SERVER, TOKEN, add_item, create_arlas_collection,
+                        setUpTest)
 from time import sleep
 
 import requests
@@ -66,44 +67,59 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, r.status_code)
         self.assertEqual(len(r.json()["results"]), 8)
 
-    def test_download_project_native_format_native_crop(self):
-        self.download_and_check_result(ids=[ID], crop_wkt=BBOX, target_format="native",
+    def __download_project_native_format_native_crop(self, id: str):
+        self.download_and_check_result(ids=[id], crop_wkt=BBOX, target_format="native",
                                        target_projection="native", raw_archive=False,
                                        expected_files=[f"{ASSET_NAME}.tif", f"{ASSET_NAME}.tfw"])
+
+    def test_download_project_native_format_native_crop(self):
+        self.__download_project_native_format_native_crop(ID)
 
     def test_download_project_native_format_native_crop_cloud(self):
         add_item(self, CLOUD_ITEM, CLOUD_ID)
-        sleep(3)
+        sleep(2)
+        self.__download_project_native_format_native_crop(CLOUD_ID)
 
-        self.download_and_check_result(ids=[CLOUD_ID], crop_wkt=BBOX, target_format="native",
-                                       target_projection="native", raw_archive=False,
-                                       expected_files=[f"{ASSET_NAME}.tif", f"{ASSET_NAME}.tfw"])
+    def test_download_project_native_format_native_crop_minio(self):
+        add_item(self, MINIO_ITEM, MINIO_ID)
+        sleep(2)
+        self.__download_project_native_format_native_crop(MINIO_ID)
 
-    def test_download_archive_geotiff(self):
-        self.download_and_check_result(ids=[ID], crop_wkt="", target_format="native",
+    def __download_archive_geotiff(self, id: str):
+        self.download_and_check_result(ids=[id], crop_wkt="", target_format="native",
                                        target_projection="native", raw_archive=True,
                                        expected_files=[f"{ASSET_NAME}.tif"])
+
+    def test_download_archive_geotiff(self):
+        self.__download_archive_geotiff(ID)
 
     def test_download_archive_geotiff_cloud(self):
         add_item(self, CLOUD_ITEM, CLOUD_ID)
-        sleep(3)
+        sleep(2)
+        self.__download_archive_geotiff(CLOUD_ID)
 
-        self.download_and_check_result(ids=[CLOUD_ID], crop_wkt="", target_format="native",
-                                       target_projection="native", raw_archive=True,
-                                       expected_files=[f"{ASSET_NAME}.tif"])
+    def test_download_archive_geotiff_minio(self):
+        add_item(self, MINIO_ITEM, MINIO_ID)
+        sleep(2)
+        self.__download_archive_geotiff(MINIO_ID)
 
-    def test_download_project_3857_format_jp2_crop(self):
-        self.download_and_check_result(ids=[ID], crop_wkt="", target_format=AssetFormat.jpg2000.value,
+    def __download_project_3857_format_jp2_crop(self, id: str):
+        self.download_and_check_result(ids=[id], crop_wkt="", target_format=AssetFormat.jpg2000.value,
                                        target_projection=EPSG_27572, raw_archive=False,
                                        expected_files=[f"{ASSET_NAME}.J2w", f"{ASSET_NAME}.JP2", f"{ASSET_NAME}.JP2.aux.xml"])
+
+    def test_download_project_3857_format_jp2_crop(self):
+        self.__download_project_3857_format_jp2_crop(ID)
 
     def test_download_project_3857_format_jp2_crop_cloud(self):
         add_item(self, CLOUD_ITEM, CLOUD_ID)
-        sleep(3)
+        sleep(2)
+        self.__download_project_3857_format_jp2_crop(CLOUD_ID)
 
-        self.download_and_check_result(ids=[CLOUD_ID], crop_wkt="", target_format=AssetFormat.jpg2000.value,
-                                       target_projection=EPSG_27572, raw_archive=False,
-                                       expected_files=[f"{ASSET_NAME}.J2w", f"{ASSET_NAME}.JP2", f"{ASSET_NAME}.JP2.aux.xml"])
+    def test_download_project_3857_format_jp2_crop_minio(self):
+        add_item(self, MINIO_ITEM, MINIO_ID)
+        sleep(2)
+        self.__download_project_3857_format_jp2_crop(MINIO_ID)
 
     def test_download_zarr(self):
         add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)

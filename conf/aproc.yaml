@@ -46,6 +46,10 @@ access_manager:
       #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
       #   private_key_id: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY_ID
       #   private_key: $APROC_INPUT_STORAGE_API_KEY_PRIVATE_KEY
+    -
+      type: s3
+      bucket: archives
+      endpoint: "http://minio:9000"
     # -
     #   type: https
     #   headers: $APROC_INPUT_STORAGE_HEADERS

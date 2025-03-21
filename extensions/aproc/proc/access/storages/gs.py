@@ -5,16 +5,12 @@ import tempfile
 from typing import Literal
 from urllib.parse import urlparse, urlunparse
 
-from common.utils import URLUtil
 from extensions.aproc.proc.access.file import File
 from google.cloud.storage import Client
 from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
 
-from aproc.core.logger import Logger
 from extensions.aproc.proc.access.storages.abstract import AbstractStorage
-
-LOGGER = Logger.logger
 
 
 class GoogleStorageConstants(str, enum.Enum):
@@ -170,7 +166,7 @@ class GoogleStorage(AbstractStorage):
 
     def makedir(self, href: str, strict=False):
         if strict:
-            raise NotImplementedError("It is not possible to create the folder on Google Storage")
+            raise PermissionError("Creating a folder on a remote storage is not permitted")
 
     def clean(self, href: str):
-        raise NotImplementedError("It is not possible to delete a file on Google Storage")
+        raise PermissionError("Deleting files on a remote storage is not permitted")
