@@ -166,7 +166,7 @@ class GoogleStorage(AbstractStorage):
 
     def makedir(self, href: str, strict=False):
         if strict:
-            raise NotImplementedError("It is not possible to create the folder on Google Storage")
+            raise PermissionError("Creating a folder on a remote storage is not permitted")
 
     def clean(self, href: str):
-        raise NotImplementedError("It is not possible to delete a file on Google Storage")
+        raise PermissionError("Deleting files on a remote storage is not permitted")
