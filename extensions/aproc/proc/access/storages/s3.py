@@ -19,6 +19,7 @@ class S3Storage(AbstractStorage):
     bucket: str
     endpoint: str
     api_key: S3ApiKey | None = Field(default=None)
+    max_objects: int = Field(default=1000, description="Maximum number of objects to fetch when listing elements in a directory")
 
     @computed_field
     @property
@@ -116,11 +117,11 @@ class S3Storage(AbstractStorage):
             return False
 
     def __list_objects(self, href: str):
-        # TODO: find a way to not be limited in elements to return
         return self.get_storage_parameters()["client"].list_objects_v2(
             Bucket=self.bucket,
             Prefix=self.__get_href_key(href).removesuffix("/") + "/",
-            Delimiter="/"
+            Delimiter="/",
+            MaxKeys=self.max_objects
         )
 
     def is_dir(self, href: str):
