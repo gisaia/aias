@@ -5,14 +5,12 @@ import tempfile
 
 from pydantic import BaseModel, Field
 
-from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
+from airs.core.models.model import SAFE_BANDS, AssetFormat, Item, ItemFormat, Role
 from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import \
     DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import extract
 from extensions.aproc.proc.drivers.exceptions import DriverException
-
-BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
 
 
 class ZarrConfiguration(BaseModel):
@@ -75,7 +73,7 @@ class Driver(DownloadDriver):
         else:
             self.LOGGER.info("Streaming archive for Zarr creation.")
 
-        raster_files = self.__find_raster_files(item, BANDS)
+        raster_files = self.__find_raster_files(item, SAFE_BANDS)
         zarr_res = self.__get_zarr_resolution()
 
         with rasterio.Env(**AccessManager.get_rasterio_session(asset_href)):

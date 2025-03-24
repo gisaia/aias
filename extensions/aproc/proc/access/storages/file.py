@@ -18,6 +18,7 @@ class AccessType(enum.Enum):
 class FileStorage(AbstractStorage):
     type: Literal["file"] = "file"
     is_local: Literal[True] = True
+    verify: Literal[True] = True
     writable_paths: list[str] = Field(default=[])
     readable_paths: list[str] = Field(default=[])
 

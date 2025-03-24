@@ -45,6 +45,7 @@ class GoogleStorageApiKey(BaseModel):
 class GoogleStorage(AbstractStorage):
     type: Literal["gs"] = "gs"
     is_local: Literal[False] = False
+    verify: Literal[True] = True
     bucket: str
     api_key: GoogleStorageApiKey | None = Field(default=None)
 

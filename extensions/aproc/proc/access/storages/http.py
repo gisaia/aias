@@ -13,6 +13,7 @@ from extensions.aproc.proc.access.storages.utils import (requests_exists,
 class HttpStorage(AbstractStorage):
     type: Literal["http"] = "http"
     is_local: Literal[False] = False
+    verify: Literal[False] = False
     headers: dict[str, str] = Field(default={})
     domain: str
     force_download: bool = Field(default=False)

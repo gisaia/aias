@@ -270,6 +270,9 @@ class Variable(BaseModel):
     expression: str = Field()
 
 
+SAFE_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
+
+
 class Indicators(BaseModel):
     dc3__time_compacity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extent of the temporal slices (groups) are compact or not compared to the cube temporal extent. Computed as follow: 1-range(group rasters) / range(cube rasters).")
     dc3__spatial_coverage: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))")
