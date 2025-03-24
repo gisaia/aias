@@ -116,14 +116,14 @@ class ObservationType(Enum):
     other = "OTHER"
 
 
-class ResourceType(Enum):
+class ResourceType(str, Enum):
     cube = "CUBE"
     gridded = "GRIDDED"
     vector = "VECTOR"
     other = "OTHER"
 
 
-class ItemFormat(Enum):
+class ItemFormat(str, Enum):
     adc3 = "adc3"
     shape = "SHAPE"
     dimap = "DIMAP"
@@ -142,7 +142,7 @@ class ItemFormat(Enum):
     csk = "COSMO-SkyMed"
 
 
-class AssetFormat(Enum):
+class AssetFormat(str, Enum):
     shape = "SHAPE"
     gml = "GML"
     geotiff = "GEOTIFF"
@@ -168,7 +168,7 @@ class AssetFormat(Enum):
     gif = "GIF"
 
 
-class Role(Enum):
+class Role(str, Enum):
     airs_item = "airs_item"
     thumbnail = "thumbnail"
     overview = "overview"
@@ -270,6 +270,9 @@ class Variable(BaseModel):
     expression: str = Field()
 
 
+SAFE_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
+
+
 class Indicators(BaseModel):
     dc3__time_compacity: float = Field(default=None, title="[ARLAS, extension dc3] Indicates whether the temporal extent of the temporal slices (groups) are compact or not compared to the cube temporal extent. Computed as follow: 1-range(group rasters) / range(cube rasters).")
     dc3__spatial_coverage: float = Field(default=None, title="[ARLAS, extension dc3] Indicates the proportion of the region of interest that is covered by the input rasters. Computed as follow: area(intersection(union(rasters),roi)) / area(roi))")
@@ -313,8 +316,8 @@ class Asset(BaseModel, extra=Extra.allow):
     name: str | None = Field(default=None, title="[ARLAS] Asset's name. Must be the same as the key in the `assets` dictionary.", max_length=300)
     size: int | None = Field(default=None, title="[ARLAS] Asset's size in Bytes.")
     href: str | None = Field(default=None, title="[STAC] Absolute link to the asset object.")
-    asset_type: str | None = Field(default=None, title="[ARLAS] Type of data (ResourceType)")
-    asset_format: str | None = Field(default=None, title="[ARLAS] Data format (AssetFormat)")
+    asset_type: ResourceType | None = Field(default=None, title="[ARLAS] Type of data (ResourceType)")
+    asset_format: AssetFormat | None = Field(default=None, title="[ARLAS] Data format (AssetFormat)")
     storage__requester_pays: bool | None = Field(default=None, title="[STAC, extension storage]Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets")
     storage__tier: str | None = Field(default=None, title="[STAC, extension storage]Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
     storage__platform: str | None = Field(default=None, title="[STAC, extension storage]PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
@@ -325,7 +328,7 @@ class Asset(BaseModel, extra=Extra.allow):
     title: str | None = Field(default=None, title="[STAC] Optional displayed title for clients and users.", max_length=300)
     description: str | None = Field(default=None, title="[STAC] A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
     type: str | None = Field(default=None, title="[STAC] Optional description of the media type. Registered Media Types are preferred. See MediaType for common media types.", max_length=300)
-    roles: List[str] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
+    roles: List[Role] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
     extra_fields: Dict[str, Any] | None = Field(default=None, title="[ARLAS] Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.")
     gsd: float | None = Field(default=None, title="[deprecated, use eo:gsd instead] Ground Sampling Distance (resolution) of the asset")
     eo__gsd: float | None = Field(default=None, title="[STAC, extension eo] Ground Sampling Distance (resolution)")

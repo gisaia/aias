@@ -9,14 +9,17 @@ LABEL description="This container serves ARLAS GEODES STAC Sync"
 RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
 COPY requirements-stac.txt /app/requirements.txt
+COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
 WORKDIR /app
 
 RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.storage.txt
 
 COPY stac /app/stac
 COPY ./airs /app/airs
 COPY ./common /app/common
+COPY ./extensions/aproc/proc/access /app/extensions/aproc/proc/access
 
 ENV PYTHONPATH=/app
 

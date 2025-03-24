@@ -46,4 +46,4 @@ docker run --rm \
   --max 1000
 ```
 
-To get some help, simply run `docker run --rm --network arlas-net gisaia/stac-geodes:latest add https://geodes-portal.cnes.fr/api/stac/items --help`
+To get some help, simply run `docker run --rm --network arlas-net gisaia/stac-geodes:latest add https://geodes-portal.cnes.fr/api/stac --help`

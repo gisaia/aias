@@ -11,6 +11,7 @@ from extensions.aproc.proc.access.storages.file import AccessType, FileStorage
 from extensions.aproc.proc.access.storages.gs import GoogleStorage
 from extensions.aproc.proc.access.storages.http import HttpStorage
 from extensions.aproc.proc.access.storages.https import HttpsStorage
+from extensions.aproc.proc.access.storages.utils import no_ssl_verification
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
 
@@ -96,8 +97,15 @@ class AccessManager:
         """
         import smart_open
 
-        with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as f:
-            yield f
+        storage = AccessManager.resolve_storage(href)
+
+        if storage.verify:
+            with smart_open.open(href, "rb", transport_params=storage.get_storage_parameters()) as f:
+                yield f
+        else:
+            with no_ssl_verification():
+                with smart_open.open(href, "rb", transport_params=storage.get_storage_parameters()) as f:
+                    yield f
 
     @staticmethod
     def get_rasterio_session(href: str):

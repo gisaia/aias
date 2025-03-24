@@ -1,4 +1,3 @@
-import io
 import os
 import re
 import tarfile
@@ -6,7 +5,7 @@ import tempfile
 
 from pydantic import BaseModel, Field
 
-from airs.core.models.model import AssetFormat, Item, ItemFormat
+from airs.core.models.model import SAFE_BANDS, AssetFormat, Item, ItemFormat, Role
 from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import \
     DownloadDriver
@@ -67,14 +66,14 @@ class Driver(DownloadDriver):
 
             # Download archive then extract it
             AccessManager.pull(asset_href, tmp_asset)
-            raster_files = self.__find_raster_files(tmp_asset)
 
             asset_href = f"file://{tmp_asset}"
+            # Necessary for the archive exploration to find the bands
+            item.assets[Role.data.value].href = asset_href
         else:
             self.LOGGER.info("Streaming archive for Zarr creation.")
-            with AccessManager.stream(asset_href) as fb:
-                raster_files = self.__find_raster_files(fb)
 
+        raster_files = self.__find_raster_files(item, SAFE_BANDS)
         zarr_res = self.__get_zarr_resolution()
 
         with rasterio.Env(**AccessManager.get_rasterio_session(asset_href)):
@@ -128,11 +127,11 @@ class Driver(DownloadDriver):
         with tarfile.open(archive_path, "w") as tar:
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
-    def __find_raster_files(self, fb: str | io.TextIOWrapper):
+    def __find_raster_files(self, item: Item, bands: list[str]):
         from extensions.aproc.proc.dc3build.utils.raster import \
             find_raster_files
 
-        return list(find_raster_files(fb, re.compile(r"IMG_DATA/.*(B\d{2})\.jp2")).values())
+        return list(find_raster_files(item.assets[Role.data.value], bands, re.compile(r"IMG_DATA/.*(B\d{2})\.jp2")).values())
 
     def __get_zarr_resolution(self):
         # TODO: with band selection, it will depend on the highest resolution SELECTED band

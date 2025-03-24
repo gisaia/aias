@@ -9,6 +9,7 @@ from pydantic import BaseModel
 class AbstractStorage(BaseModel, ABC):
     type: Any
     is_local: bool
+    verify: bool
 
     @abstractmethod
     def get_storage_parameters(self) -> dict:

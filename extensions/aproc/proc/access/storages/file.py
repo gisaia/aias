@@ -18,6 +18,7 @@ class AccessType(enum.Enum):
 class FileStorage(AbstractStorage):
     type: Literal["file"] = "file"
     is_local: Literal[True] = True
+    verify: Literal[True] = True
     writable_paths: list[str] = Field(default=[])
     readable_paths: list[str] = Field(default=[])
 
@@ -39,7 +40,7 @@ class FileStorage(AbstractStorage):
             paths = self.writable_paths
         if action == AccessType.READ:
             paths = list([*self.readable_paths, *self.writable_paths])
-        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, paths)))
+        return any(list(map(lambda p: os.path.commonpath([p, urlparse(href).path]) == p, paths)))
 
     def pull(self, href: str, dst: str):
         super().pull(href, dst)
