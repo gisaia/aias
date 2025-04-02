@@ -6,14 +6,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="airsmodel",
-    version=airsmodel_version,                        
-    author="Gisaïa",                     
+    version=aias_version,
+    author="Gisaïa",
     description="ARLAS Item Registration Service Model",
-    long_description=long_description,      
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=setuptools.find_packages(),    
-    python_requires='>=3.11',     
-    py_modules=["airs.core.models.model","airs.core.models.mapper"],  
-    package_dir={'':'src'},
+    packages=setuptools.find_packages(),
+    python_requires='>=3.10',
+    py_modules=["airs.core.models.model", "airs.core.models.mapper"],
+    package_dir={'': 'src'},
     install_requires=[]
 )

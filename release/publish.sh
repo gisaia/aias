@@ -8,7 +8,7 @@ fi
 mkdir -p target/src/airs/core/models
 cp -r airs/core/models/* target/src/airs/core/models
 cp -r  release/materials/* target/
-sed -i.bak 's/airsmodel_version/\"'$1'\"/' target/setup.py
+sed -i.bak 's/aias_version/\"'$1'\"/' target/setup.py
 
 cd target
 docker run \
