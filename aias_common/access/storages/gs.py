@@ -9,7 +9,7 @@ from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
 
 from aproc.core.logger import Logger
-from extensions.aproc.proc.access.storages.abstract import AbstractStorage
+from  aias_common.access.storages.abstract import AbstractStorage
 
 LOGGER = Logger.logger
 
