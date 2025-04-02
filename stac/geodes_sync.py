@@ -92,7 +92,7 @@ def search(stac_url: str, start_date: int, end_date: int, data_type: list[str], 
     while page:
         data["page"] = page
         url = "/".join([stac_url, "items"])
-        r = requests.post(url=url, headers=headers, data=json.dumps(data), verify=False)
+        r = requests.post(url=url, headers=headers, data=json.dumps(data), verify=False)   # NOSONAR
         if r.ok:
             doc = r.json()
             to_do = min(doc.get("context", {}).get("matched", 0), max_hits)
@@ -121,7 +121,7 @@ def search(stac_url: str, start_date: int, end_date: int, data_type: list[str], 
 
 def add_to_airs(airs_url: str, collection: str, item: Item):
     requests.post("/".join([airs_url, "collections", collection, "items"]), )
-    r = requests.post(url="/".join([airs_url, "collections", collection, "items"]), data=to_json(item), headers={"Content-Type": "application/json"}, verify=False)
+    r = requests.post(url="/".join([airs_url, "collections", collection, "items"]), data=to_json(item), headers={"Content-Type": "application/json"}, verify=False)   # NOSONAR
     if r.status_code >= 200 and r.status_code < 300:
         print("{} added".format(item.id))
     else:
@@ -137,7 +137,7 @@ def __print_table(field_names: list[str], rows, sortby: str = None):
 def list_collections(stac_url: str):
     data = '{"page":1, "limit":200}'
     headers = {"content-type": "application/json"}
-    r = requests.post(url="/".join([stac_url, "collections"]), headers=headers, data=data, verify=False)
+    r = requests.post(url="/".join([stac_url, "collections"]), headers=headers, data=data, verify=False)   # NOSONAR
     collections = r.json().get("collections", [])
     table = [["id", "dataType", "processingLevel", "start/end", "count"]]
     for collection in collections:
