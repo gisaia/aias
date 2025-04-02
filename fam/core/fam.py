@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from fam.core.model import Archive

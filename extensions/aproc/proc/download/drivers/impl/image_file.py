@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
 
 

@@ -2,7 +2,7 @@ from abc import abstractmethod
 import hashlib
 import os
 from airs.core.models.model import Asset, Item, Role
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (

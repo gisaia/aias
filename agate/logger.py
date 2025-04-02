@@ -1,7 +1,7 @@
 import logging
 import os
 
-from common.logger import CustomLogger
+from aias_common.logger import CustomLogger
 
 
 class Logger(CustomLogger):

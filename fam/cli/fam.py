@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
-from common.healthcheck import ROUTER as HEALTHCHECK
+from aias_common.rest.healthcheck import ROUTER as HEALTHCHECK
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
 from fam.core.settings import Configuration

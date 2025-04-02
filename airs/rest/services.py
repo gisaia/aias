@@ -5,7 +5,7 @@ import airs.core.product_registration as rs
 from airs.core import exceptions
 from airs.core.models.mapper import to_json
 from airs.core.models.model import Item
-from common.exception import BadRequest, Conflict, NotFound, ServerError
+from aias_common.rest.exception import BadRequest, Conflict, NotFound, ServerError
 
 ROUTER = APIRouter()
 

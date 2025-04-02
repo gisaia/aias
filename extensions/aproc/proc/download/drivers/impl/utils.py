@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 
 LOGGER = Logger.logger
 
