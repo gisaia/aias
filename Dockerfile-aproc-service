@@ -23,7 +23,7 @@ ENV APP_HOME=/app
 COPY ./aproc $APP_HOME/aproc
 COPY ./extensions $APP_HOME/extensions
 COPY ./airs/core/ $APP_HOME/airs/core/
-COPY ./common $APP_HOME/common
+COPY ./aias_common $APP_HOME/aias_common
 COPY ./conf $APP_HOME/conf
 COPY ./scripts/aproc/start.sh $APP_HOME/
 COPY ./conf $APP_HOME/conf

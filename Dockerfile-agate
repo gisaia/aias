@@ -16,7 +16,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 COPY ./agate /app/agate
-COPY ./common /app/common
+COPY ./aias_common /app/aias_common
 COPY ./conf/agate.yaml /app/conf/
 COPY ./scripts/agate/start.sh /app/
 
