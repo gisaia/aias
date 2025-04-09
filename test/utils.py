@@ -6,11 +6,13 @@ import time
 import unicodedata
 
 import requests
+from aias_common.access.manager import AccessManager
 from airs.core.models import mapper
 from airs.core.models.model import Item, MimeType
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
 from extensions.aproc.proc.ingest.ingest_process import summary
+from aproc.core.settings import Configuration as AprocConfiguration
 
 
 index_collection_prefix = os.getenv("AIRS_INDEX_COLLECTION_PREFIX", "airs")
@@ -51,6 +53,8 @@ CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"
 EPSG_27572 = "EPSG:27572"
 MAX_ITERATIONS = 600
 
+AprocConfiguration.init(configuration_file='conf/aproc.yaml')
+AccessManager.init(AprocConfiguration.settings.access_manager)
 IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
 
