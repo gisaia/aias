@@ -41,3 +41,10 @@ lazydocs \
     --output-path target/aias_common/pydoc/ \
     --overview-file modules.md
 
+
+lazydocs \
+    airs.core.models.model \
+    airs.core.models.mapper \
+    --output-path target/airs/pydoc/ \
+    --overview-file modules.md
+

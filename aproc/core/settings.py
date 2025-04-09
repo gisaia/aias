@@ -1,7 +1,7 @@
 from envyaml import EnvYAML
 from pydantic import BaseModel, Field
 
-from aias_common.access.storages.configuration import AccessManagerSettings
+from aias_common.access.configuration import AccessManagerSettings
 from aproc.core.logger import Logger
 
 LOGGER = Logger.logger

@@ -6,9 +6,11 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
+from aias_common.access.manager import AccessManager
 from aias_common.rest.healthcheck import ROUTER as HEALTHCHECK
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.settings import Configuration as IngestConfiguration
+from aproc.core.settings import Configuration as AprocConfiguration
 from fam.core.settings import Configuration
 from fam.rest.services import ROUTER
 
@@ -29,7 +31,10 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
 
     Configuration.init(configuration_file=configuration_file)
     IngestConfiguration.init(configuration_file=Configuration.settings.driver_configuration_file)
+    AprocConfiguration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
+    AccessManager.init(AprocConfiguration.settings.access_manager)
     DriverManager.init("ingest", IngestConfiguration.settings.drivers)
+
     api = FastAPI(version=AIAS_VERSION, title='ARLAS File and Archive Management Service',
                   description='ARLAS File and Archive Management API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=FAM_CORS_ORIGINS.split(","),
