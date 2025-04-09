@@ -19,6 +19,7 @@ setuptools.setup(
                 "aias_common.access.storages.utils",
                 "aias_common.access.storages.http",
                 "aias_common.access.storages.gs",
+                "aias_common.access.configuration",
                 "aias_common.access.manager",
                 "aias_common.logger",
                 "aias_common.rest.exception",

@@ -5,13 +5,12 @@ from typing import Annotated, Union
 
 from pydantic import Field
 
-from aproc.core.logger import Logger
-from aproc.core.settings import Configuration
-from  aias_common.access.storages.file import AccessType, FileStorage
-from  aias_common.access.storages.gs import GoogleStorage
-from  aias_common.access.storages.http import HttpStorage
-from  aias_common.access.storages.https import HttpsStorage
-
+from aias_common.access.storages.file import AccessType, FileStorage
+from aias_common.access.storages.gs import GoogleStorage
+from aias_common.access.storages.http import HttpStorage
+from aias_common.access.storages.https import HttpsStorage
+from aias_common.access.logger import Logger
+from aias_common.access.configuration import AccessManagerSettings
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
 
 LOGGER = Logger.logger
@@ -22,11 +21,11 @@ class AccessManager:
     tmp_dir: str
 
     @staticmethod
-    def init():
+    def init(ams: AccessManagerSettings):
         LOGGER.info("Initializing APROC storages")
         AccessManager.storages = []
 
-        for s in Configuration.settings.access_manager.storages:
+        for s in ams.storages:
             match s.type:
                 case "file":
                     AccessManager.storages.append(FileStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
@@ -39,7 +38,7 @@ class AccessManager:
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
 
-        tmp_dir = Configuration.settings.access_manager.tmp_dir
+        tmp_dir = ams.tmp_dir
         is_tmp_dir_authorized = any(
             map(lambda s: s.is_path_authorized(tmp_dir, AccessType.WRITE),
                 filter(lambda s: s.type == "file", AccessManager.storages)))
@@ -262,8 +261,3 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
         return storage.dirname(href)
-
-
-LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
-Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
-AccessManager.init()
