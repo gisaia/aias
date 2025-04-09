@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from pydantic import Field
 
-from  aias_common.access.storages.abstract import AbstractStorage
+from aias_common.access.storages.abstract import AbstractStorage
 
 
 class AccessType(enum.Enum):
