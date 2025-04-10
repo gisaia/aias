@@ -15,3 +15,18 @@ jobs:
         pip install -r test/requirements.txt
     - name: Run  tests
       run: test/tests.sh
+
+  geodes-stac-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4.1.4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Install requirements-stac.txt
+      run: |
+        pip install -r requirements-stac.txt
+    - name: Run  tests
+      run: test/test_geodes_stac.sh
+
+  
