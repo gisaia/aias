@@ -17,7 +17,7 @@ from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 
 
 LOCAL_ROOT = "/inputs"
-MINIO_ROOT = "http://minio:9000/archives/inputs"
+MINIO_ROOT = "http://minio:9000/archives/inputs"  # NOSONAR
 GS_ROOT = "gs://gisaia-public"
 
 
