@@ -40,7 +40,7 @@ class Tests(unittest.TestCase):
         print(archive.model_dump_json(exclude_none=True, exclude_unset=True))
         self.assertEqual(archive.name, "IMG_SPOT6_MS_001_A")
         self.assertEqual(archive.path, os.path.join(root.path, "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A"))
-        self.assertEqual(archive.is_dir, True)
+        self.assertTrue(archive.is_dir)
         # To test FAM with Google Storage
         # self.assertEqual(archive.id, "fa188f569e0470937befa4bf13cfd2ee26332cba56dda909d433ea3be6192717")
         self.assertEqual(archive.id, "3c3207184afc7982192f8185bbbd78b98705c4b46307d786107ea3715d47c900")

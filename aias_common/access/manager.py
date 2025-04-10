@@ -3,16 +3,16 @@ import shutil
 from contextlib import contextmanager
 from typing import Annotated, Union
 
-from extensions.aproc.proc.access.storages.s3 import S3Storage
 from pydantic import Field
 
+from aias_common.access.configuration import AccessManagerSettings
+from aias_common.access.file import File
+from aias_common.access.logger import Logger
 from aias_common.access.storages.file import AccessType, FileStorage
 from aias_common.access.storages.gs import GoogleStorage
 from aias_common.access.storages.http import HttpStorage
 from aias_common.access.storages.https import HttpsStorage
-from aias_common.access.logger import Logger
-from aias_common.access.configuration import AccessManagerSettings
-from aias_common.access.file import File
+from aias_common.access.storages.s3 import S3Storage
 
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage, S3Storage], Field(discriminator="type")]

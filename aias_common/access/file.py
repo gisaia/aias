@@ -6,5 +6,5 @@ class File(BaseModel):
     name: str
     path: str
     is_dir: bool
-    last_modification_date: datetime = None
-    creation_date: datetime = None
+    last_modification_date: datetime | None = None
+    creation_date: datetime | None = None
