@@ -7,8 +7,8 @@ import os
 
 from agate.rest.service import ROUTER
 from agate.settings import Configuration
-from common.exception_handler import EXCEPTION_HANDLERS
-from common.healthcheck import ROUTER as HEALTHCHECK
+from aias_common.rest.exception_handler import EXCEPTION_HANDLERS
+from aias_common.rest.healthcheck import ROUTER as HEALTHCHECK
 cli = typer.Typer()
 AGATE_CORS_ORIGINS = os.getenv("AGATE_CORS_ORIGINS", "*")
 AGATE_CORS_METHODS = os.getenv("AGATE_CORS_METHODS", "*")

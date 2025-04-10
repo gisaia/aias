@@ -3,7 +3,7 @@ import os
 
 from fastapi import APIRouter, HTTPException, status
 
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from fam.core.fam import Fam
 from fam.core.model import Archive, File, PathRequest
 from fam.core.settings import Configuration

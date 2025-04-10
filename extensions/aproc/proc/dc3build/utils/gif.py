@@ -7,7 +7,7 @@ import xarray as xr
 from PIL import Image, ImageDraw, ImageFont
 
 from airs.core.models.model import Item, Role
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.utils.overview import (
     create_overview, prepare_visualisation)
 

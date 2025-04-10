@@ -7,8 +7,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
 from aproc.service.aproc_services import AprocServices
-from common.exception_handler import EXCEPTION_HANDLERS
-from common.healthcheck import ROUTER as HEALTHCHECK
+from aias_common.rest.exception_handler import EXCEPTION_HANDLERS
+from aias_common.rest.healthcheck import ROUTER as HEALTHCHECK
 from aproc.service.ogc_processes_api import ROUTER
 
 cli = typer.Typer()

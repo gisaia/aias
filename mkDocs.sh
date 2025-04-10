@@ -25,4 +25,25 @@ i=1; until curl -XGET http://localhost:8004/openapi.json -o docs/docs/agate/open
 # Copy documentation to target
 cp -r docs/docs/* target/generated-docs/
 
+pip3.10 install lazydocs
+
+lazydocs \
+    aias_common.access.manager \
+    aias_common.access.configuration \
+    aias_common.access.storages.abstract \
+    aias_common.access.storages.file \
+    aias_common.access.storages.gs \
+    aias_common.access.storages.http \
+    aias_common.access.storages.https \
+    aias_common.access.storages.utils \
+    --output-path target/aias_common/pydoc/ \
+    --overview-file modules.md
+
+
+lazydocs \
+    airs.core.models.model \
+    airs.core.models.mapper \
+    --output-path target/airs/pydoc/ \
+    --overview-file modules.md
+
 docker run --rm -u `id -u`:`id -g` -v `pwd`:/data minlag/mermaid-cli -i /data/target/generated-docs/agate/agate-mermaid.md -o /data/target/generated-docs/agate/agate_doc.md

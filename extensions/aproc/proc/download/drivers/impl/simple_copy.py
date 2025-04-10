@@ -1,7 +1,7 @@
 import os
 
 from airs.core.models.model import Item
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import get_file_name
 

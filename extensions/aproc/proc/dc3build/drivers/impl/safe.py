@@ -6,7 +6,7 @@ import re
 from airs.core.models import mapper
 from airs.core.models.model import (Asset, AssetFormat, ChunkingStrategy, Item,
                                     ItemFormat, MimeType, ResourceType, Role)
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess

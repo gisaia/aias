@@ -14,6 +14,7 @@ from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
+from aias_common.access.manager import AccessManager
 from airs.core.models.mapper import serialize_datetime
 from aproc.core.logger import Logger
 from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
@@ -25,6 +26,7 @@ from aproc.core.settings import Configuration
 LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
+AccessManager.init(Configuration.settings.access_manager)
 APROC_CELERY_APP = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)
 
 

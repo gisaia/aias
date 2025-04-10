@@ -3,7 +3,7 @@ import os
 from abc import abstractmethod
 
 from airs.core.models.model import Asset, Item
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 

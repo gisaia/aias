@@ -16,7 +16,7 @@ RUN pip3 install -r requirements.txt
 
 COPY stac /app/stac
 COPY ./airs /app/airs
-COPY ./common /app/common
+COPY ./aias_common /app/aias_common
 
 ENV PYTHONPATH=/app
 

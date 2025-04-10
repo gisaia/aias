@@ -6,8 +6,8 @@ from fastapi import FastAPI
 
 from airs.core.settings import Configuration
 from airs.rest.services import ROUTER
-from common.exception_handler import EXCEPTION_HANDLERS
-from common.healthcheck import ROUTER as HEALTHCHECK
+from aias_common.rest.exception_handler import EXCEPTION_HANDLERS
+from aias_common.rest.healthcheck import ROUTER as HEALTHCHECK
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 

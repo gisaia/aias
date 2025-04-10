@@ -7,7 +7,7 @@ import tempfile
 from pydantic import BaseModel, Field
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import \
     DownloadDriver
 from extensions.aproc.proc.download.drivers.impl.utils import extract

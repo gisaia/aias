@@ -7,7 +7,7 @@ from airs.core.models import mapper
 from airs.core.models.model import Asset, Item
 from aproc.core.processes.process import Process
 from airs.core.settings import S3 as S3Configuration
-from extensions.aproc.proc.access.manager import AccessManager
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import ConnectionException, RegisterException
 
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"

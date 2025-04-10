@@ -1,4 +1,3 @@
-import json
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
@@ -13,7 +12,7 @@ from aproc.core.models.ogc.job import StatusInfoList
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
-from common.exception import OGCException, RESTException
+from aias_common.rest.exception import OGCException, RESTException
 
 LOGGER = Logger.logger
 

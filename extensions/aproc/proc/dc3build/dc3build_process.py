@@ -13,7 +13,6 @@ from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
-from extensions.aproc.proc.access.manager import AccessManager
 from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
@@ -77,8 +76,6 @@ class AprocProcess(Process):
         AprocProcess.input_model = InputDC3BuildProcess
         description.inputs.get("include_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
         description.inputs.get("exclude_drivers").schema_.items.enum = DriverManager.driver_names(summary.id)
-
-        AccessManager.init()
 
     @staticmethod
     def get_process_description() -> ProcessDescription:

@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.requests import Request
 
-from common.exception import OGCException, RESTException
+from aias_common.rest.exception import OGCException, RESTException
 
 HandledExceptions: TypeAlias = RequestValidationError | OGCException
 

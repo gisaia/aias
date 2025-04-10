@@ -45,7 +45,7 @@ RUN pip install -r $APP_HOME/requirements-ext.txt
 COPY ./aproc $APP_HOME/aproc
 COPY ./extensions $APP_HOME/extensions
 COPY ./airs/core/ $APP_HOME/airs/core/
-COPY ./common $APP_HOME/common
+COPY ./aias_common $APP_HOME/aias_common
 COPY ./conf $APP_HOME/conf
 COPY ./setup.py $APP_HOME/setup.py
 COPY ./assets $APP_HOME/assets

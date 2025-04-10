@@ -1,3 +1,6 @@
+#!/usr/bin/env sh
+set -o errexit
+
 if test -f "$HOME/.pypirc"; then
     echo "$HOME/.pypirc found."
 else
@@ -5,12 +8,17 @@ else
     exit 1
 fi
 
-mkdir -p target/src/airs/core/models
-cp -r airs/core/models/* target/src/airs/core/models
-cp -r  release/materials/* target/
-sed -i.bak 's/airsmodel_version/\"'$1'\"/' target/setup.py
+# AIRS
+mkdir -p target/airs
+rm -rf target/airs/*
+mkdir -p target/airs/src/airs/core/models
+cp -r airs/core/models/* target/airs/src/airs/core/models
+cp -r release/materials/airs/* target/airs/
+sed -i.bak 's/aias_version/\"'$1'\"/' target/airs/setup.py
 
-cd target
+
+cd target/airs
+
 docker run \
         -e GROUP_ID="$(id -g)" \
         -e USER_ID="$(id -u)" \
@@ -18,6 +26,36 @@ docker run \
         --rm \
         gisaia/python-3-alpine \
             setup.py sdist bdist_wheel
+
+
+docker run --rm \
+    -w /opt/python \
+    -v $PWD:/opt/python \
+    -v $HOME/.pypirc:/root/.pypirc \
+    python:3 \
+    /bin/bash -c  "pip install twine ; twine upload dist/*"
+
+
+# AIAS COMMON
+cd -
+
+mkdir -p target/aias_common
+rm -rf target/aias_common/*
+mkdir -p target/aias_common/src/
+cp -r aias_common target/aias_common/src/
+cp -r release/materials/aias_common/* target/aias_common/
+sed -i.bak 's/aias_version/\"'$1'\"/' target/aias_common/setup.py
+
+cd target/aias_common
+
+docker run \
+        -e GROUP_ID="$(id -g)" \
+        -e USER_ID="$(id -u)" \
+        --mount dst=/opt/python,src="$PWD",type=bind \
+        --rm \
+        gisaia/python-3-alpine \
+            setup.py sdist bdist_wheel
+
 
 docker run --rm \
     -w /opt/python \
