@@ -2,26 +2,20 @@ import enum
 import os
 import shutil
 from pathlib import Path
-from typing import Literal
 from urllib.parse import urlparse
 
-from pydantic import Field
 
+from aias_common.access.configuration import AccessType, FileStorageConfiguration
 from aias_common.access.storages.abstract import AbstractStorage
 from aias_common.access.file import File
 
 
-class AccessType(enum.Enum):
-    READ = "read"
-    WRITE = "write"
-
-
 class FileStorage(AbstractStorage):
-    type: Literal["file"] = "file"
-    is_local: Literal[True] = True
-    writable_paths: list[str] = Field(default=[])
-    readable_paths: list[str] = Field(default=[])
 
+    def get_configuration(self) -> FileStorageConfiguration:
+        assert isinstance(self.storage_configuration, FileStorageConfiguration)
+        return self.storage_configuration
+    
     def get_storage_parameters(self):
         return {}
 
@@ -37,9 +31,9 @@ class FileStorage(AbstractStorage):
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
         if action == AccessType.WRITE:
-            paths = self.writable_paths
+            paths = self.get_configuration().writable_paths
         if action == AccessType.READ:
-            paths = list([*self.readable_paths, *self.writable_paths])
+            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
         return any(list(map(lambda p: os.path.commonpath([p, href]) == p, paths)))
 
     def pull(self, href: str, dst: str):

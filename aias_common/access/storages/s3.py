@@ -1,51 +1,38 @@
 import os
-from typing import Literal
 from urllib.parse import urlparse, urlunparse
 
-from pydantic import BaseModel, Field, computed_field
 
+from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
 
 
-class S3ApiKey(BaseModel):
-    access_key: str
-    secret_key: str
-
-
 class S3Storage(AbstractStorage):
-    type: Literal["s3"] = "s3"
-    is_local: Literal[False] = False
-    bucket: str
-    endpoint: str
-    api_key: S3ApiKey | None = Field(default=None)
-    max_objects: int = Field(default=1000, description="Maximum number of objects to fetch when listing elements in a directory")
 
-    @computed_field
-    @property
-    def is_anon_client(self) -> bool:
-        return self.api_key is None
-
+    def get_configuration(self) -> S3StorageConfiguration:
+        assert isinstance(self.storage_configuration, S3StorageConfiguration)
+        return self.storage_configuration
+    
     def get_storage_parameters(self):
         import boto3
 
-        if self.is_anon_client:
+        if self.get_configuration().is_anon_client:
             from botocore import UNSIGNED
             from botocore.client import Config
 
             client = boto3.client(
                 "s3",
                 region_name="auto",
-                endpoint_url=self.endpoint,
+                endpoint_url=self.get_configuration().endpoint,
                 config=Config(signature_version=UNSIGNED)
             )
         else:
             client = boto3.client(
                 "s3",
                 region_name="auto",
-                endpoint_url=self.endpoint,
-                aws_access_key_id=self.api_key.access_key,
-                aws_secret_access_key=self.api_key.secret_key,
+                endpoint_url=self.get_configuration().endpoint,
+                aws_access_key_id=self.get_configuration().api_key.access_key,
+                aws_secret_access_key=self.get_configuration().api_key.secret_key,
             )
 
         return {"client": client}
@@ -55,9 +42,9 @@ class S3Storage(AbstractStorage):
         netloc = urlparse(href).netloc
 
         if scheme == "s3":
-            return netloc == self.bucket
+            return netloc == self.get_configuration().bucket
         elif scheme == "http":
-            return f"{scheme}://{netloc}" == self.endpoint
+            return f"{scheme}://{netloc}" == self.get_configuration().endpoint
         return False
 
     def exists(self, href: str):
@@ -73,22 +60,22 @@ class S3Storage(AbstractStorage):
 
         params = {}
 
-        if self.is_anon_client:
+        if self.get_configuration().is_anon_client:
             params["session"] = rasterio.session.AWSSession(
                 aws_unsigned=True,
-                endpoint_url=self.endpoint
+                endpoint_url=self.get_configuration().endpoint
             )
         else:
             params["session"] = rasterio.session.AWSSession(
-                aws_access_key_id=self.api_key.access_key,
-                aws_secret_access_key=self.api_key.secret_key,
-                endpoint_url=self.endpoint
+                aws_access_key_id=self.get_configuration().api_key.access_key,
+                aws_secret_access_key=self.get_configuration().api_key.secret_key,
+                endpoint_url=self.get_configuration().endpoint
             )
 
         return params
 
     def __get_href_key(self, href: str):
-        return urlparse(href).path.removeprefix(f"/{self.bucket}/")
+        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}/")
 
     def pull(self, href: str, dst: str):
         import botocore.client
@@ -97,14 +84,14 @@ class S3Storage(AbstractStorage):
 
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
 
-        obj = client.get_object(Bucket=self.bucket, Key=self.__get_href_key(href))
+        obj = client.get_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
         with open(dst, "wb") as f:
             for chunk in obj['Body'].iter_chunks(50 * 1024):
                 f.write(chunk)
 
     def __head_object(self, href: str):
         return self.get_storage_parameters()["client"].head_object(
-                Bucket=self.bucket,
+                Bucket=self.get_configuration().bucket,
                 Key=self.__get_href_key(href)
             )
 
@@ -118,10 +105,10 @@ class S3Storage(AbstractStorage):
 
     def __list_objects(self, href: str):
         return self.get_storage_parameters()["client"].list_objects_v2(
-            Bucket=self.bucket,
+            Bucket=self.get_configuration().bucket,
             Prefix=self.__get_href_key(href).removesuffix("/") + "/",
             Delimiter="/",
-            MaxKeys=self.max_objects
+            MaxKeys=self.get_configuration().max_objects
         )
 
     def is_dir(self, href: str):
@@ -135,7 +122,7 @@ class S3Storage(AbstractStorage):
         components = list(url[:])
         if len(components) == 5:
             components.append('')
-        components[2] = os.path.join(self.bucket, path)
+        components[2] = os.path.join(self.get_configuration().bucket, path)
         return urlunparse(tuple(components))
 
     def listdir(self, source: str) -> list[File]:

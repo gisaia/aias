@@ -5,7 +5,7 @@ from typing import Annotated, Union
 
 from pydantic import Field
 
-from aias_common.access.configuration import AccessManagerSettings
+from aias_common.access.configuration import AccessManagerSettings, AnyStorageConfiguration, FileStorageConfiguration, GoogleStorageConfiguration, HttpStorageConfiguration, HttpsStorageConfiguration, S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.file import AccessType, FileStorage
@@ -32,22 +32,22 @@ class AccessManager:
         for s in ams.storages:
             match s.type:
                 case "file":
-                    AccessManager.storages.append(FileStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                    AccessManager.storages.append(FileStorage(s))
                 case "gs":
-                    AccessManager.storages.append(GoogleStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                    AccessManager.storages.append(GoogleStorage(s))
                 case "http":
-                    AccessManager.storages.append(HttpStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                    AccessManager.storages.append(HttpStorage(s))
                 case "https":
-                    AccessManager.storages.append(HttpsStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                    AccessManager.storages.append(HttpsStorage(s))
                 case "s3":
-                    AccessManager.storages.append(S3Storage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                    AccessManager.storages.append(S3Storage(s))
                 case _:
-                    raise NotImplementedError(f"Specified storage {s.type} is not implemented")
+                    raise NotImplementedError(f"Specified storage {s.storage_configuration.type} is not implemented")
 
         tmp_dir = ams.tmp_dir
         is_tmp_dir_authorized = any(
             map(lambda s: s.is_path_authorized(tmp_dir, AccessType.WRITE),
-                filter(lambda s: s.type == "file", AccessManager.storages)))
+                filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
         if not is_tmp_dir_authorized:
             raise ValueError("The given tmp_dir is not part of any defined FileStorage with WRITE authorization")
 
@@ -78,7 +78,7 @@ class AccessManager:
         """
         Checks that the path is a writable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.type == "file", AccessManager.storages)))
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
         if not is_authorized:
             raise ValueError("Destination path is not authorized")
 
@@ -122,8 +122,8 @@ class AccessManager:
     def is_download_required(href: str):
         storage = AccessManager.resolve_storage(href)
 
-        return storage.type in ["http", "https"] \
-            and storage.force_download
+        return storage.storage_configuration.type in ["http", "https"] \
+            and storage.storage_configuration.force_download
 
     @staticmethod
     @contextmanager
@@ -139,7 +139,7 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         # If the storage is not local, pull it
-        if not storage.is_local:
+        if not storage.storage_configuration.is_local:
             if dst is None:
                 dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
 
@@ -173,7 +173,7 @@ class AccessManager:
             for href, dst in zip(href_list, dst_list):
                 storage = AccessManager.resolve_storage(href)
 
-                if not storage.is_local:
+                if not storage.storage_configuration.is_local:
                     if dst is None:
                         dst = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
 
