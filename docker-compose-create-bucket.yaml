@@ -19,6 +19,8 @@ services:
       echo create bucket $$BUCKET_NAME;
       /usr/bin/mc mb myminio/$$BUCKET_NAME;
       /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
-      /usr/bin/mc ls myminio
+      if [[ $$BUCKET_NAME == "archives" ]]; then /usr/bin/mc cp --recursive /inputs myminio/archives/ ; fi;
       exit 0;
       "
+    volumes:
+      - ./test/inputs:/inputs:ro

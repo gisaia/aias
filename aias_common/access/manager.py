@@ -5,13 +5,17 @@ from typing import Annotated, Union
 
 from pydantic import Field
 
+from aias_common.access.configuration import AccessManagerSettings
+from aias_common.access.file import File
+from aias_common.access.logger import Logger
 from aias_common.access.storages.file import AccessType, FileStorage
 from aias_common.access.storages.gs import GoogleStorage
 from aias_common.access.storages.http import HttpStorage
 from aias_common.access.storages.https import HttpsStorage
-from aias_common.access.logger import Logger
-from aias_common.access.configuration import AccessManagerSettings
-AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage], Field(discriminator="type")]
+from aias_common.access.storages.s3 import S3Storage
+
+
+AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage, S3Storage], Field(discriminator="type")]
 
 LOGGER = Logger.logger
 
@@ -35,6 +39,8 @@ class AccessManager:
                     AccessManager.storages.append(HttpStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case "https":
                     AccessManager.storages.append(HttpsStorage(**s.model_dump(exclude_none=True, exclude_unset=True)))
+                case "s3":
+                    AccessManager.storages.append(S3Storage(**s.model_dump(exclude_none=True, exclude_unset=True)))
                 case _:
                     raise NotImplementedError(f"Specified storage {s.type} is not implemented")
 
@@ -110,7 +116,6 @@ class AccessManager:
         Whether the file exists
         """
         storage = AccessManager.resolve_storage(href)
-
         return storage.exists(href)
 
     @staticmethod
@@ -215,20 +220,18 @@ class AccessManager:
     @staticmethod
     def get_size(href: str):
         storage = AccessManager.resolve_storage(href)
-        if href and AccessManager.exists(href):
+        if AccessManager.exists(href):
             if AccessManager.is_file(href):
                 return storage.get_file_size(href)
-            elif AccessManager.is_dir(href):
-                folder_size = 0
-                for path in AccessManager.listdir(href):
-                    folder_size += AccessManager.get_size(os.path.join(href, path))
-                return folder_size
             else:
-                raise ValueError(f"Given href is a directory {href}")
+                folder_size = 0
+                for f in AccessManager.listdir(href):
+                    folder_size += AccessManager.get_size(f.path)
+                return folder_size
         raise ValueError(f"Given href does not exist {href}")
 
     @staticmethod
-    def listdir(href: str):
+    def listdir(href: str) -> list[File]:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):

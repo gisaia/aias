@@ -254,35 +254,35 @@ class Driver(IngestDriver):
         if AccessManager.is_dir(path):
             for file in AccessManager.listdir(path):
                 # check if current file is a dir
-                if file == 'MASKS':
-                    for mask in AccessManager.listdir(os.path.join(path, file)):
-                        if mask.endswith('.GML') and mask.startswith('ROI'):
-                            self.roi_path = os.path.join(os.path.join(path, file), mask)
+                if file.name == 'MASKS':
+                    for mask in AccessManager.listdir(file.path):
+                        if mask.name.endswith('.GML') and mask.name.startswith('ROI'):
+                            self.roi_path = mask.path
                 # check if current file is a file
-                if AccessManager.is_file(os.path.join(path, file)):
-                    if file.endswith('.XML') and file.startswith('RPC'):
-                        self.rpc_file = os.path.join(path, file)
-                    if file.endswith('.XML') and file.startswith('DIM'):
-                        self.dim_path = os.path.join(path, file)
-                    if file.endswith('.JPG') and file.startswith('PREVIEW'):
-                        raw_all_quick_path = os.path.join(path, file)
+                if AccessManager.is_file(file.path):
+                    if file.name.endswith('.XML') and file.name.startswith('RPC'):
+                        self.rpc_file = file.path
+                    if file.name.endswith('.XML') and file.name.startswith('DIM'):
+                        self.dim_path = file.path
+                    if file.name.endswith('.JPG') and file.name.startswith('PREVIEW'):
+                        raw_all_quick_path = file.path
 
                     # Data and georef
-                    if file.lower().endswith(('.jpg', 'jp2')) and file.startswith('IMG_'):
-                        self.image_path = os.path.join(path, file)
-                    if file.lower().endswith('.tfw') and file.startswith('IMG_'):
-                        self.georef_path = os.path.join(path, file)
-                    if file.lower().endswith('.j2w') and file.startswith('IMG_'):
-                        self.georef_path = os.path.join(path, file)
-                    if file.lower().endswith(('.tiff', '.tif')) and file.startswith('IMG_'):
-                        self.image_path = os.path.join(path, file)
+                    if file.name.lower().endswith(('.jpg', 'jp2')) and file.name.startswith('IMG_'):
+                        self.image_path = file.path
+                    if file.name.lower().endswith('.tfw') and file.name.startswith('IMG_'):
+                        self.georef_path = file.path
+                    if file.name.lower().endswith('.j2w') and file.name.startswith('IMG_'):
+                        self.georef_path = file.path
+                    if file.name.lower().endswith(('.tiff', '.tif')) and file.name.startswith('IMG_'):
+                        self.image_path = file.path
 
-                    if file.endswith('.JPG') and file.startswith('ICON'):
-                        raw_all_thumb_path = os.path.join(path, file)
-                    if file.endswith('.JPG') and file.startswith('CAT_QL'):
-                        cat_all_quick_path = os.path.join(path, file)
-                    if file.endswith('.JPG') and file.startswith('CAT_TB'):
-                        cat_all_thumb_path = os.path.join(path, file)
+                    if file.name.endswith('.JPG') and file.name.startswith('ICON'):
+                        raw_all_thumb_path = file.path
+                    if file.name.endswith('.JPG') and file.name.startswith('CAT_QL'):
+                        cat_all_quick_path = file.path
+                    if file.name.endswith('.JPG') and file.name.startswith('CAT_TB'):
+                        cat_all_thumb_path = file.path
             if cat_all_thumb_path is not None:
                 self.thumbnail_path = cat_all_thumb_path
             else:

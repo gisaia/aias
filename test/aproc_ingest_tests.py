@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from test.utils import APROC_ENDPOINT, COLLECTION, CATALOG, MAX_ITERATIONS, setUpTest
 from time import sleep
@@ -13,6 +14,21 @@ from aproc.core.models.ogc.process import ProcessDescription, ProcessList
 from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
+
+
+LOCAL_ROOT = "/inputs"
+MINIO_ROOT = "http://minio:9000/archives/inputs"  # NOSONAR
+GS_ROOT = "gs://gisaia-public"
+
+
+DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
+AST = "ast/"
+TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
+RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
+TIF = "cog.tiff"
+JP2000 = "jpeg2000.jpg2"
 
 
 class Tests(unittest.TestCase):
@@ -55,98 +71,138 @@ class Tests(unittest.TestCase):
         return status
 
     def test_async_ingest_dimap(self):  # Driver DIMAP
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
+    def test_async_ingest_dimap_minio(self):  # Driver DIMAP
+        url = os.path.join(MINIO_ROOT, DIMAP)
+        item_id = "a75c9fc5a9fee985be7bd967ef713a20df65e7163f660bf6607436845fb48f4b"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
     def test_async_ingest_dimap_cloud(self):  # Driver DIMAP
-        url = "gs://gisaia-public/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(GS_ROOT, DIMAP)
         item_id = "7fb3088260c163c8bdf37f9b56b35b0232ab8adbb556f9fbfd8d547d26bc20d1"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_dimap_driver_include(self):  # Driver DIMAP
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["dimap"])
 
     def test_async_ingest_dimap_driver_include_fail(self):  # Driver DIMAP
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["spot5"], expected=StatusCode.failed)
 
     def test_async_ingest_dimap_driver_exclude(self):  # Driver DIMAP
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["spot5"])
 
     def test_async_ingest_dimap_driver_exclude_fail(self):  # Driver DIMAP
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["dimap"], expected=StatusCode.failed)
 
     def test_async_ingest_ikonos(self):  # Driver GEOEYE
-        url = "/inputs/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+        url = os.path.join(LOCAL_ROOT, IKONOS)
         item_id = "0e73667ac0bd10b5f18bcb5ee40518db973b2946fe8b40d2b4cb988724ac9507"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
+    def test_async_ingest_ikonos_minio(self):  # Driver GEOEYE
+        url = os.path.join(MINIO_ROOT, IKONOS)
+        item_id = "7a315977cc4dfa9809514e994e5f921f13ad0e56df6e6eec172ecf6771174970"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
     def test_async_ingest_ikonos_cloud(self):  # Driver GEOEYE
-        url = "gs://gisaia-public/test-aias/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+        url = os.path.join(GS_ROOT, "test-aias", IKONOS)
         item_id = "26fc0091ed9d5b0f53769ecaf2a0cef26b0007e477be9b4c94f198a26b2e00d1"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_wv(self):  # Driver DIGITALGLOBE
-        url = "/inputs/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
-        item_id = "4bd829d461af55d10d3cf98ae2f5014e1945b8d42c60fa36b76245e167fc35ba"
+        url = os.path.join(LOCAL_ROOT, WORLDVIEW)
+        item_id = "22785c0db31d772b6ba2f685ab7b9fbfec8931b37394b53a0a7d7e519ec9aa3a"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_wv_minio(self):  # Driver DIGITALGLOBE
+        url = os.path.join(MINIO_ROOT, WORLDVIEW)
+        item_id = "8ae23c4168a65926d6b898e548910635d5f299ddf1e711fa873d1c552a269bb6"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_wv_cloud(self):  # Driver DIGITALGLOBE
-        url = "gs://gisaia-public/test-aias/WorldView_3_sample_infrared_data_View_ready_2A_infrared"
-        item_id = "4738b485dd8612c2b204db983a46d13579ec5a90e19db4c097853908281c12e1"
+        url = os.path.join(GS_ROOT, "test-aias", WORLDVIEW)
+        item_id = "03f59a67eb3309e0a05135a8c047c364b469cae7691fa98f22026d18f5bf24d7"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast(self):  # Driver AST
-        url = "/inputs/ast"
-        item_id = "7edf8f5a9df6fff49398ae628eb4b158eea85c9cab65dc5e34fc3b8481261892"
+        url = os.path.join(LOCAL_ROOT, AST)
+        item_id = "af129ada4336f27a532950d43eaf4fa3802f82ea87b4cb339199e2562ef10f2c"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_ast_minio(self):  # Driver AST
+        url = os.path.join(MINIO_ROOT, AST)
+        item_id = "9de1896cad5ffaa490f2c38dbca2e19fb6db486350a6408364bccbc4d020f5b5"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_ast_cloud(self):  # Driver AST
-        url = "gs://gisaia-public/test-aias/ast"
-        item_id = "4ef019190200980a8ccea4004f769631b33491048d094bfc22be75efc3bfbd4e"
+        url = os.path.join(GS_ROOT, "test-aias", AST)
+        item_id = "17e377bf0c44c3a7cc8ec70e1ff9c73852454bb1a86e64f3a61545138b89b08b"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx(self):  # Driver TERRASRX
-        url = "/inputs/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
-        item_id = "5502f3e969a505f45143da8a6a7da6a96dcf6a46800afbe75f845eb0a7e90438"
+        url = os.path.join(LOCAL_ROOT, TERRASARX)
+        item_id = "53b302d1f1877f7509fbdd619b2071b024aa54604fdd1d85718059dfb88aac2c"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_terrasarx_minio(self):  # Driver TERRASRX
+        url = os.path.join(MINIO_ROOT, TERRASARX)
+        item_id = "71bc30f00c55474b9266c422a1ffdd00b0f2fa7b086d7674c5e3b0c2f62f55b8"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
-        url = "gs://gisaia-public/test-aias/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401"
-        item_id = "9038632fa643fb2ddb29fd688eb756684a7d456f951c7a25f81509f0553aadbb"
+        url = os.path.join(GS_ROOT, "test-aias", TERRASARX)
+        item_id = "650cbc54a5554720fa3290473f0db93888ecae701c602539018927292277ab46"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
-        url = "/inputs/3159120_2020-03-11_RE1_3A"
-        item_id = "f07bc337f2c904f7d23007b0d9c868872036162dc48f954ccd46f55198de530e"
+        url = os.path.join(LOCAL_ROOT, RAPID_EYE)
+        item_id = "bb2ddbcc86e90a95afa61b7cd7dccc7eb6335f6a40052e49213cb404d0baf17a"
+        self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_rapideye_minio(self):  # Driver RAPIDEYE - No thumbnail nor overview.
+        url = os.path.join(MINIO_ROOT, RAPID_EYE)
+        item_id = "c70e4c74cc2f403f13bc1bebd953433203e346fc76d2ed248a2fc1e3bfa80154"
         self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
-        url = "gs://gisaia-public/test-aias/3159120_2020-03-11_RE1_3A"
-        item_id = "dc89e2cd6533bec0cb56a1a5c3f3662783de0b1f6d8ca73ece4de00eca54d8dd"
+        url = os.path.join(GS_ROOT, "test-aias", RAPID_EYE)
+        item_id = "a4afb6d08ca248639d359ad529b84bea9afa58db4f68aab47995c46f81c3318c"
         self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_tif(self):  # Driver TIF
-        url = "/inputs/cog.tiff"
+        url = os.path.join(LOCAL_ROOT, TIF)
         item_id = "36f978ad9fe1e9b4ea8064c893140012a967e1a7a5d1ac65a589a16566f03ccd"
         self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
+    def test_async_ingest_tif_minio(self):  # Driver TIF
+        url = os.path.join(MINIO_ROOT, TIF)
+        item_id = "dbe4de0187fb0aeaf4fddd76ff7237a160109e0bcc280952d7fc4334b30992d9"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
+
     def test_async_ingest_tif_cloud(self):  # Driver TIF
-        url = "gs://gisaia-public/test-aias/cog.tiff"
+        url = os.path.join(GS_ROOT, "test-aias", TIF)
         item_id = "03bc217a7894c34abc42d292a270a3f194096507d2a86a3365092631769ff525"
         self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
     def test_async_ingest_jpg2000(self):  # Driver JPEG2000
-        url = "/inputs/jpeg2000.jpg2"
+        url = os.path.join(LOCAL_ROOT, JP2000)
         item_id = "e2614a12233e3f859a4083b54d2b7e4e4615055013af13c73b6c7e427548785c"
         self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
+    def test_async_ingest_jpg2000_minio(self):  # Driver JPEG2000
+        url = os.path.join(MINIO_ROOT, JP2000)
+        item_id = "7d0a49ed64306fa310b723788df1b5d43ef00c5367003007020aff1be436546f"
+        self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
+
     def test_async_ingest_jpg2000_cloud(self):  # Driver JPEG2000
-        url = "gs://gisaia-public/test-aias/jpeg2000.jpg2"
+        url = os.path.join(GS_ROOT, "test-aias", JP2000)
         item_id = "95d6803989b40dd72fc642e51477cd9ed0cb4432218711246aaa447c1a3bc046"
         self.async_ingest(url, item_id, ["data", "airs_item"], archive=False)
 
@@ -164,6 +220,7 @@ class Tests(unittest.TestCase):
         self.ingest_directory("", collection=COLLECTION, catalog=CATALOG)
 
     # TODO: test folder cloud
+    # TODO: test folder minio
 
     def test_processes_list(self):
         r = requests.get("/".join([APROC_ENDPOINT, "processes"]))
@@ -181,13 +238,13 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
     def check_result(self, item: Item, id, assets: list, archive=True):
-        self.assertEquals(item.collection, COLLECTION)
-        self.assertEquals(item.catalog, CATALOG)
-        self.assertEquals(item.id, id)
+        self.assertEqual(item.collection, COLLECTION)
+        self.assertEqual(item.catalog, CATALOG)
+        self.assertEqual(item.id, id)
         self.assertIsNotNone(item.geometry)
         self.assertIsNotNone(item.geometry.get("coordinates"))
-        self.assertEquals(len(item.bbox), 4)
-        self.assertEquals(len(item.centroid), 2)
+        self.assertEqual(len(item.bbox), 4)
+        self.assertEqual(len(item.centroid), 2)
         self.assertIn(Role.data.value, item.assets.keys())
         self.assertIsNotNone(item.properties.item_format)
         for asset in assets:
@@ -213,7 +270,7 @@ class Tests(unittest.TestCase):
         self.assertIsNotNone(item.properties.proj__epsg)
 
     def test_job_by_id(self):
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
         status: StatusInfo = self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         status2: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
@@ -221,7 +278,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(status2.processID, "ingest")
 
     def test_get_jobs_by_resource_id(self):
-        url = "/inputs/DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+        url = os.path.join(LOCAL_ROOT, DIMAP)
         item_id = "148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71"
         status: StatusInfo = self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
         resource_status: list = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs/resources", status.resourceID])).content)

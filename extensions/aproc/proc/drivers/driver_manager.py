@@ -51,6 +51,7 @@ class DriverManager():
         if exclude_drivers and len(exclude_drivers) > 0:
             LOGGER.debug("exclude {}".format(exclude_drivers))
             drivers = list(filter(lambda driver_class: driver_class.name not in exclude_drivers, drivers))
+        LOGGER.debug("resource: {}".format(resource))
         for driver_class in drivers:
             try:
                 LOGGER.debug("Test if driver {} supports the resource".format(driver_class.name))

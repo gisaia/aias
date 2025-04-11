@@ -235,9 +235,8 @@ class Driver(IngestDriver):
 
     def __check_path__(self, path: str):
         self.__init__()
-
         for f in AccessManager.listdir(path):
-            self.tif_path = os.path.join(path, f)
+            self.tif_path = f.path
             if AccessManager.is_file(self.tif_path) and self.tif_path.lower().endswith((".tif", ".tiff")):
                 tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
                 if AccessManager.exists(tfw_path):

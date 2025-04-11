@@ -27,12 +27,7 @@ async def files(path_request: PathRequest):
     file_path = path_request.path
     __check_file_path__(file_path)
     if AccessManager.is_dir(file_path):
-        files: list[str] = AccessManager.listdir(file_path)
-        return list(map(lambda f: File(name=f, path=os.path.join(file_path, f),
-                                       is_dir=AccessManager.is_dir(os.path.join(file_path, f)),
-                                       last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(os.path.join(file_path, f))),
-                                       creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(os.path.join(file_path, f)))),
-                        filter(lambda f: not os.path.basename(f).startswith("."), files)))
+        return list(filter(lambda f: not os.path.basename(f.name).startswith("."), AccessManager.listdir(file_path)))
     else:
         f = os.path.basename(file_path)
         return [File(name=f, path=file_path, is_dir=False,

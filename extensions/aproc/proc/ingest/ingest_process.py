@@ -112,8 +112,10 @@ class AprocProcess(Process):
             object: an dict pointing towards the registered item (OutputIngestProcess)
         """
         if not AccessManager.exists(url):
-            msg = "File or directory {} not found".format(url)
-            LOGGER.warning(msg)
+            msg = "File or directory {} not found in configured storages".format(url)
+            LOGGER.error(msg)
+            raise DriverException(msg)
+
         driver: IngestDriver = DriverManager.solve(summary.id, url, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         if driver is not None:
             try:

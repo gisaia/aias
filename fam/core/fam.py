@@ -27,7 +27,7 @@ class Fam():
             if AccessManager.is_dir(path):
                 archives: list[Archive] = []
                 for file in AccessManager.listdir(path):
-                    sub_archives = Fam.list_archives(os.path.join(path, file), size=size, max_size=max_size)
+                    sub_archives = Fam.list_archives(file.path, size=size, max_size=max_size)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives
                 return archives

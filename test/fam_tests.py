@@ -19,11 +19,11 @@ class Tests(unittest.TestCase):
         print(r.content)
         root: File = File(**r.json())
         r = requests.post(url=os.path.join(FAM_URL, "files"), data=PathRequest(path=os.path.join(root.path, "a_file_that_does_not_exist")).model_dump_json(), headers={"Content-Type": "application/json"})
-        self.assertEquals(r.status_code, status.HTTP_404_NOT_FOUND, r.content)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND, r.content)
 
     def test_dot_dot_not_authorized(self):
         r = requests.post(url=os.path.join(FAM_URL, "files"), data=PathRequest(path="toto/../titi").model_dump_json(exclude_none=True, exclude_unset=True), headers={"Content-Type": "application/json"})
-        self.assertEquals(r.status_code, status.HTTP_400_BAD_REQUEST, r.content)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST, r.content)
 
     def test_directory(self):
         r = requests.get(url=os.path.join(FAM_URL, "root"))
@@ -38,13 +38,13 @@ class Tests(unittest.TestCase):
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         archive = Archive(**(json.loads(r.content)[0]))
         print(archive.model_dump_json(exclude_none=True, exclude_unset=True))
-        self.assertEquals(archive.name, "IMG_SPOT6_MS_001_A")
-        self.assertEquals(archive.path, os.path.join(root.path, "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A"))
-        self.assertEquals(archive.is_dir, True)
+        self.assertEqual(archive.name, "IMG_SPOT6_MS_001_A")
+        self.assertEqual(archive.path, os.path.join(root.path, "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A"))
+        self.assertTrue(archive.is_dir)
         # To test FAM with Google Storage
-        # self.assertEquals(archive.id, "fa188f569e0470937befa4bf13cfd2ee26332cba56dda909d433ea3be6192717")
-        self.assertEquals(archive.id, "3c3207184afc7982192f8185bbbd78b98705c4b46307d786107ea3715d47c900")
-        self.assertEquals(archive.driver_name, "dimap")
+        # self.assertEqual(archive.id, "fa188f569e0470937befa4bf13cfd2ee26332cba56dda909d433ea3be6192717")
+        self.assertEqual(archive.id, "3c3207184afc7982192f8185bbbd78b98705c4b46307d786107ea3715d47c900")
+        self.assertEqual(archive.driver_name, "dimap")
 
 
 if __name__ == '__main__':

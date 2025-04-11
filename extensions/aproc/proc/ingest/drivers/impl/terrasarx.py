@@ -156,20 +156,19 @@ class Driver(IngestDriver):
         self.__init__()
         if AccessManager.is_dir(path):
             for f in AccessManager.listdir(path):
-                if f.endswith(".xml"):
-                    self.met_path = os.path.join(path, f)
+                if f.name.endswith(".xml"):
+                    self.met_path = f.path
                     for folder in AccessManager.listdir(path):
-                        # check if current folder is a folder
-                        if AccessManager.is_dir(os.path.join(path, folder)):
-                            if folder == "PREVIEW":
-                                self.browse_path = os.path.join(path, folder, "BROWSE.tif")
-                            if folder == "IMAGEDATA":
-                                for file in AccessManager.listdir(os.path.join(path, folder)):
-                                    if file.endswith(".tif"):
-                                        self.tif_path = os.path.join(path, folder, file)
-                                        tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
-                                        if AccessManager.exists(tfw_path):
-                                            self.tfw_path = tfw_path
+                        if folder.is_dir:
+                            if folder.name == "PREVIEW":
+                                self.browse_path = os.path.join(folder.path, "BROWSE.tif")
+                            if folder.name == "IMAGEDATA":
+                                for file in AccessManager.listdir(folder.path):
+                                    if file.name.endswith(".tif"):
+                                        self.tif_path = file.path
+                                    if file.name.endswith(".tfw"):
+                                        self.tfw_path = file.path
+
                     return self.met_path is not None and self.tif_path is not None and self.browse_path is not None
         return False
 

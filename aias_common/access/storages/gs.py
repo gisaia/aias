@@ -1,17 +1,16 @@
 import enum
 import json
+import os
 import tempfile
 from typing import Literal
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from google.cloud.storage import Client
 from google.oauth2 import service_account
 from pydantic import BaseModel, Field, computed_field
 
-from aproc.core.logger import Logger
+from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
-
-LOGGER = Logger.logger
 
 
 class GoogleStorageConstants(str, enum.Enum):
@@ -119,37 +118,37 @@ class GoogleStorage(AbstractStorage):
 
         blob.download_to_filename(dst)
 
-    def is_file(self, href: str):
-        prefix = urlparse(href).path.removeprefix("/")
-        files, dirs = self.__list_blobs(prefix=prefix)
-
-        return len(files) > 0 and files[0] == prefix and len(dirs) == 0
-
-    def __list_blobs(self, prefix: str) -> tuple[list[str], list[str]]:
+    def __list_blobs(self, source: str) -> list[File]:
         """
         Return a list of files contained in the specified folder, as well as subfolders
         """
-        # If requesting the root folder, prefix needs to be empty
-        if prefix == "/":
-            prefix = ""
-        blobs = self.__get_bucket().list_blobs(prefix=prefix, delimiter="/")
-        return list(map(lambda b: b.name, blobs)), list(blobs.prefixes)
+        url = urlparse(source)
+        blobs = self.__get_bucket().list_blobs(prefix=url.path.removeprefix("/"), delimiter="/")
+        files = list(map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs))
+        dirs = list(map(lambda b: File(name=os.path.basename(b.removesuffix("/")), path=self.__update_url__(source=source, path=b).removesuffix("/") + "/", is_dir=True), blobs.prefixes))
+        return files + dirs
+
+    def __update_url__(self, source: str, path: str):
+        url = urlparse(source)
+        components = list(url[:])
+        if len(components) == 5:
+            components.append('')
+        components[2] = path
+        return urlunparse(tuple(components))
+
+    def is_file(self, href: str):
+        files = self.__list_blobs(href)
+        return len(list(filter(lambda f: f.path == href and not f.is_dir, files))) == 1
 
     def is_dir(self, href: str):
-        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        files, dirs = self.__list_blobs(prefix)
-
-        return len(files) > 0 or len(dirs) > 0
+        files = self.__list_blobs(href)
+        return len(list(filter(lambda f: os.path.dirname(f.path).removesuffix("/") == href.removesuffix("/") and (f.is_dir or os.path.basename(f.path)), files))) > 0
 
     def get_file_size(self, href: str):
         return self.__get_blob(href).size
 
-    def listdir(self, href: str):
-        prefix = urlparse(href).path.removeprefix("/").removesuffix("/") + "/"
-        files, dirs = self.__list_blobs(prefix)
-
-        return list(map(lambda b: b.split(prefix)[1], files)) + \
-            list(map(lambda b: b.split(prefix)[1].strip("/"), dirs))
+    def listdir(self, href: str) -> list[File]:
+        return self.__list_blobs(href.removesuffix("/") + "/")
 
     def get_last_modification_time(self, href: str):
         blob = self.__get_blob(href)
@@ -167,7 +166,7 @@ class GoogleStorage(AbstractStorage):
 
     def makedir(self, href: str, strict=False):
         if strict:
-            raise NotImplementedError("It is not possible to create the folder on Google Storage")
+            raise PermissionError("Creating a folder on a remote storage is not permitted")
 
     def clean(self, href: str):
-        raise NotImplementedError("It is not possible to delete a file on Google Storage")
+        raise PermissionError("Deleting files on a remote storage is not permitted")
