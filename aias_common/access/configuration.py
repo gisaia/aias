@@ -13,12 +13,12 @@ class AccessType(enum.Enum):
 
 class StorageConfiguration(BaseModel, extra='allow'):
     type: str = Field(title='Type of storage used')
-    is_local: bool = False
+    is_local: bool
 
 
 class FileStorageConfiguration(StorageConfiguration):
     type: Literal["file"] = "file"
-    is_local: bool = True
+    is_local: Literal[True] = True
     writable_paths: list[str] = Field(default=[])
     readable_paths: list[str] = Field(default=[])
 
