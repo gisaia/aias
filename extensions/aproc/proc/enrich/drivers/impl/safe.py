@@ -82,7 +82,7 @@ class Driver(EnrichDriver):
 
         # With GS, it has been observed that performances for extracting a file directly from the zip remotely
         # Is far more slower than downloading the whole archive and then unzipping
-        if storage.type == "gs" or AccessManager.is_download_required(href):
+        if storage.get_configuration().type == "gs" or AccessManager.is_download_required(href):
             # Create tmp file where data will be downloaded
             tmp_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
 
