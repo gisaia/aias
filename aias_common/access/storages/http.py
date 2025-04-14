@@ -1,8 +1,5 @@
 import time
-from typing import Literal
 from urllib.parse import urlparse
-
-from pydantic import Field
 
 from aias_common.access.configuration import HttpStorageConfiguration
 from aias_common.access.file import File
@@ -16,7 +13,7 @@ class HttpStorage(AbstractStorage):
     def get_configuration(self) -> HttpStorageConfiguration:
         assert isinstance(self.storage_configuration, HttpStorageConfiguration)
         return self.storage_configuration
-    
+
     def get_storage_parameters(self):
         return {"headers": self.get_configuration().headers}
 

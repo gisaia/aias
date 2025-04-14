@@ -156,7 +156,7 @@ class Driver(IngestDriver):
             desired_local_path = []
 
             storage = AccessManager.resolve_storage(self.dim_path)
-            if not storage.is_local:
+            if not storage.get_configuration().is_local:
                 def list_needed_files(node: str):
                     for vertex in root.iter(node):
                         path = vertex.attrib["href"]

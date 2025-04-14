@@ -12,6 +12,15 @@ class AbstractStorage(ABC):
         self.storage_configuration = storage_configuration
 
     @abstractmethod
+    def get_configuration(self) -> AnyStorageConfiguration:
+        """Returns the storage configuration
+
+        Returns:
+            AnyStorageConfiguration: storage configuration
+        """
+    ...
+
+    @abstractmethod
     def get_storage_parameters(self) -> dict:
         """Based on the type of storage and its characteristics, gives storage-specific parameters to use to access data
 
