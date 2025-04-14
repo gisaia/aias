@@ -1,16 +1,24 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Any
 from urllib.parse import urlparse
 
-from pydantic import BaseModel
-
+from aias_common.access.configuration import AnyStorageConfiguration
 from aias_common.access.file import File
 
 
-class AbstractStorage(BaseModel, ABC):
-    type: Any
-    is_local: bool
+class AbstractStorage(ABC):
+
+    def __init__(self, storage_configuration: AnyStorageConfiguration):
+        self.storage_configuration = storage_configuration
+
+    @abstractmethod
+    def get_configuration(self) -> AnyStorageConfiguration:
+        """Returns the storage configuration
+
+        Returns:
+            AnyStorageConfiguration: storage configuration
+        """
+    ...
 
     @abstractmethod
     def get_storage_parameters(self) -> dict:

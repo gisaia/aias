@@ -29,7 +29,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, StatusCode.successful)
+        self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
         # check that the item has the new asset
         item = mapper.item_from_dict(requests.get("/".join([AIRS_URL, "collections", COLLECTION, "items", SENTINEL_2_ID])).json())
