@@ -1,4 +1,6 @@
 FROM python:3.10.17-alpine3.21
+RUN pip3 install --upgrade pip setuptools
+
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
