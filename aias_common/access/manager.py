@@ -5,7 +5,7 @@ from typing import Annotated, Union
 
 from pydantic import Field
 
-from aias_common.access.configuration import AccessManagerSettings, AnyStorageConfiguration, FileStorageConfiguration, GoogleStorageConfiguration, HttpStorageConfiguration, HttpsStorageConfiguration, S3StorageConfiguration
+from aias_common.access.configuration import AccessManagerSettings
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.file import AccessType, FileStorage
@@ -13,7 +13,6 @@ from aias_common.access.storages.gs import GoogleStorage
 from aias_common.access.storages.http import HttpStorage
 from aias_common.access.storages.https import HttpsStorage
 from aias_common.access.storages.s3 import S3Storage
-
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage, S3Storage], Field(discriminator="type")]
 
@@ -123,7 +122,7 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         return storage.storage_configuration.type in ["http", "https"] \
-            and storage.storage_configuration.force_download
+            and storage.get_configuration().force_download
 
     @staticmethod
     @contextmanager

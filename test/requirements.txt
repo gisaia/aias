@@ -2,8 +2,8 @@ boto3==1.24.89
 elasticsearch==8.9.0
 pydantic==2.10.6
 python-dateutil==2.8.2
-fastapi==0.100.0
-python-multipart==0.0.7
+fastapi==0.115.12
+python-multipart==0.0.20
 envyaml==1.10.211231
 requests==2.31.0
 ecs-logging==2.1.0
