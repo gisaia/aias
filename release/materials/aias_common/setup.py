@@ -21,6 +21,7 @@ setuptools.setup(
                 "aias_common.access.storages.gs",
                 "aias_common.access.configuration",
                 "aias_common.access.manager",
+                "aias_common.access.file",
                 "aias_common.logger",
                 "aias_common.rest.exception",
                 "aias_common.rest.healthcheck",
