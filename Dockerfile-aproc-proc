@@ -50,8 +50,6 @@ COPY ./conf $APP_HOME/conf
 COPY ./setup.py $APP_HOME/setup.py
 COPY ./assets $APP_HOME/assets
 
-RUN pip install -e $APP_HOME
-
 RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json" -o $APP_HOME//conf/mapping.json
 RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json" -o $APP_HOME//conf/downloads_mapping.json
 
@@ -60,6 +58,8 @@ ENV ARLASEO_MAPPING_URL=$APP_HOME//conf/mapping.json
 ENV DOWNLOAD_MAPPING_URL=$APP_HOME//conf/downloads_mapping.json
 ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
 WORKDIR $APP_HOME
+
+RUN apt remove curl libcurl4 libcurl3-gnutls --auto-remove -y
 
 #Force one worker to fix ES ingestion
 ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -E -c 1 -n worker@%h  --loglevel=INFO
