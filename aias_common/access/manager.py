@@ -26,7 +26,7 @@ class AccessManager:
 
     @staticmethod
     def init(ams: AccessManagerSettings):
-        LOGGER.info("Initializing APROC storages")
+        LOGGER.info("Initializing storages Access Manager")
         AccessManager.storages = []
 
         for s in ams.storages:
