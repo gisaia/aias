@@ -6,25 +6,27 @@ LABEL io.arlas.aproc-service.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS APROC Service"
 
-RUN apk update && apk add --upgrade libexpat
+RUN apk update && apk add --no-cache --upgrade libexpat \
+    && apk --no-cache add curl
 
-RUN apk --no-cache add curl
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
 
-COPY ./aproc/requirements.txt /app/requirements.txt
-COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
-
+USER 1000
 WORKDIR /app
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r requirements.storage.txt
+COPY --chown=arlasuser:arlasgroup ./aproc/requirements.txt /app/requirements.txt
+COPY --chown=arlasuser:arlasgroup ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
-COPY ./aproc /app/aproc
-COPY ./extensions /app/extensions
-COPY ./airs/core/ /app/airs/core/
-COPY ./aias_common /app/aias_common
-COPY ./conf /app/conf
-COPY ./scripts/aproc/start.sh /app/
-COPY ./conf /app/conf
+RUN pip install --no-cache-dir -r requirements.txt -r requirements.storage.txt
+
+COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
+COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
+COPY --chown=arlasuser:arlasgroup ./airs/core/ /app/airs/core/
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./conf /app/conf
+COPY --chown=arlasuser:arlasgroup ./scripts/aproc/start.sh /app/
+COPY --chown=arlasuser:arlasgroup ./conf /app/conf
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV PYTHONPATH=/app/

@@ -6,7 +6,7 @@ LABEL io.arlas.geodes-stac.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS GEODES STAC Sync"
 
-RUN apk update && apk add --upgrade libexpat \
+RUN apk update && apk add --no-cache --upgrade libexpat \
     && apk --no-cache add curl
 
 RUN addgroup -g 1000 arlasgroup && \

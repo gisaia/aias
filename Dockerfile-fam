@@ -6,7 +6,7 @@ LABEL io.arlas.fam.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS APROC FAM"
 
-RUN apk update && apk add --upgrade libexpat
+RUN apk update && apk add  --no-cache --upgrade libexpat
 
 RUN apk --no-cache add curl
 

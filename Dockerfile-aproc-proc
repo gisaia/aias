@@ -18,7 +18,8 @@ RUN groupadd -g 1000 arlasgroup && useradd -u 1000 -g arlasgroup -m arlasuser
 RUN apt-get install python3.10 -y --no-install-recommends \
     && apt-get install -y --no-install-recommends netcat \
     && apt-get update \
-    && apt-get install -y g++ make libtiff-dev imagemagick
+    && apt-get install -y g++ make libtiff-dev imagemagick \
+    && apt-get clean
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
