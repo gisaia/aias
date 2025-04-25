@@ -137,7 +137,7 @@ services:
     environment:
       - APROC_ENDPOINT_FROM_APROC=$APROC_ENDPOINT_FROM_APROC
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
-      - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
+      - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs

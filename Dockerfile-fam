@@ -10,25 +10,27 @@ RUN apk update && apk add --upgrade libexpat
 
 RUN apk --no-cache add curl
 
-COPY ./fam/requirements.txt /app/requirements.txt
-COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
-
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
 WORKDIR /app
 
-RUN pip install -r requirements.txt
-RUN pip install -r requirements.storage.txt
+COPY --chown=arlasuser:arlasgroup ./fam/requirements.txt /app/requirements.txt
+COPY --chown=arlasuser:arlasgroup ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
-COPY ./aproc /app/aproc
-COPY ./extensions /app/extensions
-COPY ./fam /app/fam
-COPY ./airs/core/models /app/airs/core/models
-COPY ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
-COPY ./aias_common /app/aias_common
-COPY ./conf/fam.yaml /app/conf/
-COPY ./conf/drivers.yaml /app/conf/
-COPY ./conf/aproc.yaml /app/conf/
+RUN pip install --no-cache-dir -r requirements.txt -r requirements.storage.txt
 
-COPY ./scripts/fam/start.sh /app/
+COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
+COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
+COPY --chown=arlasuser:arlasgroup ./fam /app/fam
+COPY --chown=arlasuser:arlasgroup ./airs/core/models /app/airs/core/models
+COPY --chown=arlasuser:arlasgroup ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./conf/fam.yaml /app/conf/
+COPY --chown=arlasuser:arlasgroup ./conf/drivers.yaml /app/conf/
+COPY --chown=arlasuser:arlasgroup ./conf/aproc.yaml /app/conf/
+
+COPY --chown=arlasuser:arlasgroup ./scripts/fam/start.sh /app/
 
 EXPOSE 8005
 

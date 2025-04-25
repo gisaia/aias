@@ -15,21 +15,19 @@ COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
 WORKDIR /app
 
-RUN pip install -r requirements.txt
-RUN pip install -r requirements.storage.txt
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.storage.txt
 
-ENV APP_HOME=/app
+COPY ./aproc /app/aproc
+COPY ./extensions /app/extensions
+COPY ./airs/core/ /app/airs/core/
+COPY ./aias_common /app/aias_common
+COPY ./conf /app/conf
+COPY ./scripts/aproc/start.sh /app/
+COPY ./conf /app/conf
 
-COPY ./aproc $APP_HOME/aproc
-COPY ./extensions $APP_HOME/extensions
-COPY ./airs/core/ $APP_HOME/airs/core/
-COPY ./aias_common $APP_HOME/aias_common
-COPY ./conf $APP_HOME/conf
-COPY ./scripts/aproc/start.sh $APP_HOME/
-COPY ./conf $APP_HOME/conf
-
-ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
-ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
+ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
+ENV PYTHONPATH=/app/
 
 EXPOSE 8001
 ENTRYPOINT ["./start.sh"]
