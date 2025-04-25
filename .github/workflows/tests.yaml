@@ -11,7 +11,7 @@ jobs:
       - name: Run Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: "Dockerfile*"
+          dockerfile: "Dockerfile-airs"
 
 
   dockle:
@@ -29,8 +29,20 @@ jobs:
           curl -L -o dockle https://github.com/goodwithtech/dockle/releases/download/v${VERSION}/dockle_${VERSION}_Linux-64bit
           chmod +x dockle
 
-      - name: Run Dockle
-        run: ./release/quality.sh tests
+      - name: Run Dockle agate
+        run: ./dockle --exit-level WARN -af settings.py gisaia/agate:tests
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py gisaia/airs:tests
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py gisaia/fam:tests      
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py -i CIS-DI-0009 -i DKL-DI-0005 gisaia/aproc-proc:tests
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py gisaia/aproc-service:tests
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py --accept-key KEY_SHA512 gisaia/arlas-fam-wui:tests
+      - name: Run Dockle agate
+        run: ./dockle -af settings.py gisaia/stac-geodes:tests
 
   aias-tests:
     runs-on: ubuntu-latest
