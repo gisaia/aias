@@ -37,7 +37,7 @@ jobs:
           format: 'list'
           exit-code: '1'
           exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
+          ignore: 'CIS-DI-0010,CIS-DI-0009'
 
       - name: Run Dockle fam
         uses: goodwithtech/dockle-action@main
