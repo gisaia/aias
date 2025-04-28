@@ -10,8 +10,7 @@ fi
 
 rm -rf ./outbox
 mkdir outbox
-chown -R 1000:1000 outbox
-
+chmod -R 777 outbox
 # Start  minio
 
 export BUCKET_NAME=$AIRS_S3_BUCKET
