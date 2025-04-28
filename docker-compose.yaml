@@ -134,7 +134,6 @@ services:
     platform: linux/amd64
     #command: tail -f /dev/null
     container_name: 'aproc-processes'
-    user: arlasuser
     environment:
       - APROC_ENDPOINT_FROM_APROC=$APROC_ENDPOINT_FROM_APROC
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH

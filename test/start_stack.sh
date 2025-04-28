@@ -10,6 +10,7 @@ fi
 
 rm -rf ./outbox
 mkdir outbox
+chown -R 1000:1000 outbox
 
 # Start  minio
 
