@@ -7,8 +7,6 @@ LABEL io.arlas.agate.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS AGATE"
 
-RUN apk update && apk add --no-cache --upgrade libexpat
-
 RUN addgroup -g 1000 arlasgroup && \
     adduser -D -u 1000 -G arlasgroup arlasuser
 USER 1000

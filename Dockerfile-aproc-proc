@@ -34,7 +34,8 @@ RUN /bin/bash -c "source ~/.bashrc"
 
 WORKDIR /app
 
-COPY ./aproc/requirements.txt \
+COPY --chown=arlasuser:arlasgroup \
+    ./aproc/requirements.txt \
     ./extensions/requirements.ext.txt \
     ./extensions/requirements.storage.txt \
     /app/
