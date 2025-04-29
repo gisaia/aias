@@ -7,18 +7,19 @@ LABEL io.arlas.agate.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS AGATE"
 
-RUN apk update && apk add --upgrade libexpat
-
-COPY ./agate/requirements.txt /app/requirements.txt
-
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+COPY --chown=arlasuser:arlasgroup ./agate/requirements.txt /app/requirements.txt
 
-COPY ./agate /app/agate
-COPY ./aias_common /app/aias_common
-COPY ./conf/agate.yaml /app/conf/
-COPY ./scripts/agate/start.sh /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=arlasuser:arlasgroup ./agate /app/agate
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./conf/agate.yaml /app/conf/
+COPY --chown=arlasuser:arlasgroup ./scripts/agate/start.sh /app/
 
 EXPOSE 8004
 ENTRYPOINT ["./start.sh"]

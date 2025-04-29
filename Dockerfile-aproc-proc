@@ -8,58 +8,57 @@ LABEL description="This container serves ARLAS APROC Processing"
 
 WORKDIR /usr/src
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# do not run as root ...
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/worker
-RUN mkdir -p $HOME && \
-    addgroup --system app && adduser --system app --ingroup app && \
-    mkdir $APP_HOME
-WORKDIR $HOME
+RUN groupadd -g 1000 arlasgroup && useradd -u 1000 -g arlasgroup -m arlasuser
 
-COPY ./aproc/requirements.txt $APP_HOME/requirements.txt
-COPY ./extensions/requirements.txt $APP_HOME/requirements-ext.txt
-COPY ./extensions/requirements.storage.txt $APP_HOME/requirements.storage.txt
+# Install python 3.10 and all
 
-# Install python 3.10
-RUN apt install python3.10 -y
+RUN apt-get install python3.10 -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends netcat \
+    && apt-get update \
+    && apt-get install -y g++ make libtiff-dev imagemagick \
+    && apt-get clean
 
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+
+RUN pip install --no-cache-dir celery==5.3.1
+
+USER 1000
 # Make python 3.10 the default
 RUN echo "alias python=python3.10" >> ~/.bashrc
 RUN echo "alias python3=python3.10" >> ~/.bashrc
 RUN export PATH=${PATH}:/usr/bin/python3.10
 RUN /bin/bash -c "source ~/.bashrc"
 
-# Install pip
-RUN apt install -y --no-install-recommends netcat
-RUN apt-get update
-# imagemagick to make gifs
-RUN apt-get install -y g++ make libtiff-dev imagemagick
+WORKDIR /app
 
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
-RUN pip install -r $APP_HOME/requirements.txt
-RUN pip install -r $APP_HOME/requirements-ext.txt
+COPY --chown=arlasuser:arlasgroup \
+    ./aproc/requirements.txt \
+    ./extensions/requirements.ext.txt \
+    ./extensions/requirements.storage.txt \
+    /app/
 
-COPY ./aproc $APP_HOME/aproc
-COPY ./extensions $APP_HOME/extensions
-COPY ./airs/core/ $APP_HOME/airs/core/
-COPY ./aias_common $APP_HOME/aias_common
-COPY ./conf $APP_HOME/conf
-COPY ./setup.py $APP_HOME/setup.py
-COPY ./assets $APP_HOME/assets
+RUN pip install --no-cache-dir \
+    -r /app/requirements.txt \
+    -r /app/requirements.ext.txt \
+    -r /app/requirements.storage.txt
 
-RUN pip install -e $APP_HOME
+COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
+COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./conf /app/conf
+COPY --chown=arlasuser:arlasgroup ./assets /app/assets
+COPY --chown=arlasuser:arlasgroup ./airs/core /app/airs/core
 
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json" -o $APP_HOME//conf/mapping.json
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json" -o $APP_HOME//conf/downloads_mapping.json
+ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json /app/conf/mapping.json
+ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json /app/conf/downloads_mapping.json
 
-ENV APROC_CONFIGURATION_FILE=$APP_HOME/conf/aproc.yaml
-ENV ARLASEO_MAPPING_URL=$APP_HOME//conf/mapping.json
-ENV DOWNLOAD_MAPPING_URL=$APP_HOME//conf/downloads_mapping.json
-ENV PYTHONPATH=PYTHONPATH=$PYTHONPATH:$APP_HOME
-WORKDIR $APP_HOME
+ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
+ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json
+ENV DOWNLOAD_MAPPING_URL=/app/conf/downloads_mapping.json
+ENV PYTHONPATH=/app
 
 #Force one worker to fix ES ingestion
 ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -E -c 1 -n worker@%h  --loglevel=INFO

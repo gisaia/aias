@@ -137,7 +137,7 @@ services:
     environment:
       - APROC_ENDPOINT_FROM_APROC=$APROC_ENDPOINT_FROM_APROC
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
-      - APROC_CONFIGURATION_FILE=/home/app/worker/conf/aproc.yaml
+      - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
@@ -168,7 +168,7 @@ services:
       - APROC_LOGGER_LEVEL=${APROC_LOGGER_LEVEL:-INFO}
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
       - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT:-3}
-      - TMP_FOLDER=${TMP_FOLDER:-/outbox}
+      - TMP_FOLDER=${TMP_FOLDER:-/tmp/aias}
       - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://minio:9000}
       - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}
       - DOWNLOAD_S3_ACCESS_KEY_ID=${DOWNLOAD_S3_ACCESS_KEY_ID:-airs}
@@ -185,7 +185,7 @@ services:
       - APROC_INPUT_STORAGE_FORCE_DOWNLOAD=${APROC_INPUT_STORAGE_FORCE_DOWNLOAD}
     volumes:
       - ./test/inputs:/inputs:ro
-      - ./outbox/:/outbox
+      - ./outbox/:/outbox:wr
     depends_on:
       redis:
           condition: service_healthy

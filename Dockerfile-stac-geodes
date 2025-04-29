@@ -6,18 +6,19 @@ LABEL io.arlas.geodes-stac.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS GEODES STAC Sync"
 
-RUN apk update && apk add --upgrade libexpat
-RUN apk --no-cache add curl
-COPY requirements-stac.txt /app/requirements.txt
+RUN apk update && apk --no-cache add curl
 
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
 WORKDIR /app
+COPY --chown=arlasuser:arlasgroup requirements-stac.txt /app/requirements.txt
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY stac /app/stac
-COPY ./airs /app/airs
-COPY ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup stac /app/stac
+COPY --chown=arlasuser:arlasgroup ./airs /app/airs
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
 
 ENV PYTHONPATH=/app
-
 ENTRYPOINT ["python3.10", "-m", "stac.geodes_sync"]

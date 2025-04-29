@@ -46,7 +46,7 @@ class Tests(unittest.TestCase):
             sleep(1)
             i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, expected)
+        self.assertEqual(status.status, expected, status.model_dump_json())
         return status
 
     def ingest_directory(self, url, collection, catalog):

@@ -6,23 +6,24 @@ LABEL io.arlas.airs.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS AIRS"
 
-RUN apk update && apk add --upgrade libexpat
+RUN apk update && apk add --no-cache curl
 
-RUN apk --no-cache add curl
-
-COPY ./airs/requirements.txt /app/requirements.txt
-
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+COPY --chown=arlasuser:arlasgroup ./airs/requirements.txt /app/requirements.txt
 
-COPY ./airs /app/airs
-COPY ./aias_common /app/aias_common
-COPY ./conf /app/conf
-COPY ./scripts/airs/start.sh /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json" -o ./conf/mapping.json
-RUN curl "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json" -o ./conf/collection.json
+COPY --chown=arlasuser:arlasgroup ./airs /app/airs
+COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./conf /app/conf
+COPY --chown=arlasuser:arlasgroup ./scripts/airs/start.sh /app/
+
+ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json /app/conf/mapping.json
+ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json /app/conf/downloads_mapping.json
 
 EXPOSE 8000
 ENTRYPOINT ["./start.sh"]

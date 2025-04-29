@@ -27,7 +27,7 @@ LABEL io.arlas.wui-fam.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves the FAM-wui app"
 
-RUN apk add --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
+RUN apk add  --no-cache --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
 
 ## Copy our default nginx config
 COPY ./file-explorer/nginx/default.conf /etc/nginx/conf.d/
@@ -39,6 +39,10 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/dist/file-explorer /usr/share/nginx/html
 COPY --from=builder /app/start.sh /usr/share/nginx/
 
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
+
 HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
 
-CMD /usr/share/nginx/start.sh
+ENTRYPOINT ["/usr/share/nginx/start.sh"]
