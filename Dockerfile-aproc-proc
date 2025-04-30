@@ -37,11 +37,11 @@ COPY ./aias_common /app/aias_common
 COPY ./conf /app/conf
 COPY ./assets /app/assets
 COPY ./airs/core /app/airs/core
+COPY ./scripts/aproc-proc/start.sh /app/
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json
 ENV DOWNLOAD_MAPPING_URL=/app/conf/downloads_mapping.json
 ENV PYTHONPATH=/app
 
-#Force one worker to fix ES ingestion
-ENTRYPOINT celery -A aproc.core.processes.processes:APROC_CELERY_APP worker -E -c 1 -n worker@%h  --loglevel=INFO
+ENTRYPOINT ["./start.sh"]

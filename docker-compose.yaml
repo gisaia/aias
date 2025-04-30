@@ -83,7 +83,7 @@ services:
     build:
       context: '.'
       dockerfile: Dockerfile-airs
-    image: airs-server:latest
+#    image: airs-server:latest
     container_name: 'airs-server'
     depends_on:
       elasticsearch:
@@ -130,7 +130,7 @@ services:
     build:
       context: '.'
       dockerfile: Dockerfile-aproc-proc
-    image: aproc-processes:latest
+#    image: aproc-processes:latest
     platform: linux/amd64
     #command: tail -f /dev/null
     container_name: 'aproc-processes'
@@ -198,7 +198,7 @@ services:
     build:
       context: '.'
       dockerfile: Dockerfile-aproc-service
-    image: aproc-service:latest
+#    image: aproc-service:latest
     container_name: 'aproc-service'
     depends_on:
       elasticsearch:
@@ -270,7 +270,7 @@ services:
     build:
       context: '.'
       dockerfile: Dockerfile-fam
-    image: fam:latest
+#    image: fam:latest
     container_name: 'fam-service'
     environment:
       - INGESTED_FOLDER=/inputs
@@ -290,7 +290,7 @@ services:
     build:
       context: '.'
       dockerfile: Dockerfile-fam
-    image: fam:latest
+#    image: fam:latest
     container_name: 'fam-bucket-service'
     environment:
       - INGESTED_FOLDER=gs://gisaia-public/
