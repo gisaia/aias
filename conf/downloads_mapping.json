@@ -1,0 +1,44 @@
+{
+    "mappings": {
+        "properties": {
+            "properties": {
+                "properties": {
+                    "download_datetime": {
+                        "type": "date",
+                        "format": "epoch_second"
+                    },
+                    "id_from_source": {
+                        "type": "keyword",
+                        "copy_to": [
+                            "internal.fulltext",
+                            "internal.autocomplete"
+                        ]
+                    },
+                    "outcome": {
+                        "type": "keyword",
+                        "copy_to": [
+                            "internal.fulltext",
+                            "internal.autocomplete"
+                        ]
+                    },
+                    "reason": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "user": {
+                        "type": "keyword",
+                        "copy_to": [
+                            "internal.fulltext",
+                            "internal.autocomplete"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

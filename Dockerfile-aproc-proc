@@ -52,9 +52,6 @@ COPY --chown=arlasuser:arlasgroup ./conf /app/conf
 COPY --chown=arlasuser:arlasgroup ./assets /app/assets
 COPY --chown=arlasuser:arlasgroup ./airs/core /app/airs/core
 
-ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json /app/conf/mapping.json
-ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json /app/conf/downloads_mapping.json
-
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json
 ENV DOWNLOAD_MAPPING_URL=/app/conf/downloads_mapping.json
