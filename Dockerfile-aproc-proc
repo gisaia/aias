@@ -14,13 +14,10 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update --no-install-recommends \
     && apt-get install -y g++ make libtiff-dev imagemagick \
     && apt-get install -y python3.12-venv \
-    && apt-get clean
-
-RUN apt-get remove -y --auto-remove curl
-
+    && apt-get clean \
+    && apt-get remove -y --auto-remove curl
 
 USER 1000
-
 WORKDIR /app
 
 COPY ./aproc/requirements.txt \

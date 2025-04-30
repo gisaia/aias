@@ -1,6 +1,4 @@
-FROM python:3.10.17-alpine3.21
-RUN pip3 install --upgrade pip setuptools
-
+FROM python:3.12-alpine3.21
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
@@ -8,7 +6,8 @@ LABEL io.arlas.aproc-service.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS APROC Service"
 
-RUN apk update && apk --no-cache add curl
+RUN apk update \
+    && apk add --no-cache python3 py3-pip
 
 RUN addgroup -g 1000 arlasgroup && \
     adduser -D -u 1000 -G arlasgroup arlasuser
@@ -19,7 +18,10 @@ WORKDIR /app
 COPY --chown=arlasuser:arlasgroup ./aproc/requirements.txt /app/requirements.txt
 COPY --chown=arlasuser:arlasgroup ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
-RUN pip install --no-cache-dir -r requirements.txt -r requirements.storage.txt
+RUN python -m venv aproc \
+    && aproc/bin/pip install --no-cache-dir \
+        -r /app/requirements.txt \
+        -r /app/requirements.storage.txt
 
 COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
 COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
