@@ -11,49 +11,35 @@ WORKDIR /usr/src
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN groupadd -g 1000 arlasgroup && useradd -u 1000 -g arlasgroup -m arlasuser
-
-# Install python 3.10 and all
-
-RUN apt-get install python3.10 -y --no-install-recommends \
-    && apt-get install -y --no-install-recommends netcat \
-    && apt-get update \
+RUN apt-get update --no-install-recommends \
     && apt-get install -y g++ make libtiff-dev imagemagick \
+    && apt-get install -y python3.12-venv \
     && apt-get clean
 
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
-
-RUN pip install --no-cache-dir celery==5.3.1
 RUN apt-get remove -y --auto-remove curl
 
 
-
 USER 1000
-# Make python 3.10 the default
-RUN echo "alias python=python3.10" >> ~/.bashrc
-RUN echo "alias python3=python3.10" >> ~/.bashrc
-RUN export PATH=${PATH}:/usr/bin/python3.10
-RUN /bin/bash -c "source ~/.bashrc"
 
 WORKDIR /app
 
-COPY --chown=arlasuser:arlasgroup \
-    ./aproc/requirements.txt \
+COPY ./aproc/requirements.txt \
     ./extensions/requirements.ext.txt \
     ./extensions/requirements.storage.txt \
     /app/
 
-RUN pip install --no-cache-dir \
+RUN python -m venv aproc
+RUN aproc/bin/pip install --no-cache-dir \
     -r /app/requirements.txt \
     -r /app/requirements.ext.txt \
     -r /app/requirements.storage.txt
 
-COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
-COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
-COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
-COPY --chown=arlasuser:arlasgroup ./conf /app/conf
-COPY --chown=arlasuser:arlasgroup ./assets /app/assets
-COPY --chown=arlasuser:arlasgroup ./airs/core /app/airs/core
+COPY ./aproc /app/aproc
+COPY ./extensions /app/extensions
+COPY ./aias_common /app/aias_common
+COPY ./conf /app/conf
+COPY ./assets /app/assets
+COPY ./airs/core /app/airs/core
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json
