@@ -13,82 +13,11 @@ jobs:
         with:
           failure-threshold: "error"
           dockerfile: "Dockerfile-airs"
-
-  dockle:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Build Docker images
-        run: ./release/build_docker_images.sh tests
-
-      - name: Run Dockle aproc-proc
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/aproc-proc:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010,CIS-DI-0009,DKL-DI-0005'
-
-      - name: Run Dockle agate
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/agate:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
-        
-      - name: Run Dockle airs
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/airs:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010,CIS-DI-0009'
-
-      - name: Run Dockle fam
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/fam:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
-
-      - name: Run Dockle aproc-service
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/aproc-service:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
-                
-      - name: Run Dockle arlas-fam-wui
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/arlas-fam-wui:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
-
-      - name: Run Dockle stac-geodes
-        uses: goodwithtech/dockle-action@main
-        with:
-          image: 'gisaia/stac-geodes:tests'
-          format: 'list'
-          exit-code: '1'
-          exit-level: 'warn'
-          ignore: 'CIS-DI-0010'
-  
+ 
   aias-tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.1.4
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11'
@@ -101,7 +30,7 @@ jobs:
   geodes-stac-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.1.4
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10'

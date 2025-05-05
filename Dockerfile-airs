@@ -1,4 +1,6 @@
 FROM python:3.10.17-alpine3.21
+RUN pip3 install --no-cache-dir --upgrade pip setuptools
+
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
@@ -21,9 +23,6 @@ COPY --chown=arlasuser:arlasgroup ./airs /app/airs
 COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
 COPY --chown=arlasuser:arlasgroup ./conf /app/conf
 COPY --chown=arlasuser:arlasgroup ./scripts/airs/start.sh /app/
-
-ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json /app/conf/mapping.json
-ADD --chown=arlasuser:arlasgroup https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/downloads_mapping.json /app/conf/downloads_mapping.json
 
 EXPOSE 8000
 ENTRYPOINT ["./start.sh"]
