@@ -81,8 +81,8 @@ services:
     networks:
       - aias
     build:
-      context: '../../'
-      dockerfile: docker/Dockerfile-airs
+      context: '.'
+      dockerfile: Dockerfile-airs
 #    image: airs-server:latest
     container_name: 'airs-server'
     depends_on:
@@ -128,8 +128,8 @@ services:
     networks:
       - aias
     build:
-      context: '../../'
-      dockerfile: docker/Dockerfile-aproc-proc
+      context: '.'
+      dockerfile: Dockerfile-aproc-proc
 #    image: aproc-processes:latest
     platform: linux/amd64
     #command: tail -f /dev/null
@@ -184,8 +184,8 @@ services:
       - APROC_INPUT_STORAGE_DOMAIN=${APROC_INPUT_STORAGE_DOMAIN}
       - APROC_INPUT_STORAGE_FORCE_DOWNLOAD=${APROC_INPUT_STORAGE_FORCE_DOWNLOAD}
     volumes:
-      - ${PWD}/test/inputs:/inputs:ro
-      - ${PWD}/outbox/:/outbox:wr
+      - ./test/inputs:/inputs:ro
+      - ./outbox/:/outbox:wr
     depends_on:
       redis:
           condition: service_healthy
@@ -196,8 +196,8 @@ services:
     networks:
       - aias
     build:
-      context: '../../'
-      dockerfile: docker/Dockerfile-aproc-service
+      context: '.'
+      dockerfile: Dockerfile-aproc-service
 #    image: aproc-service:latest
     container_name: 'aproc-service'
     depends_on:
@@ -255,7 +255,7 @@ services:
       - APROC_INPUT_STORAGE_FORCE_DOWNLOAD=${APROC_INPUT_STORAGE_FORCE_DOWNLOAD}
 
     volumes:
-      - ${PWD}/test/inputs:/inputs:ro
+      - ./test/inputs:/inputs:ro
     ports:
       - "8001:8001"
     healthcheck:
@@ -268,8 +268,8 @@ services:
     networks:
       - aias
     build:
-      context: '../../'
-      dockerfile: docker/Dockerfile-fam
+      context: '.'
+      dockerfile: Dockerfile-fam
 #    image: fam:latest
     container_name: 'fam-service'
     environment:
@@ -280,7 +280,7 @@ services:
       - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
     volumes:
-      - ${PWD}/test/inputs:/inputs:ro
+      - ./test/inputs:/inputs:ro
     ports:
       - "8005:8005"
 
@@ -288,8 +288,8 @@ services:
     networks:
       - aias
     build:
-      context: '../../'
-      dockerfile: docker/Dockerfile-fam
+      context: '.'
+      dockerfile: Dockerfile-fam
 #    image: fam:latest
     container_name: 'fam-bucket-service'
     environment:
@@ -300,6 +300,6 @@ services:
       - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
     volumes:
-      - ${PWD}/test/inputs:/inputs:ro
+      - ./test/inputs:/inputs:ro
     ports:
       - "8006:8005"

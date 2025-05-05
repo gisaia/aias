@@ -23,4 +23,4 @@ services:
       exit 0;
       "
     volumes:
-      - ${PWD}/test/inputs:/inputs:ro
+      - ./test/inputs:/inputs:ro

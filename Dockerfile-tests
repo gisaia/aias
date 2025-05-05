@@ -5,11 +5,10 @@ RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl
 
 COPY test/requirements.txt /app/requirements.txt
-COPY ./python/extensions/requirements.storage.txt /app/requirements.storage.txt
+COPY ./extensions/requirements.storage.txt /app/requirements.storage.txt
 
 COPY ./conf/aproc.yaml /app/conf/aproc.yaml
-ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
-ENV PYTHONPATH=/app/python/
+ENV APROC_CONFIGURATION_FILE /app/conf/aproc.yaml
 
 WORKDIR /app
 
