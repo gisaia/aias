@@ -105,7 +105,7 @@ class Tests(unittest.TestCase):
                     ).content
                 )
             )
-        self.assertEqual(status.status, StatusCode.successful)
+        self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         result = json.loads(status.message)
 
         item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"])

@@ -3,7 +3,7 @@ import base64
 # Necessary for the .rio to work
 import rioxarray  # noqa F401
 import xarray as xr
-from matplotlib import cm
+from matplotlib import colormaps
 from PIL import Image
 
 from airs.core.models.model import RGB
@@ -115,7 +115,7 @@ def __create_cmap_overview(datacube: xr.Dataset, preview: dict[str, str],
     data = data[int((xlen-size[1])/2):int((xlen+size[1])/2),
                 int((ylen-size[0])/2):int((ylen+size[0])/2)]
 
-    img = Image.fromarray(cm.get_cmap(cmap)(data, bytes=True))
+    img = Image.fromarray(colormaps.get_cmap(cmap)(data, bytes=True))
     try:
         img.save(preview_path)
     except OSError:

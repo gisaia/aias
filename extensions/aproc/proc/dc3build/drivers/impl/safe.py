@@ -76,7 +76,7 @@ class Driver(DC3Driver):
                     bands = find_raster_files(ab, band_regex, e.dc3__alias)
 
                 # Find the lowest resolution product among those required
-                min_res = np.Inf
+                min_res = np.inf
                 try:
                     with rasterio.Env(**AccessManager.get_rasterio_session(a.href)):
                         for p in bands.values():
@@ -105,7 +105,7 @@ class Driver(DC3Driver):
                     ...
 
                 if len(zarrs) != len(bands):
-                    raise RuntimeError(f"Error while generating the zarr for the bands of {e.dc3__id}")
+                    raise RuntimeError(f"Error while generating the zarr for the bands of {e.dc3__id} (zarr has {len(zarrs)} instead of {len(bands)})")
 
                 # Retrieve the zarr stores as xarray objects that are on a same grid
                 merged_bands: xr.Dataset = None
