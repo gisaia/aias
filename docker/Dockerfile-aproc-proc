@@ -20,9 +20,9 @@ RUN apt-get update --no-install-recommends \
 USER 1000
 WORKDIR /app
 
-COPY ./aproc/requirements.txt \
-    ./extensions/requirements.ext.txt \
-    ./extensions/requirements.storage.txt \
+COPY ./python/aproc/requirements.txt \
+    ./python/extensions/requirements.ext.txt \
+    ./python/extensions/requirements.storage.txt \
     /app/
 
 RUN python -m venv --system-site-packages aproc
@@ -31,13 +31,13 @@ RUN aproc/bin/pip install --no-cache-dir \
     -r /app/requirements.ext.txt \
     -r /app/requirements.storage.txt
 
-COPY ./aproc /app/aproc
-COPY ./extensions /app/extensions
-COPY ./aias_common /app/aias_common
+COPY ./python/aproc /app/aproc
+COPY ./python/extensions /app/extensions
+COPY ./python/aias_common /app/aias_common
 COPY ./conf /app/conf
-COPY ./assets /app/assets
-COPY ./airs/core /app/airs/core
-COPY ./scripts/aproc-proc/start.sh /app/
+COPY ./python/assets /app/assets
+COPY ./python/airs/core /app/airs/core
+COPY ./docker/materials/scripts/aproc-proc/start.sh /app/
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json

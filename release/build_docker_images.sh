@@ -8,7 +8,7 @@ build_docker (){
     # Use only signed images
     export DOCKER_CONTENT_TRUST=1
     echo "Building the image $IMAGE"
-    docker build --build-arg version=${VERSION} --platform "linux/amd64" -f Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
+    docker build --build-arg version=${VERSION} --platform "linux/amd64" -f docker/Dockerfile-${IMAGE} -t gisaia/${IMAGE}:${VERSION} -t gisaia/${IMAGE}:latest .
     
 }
 

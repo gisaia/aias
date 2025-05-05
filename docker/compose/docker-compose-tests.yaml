@@ -48,8 +48,8 @@ services:
     networks:
       - aias
     build:
-      context: '.'
-      dockerfile: Dockerfile-agate
+      context: '../../'
+      dockerfile: docker/Dockerfile-agate
     image: agate:latest
     container_name: 'agate'
     depends_on:
