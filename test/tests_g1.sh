@@ -7,8 +7,6 @@ docker build -f Dockerfile-tests . -t pythontests
 # Set env variable
 . ./test/env.sh
 
-docker network list
-
 echo "run test.aproc_download_tests"
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_download_tests
 
