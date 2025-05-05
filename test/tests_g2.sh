@@ -12,23 +12,15 @@ docker network list
 echo "run test.airs_tests"
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.airs_tests
 
-echo "run test.aproc_ingest_tests"
-docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_ingest_tests
-
-echo "run test.aproc_download_tests"
-docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_download_tests
-
-echo "run test.aproc_enrich_tests"
-docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_enrich_tests
-
 echo "run test.agate_tests"
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.agate_tests
 
 echo "run test.fam_tests"
 docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.fam_tests
 
-echo "run test.aproc_dc3build_tests"
-docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_dc3build_tests
+echo "run test.aproc_ingest_tests"
+docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m test.aproc_ingest_tests
+
 
 # docker run --rm -v `pwd`:/app/  --network aias_aias pythontests python3 -m  test.aproc_ingest_heavyload_tests
 ./test/stop_stack.sh

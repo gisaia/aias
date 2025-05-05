@@ -14,7 +14,7 @@ jobs:
           failure-threshold: "error"
           dockerfile: "Dockerfile-airs"
  
-  aias-tests:
+  aias-tests-g1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -25,7 +25,22 @@ jobs:
       run: |
         pip install -r test/requirements.txt
     - name: Run  tests
-      run: test/tests.sh
+      run: test/tests_g1.sh
+
+
+  aias-tests-g2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Run  tests
+      run: test/tests_g2.sh
+
 
   geodes-stac-test:
     runs-on: ubuntu-latest
