@@ -1,1 +1,4 @@
+CIS-DI-0010
+CIS-DI-0009
 CVE-2025-29087 # sqlite: Integer Overflow in SQLite concat_ws Function / NOT USED
+DKL-DI-0005
