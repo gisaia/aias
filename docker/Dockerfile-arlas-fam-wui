@@ -4,15 +4,15 @@
 FROM node:18.20.5 AS builder
 WORKDIR /app
 
-COPY ./file-explorer/package.json  ./
-COPY ./file-explorer/package-lock.json  ./
+COPY ./angular/file-explorer/package.json  ./
+COPY ./angular/file-explorer/package-lock.json  ./
 
 ## installing necessary libraries
 RUN npm install --ignore-scripts && npm run postinstall
 
-COPY ./file-explorer/scripts/start.sh ./
+COPY ./angular/file-explorer/scripts/start.sh ./
 
-COPY ./file-explorer .
+COPY ./angular/file-explorer .
 
 ## Build the angular app in production mode
 RUN npm run build
@@ -30,7 +30,7 @@ LABEL description="This container serves the FAM-wui app"
 RUN apk add  --no-cache --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
 
 ## Copy our default nginx config
-COPY ./file-explorer/nginx/default.conf /etc/nginx/conf.d/
+COPY ./angular/file-explorer/nginx/default.conf /etc/nginx/conf.d/
 
 ## Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*

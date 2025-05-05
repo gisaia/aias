@@ -12,7 +12,7 @@ fi
 mkdir -p target/airs
 rm -rf target/airs/*
 mkdir -p target/airs/src/airs/core/models
-cp -r airs/core/models/* target/airs/src/airs/core/models
+cp -r python/airs/core/models/* target/airs/src/airs/core/models
 cp -r release/materials/airs/* target/airs/
 sed -i.bak 's/aias_version/\"'$1'\"/' target/airs/setup.py
 

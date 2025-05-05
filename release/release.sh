@@ -25,7 +25,7 @@ cd ../
 
 # Clean target folder
 rm -r target
-export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
+export PYTHONPATH=`pwd`:`pwd`/python/extensions:`pwd`/test
 
 # Generate documentation
 ./mkDocs.sh
@@ -33,8 +33,8 @@ export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
 ./release/publish.sh $VERSION
 
 # FILE EXPLORER
-git add file-explorer/package.json
-git add file-explorer/package-lock.json
+git add angular/file-explorer/package.json
+git add angular/file-explorer/package-lock.json
 # DOCUMENTATION
 git add docs/
 git commit -m "update docs for version "$VERSION
