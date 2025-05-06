@@ -17,7 +17,7 @@ jobs:
   
     - name: Build an image from Dockerfile agate
       run: |
-        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-agate -t gisaia/agate:${{ github.sha }} .
+        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-agate -t gisaia/agate:${{ github.sha }} .
 
     - name: Run Trivy vulnerability scanner on agate
       uses: aquasecurity/trivy-action@master
@@ -50,7 +50,7 @@ jobs:
   
     - name: Build an image from Dockerfile airs
       run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-airs -t gisaia/airs:${{ github.sha }} .
+          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-airs -t gisaia/airs:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on airs
       uses: aquasecurity/trivy-action@master
@@ -83,7 +83,7 @@ jobs:
   
     - name: Build an image from Dockerfile aproc-proc
       run: |
-          docker build --build-arg version=0.0.0 --platform "linux/amd64" -f Dockerfile-aproc-proc -t gisaia/aproc-proc:${{ github.sha }} .
+          docker build --build-arg version=0.0.0 --platform "linux/amd64" -f docker/Dockerfile-aproc-proc -t gisaia/aproc-proc:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on aproc-proc
       uses: aquasecurity/trivy-action@master
@@ -116,7 +116,7 @@ jobs:
   
     - name: Build an image from Dockerfile aproc-service
       run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-aproc-service -t gisaia/aproc-service:${{ github.sha }} .
+          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-aproc-service -t gisaia/aproc-service:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on aproc-service
       uses: aquasecurity/trivy-action@master
@@ -149,7 +149,7 @@ jobs:
   
     - name: Build an image from Dockerfile fam
       run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-fam -t gisaia/fam:${{ github.sha }} .
+          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-fam -t gisaia/fam:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on fam
       uses: aquasecurity/trivy-action@master
@@ -182,7 +182,7 @@ jobs:
   
     - name: Build an image from Dockerfile stac-geodes
       run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-stac-geodes -t gisaia/stac-geodes:${{ github.sha }} .
+          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-stac-geodes -t gisaia/stac-geodes:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on stac-geodes
       uses: aquasecurity/trivy-action@master
@@ -215,7 +215,7 @@ jobs:
   
     - name: Build an image from Dockerfile arlas-fam-wui
       run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-arlas-fam-wui -t gisaia/arlas-fam-wui:${{ github.sha }} .
+          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-arlas-fam-wui -t gisaia/arlas-fam-wui:${{ github.sha }} .
   
     - name: Run Trivy vulnerability scanner on arlas-fam-wui
       uses: aquasecurity/trivy-action@master
