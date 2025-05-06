@@ -5,6 +5,9 @@ on: push
 jobs:
   hadolint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -12,7 +15,7 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           failure-threshold: "error"
-          dockerfile: "docker/Dockerfile-airs"
+          dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
  
   aias-tests-g1:
     runs-on: ubuntu-latest
