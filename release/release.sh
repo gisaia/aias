@@ -15,16 +15,16 @@ send_chat_message(){
     fi
 }
 
-cd file-explorer
+cd angular/file-explorer
 npm --no-git-tag-version version ${VERSION}
-cd ../
+cd -
 
 ./release/build_docker_images.sh $VERSION
 ./release/publish_docker_images.sh $VERSION
 
 
 # Clean target folder
-rm -r target
+rm -rf target
 export PYTHONPATH=`pwd`:`pwd`/python/extensions:`pwd`/test
 
 # Generate documentation
