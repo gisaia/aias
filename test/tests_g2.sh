@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -o errexit
 echo "build docker image for tests"
-docker build -f Dockerfile-tests . -t pythontests
+docker build -f docker/Dockerfile-tests . -t pythontests
 ./test/start_stack.sh
 
 # Set env variable
