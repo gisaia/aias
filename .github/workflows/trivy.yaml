@@ -20,7 +20,7 @@ jobs:
   
     - name: Build an image from Dockerfile ${{ matrix.image_name }}
       run: |
-        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-${{ matrix.image_name }} -t gisaia/agate:${{ github.sha }} .
+        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-${{ matrix.image_name }} -t gisaia/${{ matrix.image_name }}:${{ github.sha }} .
 
     - name: Run Trivy vulnerability scanner on ${{ matrix.image_name }}
       uses: aquasecurity/trivy-action@master
