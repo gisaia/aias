@@ -8,3 +8,4 @@ class File(BaseModel):
     is_dir: bool
     last_modification_date: datetime | None = None
     creation_date: datetime | None = None
+    metadata: dict[str, str] = {}

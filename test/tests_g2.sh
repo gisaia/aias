@@ -2,7 +2,6 @@
 set -o errexit
 echo "build docker image for tests"
 docker build -f docker/Dockerfile-tests . -t pythontests
-./test/start_stack.sh
 
 # Set env variable
 . ./test/env.sh
@@ -16,7 +15,7 @@ echo "run test.agate_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.agate_tests
 
 echo "run test.fam_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_tests
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_bucket_tests
 
 echo "run test.aproc_ingest_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests

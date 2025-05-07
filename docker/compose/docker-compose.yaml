@@ -298,8 +298,7 @@ services:
       - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}
       - FAM_CORS_METHODS=${FAM_CORS_METHODS:-*}
       - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
+      - FAM_LOGGER_LEVEL=${FAM_LOGGER_LEVEL:-INFO}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
-    volumes:
-      - ${PWD}/test/inputs:/inputs:ro
     ports:
       - "8006:8005"

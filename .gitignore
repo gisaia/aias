@@ -15,7 +15,8 @@ venv
 .venv
 outbox
 env_aias/
+.sonarlint/
 
-file-explorer/node_modules
-file-explorer/.angular
-file-explorer/dist
+angular/file-explorer/node_modules
+angular/file-explorer/.angular
+angular/file-explorer/dist
