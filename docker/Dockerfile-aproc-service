@@ -16,20 +16,20 @@ RUN addgroup -g 1000 arlasgroup && \
 USER 1000
 WORKDIR /app
 
-COPY --chown=arlasuser:arlasgroup ./aproc/requirements.txt /app/requirements.txt
-COPY --chown=arlasuser:arlasgroup ./extensions/requirements.storage.txt /app/requirements.storage.txt
+COPY --chown=arlasuser:arlasgroup ./python/aproc/requirements.txt /app/requirements.txt
+COPY --chown=arlasuser:arlasgroup ./python/extensions/requirements.storage.txt /app/requirements.storage.txt
 
 RUN python -m venv aproc \
     && aproc/bin/pip install --no-cache-dir \
         -r /app/requirements.txt \
         -r /app/requirements.storage.txt
 
-COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
-COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
-COPY --chown=arlasuser:arlasgroup ./airs/core/ /app/airs/core/
-COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./python/aproc /app/aproc
+COPY --chown=arlasuser:arlasgroup ./python/extensions /app/extensions
+COPY --chown=arlasuser:arlasgroup ./python/airs/core/ /app/airs/core/
+COPY --chown=arlasuser:arlasgroup ./python/aias_common /app/aias_common
 COPY --chown=arlasuser:arlasgroup ./conf /app/conf
-COPY --chown=arlasuser:arlasgroup ./scripts/aproc/start.sh /app/
+COPY --chown=arlasuser:arlasgroup ./docker/materials/scripts/aproc/start.sh /app/
 COPY --chown=arlasuser:arlasgroup ./conf /app/conf
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml

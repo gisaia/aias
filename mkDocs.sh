@@ -27,6 +27,8 @@ cp -r docs/docs/* target/generated-docs/
 
 pip3.10 install lazydocs
 
+export PYTHONPATH=python
+
 lazydocs \
     aias_common.access.manager \
     aias_common.access.configuration \

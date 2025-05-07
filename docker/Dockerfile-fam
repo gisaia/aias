@@ -17,22 +17,22 @@ RUN addgroup -g 1000 arlasgroup && \
 USER 1000
 WORKDIR /app
 
-COPY --chown=arlasuser:arlasgroup ./fam/requirements.txt /app/requirements.txt
-COPY --chown=arlasuser:arlasgroup ./extensions/requirements.storage.txt /app/requirements.storage.txt
+COPY --chown=arlasuser:arlasgroup ./python/fam/requirements.txt /app/requirements.txt
+COPY --chown=arlasuser:arlasgroup ./python/extensions/requirements.storage.txt /app/requirements.storage.txt
 
 RUN pip install --no-cache-dir -r requirements.txt -r requirements.storage.txt
 
-COPY --chown=arlasuser:arlasgroup ./aproc /app/aproc
-COPY --chown=arlasuser:arlasgroup ./extensions /app/extensions
-COPY --chown=arlasuser:arlasgroup ./fam /app/fam
-COPY --chown=arlasuser:arlasgroup ./airs/core/models /app/airs/core/models
-COPY --chown=arlasuser:arlasgroup ./airs/core/models/__init__.py /app/airs/core/models/__init__.py
-COPY --chown=arlasuser:arlasgroup ./aias_common /app/aias_common
+COPY --chown=arlasuser:arlasgroup ./python/aproc /app/aproc
+COPY --chown=arlasuser:arlasgroup ./python/extensions /app/extensions
+COPY --chown=arlasuser:arlasgroup ./python/fam /app/fam
+COPY --chown=arlasuser:arlasgroup ./python/airs/core/models /app/airs/core/models
+COPY --chown=arlasuser:arlasgroup ./python/airs/core/models/__init__.py /app/airs/core/models/__init__.py
+COPY --chown=arlasuser:arlasgroup ./python/aias_common /app/aias_common
 COPY --chown=arlasuser:arlasgroup ./conf/fam.yaml /app/conf/
 COPY --chown=arlasuser:arlasgroup ./conf/drivers.yaml /app/conf/
 COPY --chown=arlasuser:arlasgroup ./conf/aproc.yaml /app/conf/
 
-COPY --chown=arlasuser:arlasgroup ./scripts/fam/start.sh /app/
+COPY --chown=arlasuser:arlasgroup ./docker/materials/scripts/fam/start.sh /app/
 
 EXPOSE 8005
 

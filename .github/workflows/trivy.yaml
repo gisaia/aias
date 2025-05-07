@@ -8,24 +8,27 @@ on:
     - cron: '15 5 2 * *'
 
 jobs:
-  agate:
-    name: Build and scan agate
+  trivy:
+    name: Build and scan image
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
   
-    - name: Build an image from Dockerfile agate
+    - name: Build an image from Dockerfile ${{ matrix.image_name }}
       run: |
-        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-agate -t gisaia/agate:${{ github.sha }} .
+        docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f docker/Dockerfile-${{ matrix.image_name }} -t gisaia/${{ matrix.image_name }}:${{ github.sha }} .
 
-    - name: Run Trivy vulnerability scanner on agate
+    - name: Run Trivy vulnerability scanner on ${{ matrix.image_name }}
       uses: aquasecurity/trivy-action@master
       env:
         TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
         TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
       with:
-        image-ref: 'docker.io/gisaia/agate:${{ github.sha }}'
+        image-ref: 'docker.io/gisaia/${{ matrix.image_name }}:${{ github.sha }}'
         format: 'table'
         exit-code: '1'
         ignore-unfixed: false
@@ -39,201 +42,4 @@ jobs:
       with:
         webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
         jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS agate'
-
-  airs:
-    name: Build and scan airs
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile airs
-      run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-airs -t gisaia/airs:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on airs
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/airs:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-        scanners: 'vuln'
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS airs'
-
-  aproc-proc:
-    name: Build and scan aproc-proc
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile aproc-proc
-      run: |
-          docker build --build-arg version=0.0.0 --platform "linux/amd64" -f Dockerfile-aproc-proc -t gisaia/aproc-proc:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on aproc-proc
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/aproc-proc:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-        scanners: 'vuln'
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS aproc-proc'
-
-  aproc-service:
-    name: Build and scan aproc-service
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile aproc-service
-      run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-aproc-service -t gisaia/aproc-service:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on aproc-service
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/aproc-service:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-        scanners: 'vuln'
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS aproc-service'
-
-  fam:
-    name: Build and scan fam
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile fam
-      run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-fam -t gisaia/fam:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on fam
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/fam:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-        scanners: 'vuln'
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS fam'
-
-  stac-geodes:
-    name: Build and scan stac-geodes
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile stac-geodes
-      run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-stac-geodes -t gisaia/stac-geodes:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on stac-geodes
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/stac-geodes:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-        scanners: 'vuln'
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on AIAS stac-geodes'
-
-  arlas-fam-wui:
-    name: Build and scan arlas-fam-wui
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-  
-    - name: Build an image from Dockerfile arlas-fam-wui
-      run: |
-          docker build --build-arg version=${{ github.sha }} --platform "linux/amd64" -f Dockerfile-arlas-fam-wui -t gisaia/arlas-fam-wui:${{ github.sha }} .
-  
-    - name: Run Trivy vulnerability scanner on arlas-fam-wui
-      uses: aquasecurity/trivy-action@master
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-      with:
-        image-ref: 'docker.io/gisaia/arlas-fam-wui:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-        trivyignores: .github/workflows/.trivyignore
-    - name: Notify Google Chat
-      if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
-      uses: SimonScholz/google-chat-action@main
-      with:
-        webhookUrl: '${{ secrets.GOOGLE_CHAT_SCAN_CHANEL }}'
-        jobStatus: '${{ job.status }}'
-        title: 'Trivy Scan on ARLAS-fam-wui'
+        title: 'Trivy Scan on AIAS ${{ matrix.image_name }}'
