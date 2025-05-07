@@ -5,6 +5,7 @@ from urllib.parse import urlparse, urlunparse
 from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
+from fastapi_utilities import ttl_lru_cache
 
 
 class S3Storage(AbstractStorage):
@@ -103,6 +104,7 @@ class S3Storage(AbstractStorage):
         except botocore.exceptions.ClientError:
             return False
 
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_objects(self, href: str):
         return self.get_storage_parameters()["client"].list_objects_v2(
             Bucket=self.get_configuration().bucket,

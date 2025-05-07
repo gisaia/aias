@@ -1,14 +1,12 @@
-import json
 import os
-import tempfile
 from urllib.parse import urlparse, urlunparse
-
-from google.cloud.storage import Client
-from google.oauth2 import service_account
 
 from aias_common.access.configuration import GoogleStorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
+from google.cloud.storage import Client
+from google.oauth2 import service_account
+from fastapi_utilities import ttl_lru_cache
 
 
 class GoogleStorage(AbstractStorage):
@@ -71,13 +69,15 @@ class GoogleStorage(AbstractStorage):
 
         blob.download_to_filename(dst)
 
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_blobs(self, source: str) -> list[File]:
         """
         Return a list of files contained in the specified folder, as well as subfolders
         """
         url = urlparse(source)
-        blobs = self.__get_bucket().list_blobs(prefix=url.path.removeprefix("/"), delimiter="/")
-        files = list(map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creattion_date=b.time_created), blobs))
+        path = url.path.removeprefix("/")
+        blobs = self.__get_bucket().list_blobs(prefix=path, delimiter="/")
+        files = list(filter(lambda f: f.path != path and f.name != "", map(lambda b: File(name=os.path.basename(b.name), path=self.__update_url__(source=source, path=b.name), is_dir=False, last_modification_date=b.updated, creation_date=b.time_created), blobs)))
         dirs = list(map(lambda b: File(name=os.path.basename(b.removesuffix("/")), path=self.__update_url__(source=source, path=b).removesuffix("/") + "/", is_dir=True), blobs.prefixes))
         return files + dirs
 

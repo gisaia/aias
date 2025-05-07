@@ -7,6 +7,7 @@ from aias_common.access.file import File
 
 
 class AbstractStorage(ABC):
+    cache_tt = 60 * 5
 
     def __init__(self, storage_configuration: AnyStorageConfiguration):
         self.storage_configuration = storage_configuration

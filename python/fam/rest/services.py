@@ -36,11 +36,11 @@ async def files(path_request: PathRequest):
 
 
 @ROUTER.post("/archives", response_model=list[Archive])
-async def archives(path_request: PathRequest):
+async def archives(path_request: PathRequest, timeout: int = 10):
     path_request.size = min(path_request.size, MAX_SIZE)
     file_path = path_request.path
     __check_file_path__(file_path)
-    return Fam.list_archives(file_path, max_size=path_request.size)
+    return Fam.list_archives(file_path, max_size=path_request.size, timeout_in_seconds=timeout, start_timestamp=datetime.datetime.now().timestamp())
 
 
 def __check_file_path__(file_path: str):

@@ -57,9 +57,12 @@ class FileStorage(AbstractStorage):
         return list(map(lambda f: self.__to_file__(base=href, name=f), os.listdir(href)))
 
     def __to_file__(self, base: str, name: str):
-        path = os.sep.join([base, name])
-        return File(name=name, path=path, is_dir=os.path.isdir(path), last_modification_date=os.path.getmtime(path), creation_date=os.path.getctime(path))
-
+        path = os.sep.join([base.removesuffix("/"), name])
+        f = File(name=name, path=path, is_dir=os.path.isdir(path), last_modification_date=os.path.getmtime(path), creation_date=os.path.getctime(path))
+        if f.is_dir:
+            f.path = f.path.removesuffix("/") + "/"
+        return f
+    
     def get_last_modification_time(self, href: str):
         return os.path.getmtime(href)
 
