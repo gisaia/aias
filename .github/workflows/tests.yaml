@@ -27,7 +27,9 @@ jobs:
     - name: Install test/requirements
       run: |
         pip install -r test/requirements.txt
-    - name: Run  tests
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g1 tests
       run: test/tests_g1.sh
 
 
@@ -41,9 +43,27 @@ jobs:
     - name: Install test/requirements
       run: |
         pip install -r test/requirements.txt
-    - name: Run  tests
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g2 tests
       run: test/tests_g2.sh
+  
 
+  aias-tests-g3:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g3 tests
+      run: test/tests_g3.sh
+  
 
   geodes-stac-test:
     runs-on: ubuntu-latest
