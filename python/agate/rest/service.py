@@ -64,7 +64,8 @@ async def path(request: Request, service: str):
             LOGGER.debug("test against public pattern {}".format(pattern))
             matches = re.finditer(pattern=pattern, string=target)
             for match in matches:
-                return Response(status_code=status.HTTP_202_ACCEPTED)
+                if match.start() == 0:
+                    return Response(status_code=status.HTTP_202_ACCEPTED)
     if not patterns:
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content="Invalid configuration: not pattern configured for {}".format(service))
     for pattern in patterns:
