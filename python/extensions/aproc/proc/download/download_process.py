@@ -3,16 +3,15 @@ import os
 import shutil
 from datetime import datetime
 
-from celery import shared_task
-from pydantic import BaseModel, Field
-
+from aias_common.access.manager import AccessManager
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
-from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
+from aproc.core.models.ogc.process import ProcessDescription, ProcessSummary
 from aproc.core.processes.process import Process
 from aproc.core.settings import Configuration as AprocConfiguration
 from aproc.core.utils import base_model2description
+from celery import shared_task
 from extensions.aproc.proc.download.drivers.download_driver import \
     DownloadDriver
 from extensions.aproc.proc.download.notifications import Notifications
@@ -21,7 +20,8 @@ from extensions.aproc.proc.download.settings import \
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (DriverException,
                                                       RegisterException)
-from extensions.aproc.proc.processes.arlas_services_helper import ARLASServicesHelper
+from extensions.aproc.proc.processes.arlas_services_helper import \
+    ARLASServicesHelper
 from extensions.aproc.proc.processes.process_model import InputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
@@ -31,6 +31,7 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              EVENT_OUTCOME_KEY, EVENT_REASON,
                                              EVENT_TYPE_KEY, USER_ACTION_KEY,
                                              USER_EMAIL_KEY, USER_ID_KEY)
+from pydantic import BaseModel, Field
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -130,9 +131,8 @@ class AprocProcess(Process):
             send_to = "anonymous"
         relative_target_directory = os.path.join(send_to.split("@")[0].replace(".", "_").replace("-", "_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
         target_directory = os.path.join(DownloadConfiguration.settings.outbox_directory, relative_target_directory)
-        if not os.path.exists(target_directory):
-            LOGGER.info("create {}".format(target_directory))
-            os.makedirs(target_directory)
+        LOGGER.info("create {} if not exist".format(target_directory))
+        AccessManager.makedir(target_directory)
         return (target_directory, relative_target_directory)
 
     @staticmethod

@@ -49,7 +49,7 @@ class Driver(IngestDriver):
         if self.browse_path is not None:
             with AccessManager.make_local(self.browse_path) as local_browse_path:
                 thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
-                os.makedirs(thumbnail_path, exist_ok=True)
+                AccessManager.makedir(thumbnail_path)
                 self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
                 geotiff_to_jpg(local_browse_path, 50, 50, self.thumbnail_path)
                 assets.append(Asset(href=self.thumbnail_path,
@@ -57,7 +57,7 @@ class Driver(IngestDriver):
                                     description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
 
                 quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
-                os.makedirs(quicklook_path, exist_ok=True)
+                AccessManager.makedir(quicklook_path)
                 self.quicklook_path = quicklook_path + '/quicklook.jpg'
                 geotiff_to_jpg(local_browse_path, 250, 250, self.quicklook_path)
                 assets.append(Asset(href=self.quicklook_path,
