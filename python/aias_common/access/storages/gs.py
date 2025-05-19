@@ -19,8 +19,8 @@ class GoogleStorage(AbstractStorage):
         if self.get_configuration().is_anon_client:
             client = Client.create_anonymous_client()
         else:
-            credentials = service_account.Credentials.from_service_account_info(self.get_configuration().api_key)
-            client = Client("APROC", credentials=credentials)
+            credentials = service_account.Credentials.from_service_account_info(self.get_configuration().api_key.model_dump())
+            client = Client(project=self.get_configuration().api_key.project_id, credentials=credentials)
 
         return {"client": client}
 

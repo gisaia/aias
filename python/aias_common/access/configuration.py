@@ -29,26 +29,22 @@ class GoogleStorageConstants(str, enum.Enum):
     AUTH_PROVIDER_CERT_URL = "https://www.googleapis.com/oauth2/v1/certs"
 
 
-class GoogleStorageApiKey(StorageConfiguration):
+class GoogleStorageApiKey(BaseModel):
     type: Literal["service_account"] = "service_account"
     project_id: str
     private_key_id: str
     private_key: str
+    client_email: str
     client_id: str | None = Field(None)
-    auth_uri: Literal[GoogleStorageConstants.AUTH_URI] = GoogleStorageConstants.AUTH_URI
-    token_uri: Literal[GoogleStorageConstants.TOKEN_URI] = GoogleStorageConstants.TOKEN_URI
-    auth_provider_x509_cert_url: Literal[GoogleStorageConstants.AUTH_PROVIDER_CERT_URL] = GoogleStorageConstants.AUTH_PROVIDER_CERT_URL
+    auth_uri: Literal[GoogleStorageConstants.AUTH_URI] = GoogleStorageConstants.AUTH_URI.value
+    token_uri: Literal[GoogleStorageConstants.TOKEN_URI] = GoogleStorageConstants.TOKEN_URI.value
+    auth_provider_x509_cert_url: Literal[GoogleStorageConstants.AUTH_PROVIDER_CERT_URL] = GoogleStorageConstants.AUTH_PROVIDER_CERT_URL.value
     universe_domain: Literal["googleapis.com"] = "googleapis.com"
 
     @computed_field
     @property
     def client_x509_cert_url(self) -> str:
         return f"https://www.googleapis.com/robot/v1/metadata/x509/{self.project_id}%40appspot.gserviceaccount.com"
-
-    @computed_field
-    @property
-    def client_email(self) -> str:
-        return f"{self.project_id}@appspot.gserviceaccount.com"
 
 
 class GoogleStorageConfiguration(StorageConfiguration):
