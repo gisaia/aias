@@ -79,7 +79,28 @@ class AccessManager:
         """
         is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
         if not is_authorized:
-            raise ValueError("Destination path is not authorized")
+            raise ValueError(f"Local path '{href}' is not writable")
+
+    @staticmethod
+    def check_local_path_readable(href: str):
+        """
+        Checks that the path is a writable path for at least one of the file storages
+        """
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),
+                                filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
+        if not is_authorized:
+            raise ValueError(f"Local path '{href}' is not readable")
+
+    @staticmethod
+    def push(href: str, dst: str):
+        """
+        Push a file from a local storage to write it in a storage.
+        If the destination storage is local, then it is a copy. Otherwise it is an upload.
+        """
+        storage = AccessManager.resolve_storage(dst)
+        AccessManager.check_local_path_readable(href)
+
+        storage.push(href, dst)
 
     @staticmethod
     def pull(href: str, dst: str):

@@ -34,6 +34,10 @@ class HttpStorage(AbstractStorage):
         super().pull(href, dst)
         requests_get(href, dst, self.get_configuration().headers)
 
+    def push(self, href: str, dst: str):
+        super().push(href, dst)
+        raise NotImplementedError("'push' method is not available for http storage")
+
     def is_file(self, href: str):
         return self.exists(href)
 

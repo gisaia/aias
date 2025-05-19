@@ -43,6 +43,10 @@ class GoogleStorage(AbstractStorage):
         bucket = self.__get_bucket()
         return bucket.get_blob(urlparse(href).path[1:] or "/")
 
+    def __create_blob(self, href: str):
+        bucket = self.__get_bucket()
+        return bucket.blob(href)
+
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
 
@@ -68,6 +72,15 @@ class GoogleStorage(AbstractStorage):
             raise LookupError(f"Can't find {href}")
 
         blob.download_to_filename(dst)
+
+    def push(self, href: str, dst: str):
+        super().push(href, dst)
+
+        blob = self.__create_blob(dst)
+        if blob is None:
+            raise LookupError(f"Can't create blob: {dst}")
+
+        blob.upload_from_filename(href)
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_blobs(self, source: str) -> list[File]:
