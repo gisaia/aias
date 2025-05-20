@@ -2,12 +2,12 @@
 set -o errexit
 [ -z "$1" ] && echo "Please provide the version" && exit 1;
 VERSION=$1
-echo "Build and releas the image with version ${VERSION}"
+echo "Build and release the image with version ${VERSION}"
 
 send_chat_message(){
     MESSAGE=$1
     if [ -z "$GOOGLE_CHAT_RELEASE_CHANEL" ] ; then
-        echo "Environement variable GOOGLE_CHAT_RELEASE_CHANEL is not definied ... skipping message publishing"
+        echo "Environment variable GOOGLE_CHAT_RELEASE_CHANEL is not defined ... skipping message publishing"
     else
         DATA='{"text":"'${MESSAGE}'"}'
         echo $DATA

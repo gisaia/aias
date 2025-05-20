@@ -77,14 +77,15 @@ class AccessManager:
         """
         Checks that the path is a writable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE), filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE),
+                                filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
         if not is_authorized:
             raise ValueError(f"Local path '{href}' is not writable")
 
     @staticmethod
     def check_local_path_readable(href: str):
         """
-        Checks that the path is a writable path for at least one of the file storages
+        Checks that the path is a readable path for at least one of the file storages
         """
         is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),
                                 filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
