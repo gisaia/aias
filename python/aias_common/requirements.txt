@@ -1,6 +1,6 @@
-setuptools
-fastapi_utilities
-ecs_logging
+setuptools==80.4.0
+fastapi_utilities==0.3.1
+ecs_logging==2.2.0
 google-cloud-storage==2.5.0
 pydantic==2.10.6
 requests==2.31.0
