@@ -41,11 +41,11 @@ class GoogleStorage(AbstractStorage):
 
     def __get_blob(self, href: str):
         bucket = self.__get_bucket()
-        return bucket.get_blob(urlparse(href).path[1:] or "/")
+        return bucket.get_blob(urlparse(href).path.lstrip("/") or "/")
 
     def __create_blob(self, href: str):
         bucket = self.__get_bucket()
-        return bucket.blob(href)
+        return bucket.blob(urlparse(href).path.lstrip("/") or "/")
 
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
