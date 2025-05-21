@@ -12,10 +12,10 @@ build_docker (){
     
 }
 
-build_docker agate
-build_docker fam
-build_docker aproc-proc
-build_docker aproc-service
-build_docker airs
-build_docker stac-geodes
-build_docker arlas-fam-wui
+# build_docker agate
+# build_docker fam
+# build_docker aproc-proc
+# build_docker aproc-service
+# build_docker airs
+# build_docker stac-geodes
+ build_docker arlas-fam-wui
