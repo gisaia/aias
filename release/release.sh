@@ -28,7 +28,8 @@ rm -rf target
 export PYTHONPATH=`pwd`:`pwd`/python/extensions:`pwd`/test
 
 # Generate documentation
-./mkDocs.sh
+#./mkDocs.sh
+
 # PYTHON PIP
 ./release/publish.sh $VERSION
 
