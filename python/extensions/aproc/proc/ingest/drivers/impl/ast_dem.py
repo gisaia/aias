@@ -200,36 +200,30 @@ class Driver(IngestDriver):
         if view__sun_elevation:
             view__sun_elevation = float(view__sun_elevation)
 
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
-
-        with AccessManager.make_local(self.tif_path) as local_tif_path:
-            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
-
-            item = Item(
-                id=self.get_item_id(url),
-                geometry=geometry,
-                bbox=bbox,
-                centroid=centroid,
-                properties=Properties(
-                    datetime=date_time,
-                    eo__cloud_cover=eo__cloud_cover,
-                    processing__level=processing__level,
-                    gsd=gsd,
-                    proj__epsg=get_epsg(src_ds),
-                    instrument=instrument,
-                    constellation=constellation,
-                    sensor=sensor,
-                    view__sun_azimuth=view__sun_azimuth,
-                    view__sun_elevation=view__sun_elevation,
-                    item_type=ResourceType.gridded.value,
-                    item_format=ItemFormat.ast_dem.value,
-                    main_asset_format=AssetFormat.geotiff.value,
-                    main_asset_name=Role.data.value,
-                    observation_type=ObservationType.dem.value,
-                ),
-                assets=dict(map(lambda asset: (asset.name, asset), assets)),
-            )
+        item = Item(
+            id=self.get_item_id(url),
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                eo__cloud_cover=eo__cloud_cover,
+                processing__level=processing__level,
+                gsd=gsd,
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.ast_dem.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.dem.value,
+            ),
+            assets=dict(map(lambda asset: (asset.name, asset), assets)),
+        )
 
         return item
 

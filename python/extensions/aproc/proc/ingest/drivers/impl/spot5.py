@@ -73,8 +73,6 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
         setup_gdal()
 
         with AccessManager.make_local(self.dim_path) as local_dim_path:
@@ -91,8 +89,7 @@ class Driver(IngestDriver):
                 gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
             else:
                 gsd = None
-            src_ds = gdal.Open(local_dim_path, GA_ReadOnly)
-            metadata = src_ds.GetMetadata()
+            metadata = AccessManager.get_gdal_md(local_dim_path)
             # We retrieve the time
             date = metadata["IMAGING_DATE"]
             time = metadata["IMAGING_TIME"]
@@ -106,7 +103,7 @@ class Driver(IngestDriver):
                     datetime=date_time,
                     processing__level=metadata.get("PROCESSING_LEVEL"),
                     gsd=gsd,
-                    proj__epsg=get_epsg(src_ds),
+                    proj__epsg=get_epsg(AccessManager.get_gdal_proj(local_dim_path)),
                     instrument=metadata.get("INSTRUMENT"),
                     constellation=metadata.get("MISSION"),
                     sensor=metadata.get("MISSION"),

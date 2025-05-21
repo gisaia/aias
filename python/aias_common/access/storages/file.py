@@ -87,3 +87,9 @@ class FileStorage(AbstractStorage):
                 os.remove(href)  # !DELETE!
         else:
             raise ValueError("The given path is read-only")
+
+    def get_gdal_src(self, href: str):
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+
+        return gdal.Open(href, GA_ReadOnly)

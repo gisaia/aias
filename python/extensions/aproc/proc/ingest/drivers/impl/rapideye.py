@@ -69,8 +69,6 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
         setup_gdal()
         ns = {"gml": "http://www.opengis.net/gml",
               "re": "http://schemas.rapideye.de/products/productMetadataGeocorrected",
@@ -106,35 +104,33 @@ class Driver(IngestDriver):
         gsd_row = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", ns).text)
         gsd = (gsd_col + gsd_row) / 2
 
-        with AccessManager.make_local(self.tif_path) as local_tif_path:
-            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
-            item = Item(
-                id=self.get_item_id(url),
-                geometry=geometry,
-                bbox=bbox,
-                centroid=centroid,
-                properties=Properties(
-                    datetime=date_time,
-                    eo__cloud_cover=eo__cloud_cover,
-                    processing__level=processing__level,
-                    gsd=gsd,
-                    proj__epsg=get_epsg(src_ds),
-                    instrument=instrument,
-                    constellation=constellation,
-                    sensor=sensor,
-                    sensor_type=sensor_type,
-                    view__azimuth=view__azimuth,
-                    view__incidence_angle=view__incidence_angle,
-                    view__sun_azimuth=view__sun_azimuth,
-                    view__sun_elevation=view__sun_elevation,
-                    item_type=ResourceType.gridded.value,
-                    item_format=ItemFormat.rapideye.value,
-                    main_asset_format=AssetFormat.geotiff.value,
-                    main_asset_name=Role.data.value,
-                    observation_type=ObservationType.image.value
-                ),
-                assets=dict(map(lambda asset: (asset.name, asset), assets))
-            )
+        item = Item(
+            id=self.get_item_id(url),
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                eo__cloud_cover=eo__cloud_cover,
+                processing__level=processing__level,
+                gsd=gsd,
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                sensor_type=sensor_type,
+                view__azimuth=view__azimuth,
+                view__incidence_angle=view__incidence_angle,
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.rapideye.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.image.value
+            ),
+            assets=dict(map(lambda asset: (asset.name, asset), assets))
+        )
 
         return item
 

@@ -171,3 +171,12 @@ class AbstractStorage(ABC):
             href(str): The href to delete
         """
         ...
+
+    @abstractmethod
+    def get_gdal_src(self, href: str):
+        """Return the archive's dataset through GDAL's virtual file systems
+
+        Args:
+            href(str): The href to examine
+        """
+        ...
