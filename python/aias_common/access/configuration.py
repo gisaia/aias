@@ -45,7 +45,7 @@ class GoogleStorageApiKey(BaseModel):
     @computed_field
     @property
     def client_x509_cert_url(self) -> str:
-        return f"https://www.googleapis.com/robot/v1/metadata/x509/{self.client_email.replace("@", "%40")}"
+        return f"https://www.googleapis.com/robot/v1/metadata/x509/{self.client_email.replace('@', '%40')}"
 
 
 class GoogleStorageConfiguration(StorageConfiguration):
