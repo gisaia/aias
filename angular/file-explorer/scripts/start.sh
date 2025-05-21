@@ -1,3 +1,5 @@
+#!/bin/sh
+
 fetchSettings(){
   echo "Download settings file from \"${ARLAS_IAM_SETTINGS_URL}\" ..."
   curl ${ARLAS_IAM_SETTINGS_URL} -o /usr/share/nginx/html/settings.yaml && echo "settings.yaml file downloaded with success." || (echo "Failed to download the settings.yaml file."; exit 1)
