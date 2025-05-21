@@ -135,35 +135,31 @@ class Driver(IngestDriver):
         else:
             view__sun_elevation = float(root.find("./IMD/IMAGE/MEANSUNEL").text)
 
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
+        item = Item(
+            id=self.get_item_id(url),
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                processing__level=processing__level,
+                gsd=gsd,
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                instrument=constellation,
+                constellation=constellation,
+                sensor=constellation,
+                view__azimuth=view__azimuth,
+                view__sun_azimuth=view__sun_azimuth,
+                view__sun_elevation=view__sun_elevation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.digitalglobe.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.image.value
+            ),
+            assets=dict(map(lambda asset: (asset.name, asset), assets))
+        )
 
-        with AccessManager.make_local(self.tif_path) as local_tif_path:
-            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
-            item = Item(
-                id=self.get_item_id(url),
-                geometry=geometry,
-                bbox=bbox,
-                centroid=centroid,
-                properties=Properties(
-                    datetime=date_time,
-                    processing__level=processing__level,
-                    gsd=gsd,
-                    proj__epsg=get_epsg(src_ds),
-                    instrument=constellation,
-                    constellation=constellation,
-                    sensor=constellation,
-                    view__azimuth=view__azimuth,
-                    view__sun_azimuth=view__sun_azimuth,
-                    view__sun_elevation=view__sun_elevation,
-                    item_type=ResourceType.gridded.value,
-                    item_format=ItemFormat.digitalglobe.value,
-                    main_asset_format=AssetFormat.geotiff.value,
-                    main_asset_name=Role.data.value,
-                    observation_type=ObservationType.image.value
-                ),
-                assets=dict(map(lambda asset: (asset.name, asset), assets))
-            )
         if eo__cloud_cover != -999000.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
 

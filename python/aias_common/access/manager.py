@@ -263,3 +263,25 @@ class AccessManager:
         """
         storage = AccessManager.resolve_storage(href)
         return storage.dirname(href)
+
+    @staticmethod
+    def get_gdal_src(href: str):
+        """
+        Returns the dataset of an archive through GDAL without pulling the file
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_gdal_src(href)
+
+    @staticmethod
+    def get_gdal_md(href: str):
+        """
+        Returns the metadata of an archive through GDAL without pulling the file
+        """
+        return AccessManager.get_gdal_src(href).GetMetadata()
+
+    @staticmethod
+    def get_gdal_proj(href: str):
+        """
+        Returns the projection of an archive through GDAL without pulling the file
+        """
+        return AccessManager.get_gdal_src(href).GetProjection()

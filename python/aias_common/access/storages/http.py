@@ -61,3 +61,16 @@ class HttpStorage(AbstractStorage):
 
     def clean(self, href: str):
         raise NotImplementedError(f"It is not possible to delete a file with {self.get_configuration().type} protocol")
+
+    def get_gdal_src(self, href: str):
+        import rasterio
+        from osgeo import gdal
+        from osgeo.gdalconst import GA_ReadOnly
+
+        params = {}
+        for (k, v) in self.get_configuration().headers.items():
+            params[f"header.{k}"] = v
+
+        with rasterio.Env(**params):
+            src_ds = gdal.Open("/vsicurl/" + href, GA_ReadOnly)
+        return src_ds

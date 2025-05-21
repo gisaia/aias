@@ -1,4 +1,3 @@
-import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -92,8 +91,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal, ogr, osr
-        from osgeo.gdalconst import GA_ReadOnly
+        from osgeo import ogr, osr
         from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         setup_gdal()
 
@@ -150,33 +148,9 @@ class Driver(IngestDriver):
             geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
                                                               coords[2][0], coords[2][1], coords[3][0], coords[3][1])
 
-            # If we get the archive NOT locally, then we need to retrieve the files referenced and put them in the right spot
-            # In order for GDAL to be able to properly open the dim file
-            files_to_make_local = []
-            desired_local_path = []
-
-            storage = AccessManager.resolve_storage(self.dim_path)
-            if not storage.get_configuration().is_local:
-                def list_needed_files(node: str):
-                    for vertex in root.iter(node):
-                        path = vertex.attrib["href"]
-
-                        dst = os.path.join(AccessManager.tmp_dir, path)
-                        # Makedir to prepare for AccessManager.make_local
-                        AccessManager.makedir(os.path.dirname(dst))
-
-                        files_to_make_local.append(os.path.join(AccessManager.dirname(self.dim_path), path))
-                        desired_local_path.append(dst)
-
-                list_needed_files("COMPONENT_PATH")
-                list_needed_files("DATASET_TN_PATH")
-                list_needed_files("DATASET_QL_PATH")
-                list_needed_files("DATA_FILE_PATH")
-
             # Open the XML dimap file with gdal to retrieve the metadata
-            with AccessManager.make_local_list(files_to_make_local, desired_local_path):
-                src_ds = gdal.Open(local_dim_path, GA_ReadOnly)
-                metadata = src_ds.GetMetadata()
+            metadata = AccessManager.get_gdal_md(self.dim_path)
+
         # We retrieve the time
         if "IMAGING_DATE" in metadata and "IMAGING_TIME" in metadata:
             date = metadata["IMAGING_DATE"]
@@ -216,7 +190,7 @@ class Driver(IngestDriver):
                 processing__level=metadata.get("PROCESSING_LEVEL"),
                 eo__cloud_cover=cloud_cover,
                 gsd=gsd,
-                proj__epsg=get_epsg(src_ds),
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
                 view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
                 view__azimuth=metadata.get("AZIMUTH_ANGLE"),
                 view__sun_azimuth=metadata.get("SUN_AZIMUTH"),

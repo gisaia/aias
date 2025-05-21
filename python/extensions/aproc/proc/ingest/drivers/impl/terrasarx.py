@@ -43,21 +43,20 @@ class Driver(IngestDriver):
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
         if self.browse_path is not None:
-            with AccessManager.make_local(self.browse_path) as local_browse_path:
-                thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
-                AccessManager.makedir(thumbnail_path)
-                self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-                geotiff_to_jpg(local_browse_path, 50, 50, self.thumbnail_path)
-                assets.append(Asset(href=self.thumbnail_path,
-                                    roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                    description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
-                quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
-                AccessManager.makedir(quicklook_path)
-                self.quicklook_path = quicklook_path + '/quicklook.jpg'
-                geotiff_to_jpg(local_browse_path, 250, 250, self.quicklook_path)
-                assets.append(Asset(href=self.quicklook_path,
-                                    roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                    description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+            thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
+            AccessManager.makedir(thumbnail_path)
+            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
+            assets.append(Asset(href=self.thumbnail_path,
+                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
+                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+            quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
+            AccessManager.makedir(quicklook_path)
+            self.quicklook_path = quicklook_path + '/quicklook.jpg'
+            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
+            assets.append(Asset(href=self.quicklook_path,
+                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
+                                description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
 
         assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
@@ -121,34 +120,29 @@ class Driver(IngestDriver):
         view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
         date_time = int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
-
-        with AccessManager.make_local(self.tif_path) as local_tif_path:
-            src_ds = gdal.Open(local_tif_path, GA_ReadOnly)
-            item = Item(
-                id=self.get_item_id(url),
-                geometry=geometry,
-                bbox=bbox,
-                centroid=centroid,
-                properties=Properties(
-                    datetime=date_time,
-                    processing__level=processing__level,
-                    gsd=gsd,
-                    proj__epsg=get_epsg(src_ds),
-                    instrument=instrument,
-                    constellation=constellation,
-                    sensor=sensor,
-                    sensor_type=sensor_type,
-                    view__incidence_angle=view__incidence_angle,
-                    item_type=ResourceType.gridded.value,
-                    item_format=ItemFormat.terrasar.value,
-                    main_asset_format=AssetFormat.geotiff.value,
-                    main_asset_name=Role.data.value,
-                    observation_type=ObservationType.radar.value
-                ),
-                assets=dict(map(lambda asset: (asset.name, asset), assets))
-            )
+        item = Item(
+            id=self.get_item_id(url),
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                processing__level=processing__level,
+                gsd=gsd,
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                instrument=instrument,
+                constellation=constellation,
+                sensor=sensor,
+                sensor_type=sensor_type,
+                view__incidence_angle=view__incidence_angle,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.terrasar.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.radar.value
+            ),
+            assets=dict(map(lambda asset: (asset.name, asset), assets))
+        )
 
         return item
 
