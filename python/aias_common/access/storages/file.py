@@ -1,13 +1,12 @@
-import enum
 import os
 import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
-
-from aias_common.access.configuration import AccessType, FileStorageConfiguration
-from aias_common.access.storages.abstract import AbstractStorage
+from aias_common.access.configuration import (AccessType,
+                                              FileStorageConfiguration)
 from aias_common.access.file import File
+from aias_common.access.storages.abstract import AbstractStorage
 
 
 class FileStorage(AbstractStorage):
@@ -15,7 +14,7 @@ class FileStorage(AbstractStorage):
     def get_configuration(self) -> FileStorageConfiguration:
         assert isinstance(self.storage_configuration, FileStorageConfiguration)
         return self.storage_configuration
-    
+
     def get_storage_parameters(self):
         return {}
 
@@ -70,7 +69,7 @@ class FileStorage(AbstractStorage):
         if f.is_dir:
             f.path = f.path.removesuffix("/") + "/"
         return f
-    
+
     def get_last_modification_time(self, href: str):
         return os.path.getmtime(href)
 
@@ -78,6 +77,9 @@ class FileStorage(AbstractStorage):
         return os.path.getctime(href)
 
     def makedir(self, href: str, strict=False):
+        if not self.is_path_authorized(href, AccessType.WRITE):
+            raise ValueError('The desired folder is not authorized')
+
         if not self.exists(href) or strict:
             os.makedirs(href)
 
