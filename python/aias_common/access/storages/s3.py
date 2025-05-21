@@ -90,6 +90,10 @@ class S3Storage(AbstractStorage):
             for chunk in obj['Body'].iter_chunks(50 * 1024):
                 f.write(chunk)
 
+    def push(self, href: str, dst: str):
+        super().push(href, dst)
+        raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
+
     def __head_object(self, href: str):
         return self.get_storage_parameters()["client"].head_object(
                 Bucket=self.get_configuration().bucket,

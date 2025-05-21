@@ -44,6 +44,14 @@ class FileStorage(AbstractStorage):
 
         shutil.copy(href, dst)
 
+    def push(self, href: str, dst: str):
+        super().push(href, dst)
+
+        if not self.is_path_authorized(dst, AccessType.WRITE):
+            raise ValueError('The desired output path is not authorized')
+
+        shutil.copy(href, dst)
+
     def is_file(self, href: str):
         return os.path.isfile(href)
 

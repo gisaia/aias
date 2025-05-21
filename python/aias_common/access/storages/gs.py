@@ -19,8 +19,8 @@ class GoogleStorage(AbstractStorage):
         if self.get_configuration().is_anon_client:
             client = Client.create_anonymous_client()
         else:
-            credentials = service_account.Credentials.from_service_account_info(self.get_configuration().api_key)
-            client = Client("APROC", credentials=credentials)
+            credentials = service_account.Credentials.from_service_account_info(self.get_configuration().api_key.model_dump())
+            client = Client(project=self.get_configuration().api_key.project_id, credentials=credentials)
 
         return {"client": client}
 
@@ -41,7 +41,11 @@ class GoogleStorage(AbstractStorage):
 
     def __get_blob(self, href: str):
         bucket = self.__get_bucket()
-        return bucket.get_blob(urlparse(href).path[1:] or "/")
+        return bucket.get_blob(urlparse(href).path.lstrip("/") or "/")
+
+    def __create_blob(self, href: str):
+        bucket = self.__get_bucket()
+        return bucket.blob(urlparse(href).path.lstrip("/") or "/")
 
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
@@ -68,6 +72,15 @@ class GoogleStorage(AbstractStorage):
             raise LookupError(f"Can't find {href}")
 
         blob.download_to_filename(dst)
+
+    def push(self, href: str, dst: str):
+        super().push(href, dst)
+
+        blob = self.__create_blob(dst)
+        if blob is None:
+            raise LookupError(f"Can't create blob: {dst}")
+
+        blob.upload_from_filename(href)
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_blobs(self, source: str) -> list[File]:

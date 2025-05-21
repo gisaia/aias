@@ -19,7 +19,7 @@ class AbstractStorage(ABC):
         Returns:
             AnyStorageConfiguration: storage configuration
         """
-    ...
+        ...
 
     @abstractmethod
     def get_storage_parameters(self) -> dict:
@@ -78,6 +78,19 @@ class AbstractStorage(ABC):
         scheme = urlparse(dst).scheme
         if scheme != "" and scheme != "file":
             raise ValueError("Destination must be on the local filesystem")
+
+    @abstractmethod
+    def push(self, href: str, dst: str):
+        """Copy/upload the desired file from local to write it on the file system
+
+        Args:
+            href (str): File to upload
+            dst (str): Destination of the file
+        """
+        # Check that href is local
+        scheme = urlparse(href).scheme
+        if scheme != "" and scheme != "file":
+            raise ValueError("Source file to upload must be on the local filesystem")
 
     @abstractmethod
     def is_file(self, href: str) -> bool:
