@@ -1,2 +1,4 @@
-source ./test/env.sh
+# Set env variable
+. ./test/env.sh
+
 docker compose -f docker/compose/docker-compose.yaml -f docker/compose/docker-compose-tests.yaml down
