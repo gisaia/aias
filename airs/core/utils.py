@@ -9,7 +9,7 @@ seasons = {'Summer': (utc.localize(datetime.datetime(2014, 6, 21)), utc.localize
 
 class Utils:
     def get_season(date):
-        date=pytz.UTC.localize(datetime.datetime(2014,date.month,date.day))
+        date=pytz.UTC.localize(datetime.datetime(2014,date.month, min(date.day, 28)))
         for season,(season_start, season_end) in seasons.items():
             if date>=season_start and date<= season_end:
                 return season
