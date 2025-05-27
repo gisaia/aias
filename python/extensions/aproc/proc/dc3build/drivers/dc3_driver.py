@@ -1,7 +1,7 @@
-import os
 import tempfile
 from abc import abstractmethod
 
+from aias_common.access.manager import AccessManager
 from airs.core.models.model import Item
 from extensions.aproc.proc.dc3build.model.dc3build_input import \
     InputDC3BuildProcess
@@ -23,8 +23,7 @@ class DC3Driver(AbstractDriver):
         Returns:
             str: the directory for storing the assets
         """
-        if not os.path.exists(self.assets_dir):
-            os.makedirs(self.assets_dir)
+        AccessManager.makedir(self.assets_dir)
         return tempfile.mkdtemp(dir=self.assets_dir, prefix="{}_{}".format(self.name, key))
 
     @staticmethod

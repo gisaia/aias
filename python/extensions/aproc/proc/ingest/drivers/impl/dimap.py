@@ -163,7 +163,7 @@ class Driver(IngestDriver):
 
                         dst = os.path.join(AccessManager.tmp_dir, path)
                         # Makedir to prepare for AccessManager.make_local
-                        os.makedirs(os.path.dirname(dst), exist_ok=True)
+                        AccessManager.makedir(os.path.dirname(dst))
 
                         files_to_make_local.append(os.path.join(AccessManager.dirname(self.dim_path), path))
                         desired_local_path.append(dst)
