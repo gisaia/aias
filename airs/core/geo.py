@@ -54,8 +54,6 @@ def valid_bbox(bbox:List[float]):
         return False
     if not len(bbox)==4: return False
     if bbox[0] is None or bbox[1] is None or bbox[2] is None or bbox[3] is None: return False
-    if bbox[0]>180 or bbox[0]<-180 : return False
     if bbox[1]>90 or bbox[1]<-90 : return False
-    if bbox[2]>180 or bbox[2]<-180 : return False
     if bbox[3]>90 or bbox[3]<-90 : return False
     return True
