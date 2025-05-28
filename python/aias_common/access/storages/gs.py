@@ -51,12 +51,12 @@ class GoogleStorage(AbstractStorage):
 
         params = {
             "session": rasterio.session.GSSession(self.get_configuration().credentials_file),
-            **self.get_gdal_env()
+            **self.__get_gdal_signed()
         }
 
         return params
 
-    def get_gdal_env(self):
+    def __get_gdal_signed(self):
         params = {}
         if self.get_configuration().api_key is None:
             params["GS_NO_SIGN_REQUEST"] = "YES"
@@ -129,19 +129,16 @@ class GoogleStorage(AbstractStorage):
     def clean(self, href: str):
         raise PermissionError("Deleting files on a remote storage is not permitted")
 
-    def get_gdal_src(self, href: str):
-        import rasterio
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
-
+    def get_gdal_stream_options(self):
         params = {
-            **self.get_gdal_env()
+            **self.__get_gdal_signed()
         }
 
         if not self.get_configuration().is_anon_client:
             params["GS_OAUTH2_PRIVATE_KEY"] = self.get_configuration().api_key.private_key
             params["GS_OAUTH2_CLIENT_EMAIL"] = self.get_configuration().api_key.client_email
 
-        with rasterio.Env(**params):
-            src_ds = gdal.Open(href.replace("gs://", "/vsigs/"), GA_ReadOnly)
-        return src_ds
+        return params
+
+    def gdal_transform_href_vsi(self, href: str):
+        return href.replace("gs://", "/vsigs/")

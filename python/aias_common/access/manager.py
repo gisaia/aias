@@ -285,3 +285,11 @@ class AccessManager:
         Returns the projection of an archive through GDAL without pulling the file
         """
         return AccessManager.get_gdal_src(href).GetProjection()
+
+    @staticmethod
+    def get_gdal_info(href: str, gdal_options):
+        """
+        Returns the info of an archive through GDAL without pulling the file
+        """
+        storage = AccessManager.resolve_storage(href)
+        return storage.get_gdal_info(href, gdal_options)

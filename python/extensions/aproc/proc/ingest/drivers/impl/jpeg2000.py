@@ -49,8 +49,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        with AccessManager.make_local(url + ".aux.xml"):
-            item = ImageDriverHelper.to_item(self, ItemFormat.jpeg2000, AssetFormat.jpg2000, url, assets)
+        item = ImageDriverHelper.to_item(self, ItemFormat.jpeg2000, AssetFormat.jpg2000, url, assets)
         return item
 
     @staticmethod

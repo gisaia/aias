@@ -88,8 +88,8 @@ class FileStorage(AbstractStorage):
         else:
             raise ValueError("The given path is read-only")
 
-    def get_gdal_src(self, href: str):
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
+    def get_gdal_stream_options(self):
+        return {}
 
-        return gdal.Open(href, GA_ReadOnly)
+    def gdal_transform_href_vsi(self, href: str):
+        return href

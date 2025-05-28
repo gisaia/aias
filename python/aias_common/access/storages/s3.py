@@ -158,31 +158,33 @@ class S3Storage(AbstractStorage):
     def clean(self, href: str):
         raise PermissionError("Deleting files on a remote storage is not permitted")
 
-    def get_gdal_src(self, href: str):
-        import rasterio
-        from osgeo import gdal
-        from osgeo.gdalconst import GA_ReadOnly
+    def get_gdal_stream_options(self):
+        config = self.get_configuration()
 
         params = {
             "AWS_VIRTUAL_HOSTING": "FALSE",
             # Before GDAL 3.11, http and https should not be in the endpoint adress
-            "AWS_S3_ENDPOINT": self.get_configuration().endpoint.removeprefix("http://").removeprefix("https://")
+            "AWS_S3_ENDPOINT": config.endpoint.removeprefix("http://").removeprefix("https://")
         }
 
-        if self.get_configuration().is_anon_client:
+        if config.is_anon_client:
             params["AWS_NO_SIGN_REQUEST"] = "YES"
         else:
             params["AWS_NO_SIGN_REQUEST"] = "NO"
-            params["AWS_SECRET_ACCESS_KEY"] = self.get_configuration().api_key.secret_key
-            params["AWS_ACCESS_KEY_ID"] = self.get_configuration().api_key.access_key
+            params["AWS_SECRET_ACCESS_KEY"] = config.api_key.secret_key
+            params["AWS_ACCESS_KEY_ID"] = config.api_key.access_key
 
-        if self.get_configuration().endpoint.startswith("http://"):
+        # Not needed after GDAL 3.11
+        if config.endpoint.startswith("http://"):
             params["AWS_HTTPS"] = "FALSE"
+        return params
 
-        with rasterio.Env(**params):
-            if urlparse(href).scheme == "s3":
-                href = href.replace("s3://", "/vsis3/")
-            else:
-                href = href.replace(self.get_configuration().endpoint, "/vsis3")
-            src_ds = gdal.Open(href, GA_ReadOnly)
-        return src_ds
+    def gdal_transform_href_vsi(self, href: str):
+        config = self.get_configuration()
+
+        if urlparse(href).scheme == "s3":
+            href = href.replace("s3://", "/vsis3/")
+        else:
+            href = href.replace(config.endpoint, "/vsis3")
+
+        return href
