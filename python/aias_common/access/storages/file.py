@@ -95,3 +95,9 @@ class FileStorage(AbstractStorage):
                 os.remove(href)  # !DELETE!
         else:
             raise ValueError("The given path is read-only")
+
+    def get_gdal_stream_options(self):
+        return {}
+
+    def gdal_transform_href_vsi(self, href: str):
+        return href

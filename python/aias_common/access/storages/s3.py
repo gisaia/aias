@@ -1,7 +1,6 @@
 import os
 from urllib.parse import urlparse, urlunparse
 
-
 from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
@@ -13,7 +12,7 @@ class S3Storage(AbstractStorage):
     def get_configuration(self) -> S3StorageConfiguration:
         assert isinstance(self.storage_configuration, S3StorageConfiguration)
         return self.storage_configuration
-    
+
     def get_storage_parameters(self):
         import boto3
 
@@ -44,7 +43,7 @@ class S3Storage(AbstractStorage):
 
         if scheme == "s3":
             return netloc == self.get_configuration().bucket
-        elif scheme == "http":
+        elif scheme == "http" or scheme == "https":
             return f"{scheme}://{netloc}" == self.get_configuration().endpoint
         return False
 
@@ -162,3 +161,34 @@ class S3Storage(AbstractStorage):
 
     def clean(self, href: str):
         raise PermissionError("Deleting files on a remote storage is not permitted")
+
+    def get_gdal_stream_options(self):
+        config = self.get_configuration()
+
+        params = {
+            "AWS_VIRTUAL_HOSTING": "FALSE",
+            # Before GDAL 3.11, http and https should not be in the endpoint adress
+            "AWS_S3_ENDPOINT": config.endpoint.removeprefix("http://").removeprefix("https://")  # NOSONAR
+        }
+
+        if config.is_anon_client:
+            params["AWS_NO_SIGN_REQUEST"] = "YES"
+        else:
+            params["AWS_NO_SIGN_REQUEST"] = "NO"
+            params["AWS_SECRET_ACCESS_KEY"] = config.api_key.secret_key
+            params["AWS_ACCESS_KEY_ID"] = config.api_key.access_key
+
+        # Not needed after GDAL 3.11
+        if config.endpoint.startswith("http://"):  # NOSONAR
+            params["AWS_HTTPS"] = "FALSE"
+        return params
+
+    def gdal_transform_href_vsi(self, href: str):
+        config = self.get_configuration()
+
+        if urlparse(href).scheme == "s3":
+            href = href.replace("s3://", "/vsis3/")
+        else:
+            href = href.replace(config.endpoint, "/vsis3")
+
+        return href

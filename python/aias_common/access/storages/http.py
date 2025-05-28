@@ -65,3 +65,13 @@ class HttpStorage(AbstractStorage):
 
     def clean(self, href: str):
         raise NotImplementedError(f"It is not possible to delete a file with {self.get_configuration().type} protocol")
+
+    def get_gdal_stream_options(self):
+        params = {}
+        for (k, v) in self.get_configuration().headers.items():
+            params[f"header.{k}"] = v
+
+        return params
+
+    def gdal_transform_href_vsi(self, href: str):
+        return "/vsicurl/" + href

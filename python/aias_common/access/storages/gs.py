@@ -4,9 +4,9 @@ from urllib.parse import urlparse, urlunparse
 from aias_common.access.configuration import GoogleStorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
+from fastapi_utilities import ttl_lru_cache
 from google.cloud.storage import Client
 from google.oauth2 import service_account
-from fastapi_utilities import ttl_lru_cache
 
 
 class GoogleStorage(AbstractStorage):
@@ -55,8 +55,13 @@ class GoogleStorage(AbstractStorage):
 
         params = {
             "session": rasterio.session.GSSession(self.get_configuration().credentials_file),
+            **self.__get_gdal_signed()
         }
 
+        return params
+
+    def __get_gdal_signed(self):
+        params = {}
         if self.get_configuration().api_key is None:
             params["GS_NO_SIGN_REQUEST"] = "YES"
         else:
@@ -136,3 +141,17 @@ class GoogleStorage(AbstractStorage):
 
     def clean(self, href: str):
         raise PermissionError("Deleting files on a remote storage is not permitted")
+
+    def get_gdal_stream_options(self):
+        params = {
+            **self.__get_gdal_signed()
+        }
+
+        if not self.get_configuration().is_anon_client:
+            params["GS_OAUTH2_PRIVATE_KEY"] = self.get_configuration().api_key.private_key
+            params["GS_OAUTH2_CLIENT_EMAIL"] = self.get_configuration().api_key.client_email
+
+        return params
+
+    def gdal_transform_href_vsi(self, href: str):
+        return href.replace("gs://", "/vsigs/")

@@ -69,7 +69,7 @@ class Driver(DownloadDriver):
 
     def get_dimap_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
         with AccessManager.make_local(href) as local_href:
-            dir_name = os.path.dirname(local_href)
+            dir_name = AccessManager.dirname(local_href)
             tree = ET.parse(local_href)
             root = tree.getroot()
             files_elements = root.findall('./Raster_Data/Data_Access/Data_Files/Data_File/DATA_FILE_PATH')
@@ -87,7 +87,7 @@ class Driver(DownloadDriver):
 
     def get_terrasarx_images(self, href: str, extension: str) -> list[tuple[str, str, str, str]]:
         with AccessManager.make_local(href) as local_href:
-            dir_name = os.path.dirname(local_href)
+            dir_name = AccessManager.dirname(local_href)
             tree = ET.parse(local_href)
             root = tree.getroot()
             files_elements = root.findall('.productComponents/imageData/file/location')

@@ -83,23 +83,24 @@ class ImageDriverHelper:
         bands = []
 
         gdal_options = gdal.InfoOptions(format='json')
-        with AccessManager.make_local(url) as local_url:
-            try:
-                gdal_info = gdal.Info(local_url, options=gdal_options)
-            except Exception as e:
-                raise DriverException("Can not read image metadata from {}: {}".format(url, e))
-            metadata_keys = list(gdal_info.get("metadata", {}))
-            if metadata_keys:
-                description = gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("title", "Image file")
-                try:
-                    creation_time = dateutil.parser.parse(gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("creation_time", ""))
-                except dateutil.parser.ParserError:
-                    creation_time = None
-            else:
-                description = "Image file"
-                creation_time = None
+        try:
+            gdal_info = AccessManager.get_gdal_info(url, gdal_options)
+        except Exception as e:
+            raise DriverException("Can not read image metadata from {}: {}".format(url, e))
 
-            with rasterio.open(local_url) as dataset:
+        metadata_keys = list(gdal_info.get("metadata", {}))
+        if metadata_keys:
+            description = gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("title", "Image file")
+            try:
+                creation_time = dateutil.parser.parse(gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("creation_time", ""))
+            except dateutil.parser.ParserError:
+                creation_time = None
+        else:
+            description = "Image file"
+            creation_time = None
+
+        with rasterio.Env(**AccessManager.get_rasterio_session(url)):
+            with rasterio.open(url) as dataset:
                 for v in zip(dataset.indexes, dataset.descriptions):
                     bands.append(Band(name="Band " + str(v[0]), eo__common_name="Band " + str(v[0]), description=v[1] if v[1] else "Band " + str(v[0])))
                 # GET THE GEO EXTENT
@@ -121,9 +122,9 @@ class ImageDriverHelper:
                 bbox = [a, b, c, d]
                 c = centroid(geom)
 
-            asset_size = os.stat(local_url).st_size
-
+        asset_size = AccessManager.get_size(url)
         date_time = AccessManager.get_creation_time(url)
+
         item = Item(
             id=driver.get_item_id(url),
             geometry=json.loads(to_geojson(geom)),

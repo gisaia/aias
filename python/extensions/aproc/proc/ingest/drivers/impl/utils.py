@@ -1,6 +1,7 @@
 import hashlib
 import os
 
+from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
 
 
@@ -53,16 +54,19 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def geotiff_to_jpg(input_path, widthPct, heightPct, output_path=None):
+def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None):
+    """
+    Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages
+    """
     from osgeo import gdal
     # Open input file
-    dataset = gdal.Open(input_path)
+    dataset = AccessManager.get_gdal_src(input_path)
     output_types = [gdal.GDT_Byte, gdal.GDT_UInt16, gdal.GDT_Float32]
     bands_list = [1]
     if dataset.RasterCount == 3:
         bands_list = [3, 2, 1]
     # Define output format and options
-    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=widthPct, heightPct=heightPct, creationOptions=['WORLDFILE=YES'],
+    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0])
 
     # Translate to JPEG
@@ -70,10 +74,13 @@ def geotiff_to_jpg(input_path, widthPct, heightPct, output_path=None):
         gdal.Translate(output_path, dataset, options=options)
 
 
-def get_epsg(src):
+def get_epsg(proj):
+    """
+    Returns the EPSG code of an archive from its archive's projection
+    """
     try:
         from osgeo import osr
-        proj = osr.SpatialReference(wkt=src.GetProjection())
+        proj = osr.SpatialReference(wkt=proj)
         return int(proj.GetAttrValue('AUTHORITY', 1))
     except Exception:
         ...
