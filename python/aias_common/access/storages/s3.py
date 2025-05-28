@@ -164,7 +164,7 @@ class S3Storage(AbstractStorage):
         params = {
             "AWS_VIRTUAL_HOSTING": "FALSE",
             # Before GDAL 3.11, http and https should not be in the endpoint adress
-            "AWS_S3_ENDPOINT": config.endpoint.removeprefix("http://").removeprefix("https://")
+            "AWS_S3_ENDPOINT": config.endpoint.removeprefix("http://").removeprefix("https://")  # NOSONAR
         }
 
         if config.is_anon_client:
@@ -175,7 +175,7 @@ class S3Storage(AbstractStorage):
             params["AWS_ACCESS_KEY_ID"] = config.api_key.access_key
 
         # Not needed after GDAL 3.11
-        if config.endpoint.startswith("http://"):
+        if config.endpoint.startswith("http://"):  # NOSONAR
             params["AWS_HTTPS"] = "FALSE"
         return params
 

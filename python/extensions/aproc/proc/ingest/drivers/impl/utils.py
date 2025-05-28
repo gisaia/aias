@@ -54,7 +54,7 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def geotiff_to_jpg(input_path: str, widthPct: float, heightPct: float, output_path=None):
+def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None):
     """
     Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages
     """
@@ -66,7 +66,7 @@ def geotiff_to_jpg(input_path: str, widthPct: float, heightPct: float, output_pa
     if dataset.RasterCount == 3:
         bands_list = [3, 2, 1]
     # Define output format and options
-    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=widthPct, heightPct=heightPct, creationOptions=['WORLDFILE=YES'],
+    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0])
 
     # Translate to JPEG
