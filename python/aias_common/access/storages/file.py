@@ -76,13 +76,11 @@ class FileStorage(AbstractStorage):
         return os.path.dirname(os.path.abspath(href))
 
     def clean(self, href: str):
-        if self.is_path_authorized(href, AccessType.WRITE):
-            if self.is_dir(href):
-                shutil.rmtree(href)  # !DELETE!
-            else:
-                os.remove(href)  # !DELETE!
+        super().clean(href=href)
+        if self.is_dir(href):
+            shutil.rmtree(href)  # !DELETE!
         else:
-            raise ValueError("The given path is read-only")
+            os.remove(href)  # !DELETE!
 
     def get_gdal_stream_options(self):
         return {}

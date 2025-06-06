@@ -207,7 +207,8 @@ class AbstractStorage(ABC):
         Args:
             href(str): The href to delete
         """
-        ...
+        if not self.is_path_authorized(href, AccessType.WRITE):
+            raise PermissionError(f'The desired path ({href}) is not authorized to write (for deletion)')
 
     @abstractmethod
     def get_gdal_stream_options(self) -> dict:
