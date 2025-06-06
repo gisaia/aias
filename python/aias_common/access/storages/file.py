@@ -28,26 +28,13 @@ class FileStorage(AbstractStorage):
     def get_rasterio_session(self):
         return {}
 
-    def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        if action == AccessType.READ:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
-        return any(list(map(lambda p: os.path.commonpath([p, href]) == p, paths)))
-
     def pull(self, href: str, dst: str):
         super().pull(href, dst)
-
-        if not self.is_path_authorized(dst, AccessType.WRITE):
-            raise ValueError('The desired output path is not authorized')
 
         shutil.copy(href, dst)
 
     def push(self, href: str, dst: str, content_type: str | None = None):
         super().push(href, dst)
-
-        if not self.is_path_authorized(dst, AccessType.WRITE):
-            raise ValueError('The desired output path is not authorized')
 
         shutil.copy(href, dst)
 
@@ -65,7 +52,8 @@ class FileStorage(AbstractStorage):
 
     def __to_file__(self, base: str, name: str):
         path = os.sep.join([base.removesuffix("/"), name])
-        f = File(name=name, path=path, is_dir=os.path.isdir(path), last_modification_date=os.path.getmtime(path), creation_date=os.path.getctime(path))
+        f = File(name=name, path=path, is_dir=os.path.isdir(path), last_modification_date=os.path.getmtime(path),
+                 creation_date=os.path.getctime(path))
         if f.is_dir:
             f.path = f.path.removesuffix("/") + "/"
         return f

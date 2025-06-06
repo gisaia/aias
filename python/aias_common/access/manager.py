@@ -74,24 +74,22 @@ class AccessManager:
         return storage.get_storage_parameters()
 
     @staticmethod
-    def check_local_path_writable(href: str):
+    def check_path_writable(href: str):
         """
         Checks that the path is a writable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE),
-                                filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE),AccessManager.storages))
         if not is_authorized:
-            raise ValueError(f"Local path '{href}' is not writable")
+            raise ValueError(f"Path '{href}' is not writable")
 
     @staticmethod
-    def check_local_path_readable(href: str):
+    def check_path_readable(href: str):
         """
         Checks that the path is a readable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),
-                                filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
+        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),AccessManager.storages))
         if not is_authorized:
-            raise ValueError(f"Local path '{href}' is not readable")
+            raise ValueError(f"Path '{href}' is not readable")
 
     @staticmethod
     def push(href: str, dst: str):
@@ -99,9 +97,10 @@ class AccessManager:
         Push a file from a local storage to write it in a storage.
         If the destination storage is local, then it is a copy. Otherwise it is an upload.
         """
-        storage = AccessManager.resolve_storage(dst)
-        AccessManager.check_local_path_readable(href)
+        AccessManager.check_path_readable(href)
+        AccessManager.check_path_writable(dst)
 
+        storage = AccessManager.resolve_storage(dst)
         storage.push(href, dst)
 
     @staticmethod
@@ -110,9 +109,10 @@ class AccessManager:
         Pulls a file from a storage to write it in the local storage.
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
-        storage = AccessManager.resolve_storage(href)
-        AccessManager.check_local_path_writable(dst)
+        AccessManager.check_path_readable(href)
+        AccessManager.check_path_writable(dst)
 
+        storage = AccessManager.resolve_storage(href)
         storage.pull(href, dst)
 
     @staticmethod

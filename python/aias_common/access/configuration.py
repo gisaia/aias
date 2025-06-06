@@ -14,13 +14,13 @@ class AccessType(enum.Enum):
 class StorageConfiguration(BaseModel, extra='allow'):
     type: str = Field(title='Storage type', description="Type of the storage used")
     is_local: bool = Field(title='Is a local storage', description="Whether the storage is local or remote")
+    writable_paths: list[str] = Field(default=[], title="Writable Paths", description="List of paths where files can be written")
+    readable_paths: list[str] = Field(default=[], title="Readable Paths", description="List of paths from which files can be read")
 
 
 class FileStorageConfiguration(StorageConfiguration):
     type: Literal["file"] = Field(default="file", title="Type", description="Indicates the storage type, fixed to 'file'")
     is_local: Literal[True] = Field(default=True, title='Is a local storage', description="Whether the storage is local or remote")
-    writable_paths: list[str] = Field(default=[], title="Writable Paths", description="List of paths where files can be written")
-    readable_paths: list[str] = Field(default=[], title="Readable Paths", description="List of paths from which files can be read")
 
 
 class GoogleStorageConstants(str, enum.Enum):

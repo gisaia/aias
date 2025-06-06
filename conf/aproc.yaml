@@ -41,6 +41,8 @@ access_manager:
         - /inputs
     -
       type: gs
+      readable_paths:
+        - gs://gisaia-public
       bucket: gisaia-public
       # api_key:
       #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT

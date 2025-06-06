@@ -1,9 +1,11 @@
 import os
 from abc import ABC, abstractmethod
+from pathlib import Path
 from urllib.parse import urlparse
 
-from aias_common.access.configuration import AnyStorageConfiguration
+from aias_common.access.configuration import AnyStorageConfiguration, AccessType
 from aias_common.access.file import File
+from aias_common.access.storages.utils import remote_path_starts_with
 
 
 class AbstractStorage(ABC):
@@ -25,11 +27,32 @@ class AbstractStorage(ABC):
     @abstractmethod
     def get_storage_parameters(self) -> dict:
         """Based on the type of storage and its characteristics, gives storage-specific parameters to use to access data
+        """
+        ...
+
+    def is_path_authorized(self, href: str, action: AccessType) -> bool:
+        """Check whether a given action is permitted on the specified path.
 
         Args:
             href (str): Href of the file to consult
+            action (AccessType): Action to check permission for, on the specified path
+
+        Returns:
+            bool: True if the action is authorized, False otherwise
         """
-        ...
+        # Get the list of accessible paths for the given action
+        if action == AccessType.WRITE:
+            paths = self.get_configuration().writable_paths
+        if action == AccessType.READ:
+            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+        # Check if the given path is a sub-path of the authorized paths
+        if self.storage_configuration.is_local:
+            is_authorized = any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
+        else:
+            is_authorized =  any(list(map(lambda p: remote_path_starts_with(path=href, prefix=p), paths)))
+        return is_authorized
+
+
 
     @abstractmethod
     def supports(self, href: str) -> bool:
