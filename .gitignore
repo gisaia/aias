@@ -20,3 +20,5 @@ env_aias/
 angular/file-explorer/node_modules
 angular/file-explorer/.angular
 angular/file-explorer/dist
+
+conf/roles.yaml

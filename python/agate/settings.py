@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Extra, Field
 from envyaml import EnvYAML
 from agate.logger import Logger
+from agate.roles_model import Roles
+import yaml
 
 LOGGER = Logger.logger
 
@@ -13,12 +15,21 @@ class Service(BaseModel, extra=Extra.allow):
     pattern_target: str | None = Field(title="If undefined, then the pattern is matched against the path. Use query.{param}, where {param} is the parameter value, to use a query parameter. Use query.{param}.url.path|query if the param value is a url and that you want to target the path or query of that url.")
 
 
+class URBAC(BaseModel, extra=Extra.allow):
+    url_header: str
+    method_header: str
+    jwt_header: str
+    roles: Roles = Roles(technicalRoles={})
+    role_file: str
+
+
 class Settings(BaseModel, extra=Extra.allow):
     arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
     agate_prefix: str
     host: str
     port: int
     services: dict[str, Service] = Field({}, title="Dictionary of service name/values. Each value is a pattern configuration for extracting collection and id values for building an ARLAS request that determines whether the access is granted or not.")
+    urbac: URBAC
 
 
 class Configuration:
@@ -28,3 +39,6 @@ class Configuration:
     def init(configuration_file: str):
         envyaml = EnvYAML(configuration_file, strict=False)
         Configuration.settings = Settings.model_validate(envyaml.export())
+        with open(Configuration.settings.urbac.role_file, "r") as f:
+            roles = yaml.safe_load(f)
+            Configuration.settings.urbac.roles = Roles.model_validate(roles)
