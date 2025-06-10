@@ -1,6 +1,6 @@
 
 import re
-
+import jwt
 import requests
 from fastapi import APIRouter, Request, status
 from fastapi.responses import Response
@@ -11,10 +11,48 @@ from urllib import parse
 
 LOGGER = Logger.logger
 ROUTER = APIRouter()
+MISSING_MSG = "{} missing"
+
+@ROUTER.get("/url-role-based-authorization")
+async def urbac(request: Request):
+    LOGGER.debug(request.headers)
+    request_path = request.headers[Configuration.settings.urbac.url_header]
+    if not request_path:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.url_header))
+    request_method = request.headers[Configuration.settings.urbac.method_header]
+    if not request_method:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.method_header))
+    authorization = request.headers[Configuration.settings.urbac.jwt_header]
+    LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
+    if authorization:
+        token = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})  # NOSONAR
+        user_roles = token.get("resource_access", {}).get("arlas-backend", {}).get("roles", [])
+        LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
+        for n, r in Configuration.settings.urbac.roles.technicalRoles.items():
+            if n in user_roles:
+                for p in r.permissions:
+                    components = p.split(":")
+                    if len(components) == 3:
+                        role_type, url_pattern, verbs = components
+                        if role_type == "r":
+                            if request_method.lower() in verbs.lower().split(","):
+                                matches = re.finditer(pattern=url_pattern, string=request_path)
+                                for match in matches:
+                                    if match.start() == 0:
+                                        LOGGER.debug("{} matches {}".format(request_path, url_pattern))
+                                        return Response(status_code=status.HTTP_202_ACCEPTED)
+                                LOGGER.debug("{} does not matches {}".format(request_path, url_pattern))
+                    else:
+                        LOGGER.warning("unrecognized permission {}".format(p))
+            else:
+                LOGGER.debug("user hasn't role {}".format(n))
+    else:
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.jwt_header))
+    return Response(status_code=status.HTTP_403_FORBIDDEN)
 
 
 @ROUTER.get("/authorization/{service}")
-async def path(request: Request, service: str):
+async def authorization(request: Request, service: str):
     service: Service = Configuration.settings.services.get(service)
     if not service:
         msg = "Service {} not found".format(service)
