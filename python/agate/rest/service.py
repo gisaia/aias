@@ -16,16 +16,16 @@ MISSING_MSG = "{} missing"
 @ROUTER.get("/url-role-based-authorization")
 async def urbac(request: Request):
     LOGGER.debug(request.headers)
-    request_path = request.headers[Configuration.settings.urbac.url_header]
+    request_path = request.headers.get(Configuration.settings.urbac.url_header)
     if not request_path:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.url_header))
-    request_method = request.headers[Configuration.settings.urbac.method_header]
+    request_method = request.headers.get(Configuration.settings.urbac.method_header)
     if not request_method:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.method_header))
-    authorization = request.headers[Configuration.settings.urbac.jwt_header]
+    authorization = request.headers.get(Configuration.settings.urbac.jwt_header)
     LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
     if authorization:
-        token = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})  # NOSONAR
+        token = jwt.decode(authorization.removeprefix("Bearer ").removeprefix("bearer "), options={"verify_signature": False})  # NOSONAR
         user_roles = token.get("resource_access", {}).get("arlas-backend", {}).get("roles", [])
         LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
         for n, r in Configuration.settings.urbac.roles.technicalRoles.items():
