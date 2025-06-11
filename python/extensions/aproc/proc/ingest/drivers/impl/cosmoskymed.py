@@ -4,7 +4,7 @@ from datetime import datetime
 
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, get_hash_url)
@@ -137,7 +137,7 @@ class Driver(IngestDriver):
                 instrument=instrument,
                 constellation="COSMO-SkyMed",
                 sensor=sensor,
-                sensor_type="SAR",
+                sensor_type=SensorType.SAR,
                 view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,

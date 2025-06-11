@@ -80,12 +80,12 @@ class IngestDriver(AbstractDriver):
         ...
 
     @abstractmethod
-    def fetch_assets(self, url: str, resources: list[Asset]) -> list[Asset]:
+    def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         """Copy or download the assets locally
 
         Args:
             url (str): archive's url
-            resources (list[Asset]): list of assets to be fetched
+            assets (list[Asset]): list of assets to be fetched
 
         Returns:
             list[Asset]: list of fetched assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
@@ -93,12 +93,12 @@ class IngestDriver(AbstractDriver):
         ...
 
     @abstractmethod
-    def transform_assets(self, url: str, resources: list[Asset]) -> list[Asset]:
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         """Transform the assets, if necessary
 
         Args:
             url (str): archive's url
-            resources (list[Asset]): list of assets to be transformed
+            assets (list[Asset]): list of assets to be transformed
 
         Returns:
             list[Asset]: list of transformed assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
@@ -106,12 +106,12 @@ class IngestDriver(AbstractDriver):
         ...
 
     @abstractmethod
-    def to_item(self, url: str, resources: list[Asset]) -> Item:
+    def to_item(self, url: str, assets: list[Asset]) -> Item:
         """Analyse an archive assets to create an item
 
         Args:
             url (str): archive's url
-            resources (list[Asset]): list of assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
 
         Returns:
             Item: the item. An item must have a valid id and valid assets.
