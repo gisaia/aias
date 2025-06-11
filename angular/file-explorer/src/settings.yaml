@@ -7,41 +7,41 @@
 #   sign_up_enabled: false
 
 authentication:
- use_authent: true
- force_connect: true
- use_discovery: true
- auth_mode: 'openid'
- url: 'https://girabal/arlas_iam_server'
- threshold: 60000
- scope: openid
- issuer: https://girabal:9443/auth/realms/arlas
- client_id: arlas-front
- redirect_uri: http://localhost:4200/callback
- silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html
- require_https: false
- response_type: "code"
- silent_refresh_timeout: 10000
- timeout_factor: 0.75
- session_checks_enabled: false
- clear_hash_after_login: true
- disable_at_hash_check: false
- show_debug_information: true
- login_url: NOT_CONFIGURED
- logout_url: https://girabal:9443/auth/realms/arlas/protocol/openid-connect/logout
- storage: sessionstorage
- custom_query_params: [{"audience":"http://arlas.io/api/server"}]
- sign_up_enabled: true
+  use_authent: true
+  force_connect: true
+  use_discovery: true
+  auth_mode: "openid"
+  url: "https://localhost/arlas_iam_server"
+  threshold: 60000
+  scope: openid
+  issuer: https://girabal:9443/auth/realms/arlas
+  client_id: arlas-front
+  redirect_uri: http://localhost:4200/callback
+  silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html
+  require_https: false
+  response_type: "code"
+  silent_refresh_timeout: 10000
+  timeout_factor: 0.75
+  session_checks_enabled: false
+  clear_hash_after_login: true
+  disable_at_hash_check: false
+  show_debug_information: true
+  login_url: NOT_CONFIGURED
+  logout_url: https://localhost:9443/auth/realms/arlas/protocol/openid-connect/logout
+  storage: sessionstorage
+  custom_query_params: [{ "audience": "http://arlas.io/api/server" }]
+  sign_up_enabled: true
 
 file_manager:
-  url: https://girabal/fam
-  default_path: ''
-  collection: 'catalogue'
+  url: https://localhost/fam
+  default_path: ""
+  collection: "catalogue"
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://girabal/aproc
-  collection: 'catalogue'
-  catalog: 'catalogue'
+  url: https://localhost/aproc
+  collection: "catalogue"
+  catalog: "catalogue"
 status:
-  url: https://girabal/airs
-  collection: 'catalogue'
+  url: https://localhost/airs
+  collection: "catalogue"

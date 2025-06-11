@@ -92,23 +92,14 @@ export class StartupService {
               const authService = this.injector.get('AuthentificationService')[0];
               authService.canActivateProtectedRoutes.subscribe(isActivable => {
                 if (isActivable) {
-                  this.famService.setOptions({
+                  const headers = {
                     headers: {
                       Authorization: 'Bearer ' + authService.accessToken
                     }
-                  });
-
-                  this.jobService.setOptions({
-                    headers: {
-                      Authorization: 'Bearer ' + authService.accessToken
-                    }
-                  });
-
-                  this.statusService.setOptions({
-                    headers: {
-                      Authorization: 'Bearer ' + authService.accessToken
-                    }
-                  });
+                  }
+                  this.famService.setOptions(headers);
+                  this.jobService.setOptions(headers);
+                  this.statusService.setOptions(headers);
                 }
                 resolve(settings);
               });
@@ -117,27 +108,15 @@ export class StartupService {
               this.arlasIamService.tokenRefreshed$.subscribe({
                 next: loginData => {
                   if (!!loginData) {
-
-                    this.famService.setOptions({
+                    const iamHeaders = {
                       headers: {
                         Authorization: 'bearer ' + loginData.access_token,
                         'arlas-org-filter': this.arlasIamService.getOrganisation()
                       }
-                    });
-
-                    this.jobService.setOptions({
-                      headers: {
-                        Authorization: 'bearer ' + loginData.access_token,
-                        'arlas-org-filter': this.arlasIamService.getOrganisation()
-                      }
-                    });
-
-                    this.statusService.setOptions({
-                      headers: {
-                        Authorization: 'bearer ' + loginData.access_token,
-                        'arlas-org-filter': this.arlasIamService.getOrganisation()
-                      }
-                    });
+                    }
+                    this.famService.setOptions(iamHeaders);
+                    this.jobService.setOptions(iamHeaders);
+                    this.statusService.setOptions(iamHeaders);
                   }
                   resolve(settings);
                 }
