@@ -2,11 +2,12 @@ import json
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    Properties, ResourceType, Role, SensorType)
-from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (get_epsg,
-                                                             get_hash_url)
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, Properties, ResourceType, Role,
+                                    SensorType)
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.utils import get_epsg
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -22,18 +23,6 @@ class Driver(IngestDriver):
     def init(configuration: dict):
         IngestDriver.init(configuration)
 
-    # Implements drivers method
-    def supports(self, url: str) -> bool:
-        try:
-            result = self.__check_path__(url)
-            return result
-        except Exception as e:
-            self.LOGGER.warn(e)
-            return False
-
-    def get_item_id(self, url: str) -> str:
-        return get_hash_url(url)
-
     def identify_assets(self, url: str):
         assets: list[Asset] = []
 
@@ -41,7 +30,6 @@ class Driver(IngestDriver):
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.PNG.value,
                                 description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.png.value))
-        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
 
         assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
@@ -55,6 +43,7 @@ class Driver(IngestDriver):
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
+        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):

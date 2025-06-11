@@ -2,12 +2,12 @@ import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
-from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid, get_hash_url, setup_gdal)
+    get_epsg, get_geom_bbox_centroid, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -25,15 +25,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-
-    # Implements drivers method
-    def supports(self, url: str) -> bool:
-        try:
-            result = self.__check_path__(url)
-            return result
-        except Exception as e:
-            self.LOGGER.warn(e)
-            return False
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -62,10 +53,6 @@ class Driver(IngestDriver):
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
-
-    # Implements drivers method
-    def get_item_id(self, url: str) -> str:
-        return get_hash_url(url)
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:

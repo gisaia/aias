@@ -2,10 +2,11 @@ import hashlib
 import os
 from abc import abstractmethod
 
-from airs.core.models.model import Asset, Item
 from aias_common.access.manager import AccessManager
+from airs.core.models.model import Asset, Item
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
 
 
 class IngestDriver(AbstractDriver):
@@ -55,7 +56,15 @@ class IngestDriver(AbstractDriver):
             raise DriverException("Asset name is undefined for {}".format(asset.model_dump_json(exclude_none=True, exclude_unset=True)))
         return os.path.sep.join([self.get_assets_dir(url), asset.name])
 
-    @abstractmethod
+    # Implements drivers method
+    def supports(self, url: str) -> bool:
+        try:
+            result = self.__check_path__(url)
+            return result
+        except Exception as e:
+            self.LOGGER.warn(e)
+            return False
+
     def get_item_id(self, url: str) -> str:
         """Return the id of the item currently process by the driver.
 
@@ -65,7 +74,7 @@ class IngestDriver(AbstractDriver):
         Returns:
             str: the id of the item currently process by the driver
         """
-        ...
+        return get_hash_url(url)
 
     @abstractmethod
     def identify_assets(self, url: str) -> list[Asset]:
@@ -115,5 +124,17 @@ class IngestDriver(AbstractDriver):
 
         Returns:
             Item: the item. An item must have a valid id and valid assets.
+        """
+        ...
+
+    @abstractmethod
+    def __check_path__(self, path: str) -> bool:
+        """Checks whether the given archive's path is supported by the driver
+
+        Args:
+            path (str): archive's path to check
+
+        Returns:
+            bool: Whether the archive is supported
         """
         ...

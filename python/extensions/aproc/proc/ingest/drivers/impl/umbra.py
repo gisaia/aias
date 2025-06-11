@@ -2,11 +2,12 @@ import json
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat, MimeType,
-                                    Properties, ResourceType, Role, SensorType)
-from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (get_epsg,
-                                                             get_hash_url)
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, Properties, ResourceType, Role,
+                                    SensorType)
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.utils import get_epsg
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -21,18 +22,6 @@ class Driver(IngestDriver):
     def init(configuration: dict):
         IngestDriver.init(configuration)
 
-    # Implements drivers method
-    def supports(self, url: str) -> bool:
-        try:
-            result = self.__check_path__(url)
-            return result
-        except Exception as e:
-            self.LOGGER.warn(e)
-            return False
-
-    def get_item_id(self, url: str) -> str:
-        return get_hash_url(url)
-
     def identify_assets(self, url: str):
         assets: list[Asset] = []
 
@@ -40,7 +29,6 @@ class Driver(IngestDriver):
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.PNG.value,
                                 description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.png.value))
-        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
 
         assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
@@ -51,6 +39,7 @@ class Driver(IngestDriver):
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
+        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
@@ -60,10 +49,10 @@ class Driver(IngestDriver):
         with AccessManager.make_local(self.md_path) as local_md_path:
             with open(local_md_path, 'r') as f:
                 data = json.load(f)
-                dataTake = data["collects"][0]
+                data_take = data["collects"][0]
 
-        geometry = dataTake["footprintPolygonLla"]
-        centroid = dataTake["sceneCenterPointLla"]["coordinates"][:2]
+        geometry = data_take["footprintPolygonLla"]
+        centroid = data_take["sceneCenterPointLla"]["coordinates"][:2]
 
         coordinates = geometry["coordinates"][0]
         bbox = [min(map(lambda xy: xy[0], coordinates)),
@@ -74,23 +63,23 @@ class Driver(IngestDriver):
         for idx, coords in enumerate(coordinates):
             coordinates[idx] = coords[:2]
 
-        start_datetime = datetime.strptime(dataTake["startAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S")
-        end_datetime = datetime.strptime(dataTake["endAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S.%f")
+        start_datetime = datetime.strptime(data_take["startAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S")
+        end_datetime = datetime.strptime(data_take["endAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S.%f")
         constellation = "UMBRA"
         satellite = data["umbraSatelliteName"]
         sensor_mode = data["imagingMode"]
         gsd = data["baseIpr"]
-        view__incidence_angle = dataTake["angleIncidenceDegrees"]
-        view__azimuth = dataTake["angleAzimuthDegrees"]
-        acq__acquisition_orbit_direction = dataTake["satelliteTrack"]
+        view__incidence_angle = data_take["angleIncidenceDegrees"]
+        view__azimuth = data_take["angleAzimuthDegrees"]
+        acq__acquisition_orbit_direction = data_take["satelliteTrack"]
         acq__acquisition_type = data["orderType"]
-        acq__request_id = dataTake["taskId"]
-        sar__frequency_band = dataTake["radarBand"]
-        sar__center_frequency = dataTake["radarCenterFrequencyHz"]
-        sar__polarizations = dataTake["polarizations"]
-        sar__resolution_range = dataTake["maxGroundResolution"]["rangeMeters"]
-        sar__resolution_azimuth = dataTake["maxGroundResolution"]["azimuthMeters"]
-        sar__observation_direction = dataTake["observationDirection"]
+        acq__request_id = data_take["taskId"]
+        sar__frequency_band = data_take["radarBand"]
+        sar__center_frequency = data_take["radarCenterFrequencyHz"]
+        sar__polarizations = data_take["polarizations"]
+        sar__resolution_range = data_take["maxGroundResolution"]["rangeMeters"]
+        sar__resolution_azimuth = data_take["maxGroundResolution"]["azimuthMeters"]
+        sar__observation_direction = data_take["observationDirection"]
 
         item = Item(
             id=self.get_item_id(url),

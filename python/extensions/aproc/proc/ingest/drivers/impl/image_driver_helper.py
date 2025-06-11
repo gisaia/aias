@@ -2,13 +2,11 @@ import json
 import os
 
 import dateutil.parser
-
+from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, Properties, ResourceType, Role)
-from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -59,11 +57,6 @@ class ImageDriverHelper:
     @staticmethod
     def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
-
-    # Implements drivers method
-    @staticmethod
-    def get_item_id(driver: IngestDriver, url: str) -> str:
-        return get_hash_url(url)
 
     # Implements drivers method
     @staticmethod
