@@ -20,7 +20,7 @@
 import { LOCATION_INITIALIZED } from '@angular/common';
 import { Injectable, Injector } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ArlasIamService, ArlasSettings, ArlasStartupService } from 'arlas-wui-toolkit';
+import { ArlasIamService, ArlasSettings, ArlasStartupService, FetchInterceptorService } from 'arlas-wui-toolkit';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from './job/job.service';
 import { StatusService } from './status/status.service';
@@ -65,43 +65,74 @@ export class StartupService {
     private arlasIamService: ArlasIamService,
     private famService: FamService,
     private jobService: JobService,
-    private statusService: StatusService
-    ) { }
+    private statusService: StatusService,
+    private fetchInterceptorService: FetchInterceptorService
+  ) { }
 
   public init(): Promise<string> {
     return this.arlasStartupService.applyAppSettings()
       .then((s: ArlasSettings) => this.arlasStartupService.authenticate(s))
       .then((s: ArlasSettings) => this.arlasStartupService.enrichHeaders(s))
-      .then((s: ArlasSettings) =>
-        this.arlasIamService.tokenRefreshed$.subscribe({
-          next: loginData => {
-            if (!!loginData) {
-              this.famService.setSettings((s as any).file_manager);
-              this.famService.setOptions({
-                headers: {
-                  Authorization: 'bearer ' + loginData.access_token,
-                  'arlas-org-filter': this.arlasIamService.getOrganisation()
+      .then((s: ArlasSettings) => {
+        this.famService.setSettings((s as any).file_manager);
+        this.jobService.setSettings((s as any).jobs);
+        this.statusService.setSettings((s as any).status);
+        return Promise.resolve(s)
+      })
+      .then((settings: ArlasSettings) => {
+        return new Promise((resolve, reject) => {
+          const useAuthent = !!settings && !!settings.authentication
+            && !!settings.authentication.use_authent;
+          // The default behavior is openid, so if there is no auth_mode specified, it is openid
+          const useAuthentOpenID = useAuthent && settings.authentication.auth_mode !== 'iam';
+          const useAuthentIam = useAuthent && settings.authentication.auth_mode === 'iam';
+          if (useAuthent) {
+            this.fetchInterceptorService.applyInterceptor();
+            if (useAuthentOpenID) {
+              const authService = this.injector.get('AuthentificationService')[0];
+              authService.canActivateProtectedRoutes.subscribe(isActivable => {
+                if (isActivable) {
+                  const headers = {
+                    headers: {
+                      Authorization: 'Bearer ' + authService.accessToken
+                    }
+                  }
+                  this.famService.setOptions(headers);
+                  this.jobService.setOptions(headers);
+                  this.statusService.setOptions(headers);
                 }
+                resolve(settings);
               });
-              this.jobService.setSettings((s as any).jobs);
-              this.jobService.setOptions({
-                headers: {
-                  Authorization: 'bearer ' + loginData.access_token,
-                  'arlas-org-filter': this.arlasIamService.getOrganisation()
-                }
-              });
-              this.statusService.setSettings((s as any).status);
-              this.statusService.setOptions({
-                headers: {
-                  Authorization: 'bearer ' + loginData.access_token,
-                  'arlas-org-filter': this.arlasIamService.getOrganisation()
+            }
+            else if (useAuthentIam) {
+              this.arlasIamService.tokenRefreshed$.subscribe({
+                next: loginData => {
+                  if (!!loginData) {
+                    const iamHeaders = {
+                      headers: {
+                        Authorization: 'bearer ' + loginData.access_token,
+                        'arlas-org-filter': this.arlasIamService.getOrganisation()
+                      }
+                    }
+                    this.famService.setOptions(iamHeaders);
+                    this.jobService.setOptions(iamHeaders);
+                    this.statusService.setOptions(iamHeaders);
+                  }
+                  resolve(settings);
                 }
               });
             }
-            return Promise.resolve(s);
           }
+          else {
+            this.famService.setOptions({});
+            this.jobService.setOptions({});
+            this.statusService.setOptions({});
+            resolve(settings);
+          }
+        });
+      }
 
-        }))
+      )
       // Init app with the language read from url
       .then(() => StartupService.translationLoaded(this.translateService, this.injector));
   }

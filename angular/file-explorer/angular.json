@@ -40,7 +40,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/settings.yaml",
-              "src/styles"
+              "src/styles",
+              "src/silent-refresh.html"
             ],
             "styles": [
               "src/file-explorer-theme.scss",
@@ -78,7 +79,8 @@
                   "glob": "*.yaml"
                 },
                 "src/assets",
-                "src/favicon.ico"
+                "src/favicon.ico",
+                "src/silent-refresh.html"
               ],
               "outputHashing": "all"
             },
@@ -121,7 +123,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/settings.yaml",
-              "src/styles"
+              "src/styles",
+              "src/silent-refresh.html"
             ],
             "styles": [
               "src/file-explorer-theme.scss",

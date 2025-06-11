@@ -49,7 +49,8 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import {
   ArlasCollaborativesearchService, ArlasConfigurationDescriptor, ArlasIamService, ArlasSettingsService,
   ArlasStartupService, ArlasToolkitSharedModule, AuthentificationService, CONFIG_UPDATER, FETCH_OPTIONS, GET_OPTIONS,
-  LoginModule, PersistenceService, configUpdaterFactory, getOptionsFactory
+  LoginModule, PersistenceService, auhtentServiceFactory, configUpdaterFactory, getOptionsFactory,
+  iamServiceFactory
 } from 'arlas-wui-toolkit';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
@@ -127,6 +128,18 @@ export function startupServiceFactory(startupService: StartupService) {
       provide: APP_INITIALIZER,
       useFactory: startupServiceFactory,
       deps: [StartupService],
+      multi: true
+    },
+    {
+      provide: 'AuthentificationService',
+      useFactory: auhtentServiceFactory,
+      deps: [AuthentificationService],
+      multi: true
+    },
+    {
+      provide: 'ArlasIamService',
+      useFactory: iamServiceFactory,
+      deps: [ArlasIamService],
       multi: true
     },
     forwardRef(() => ArlasConfigurationDescriptor),
