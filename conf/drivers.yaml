@@ -62,6 +62,13 @@ drivers:
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 9
+  -
+    name: bsg
+    class_name: extensions.aproc.proc.ingest.drivers.impl.bsg
+    assets_dir: /tmp/aproc/bsg
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 10
 
   -
     name: tiff
@@ -69,7 +76,7 @@ drivers:
     assets_dir: /tmp/aproc/tiff
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 10
+    priority: 11
 
   -
     name: jpeg2000
@@ -77,4 +84,4 @@ drivers:
     assets_dir: /tmp/aproc/jpeg2000
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 11
+    priority: 12

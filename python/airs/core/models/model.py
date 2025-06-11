@@ -141,6 +141,7 @@ class ItemFormat(Enum):
     terrasar = "TerraSAR-X"
     csk = "COSMO-SkyMed"
     umbra = "UMBRA"
+    bsg = "BlackSkyGlobal"
 
 
 class AssetFormat(Enum):
@@ -213,6 +214,7 @@ class Role(Enum):
     covmat = "covmat"
     prd = "prd"
     extent = "extent"
+    pan_sharpened = "pan-sharpened"
 
 
 class CommonBandName(Enum):
