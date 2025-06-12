@@ -27,12 +27,12 @@ LABEL io.arlas.wui-fam.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves the FAM-wui app"
 
-RUN apk add  --no-cache --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/*
+RUN apk add  --no-cache --update bash jq netcat-openbsd curl libxml2 && rm -rf /var/cache/apk/* 
 
 ## Remove default nginx website
-RUN chown -R nginx /etc/nginx
-RUN chown -R nginx /usr/share/nginx/html
-RUN chown -R nginx /var/cache/nginx
+RUN chown -R nginx /etc/nginx && \
+    chown -R nginx /usr/share/nginx/html  && \
+    chown -R nginx /var/cache/nginx
 
 ## Copy our default nginx config
 COPY ./angular/file-explorer/nginx/default.conf /etc/nginx/conf.d/
