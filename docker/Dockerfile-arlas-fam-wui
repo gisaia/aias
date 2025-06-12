@@ -27,7 +27,7 @@ LABEL io.arlas.wui-fam.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves the FAM-wui app"
 
-RUN apk add  --no-cache --update bash jq netcat-openbsd curl libxml2 && rm -rf /var/cache/apk/* 
+RUN apk add  --no-cache --update bash jq netcat-openbsd curl && rm -rf /var/cache/apk/* && apk add 'libxml2==2.13.4-r6'
 
 ## Remove default nginx website
 RUN chown -R nginx /etc/nginx && \
