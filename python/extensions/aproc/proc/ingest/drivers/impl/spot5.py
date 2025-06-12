@@ -76,36 +76,37 @@ class Driver(IngestDriver):
                 gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
             else:
                 gsd = None
-            metadata = AccessManager.get_gdal_md(local_dim_path)
-            # We retrieve the time
-            date = metadata["IMAGING_DATE"]
-            time = metadata["IMAGING_TIME"]
-            date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
-            item = Item(
-                id=self.get_item_id(url),
-                geometry=geometry,
-                bbox=bbox,
-                centroid=centroid,
-                properties=Properties(
-                    datetime=date_time,
-                    processing__level=metadata.get("PROCESSING_LEVEL"),
-                    gsd=gsd,
-                    proj__epsg=get_epsg(AccessManager.get_gdal_proj(local_dim_path)),
-                    instrument=metadata.get("INSTRUMENT"),
-                    constellation=metadata.get("MISSION"),
-                    sensor=metadata.get("MISSION"),
-                    sensor_type=metadata.get("MISSION_INDEX"),
-                    view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
-                    view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
-                    view__sun_elevation=metadata.get("SUN_ELEVATION"),
-                    item_type=ResourceType.gridded.value,
-                    item_format=ItemFormat.spot5.value,
-                    main_asset_format=AssetFormat.geotiff.value,
-                    main_asset_name=Role.data.value,
-                    observation_type=ObservationType.image.value
-                ),
-                assets=dict(map(lambda asset: (asset.name, asset), assets))
-            )
+
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+        # We retrieve the time
+        date = metadata["IMAGING_DATE"]
+        time = metadata["IMAGING_TIME"]
+        date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
+        item = Item(
+            id=self.get_item_id(url),
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                processing__level=metadata.get("PROCESSING_LEVEL"),
+                gsd=gsd,
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
+                instrument=metadata.get("INSTRUMENT"),
+                constellation=metadata.get("MISSION"),
+                sensor=metadata.get("MISSION"),
+                sensor_type=metadata.get("MISSION_INDEX"),
+                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
+                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
+                view__sun_elevation=metadata.get("SUN_ELEVATION"),
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.spot5.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.image.value
+            ),
+            assets=dict(map(lambda asset: (asset.name, asset), assets))
+        )
 
         return item
 
