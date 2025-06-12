@@ -22,13 +22,9 @@ class Driver(DownloadDriver):
         item_format = item.properties.item_format
         href = self.get_asset_href(item)
         return href is not None \
-            and (item_format == ItemFormat.geotiff.value
-                 or item_format == ItemFormat.jpeg2000.value
-                 or item_format == ItemFormat.ast_dem.value
-                 or item_format == ItemFormat.csk.value
-                 or item_format == ItemFormat.digitalglobe.value
-                 or item_format == ItemFormat.geoeye.value
-                 or item_format == ItemFormat.rapideye.value)
+            and item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value, ItemFormat.ast_dem.value,
+                                ItemFormat.csk.value, ItemFormat.digitalglobe.value, ItemFormat.geoeye.value,
+                                ItemFormat.rapideye.value, ItemFormat.umbra.value, ItemFormat.bsg.value]
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str,

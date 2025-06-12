@@ -11,7 +11,8 @@ from prettytable import PrettyTable
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
-SLASH_ITEMS="/items"
+SLASH_ITEMS = "/items"
+
 
 def to_item(feature, extra_params={}) -> Item:
     feature["centroid"] = [
@@ -26,6 +27,7 @@ def to_item(feature, extra_params={}) -> Item:
     fields_to_keep = {}
     # TO ITEM
     feature.get("properties").pop("proj:bbox", "")
+    polarization = feature.get("properties").pop("sar:polarizations", "")
     item = item_from_dict(feature)
     item.collection = extra_params.get("collection")
     item.catalog = extra_params.get("catalog")
@@ -35,6 +37,12 @@ def to_item(feature, extra_params={}) -> Item:
     item.properties.acq__acquisition_orbit_direction = feature.get("properties").get("sat:orbit_state", "").upper()
     item.properties.item_format = ItemFormat.safe.value
     fields_to_keep["endpoint_url"] = feature.get("properties").get("endpoint_url")
+
+    # Correct polarization type as it should be a list
+    if polarization:
+        if isinstance(polarization, str):
+            polarization = [polarization]
+        item.properties.sar__polarizations = polarization
 
     for name, asset in item.assets.items():
         asset: Asset = asset
@@ -151,6 +159,7 @@ def list_collections(stac_url: str):
                 count
             ])
     return table
+
 
 @app.command(help="Add STAC features to ARLAS AIRS")
 def add(
