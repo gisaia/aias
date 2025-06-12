@@ -26,16 +26,10 @@ class Driver(IngestDriver):
         assets: list[Asset] = []
 
         if self.thumbnail_path:
-            assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.PNG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.png.value))
+            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.PNG, AssetFormat.png, ResourceType.other)
+        ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+        ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
 
-        assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
-                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
-                            description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-        assets.append(Asset(href=self.md_path, size=AccessManager.get_size(self.md_path),
-                      roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.JSON.value,
-                      description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.json.value, asset_type=ResourceType.other.value))
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):

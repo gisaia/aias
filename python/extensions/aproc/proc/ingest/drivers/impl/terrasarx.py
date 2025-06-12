@@ -6,6 +6,8 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     geotiff_to_jpg, get_epsg, get_geom_bbox_centroid)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -52,16 +54,13 @@ class Driver(IngestDriver):
             AccessManager.makedir(thumbnail_path)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
             geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
-            assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other)
+
             quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
             AccessManager.makedir(quicklook_path)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
-            assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other)
         return assets
 
     # Implements drivers method

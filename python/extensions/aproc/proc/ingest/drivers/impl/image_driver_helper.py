@@ -53,6 +53,12 @@ class ImageDriverHelper:
             driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
             driver.LOGGER.error(e)
 
+    @staticmethod
+    def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False):
+        assets.append(Asset(href=href, size=AccessManager.get_size(href),
+                            roles=[role.value], name=role.value, type=type.value,
+                            description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value))
+
     # Implements drivers method
     @staticmethod
     def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
