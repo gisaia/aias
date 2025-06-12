@@ -116,7 +116,7 @@ class S3Storage(AbstractStorage):
     def __list_objects(self, href: str):
         return self.get_storage_parameters()["client"].list_objects_v2(
             Bucket=self.get_configuration().bucket,
-            Prefix=self.__get_href_key(href).removesuffix("/") + "/",
+            Prefix=self.__get_href_key(href).removeprefix("/").removesuffix("/") + "/",
             Delimiter="/",
             MaxKeys=self.get_configuration().max_objects
         )
