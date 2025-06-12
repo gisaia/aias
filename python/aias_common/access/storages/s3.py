@@ -90,8 +90,13 @@ class S3Storage(AbstractStorage):
                 f.write(chunk)
 
     def push(self, href: str, dst: str):
+        import botocore.client
+
         super().push(href, dst)
-        raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
+
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+
+        client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst))
 
     def __head_object(self, href: str):
         return self.get_storage_parameters()["client"].head_object(
