@@ -70,3 +70,5 @@ services:
 #      - ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail"
     ports:
       - $AGATE_PORT:$AGATE_PORT
+    volumes:
+      - ${PWD}/conf/roles.yaml:/app/conf/roles.yaml:ro
