@@ -49,7 +49,7 @@ class AccessManager:
             map(lambda s: s.is_path_authorized(tmp_dir, AccessType.WRITE),
                 filter(lambda s: s.storage_configuration.type == "file", AccessManager.storages)))
         if not is_tmp_dir_authorized:
-            raise ValueError("The given tmp_dir is not part of any defined FileStorage with WRITE authorization")
+            raise PermissionError("The given tmp_dir is not part of any defined FileStorage with WRITE authorization")
 
         AccessManager.tmp_dir = tmp_dir
 
@@ -80,7 +80,7 @@ class AccessManager:
         """
         is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE),AccessManager.storages))
         if not is_authorized:
-            raise ValueError(f"Path '{href}' is not writable")
+            raise PermissionError(f"Path '{href}' is not writable")
 
     @staticmethod
     def check_path_readable(href: str):
@@ -89,7 +89,7 @@ class AccessManager:
         """
         is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),AccessManager.storages))
         if not is_authorized:
-            raise ValueError(f"Path '{href}' is not readable")
+            raise PermissionError(f"Path '{href}' is not readable")
 
     @staticmethod
     def push(href: str, dst: str):
@@ -264,14 +264,14 @@ class AccessManager:
                 for f in AccessManager.listdir(href):
                     folder_size += AccessManager.get_size(f.path)
                 return folder_size
-        raise ValueError(f"Given href does not exist {href}")
+        raise FileNotFoundError(f"Given href does not exist: {href}")
 
     @staticmethod
     def listdir(href: str) -> list[File]:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):
-            raise ValueError("Given href does not point to a directory ({})".format(href))
+            raise NotADirectoryError(f"Given href does not point to a directory: {href}")
 
         return storage.listdir(href)
 

@@ -66,7 +66,7 @@ class FileStorage(AbstractStorage):
 
     def makedir(self, href: str, strict=False):
         if not self.is_path_authorized(href, AccessType.WRITE):
-            raise ValueError('The desired folder is not authorized')
+            raise PermissionError(f'The desired folder path is not authorized to write: {href}')
 
         if not self.exists(href) or strict:
             os.makedirs(href)
