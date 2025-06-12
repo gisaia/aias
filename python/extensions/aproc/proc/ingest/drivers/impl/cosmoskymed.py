@@ -68,13 +68,13 @@ class Driver(IngestDriver):
             AccessManager.makedir(thumbnail_path)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
             geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other)
+            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
             quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
             AccessManager.makedir(quicklook_path)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
-            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other)
+            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
         return assets
 
