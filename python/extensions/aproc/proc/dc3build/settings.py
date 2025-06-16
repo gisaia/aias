@@ -5,8 +5,8 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Settings(BaseModel, extra='allow'):
-    arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
-    drivers: list[DriverConfiguration] = Field(title="Configuration of the drivers")
+    arlas_url_search: str = Field(title="ARLAS URL Search", description="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
+    drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the dc3build drivers")
 
 
 class Configuration:

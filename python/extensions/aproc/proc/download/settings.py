@@ -1,14 +1,14 @@
-from pydantic import BaseModel, Extra, Field
-from envyaml import EnvYAML
-
 from airs.core.models.model import Item, Role
 from airs.core.settings import S3
-from extensions.aproc.proc.drivers.driver_configuration import DriverConfiguration as DriverConfiguration
+from envyaml import EnvYAML
+from extensions.aproc.proc.drivers.driver_configuration import \
+    DriverConfiguration as DriverConfiguration
 from extensions.aproc.proc.drivers.exceptions import DriverException
+from pydantic import BaseModel, Extra, Field
 
 
 class Driver(DriverConfiguration):
-    alternative_asset_href_field: str | None = Field(None, title="Property field to use as an alternative to the data's href")
+    alternative_asset_href_field: str | None = Field(None, title="Data href alternative", description="By default, data are fetched from the href of the asset named \"data\". Instead, data can be retrieved from an item's property.")
 
     def get_asset_href(self, item: Item) -> str | None:
         if self.alternative_asset_href_field:
@@ -18,47 +18,47 @@ class Driver(DriverConfiguration):
 
 
 class SMPTConfiguration(BaseModel, extra='allow'):
-    host: str = Field(title="smtp host")
-    port: int = Field(title="smtp port")
-    login: str = Field(title="smtp user login")
-    password: str = Field(title="smtp user password")
-    from_addr: str = Field(title="Emails address of the system that sends the emails")
+    host: str = Field(title="Host", description="SMTP host")
+    port: int = Field(title="Port", description="SMTP port")
+    login: str = Field(title="Login", description="SMTP user login")
+    password: str = Field(title="Password", description="SMTP user password")
+    from_addr: str = Field(title="From", description="Emails address of the system that sends the emails")
 
 
 class Index(BaseModel, extra=Extra.allow):
-    index_name: str
-    endpoint_url: str
-    login: str = Field(None)
-    pwd: str = Field(None)
+    index_name: str = Field(title="Index name", description="Elasticsearch index name for indexing download requests")
+    endpoint_url: str = Field(title="ES endpoint", description="Elasticsearch URL for indexing download requests")
+    login: str = Field("", title="login", description="Elasticsearch login")
+    pwd: str = Field("", title="", description="Elasticsearch password")
 
 
 class Settings(BaseModel, extra='allow'):
-    arlas_url_search: str = Field(title="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
-    drivers: list[DriverConfiguration] = Field(title="Configuration of the drivers")
-    outbox_directory: str = Field(title="Directory where the downloads will be placed. Must be configured, even so you enabled outbox_s3")
-    outbox_s3: S3 | None = Field(title="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
-    clean_outbox_directory: bool = Field(True, title="Clean outbox directory once files copied on S3")
-    notification_admin_emails: str = Field(title="List of admin emails for receiving download notifications, comma seperated.")
-    smtp: SMPTConfiguration = Field(title="Emails address of the system that sends the emails")
-    email_content_user: str = Field(title="Content of the email to be sent to the user")
-    email_content_error_download: str = Field(title="Content of the email to be sent to the user")
-    email_content_admin: str = Field(title="Content of the email to be sent to the admin")
-    email_subject_user: str = Field(title="Subject of the email to be sent to the user")
-    email_subject_error_download: str = Field(title="Subject of the email to be sent to the user")
-    email_subject_admin: str = Field(title="Subject of the email to be sent to the admin")
-    email_path_prefix_add: str = Field(title="Prefix to add to the download paths presented to the users/admin")
-    email_path_to_windows: bool = Field(False, title="Whether to change or not the path seperators for windows")
-    email_request_subject_user: str = Field(title="Content of the subject to be sent to the user when download request submitted")
-    email_request_content_user: str = Field(title="Content of the email to be sent to the user when download request submitted")
-    email_request_subject_admin: str = Field(title="Content of the subject to be sent to the admins when download request submitted")
-    email_request_content_admin: str = Field(title="Content of the email to be sent to the admins when download request submitted")
-    index_for_download: Index = Field(title="Configuration of the elasticsearch index for reporting downloads")
-    arlaseo_mapping_url: str = Field(title="Location of the arlas eo mapping")
-    download_mapping_url: str = Field(title="Location of the download requests mapping")
+    arlas_url_search: str = Field(title="Search template", description="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
+    drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the download drivers")
+    outbox_directory: str = Field(title="Outbox location", description="Directory where the downloads will be placed. Must be configured, even so you enabled outbox_s3")
+    outbox_s3: S3 | None = Field(title="S3 outbox configuration", description="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
+    clean_outbox_directory: bool = Field(True, title="Clean after S3 copy", description="Clean outbox directory once files copied on S3")
+    notification_admin_emails: str = Field(title="Admin's email", description="List of admin emails for receiving download notifications, comma seperated.")
+    smtp: SMPTConfiguration = Field(title="SMTP Configuration", description="Emails address of the system that sends the emails")
+    email_content_user: str = Field(title="Email content", description="Content of the email to be sent to the user")
+    email_content_error_download: str = Field(title="Error email content", description="Content of the email to be sent to the user")
+    email_content_admin: str = Field(title="Admin email content", description="Content of the email to be sent to the admin")
+    email_subject_user: str = Field(title="Email subject", description="Subject of the email to be sent to the user")
+    email_subject_error_download: str = Field(title="Error email subject", description="Subject of the email to be sent to the user")
+    email_subject_admin: str = Field(title="Admin email subject", description="Subject of the email to be sent to the admin")
+    email_path_prefix_add: str = Field(title="Path prefix for download link", description="Prefix to add to the download paths presented to the users/admin")
+    email_path_to_windows: bool = Field(False, title="Is a MS Windows path", description="Whether to change or not the path separators for windows")
+    email_request_subject_user: str = Field(title="Request sent email subject", description="Content of the subject to be sent to the user when download request submitted")
+    email_request_content_user: str = Field(title="Request sent email content", description="Content of the email to be sent to the user when download request submitted")
+    email_request_subject_admin: str = Field(title="Request sent admin email subject", description="Content of the subject to be sent to the admins when download request submitted")
+    email_request_content_admin: str = Field(title="Request sent admin email content", description="Content of the email to be sent to the admins when download request submitted")
+    index_for_download: Index = Field(title="ES configuration", description="Configuration of the elasticsearch index for reporting downloads")
+    arlaseo_mapping_url: str = Field(title="ARLAS EO mapping", description="Location of the ARLAS EO index mapping for STAC Items")
+    download_mapping_url: str = Field(title="Download mapping", description="Location of the download requests mapping")
 
 
 class Configuration:
-    settings: Settings | None = Field(title="aproc Download service configuration")
+    settings: Settings | None = Field(title="Download configuration", description="APROC Download service configuration")
 
     @staticmethod
     def init(configuration_file: str):

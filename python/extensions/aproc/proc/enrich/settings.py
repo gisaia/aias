@@ -5,11 +5,11 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Settings(BaseModel, extra='allow'):
-    drivers: list[DriverConfiguration] = Field(title="Configuration of the drivers")
+    drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="List of driver configuration for item enrichment.")
 
 
 class Configuration:
-    settings: Settings | None = Field(title="aproc Ingest Service configuration")
+    settings: Settings | None = Field(title="Enrichment configuration", description="APROC Enrichment Service configuration")
 
     @staticmethod
     def init(configuration_file: str):

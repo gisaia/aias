@@ -31,7 +31,7 @@ class Settings(BaseModel, extra="allow"):
 
 
 class Configuration:
-    settings: Settings = None
+    settings: Settings = Field(title="AIRS Configuration", description="ARLAS Item and Assets Registration Service configuration")
 
     @staticmethod
     def init(configuration_file: str):
