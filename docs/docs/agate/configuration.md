@@ -1,0 +1,3 @@
+# AGATE Configuration
+
+::: agate.settings

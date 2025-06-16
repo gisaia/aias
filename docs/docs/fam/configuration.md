@@ -1,0 +1,3 @@
+# FAM Configuration
+
+::: fam.settings

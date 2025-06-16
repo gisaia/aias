@@ -1,0 +1,3 @@
+# AIRS Configuration
+
+::: airs.settings
