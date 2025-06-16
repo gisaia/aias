@@ -12,7 +12,7 @@ class Service(BaseModel, extra=Extra.allow):
     public_url_patterns: list[str] | None = Field(title="Public pattern list", description="List of patterns for public access. IMPORTANT: no access control done on those patterns.")
     url_header: str = Field(title="URL Header", description="Header containing the URL")
     url_header_prefix: str | None = Field(title="URL Prefix", description="URL prefix that is removed before pattern matching.")
-    pattern_target: str | None = Field(title="If undefined, then the pattern is matched against the path. Use query.{param}, where {param} is the parameter value, to use a query parameter. Use query.{param}.url.path|query if the param value is a url and that you want to target the path or query of that url.")
+    pattern_target: str | None = Field(title="Pattern target", description="If undefined, then the pattern is matched against the path. Use query.{param}, where {param} is the parameter value, to use a query parameter. Use query.{param}.url.path|query if the param value is a url and that you want to target the path or query of that url.")
 
 
 class URBAC(BaseModel, extra=Extra.allow):
