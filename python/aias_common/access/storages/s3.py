@@ -100,7 +100,7 @@ class S3Storage(AbstractStorage):
         import botocore.exceptions
         try:
             return self.__head_object(href)['ResponseMetadata']['HTTPStatusCode'] == 200
-        except botocore.exceptions.ClientError as e:
+        except botocore.exceptions.ClientError:
             return False
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
