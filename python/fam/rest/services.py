@@ -16,10 +16,13 @@ MAX_SIZE = 1000
 async def root():
     lm: float | None = AccessManager.get_last_modification_time(Configuration.settings.inputs_directory)
     cd: float | None = AccessManager.get_creation_time(Configuration.settings.inputs_directory)
+    print("!!!!!!")
+    print(lm)
+    print(cd)
     if lm:
         lm = datetime.datetime.fromtimestamp(lm)
     if cd:
-        cd = datetime.datetime.fromtimestamp(lm)
+        cd = datetime.datetime.fromtimestamp(cd)
     return File(
         name=Configuration.settings.inputs_directory,
         path=Configuration.settings.inputs_directory,
@@ -41,7 +44,7 @@ async def files(path_request: PathRequest):
         if lm:
             lm = datetime.datetime.fromtimestamp(lm)
         if cd:
-            cd = datetime.datetime.fromtimestamp(lm)
+            cd = datetime.datetime.fromtimestamp(cd)
         return [File(name=f, path=file_path, is_dir=False,
                      last_modification_date=lm,
                      creation_date=cd)]

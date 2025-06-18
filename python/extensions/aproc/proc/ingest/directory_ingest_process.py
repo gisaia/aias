@@ -136,7 +136,7 @@ class AprocProcess(Process):
             if lm:
                 lm = datetime.datetime.fromtimestamp(lm)
             if cd:
-                cd = datetime.datetime.fromtimestamp(lm)
+                cd = datetime.datetime.fromtimestamp(cd)
             archive = Archive(id=driver.get_item_id(full_path),
                               name=os.path.basename(path),
                               driver_name=driver.name,
