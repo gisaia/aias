@@ -51,11 +51,7 @@ class S3Storage(AbstractStorage):
         return False
 
     def exists(self, href: str):
-        import botocore.exceptions       
-        try:
-            return self.__head_object(href)['ResponseMetadata']['HTTPStatusCode'] == 200
-        except botocore.exceptions.ClientError:
-            return self.is_dir(href)
+        return self.is_file(href) or self.is_dir(href)
 
     def get_rasterio_session(self):
         import rasterio.session
@@ -117,7 +113,8 @@ class S3Storage(AbstractStorage):
         )
 
     def is_dir(self, href: str):
-        return self.__list_objects(href)['KeyCount'] > 0
+        objects = self.__list_objects(href)
+        return objects['KeyCount'] > 0 or len(objects.get('CommonPrefixes', [])) > 0
 
     def get_file_size(self, href: str):
         return self.__head_object(href)['ContentLength']
@@ -139,8 +136,6 @@ class S3Storage(AbstractStorage):
                 path=self.__update_url__(source, c["Key"]),
                 is_dir=False,
                 last_modification_date=c["LastModified"]), objects["Contents"]))
-        else:
-            LOGGER.warning("No content found for {}".format(source))
 
         dirs = []
         if objects.get("CommonPrefixes"):
