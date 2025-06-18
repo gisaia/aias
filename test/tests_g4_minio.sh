@@ -11,4 +11,4 @@ cat test/env_minio.sh >> test/env.sh
 docker network list
 
 echo "run test.aproc_ingest_tests_minio"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_minio Tests.test_ingest_directory
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_minio Tests.test_ingest_directory || docker logs aproc-processes
