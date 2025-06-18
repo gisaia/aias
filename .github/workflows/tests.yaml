@@ -3,98 +3,98 @@ name: Test AIAS
 on: push
 
 jobs:
-  # hadolint:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #     - name: Run Hadolint
-  #       uses: hadolint/hadolint-action@v3.1.0
-  #       with:
-  #         failure-threshold: "error"
-  #         dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
+  hadolint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          failure-threshold: "error"
+          dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
  
-  # aias-tests-g1:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.11'
-  #   - name: Install test/requirements
-  #     run: |
-  #       pip install -r test/requirements.txt
-  #   - name: Start stack
-  #     run: test/start_stack.sh
-  #   - name: Run g1 tests
-  #     run: test/tests_g1.sh
+  aias-tests-g1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g1 tests
+      run: test/tests_g1.sh
 
 
-  # aias-tests-g2:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.11'
-  #   - name: Install test/requirements
-  #     run: |
-  #       pip install -r test/requirements.txt
-  #   - name: Start stack
-  #     run: test/start_stack.sh
-  #   - name: Run g2 tests
-  #     run: test/tests_g2.sh
+  aias-tests-g2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g2 tests
+      run: test/tests_g2.sh
   
 
-  # aias-tests-g3:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.11'
-  #   - name: Install test/requirements
-  #     run: |
-  #       pip install -r test/requirements.txt
-  #   - name: Start stack
-  #     run: test/start_stack.sh
-  #   - name: Run g3 tests
-  #     run: test/tests_g3.sh
+  aias-tests-g3:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack
+      run: test/start_stack.sh
+    - name: Run g3 tests
+      run: test/tests_g3.sh
   
 
-  # aias-tests-g4-fs:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.11'
-  #   - name: Install test/requirements
-  #     run: |
-  #       pip install -r test/requirements.txt
-  #   - name: Start stack fs
-  #     run: test/start_stack.sh
-  #   - name: Run g4 tests fs
-  #     run: test/tests_g4_fs.sh
+  aias-tests-g4-fs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack fs
+      run: test/start_stack.sh
+    - name: Run g4 tests fs
+      run: test/tests_g4_fs.sh
   
 
-  # aias-tests-g4-gs:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.11'
-  #   - name: Install test/requirements
-  #     run: |
-  #       pip install -r test/requirements.txt
-  #   - name: Start stack gs
-  #     run: test/start_stack.sh gs
-  #   - name: Run g4 tests gs
-  #     run: test/tests_g4_gs.sh
+  aias-tests-g4-gs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack gs
+      run: test/start_stack.sh gs
+    - name: Run g4 tests gs
+      run: test/tests_g4_gs.sh
   
 
   aias-tests-g4-minio:
@@ -113,16 +113,16 @@ jobs:
       run: test/tests_g4_minio.sh
   
 
-  # geodes-stac-test:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - uses: actions/setup-python@v4
-  #     with:
-  #       python-version: '3.10'
-  #   - name: Install python/requirements-stac.txt
-  #     run: |
-  #       pip install -r python/requirements-stac.txt
-  #   - name: Run  tests
-  #     run: test/test_geodes_stac.sh
+  geodes-stac-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Install python/requirements-stac.txt
+      run: |
+        pip install -r python/requirements-stac.txt
+    - name: Run  tests
+      run: test/test_geodes_stac.sh
   
