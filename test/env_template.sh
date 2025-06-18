@@ -95,7 +95,6 @@ export ASSET_MINIO_PUBLIC_PATTERN="(/collections/)(?P<collection>[^/]+)/items/(?
 export AGATE_LOGGER_LEVEL=DEBUG
 
 # FAM
-# To test FAM with Google Storage
 export FAM_LOGGER_LEVEL=DEBUG
 export FAM_CORS_ORIGINS="*"
 export FAM_CORS_METHODS="*"

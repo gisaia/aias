@@ -4,8 +4,6 @@ echo "build docker image for tests"
 docker build -f docker/Dockerfile-tests . -t pythontests
 
 # Set env variable
-cp test/env_template.sh test/env.sh
-cat test/env_gs.sh >> test/env.sh
 . ./test/env.sh
 
 docker network list

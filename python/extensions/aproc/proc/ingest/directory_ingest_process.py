@@ -123,32 +123,31 @@ class AprocProcess(Process):
 
     @staticmethod
     def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
-        full_path = path
-        if not AccessManager.exists(full_path):
-            LOGGER.error("{} does not exist, directory/file can no be scanned to find archives".format(full_path))
+        if not AccessManager.exists(path):
+            LOGGER.error("{} does not exist, directory/file can no be scanned to find archives".format(path))
             return []
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
-        driver: IngestDriver = DriverManager.solve(summary.id, full_path)
+        driver: IngestDriver = DriverManager.solve(summary.id, path)
         if driver is not None:
-            lm: float | None = AccessManager.get_last_modification_time(full_path)
-            cd: float | None = AccessManager.get_creation_time(full_path)
+            lm: float | None = AccessManager.get_last_modification_time(path)
+            cd: float | None = AccessManager.get_creation_time(path)
             if lm:
                 lm = datetime.datetime.fromtimestamp(lm)
             if cd:
                 cd = datetime.datetime.fromtimestamp(cd)
-            archive = Archive(id=driver.get_item_id(full_path),
+            archive = Archive(id=driver.get_item_id(path),
                               name=os.path.basename(path),
                               driver_name=driver.name,
                               path=path,
-                              is_dir=AccessManager.is_dir(full_path),
+                              is_dir=AccessManager.is_dir(path),
                               last_modification_date=lm,
                               creation_date=cd)
             return [archive]
         else:
-            if AccessManager.is_dir(full_path):
+            if AccessManager.is_dir(path):
                 archives: list[Archive] = []
-                for file in AccessManager.listdir(full_path):
+                for file in AccessManager.listdir(path):
                     sub_archives = AprocProcess.list_archives(file.path, size=size, max_size=max_size)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives

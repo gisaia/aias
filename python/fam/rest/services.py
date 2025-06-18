@@ -16,9 +16,6 @@ MAX_SIZE = 1000
 async def root():
     lm: float | None = AccessManager.get_last_modification_time(Configuration.settings.inputs_directory)
     cd: float | None = AccessManager.get_creation_time(Configuration.settings.inputs_directory)
-    print("!!!!!!")
-    print(lm)
-    print(cd)
     if lm:
         lm = datetime.datetime.fromtimestamp(lm)
     if cd:
