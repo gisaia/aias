@@ -27,6 +27,7 @@ cp -r docs/docs/* target/generated-docs/
 
 # Get Pydantic Settings models
 cp python/agate/settings.py target/generated-docs/agate/settings.py
+mkdir -p target/generated-docs/aias_common
 cp python/aias_common/access/configuration.py target/generated-docs/aias_common/configuration.py
 cp python/airs/core/settings.py target/generated-docs/airs/settings.py
 cp python/aproc/core/settings.py target/generated-docs/aproc/settings.py
