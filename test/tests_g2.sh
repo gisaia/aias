@@ -20,6 +20,3 @@ docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m te
 echo "run test.aproc_ingest_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests
 
-
-# docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m  test.aproc_ingest_heavyload_tests
-./test/stop_stack.sh

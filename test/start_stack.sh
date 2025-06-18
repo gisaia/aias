@@ -1,4 +1,23 @@
 #!/usr/bin/env sh
+
+rm ./test/env.sh
+cp test/env_template.sh test/env.sh
+cat test/env_fs.sh >> test/env.sh
+
+if [ "$1" = "minio" ] 
+then
+    rm ./test/env.sh
+    cp test/env_template.sh test/env.sh
+    cat test/env_minio.sh >> test/env.sh
+fi
+
+if [ "$1" = "gs" ] 
+then
+    rm ./test/env.sh
+    cp test/env_template.sh test/env.sh
+    cat test/env_gs.sh >> test/env.sh
+fi
+
 # Set env variable
 . ./test/env.sh
 # Copy heavy data for test from gcp bucket

@@ -65,6 +65,54 @@ jobs:
       run: test/tests_g3.sh
   
 
+  aias-tests-g4-fs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack fs
+      run: test/start_stack.sh
+    - name: Run g4 tests fs
+      run: test/tests_g4_fs.sh
+  
+
+  aias-tests-g4-gs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack gs
+      run: test/start_stack.sh gs
+    - name: Run g4 tests gs
+      run: test/tests_g4_gs.sh
+  
+
+  aias-tests-g4-minio:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.txt
+    - name: Start stack minio
+      run: test/start_stack.sh minio
+    - name: Run g4 tests minio
+      run: test/tests_g4_minio.sh
+  
+
   geodes-stac-test:
     runs-on: ubuntu-latest
     steps:

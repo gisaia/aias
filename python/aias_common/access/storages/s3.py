@@ -5,7 +5,10 @@ from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
+from aias_common.access.logger import Logger
 
+
+LOGGER = Logger.logger
 
 class S3Storage(AbstractStorage):
 
@@ -48,8 +51,7 @@ class S3Storage(AbstractStorage):
         return False
 
     def exists(self, href: str):
-        import botocore.exceptions
-
+        import botocore.exceptions       
         try:
             return self.__head_object(href)['ResponseMetadata']['HTTPStatusCode'] == 200
         except botocore.exceptions.ClientError:
@@ -95,13 +97,11 @@ class S3Storage(AbstractStorage):
 
     def __head_object(self, href: str):
         return self.get_storage_parameters()["client"].head_object(
-                Bucket=self.get_configuration().bucket,
-                Key=self.__get_href_key(href)
-            )
+            Bucket=self.get_configuration().bucket,
+            Key=self.__get_href_key(href))
 
     def is_file(self, href: str):
         import botocore.exceptions
-
         try:
             return self.__head_object(href)['ResponseMetadata']['HTTPStatusCode'] == 200
         except botocore.exceptions.ClientError:
@@ -132,12 +132,15 @@ class S3Storage(AbstractStorage):
 
     def listdir(self, source: str) -> list[File]:
         objects = self.__list_objects(source)
-
-        files = list(map(lambda c: File(
-            name=os.path.basename(c["Key"]),
-            path=self.__update_url__(source, c["Key"]),
-            is_dir=False,
-            last_modification_date=c["LastModified"]), objects["Contents"]))
+        files = []
+        if objects.get("Contents"):
+            files = list(map(lambda c: File(
+                name=os.path.basename(c["Key"]),
+                path=self.__update_url__(source, c["Key"]),
+                is_dir=False,
+                last_modification_date=c["LastModified"]), objects["Contents"]))
+        else:
+            LOGGER.warning("No content found for {}".format(source))
 
         dirs = []
         if objects.get("CommonPrefixes"):
@@ -148,8 +151,12 @@ class S3Storage(AbstractStorage):
 
         return files + dirs
 
-    def get_last_modification_time(self, href: str):
-        return self.__head_object(href)['LastModified'].timestamp()
+    def get_last_modification_time(self, href: str):        
+        import botocore.exceptions
+        try:
+            return self.__head_object(href)['LastModified'].timestamp()
+        except botocore.exceptions.ClientError:
+            return None
 
     def get_creation_time(self, href: str):
         # There is no difference in s3 between last update and creation date

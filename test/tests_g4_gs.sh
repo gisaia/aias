@@ -6,7 +6,7 @@ docker build -f docker/Dockerfile-tests . -t pythontests
 # Set env variable
 . ./test/env.sh
 
-docker ps
+docker network list
 
-echo "run test.aproc_download_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_download_tests
+echo "run test.aproc_ingest_tests_gs"
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_gs
