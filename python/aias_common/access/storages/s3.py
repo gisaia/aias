@@ -5,7 +5,10 @@ from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
+from aias_common.access.logger import Logger
 
+
+LOGGER = Logger.logger
 
 class S3Storage(AbstractStorage):
 
@@ -129,12 +132,15 @@ class S3Storage(AbstractStorage):
 
     def listdir(self, source: str) -> list[File]:
         objects = self.__list_objects(source)
-
-        files = list(map(lambda c: File(
-            name=os.path.basename(c["Key"]),
-            path=self.__update_url__(source, c["Key"]),
-            is_dir=False,
-            last_modification_date=c["LastModified"]), objects["Contents"]))
+        files = []
+        if objects.get("Contents"):
+            files = list(map(lambda c: File(
+                name=os.path.basename(c["Key"]),
+                path=self.__update_url__(source, c["Key"]),
+                is_dir=False,
+                last_modification_date=c["LastModified"]), objects["Contents"]))
+        else:
+            LOGGER.warning("No content found for {}".format(source))
 
         dirs = []
         if objects.get("CommonPrefixes"):
