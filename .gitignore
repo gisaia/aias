@@ -22,3 +22,4 @@ angular/file-explorer/.angular
 angular/file-explorer/dist
 
 conf/roles.yaml
+test/env.sh

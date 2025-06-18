@@ -1,0 +1,1 @@
+export INGESTED_FOLDER=gs://gisaia-public/test-aias

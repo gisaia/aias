@@ -17,13 +17,19 @@ class Fam():
             return []
         driver: IngestDriver = DriverManager.solve("ingest", path)
         if driver is not None:
+            lm: float | None = AccessManager.get_last_modification_time(path)
+            cd: float | None = AccessManager.get_creation_time(path)
+            if lm:
+                lm = datetime.datetime.fromtimestamp(lm)
+            if cd:
+                cd = datetime.datetime.fromtimestamp(lm)
             archive = Archive(id=driver.get_item_id(path),
                               name=os.path.basename(path.removesuffix("/")),
                               driver_name=driver.name,
                               path=path,
                               is_dir=AccessManager.is_dir(path),
-                              last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(path)),
-                              creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(path)))
+                              last_modification_date=lm,
+                              creation_date=cd)
             return [archive]
         else:
             if AccessManager.is_dir(path):

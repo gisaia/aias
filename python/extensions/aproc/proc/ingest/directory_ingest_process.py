@@ -67,6 +67,8 @@ class AprocProcess(Process):
         else:
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
         AprocProcess.input_model = InputDirectoryIngestProcess
+        LOGGER.info("Service configuration:")
+        LOGGER.info(IngestConfiguration.settings.model_dump_json())
 
     @staticmethod
     def get_process_description() -> ProcessDescription:
@@ -93,12 +95,17 @@ class AprocProcess(Process):
         Returns:
             list: List of archives(urls) (OutputDirectoryIngestProcess)
         """
-        archives: list[Archive] = AprocProcess.list_archives(Configuration.settings.inputs_directory, directory, max_size=Configuration.settings.max_number_of_archive_for_ingest)
-        LOGGER.info("{} archives to be ingested from {}".format(len(archives), os.path.join(Configuration.settings.inputs_directory, directory)))
+        if not directory.startswith(Configuration.settings.inputs_directory):
+            msg = "Can not ingest directory {} : it is not prefixed with {}".format(directory, Configuration.settings.inputs_directory)
+            LOGGER.error(msg)
+            raise Exception(msg)
+
+        archives: list[Archive] = AprocProcess.list_archives(directory, max_size=Configuration.settings.max_number_of_archive_for_ingest)
+        LOGGER.info("{} archives to be ingested from {}".format(len(archives), directory))
         for archive in archives:
             LOGGER.info(archive.model_dump_json(exclude_none=True, exclude_unset=True))
             try:
-                inputs = InputIngestProcess(url=os.path.join(Configuration.settings.inputs_directory, archive.path), collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+                inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
                 execute = Execute(inputs=inputs.model_dump())
                 r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
@@ -115,28 +122,34 @@ class AprocProcess(Process):
         return list(map(lambda a: a.model_dump(exclude_none=True, exclude_unset=True), archives))
 
     @staticmethod
-    def list_archives(prefix: str, path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
-        full_path = os.path.join(prefix, path)
+    def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:
+        full_path = path
         if not AccessManager.exists(full_path):
-            LOGGER.error("{} does not exist, directory/file can no be scanned to find archives")
+            LOGGER.error("{} does not exist, directory/file can no be scanned to find archives".format(full_path))
             return []
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
         driver: IngestDriver = DriverManager.solve(summary.id, full_path)
         if driver is not None:
+            lm: float | None = AccessManager.get_last_modification_time(full_path)
+            cd: float | None = AccessManager.get_creation_time(full_path)
+            if lm:
+                lm = datetime.datetime.fromtimestamp(lm)
+            if cd:
+                cd = datetime.datetime.fromtimestamp(lm)
             archive = Archive(id=driver.get_item_id(full_path),
                               name=os.path.basename(path),
                               driver_name=driver.name,
                               path=path,
                               is_dir=AccessManager.is_dir(full_path),
-                              last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(full_path)),
-                              creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(full_path)))
+                              last_modification_date=lm,
+                              creation_date=cd)
             return [archive]
         else:
             if AccessManager.is_dir(full_path):
                 archives: list[Archive] = []
                 for file in AccessManager.listdir(full_path):
-                    sub_archives = AprocProcess.list_archives(prefix, file.path, size=size, max_size=max_size)
+                    sub_archives = AprocProcess.list_archives(file.path, size=size, max_size=max_size)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives
                 return archives

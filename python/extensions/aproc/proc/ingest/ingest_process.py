@@ -111,6 +111,11 @@ class AprocProcess(Process):
         Returns:
             object: an dict pointing towards the registered item (OutputIngestProcess)
         """
+        if not url.startswith(IngestConfiguration.settings.inputs_directory):
+            msg = "Can not ingest directory {} : it is not prefixed with {}".format(url, IngestConfiguration.settings.inputs_directory)
+            LOGGER.error(msg)
+            raise Exception(msg)
+
         if not AccessManager.exists(url):
             msg = "File or directory {} not found in configured storages".format(url)
             LOGGER.error(msg)

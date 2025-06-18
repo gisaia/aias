@@ -14,12 +14,18 @@ MAX_SIZE = 1000
 
 @ROUTER.get("/root", response_model=File)
 async def root():
+    lm: float | None = AccessManager.get_last_modification_time(Configuration.settings.inputs_directory)
+    cd: float | None = AccessManager.get_creation_time(Configuration.settings.inputs_directory)
+    if lm:
+        lm = datetime.datetime.fromtimestamp(lm)
+    if cd:
+        cd = datetime.datetime.fromtimestamp(lm)
     return File(
         name=Configuration.settings.inputs_directory,
         path=Configuration.settings.inputs_directory,
         is_dir=AccessManager.is_dir(Configuration.settings.inputs_directory),
-        last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(Configuration.settings.inputs_directory)),
-        creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(Configuration.settings.inputs_directory)))
+        last_modification_date=lm,
+        creation_date=cd)
 
 
 @ROUTER.post("/files", response_model=list[File])
@@ -30,9 +36,15 @@ async def files(path_request: PathRequest):
         return list(filter(lambda f: not os.path.basename(f.name).startswith("."), AccessManager.listdir(file_path)))
     else:
         f = os.path.basename(file_path)
+        lm: float | None = AccessManager.get_last_modification_time(file_path)
+        cd: float | None = AccessManager.get_creation_time(file_path)
+        if lm:
+            lm = datetime.datetime.fromtimestamp(lm)
+        if cd:
+            cd = datetime.datetime.fromtimestamp(lm)
         return [File(name=f, path=file_path, is_dir=False,
-                     last_modification_date=datetime.datetime.fromtimestamp(AccessManager.get_last_modification_time(file_path)),
-                     creation_date=datetime.datetime.fromtimestamp(AccessManager.get_creation_time(file_path)))]
+                     last_modification_date=lm,
+                     creation_date=cd)]
 
 
 @ROUTER.post("/archives", response_model=list[Archive])
@@ -49,6 +61,6 @@ def __check_file_path__(file_path: str):
     if not file_path:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path must be provided. Root is at {}".format(Configuration.settings.inputs_directory))
     if not file_path.startswith(Configuration.settings.inputs_directory):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path ({}) must be start with the root prefix ({}).".format(file_path, Configuration.settings.inputs_directory))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path ({}) must start with the root prefix ({}).".format(file_path, Configuration.settings.inputs_directory))
     if not AccessManager.exists(file_path):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File {} not found".format(file_path))
