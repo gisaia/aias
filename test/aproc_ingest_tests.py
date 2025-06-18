@@ -56,7 +56,7 @@ class IngestTests(unittest.TestCase):
             sleep(1)
             i = i + 1
             status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, StatusCode.successful)
+        self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
     def async_ingest(self, url, id, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
