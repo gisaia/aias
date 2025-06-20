@@ -95,6 +95,7 @@ class S3StorageConfiguration(StorageConfiguration):
     type: Literal["s3"] = Field(default="s3", title="Type", description="Indicates the storage type, fixed to 's3'")
     is_local: Literal[False] = Field(default=False, title='Is a local storage', description="Whether the storage is local or remote")
     bucket: str = Field(title="Bucket name", description="Name of the S3 bucket")
+    region: str = Field(default="auto", title="Region", description="Region of the bucket")
     endpoint: str = Field(title="Endpoint", description="Endpoint to access S3 storage")
     api_key: S3ApiKey | None = Field(title="API Key", description="API key for storage authentication", default=None)
     max_objects: int = Field(default=1000, title="Max object", description="Maximum number of objects to fetch when listing elements in a directory")

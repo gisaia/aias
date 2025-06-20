@@ -25,14 +25,14 @@ class S3Storage(AbstractStorage):
 
             client = boto3.client(
                 "s3",
-                region_name="auto",
+                region_name=self.get_configuration().region,
                 endpoint_url=self.get_configuration().endpoint,
                 config=Config(signature_version=UNSIGNED)
             )
         else:
             client = boto3.client(
                 "s3",
-                region_name="auto",
+                region_name=self.get_configuration().region,
                 endpoint_url=self.get_configuration().endpoint,
                 aws_access_key_id=self.get_configuration().api_key.access_key,
                 aws_secret_access_key=self.get_configuration().api_key.secret_key,
@@ -51,7 +51,7 @@ class S3Storage(AbstractStorage):
         return False
 
     def exists(self, href: str):
-        return self.is_file(href) or self.is_dir(href)
+        return self.is_dir(href) or self.is_file(href)
 
     def get_rasterio_session(self):
         import rasterio.session
@@ -61,19 +61,21 @@ class S3Storage(AbstractStorage):
         if self.get_configuration().is_anon_client:
             params["session"] = rasterio.session.AWSSession(
                 aws_unsigned=True,
+                region_name=self.get_configuration().region,
                 endpoint_url=self.get_configuration().endpoint
             )
         else:
             params["session"] = rasterio.session.AWSSession(
                 aws_access_key_id=self.get_configuration().api_key.access_key,
                 aws_secret_access_key=self.get_configuration().api_key.secret_key,
+                region_name=self.get_configuration().region,
                 endpoint_url=self.get_configuration().endpoint
             )
 
         return params
 
     def __get_href_key(self, href: str):
-        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}/")
+        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/")
 
     def pull(self, href: str, dst: str):
         import botocore.client
@@ -92,6 +94,7 @@ class S3Storage(AbstractStorage):
         raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
 
     def __head_object(self, href: str):
+        print("__head_object {}".format(href))
         return self.get_storage_parameters()["client"].head_object(
             Bucket=self.get_configuration().bucket,
             Key=self.__get_href_key(href))
@@ -103,14 +106,16 @@ class S3Storage(AbstractStorage):
         except botocore.exceptions.ClientError:
             return False
 
-    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_objects(self, href: str):
-        return self.get_storage_parameters()["client"].list_objects_v2(
-            Bucket=self.get_configuration().bucket,
-            Prefix=self.__get_href_key(href).removesuffix("/") + "/",
-            Delimiter="/",
-            MaxKeys=self.get_configuration().max_objects
-        )
+        params = {
+            "Bucket": self.get_configuration().bucket,
+            "Delimiter": "/",
+            "MaxKeys": self.get_configuration().max_objects
+        }
+        prefix = self.__get_href_key(href).removesuffix("/") + "/"
+        if prefix != "/":
+            params["Prefix"] = prefix
+        return self.get_storage_parameters()["client"].list_objects_v2(**params)
 
     def is_dir(self, href: str):
         objects = self.__list_objects(href)
@@ -152,6 +157,8 @@ class S3Storage(AbstractStorage):
             return self.__head_object(href)['LastModified'].timestamp()
         except botocore.exceptions.ClientError:
             return None
+        except botocore.exceptions.ParamValidationError:  # key LastModified does exists for root
+            return None
 
     def get_creation_time(self, href: str):
         # There is no difference in s3 between last update and creation date
@@ -173,6 +180,8 @@ class S3Storage(AbstractStorage):
             "AWS_S3_ENDPOINT": config.endpoint.removeprefix("http://").removeprefix("https://")  # NOSONAR
         }
 
+        if config.region != "auto":
+            params["AWS_DEFAULT_REGION"] = config.region
         if config.is_anon_client:
             params["AWS_NO_SIGN_REQUEST"] = "YES"
         else:
