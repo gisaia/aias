@@ -2,6 +2,7 @@ import os
 import shutil
 from contextlib import contextmanager
 from typing import Annotated, Union
+from urllib.parse import urlparse, urlunparse
 
 from pydantic import Field
 
@@ -115,14 +116,28 @@ class AccessManager:
         storage.pull(href, dst)
 
     @staticmethod
+    def __http_to_s3__(href:str):
+        url = urlparse(href)
+        components = list(url[:])
+        if len(components) == 5:
+            components.append('')
+        components[0] = "s3"
+        components[1] = ""
+        components[2] = components[2].removeprefix("/")
+        s3url = urlunparse(tuple(components))
+        return s3url
+
+    @staticmethod
     @contextmanager
     def stream(href: str):
+        import smart_open
         """
         Reads the content of a file in a storage without downloading it.
         """
-        import smart_open
-
-        with smart_open.open(href, "rb", transport_params=AccessManager.get_storage_parameters(href)) as f:
+        params = AccessManager.get_storage_parameters(href)
+        if AccessManager.resolve_storage(href).get_configuration().type.lower() == "s3":
+            href = AccessManager.__http_to_s3__(href)
+        with smart_open.open(href, "rb", transport_params=params) as f:
             yield f
 
     @staticmethod
