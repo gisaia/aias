@@ -130,11 +130,11 @@ class AccessManager:
     @staticmethod
     @contextmanager
     def stream(href: str):
+        import smart_open
         """
         Reads the content of a file in a storage without downloading it.
         """
         params = AccessManager.get_storage_parameters(href)
-        import smart_open
         if AccessManager.resolve_storage(href).get_configuration().type.lower() == "s3":
             href = AccessManager.__http_to_s3__(href)
         with smart_open.open(href, "rb", transport_params=params) as f:

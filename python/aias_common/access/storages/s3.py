@@ -157,7 +157,7 @@ class S3Storage(AbstractStorage):
             return self.__head_object(href)['LastModified'].timestamp()
         except botocore.exceptions.ClientError:
             return None
-        except botocore.exceptions.ParamValidationError:  # key LastModified does exists for root
+        except botocore.exceptions.ParamValidationError:  # key LastModified does not exists for root
             return None
 
     def get_creation_time(self, href: str):
