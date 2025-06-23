@@ -17,12 +17,8 @@ class S3Storage(AbstractStorage):
         return self.storage_configuration
 
     def get_storage_parameters(self):
-        return S3Storage.get_storage_parameters_static(self.get_configuration())
-
-    @staticmethod
-    def get_storage_parameters_static(conf: S3StorageConfiguration):
         import boto3
-
+        conf = self.get_configuration()
         if conf.is_anon_client:
             from botocore import UNSIGNED
             from botocore.client import Config
@@ -81,17 +77,13 @@ class S3Storage(AbstractStorage):
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/")
 
-    @staticmethod
-    def __get_href_key_static(conf: S3StorageConfiguration, href: str):
-        return urlparse(href).path.removeprefix(f"/{conf.bucket}").removeprefix("/")
-
 
     def pull(self, href: str, dst: str):
         import botocore.client
 
         super().pull(href, dst)
 
-        client: botocore.client.BaseClient = S3Storage.get_storage_parameters_static(self.get_configuration())["client"]
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
 
         obj = client.get_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
         with open(dst, "wb") as f:
@@ -102,18 +94,15 @@ class S3Storage(AbstractStorage):
         super().push(href, dst)
         raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
 
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
-        return S3Storage.__head_object_cached(self.get_configuration().model_dump_json(), href)
-
-    @staticmethod
-    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
-    def __head_object_cached(conf_json: str, href: str):
-        conf: S3StorageConfiguration = S3StorageConfiguration.model_validate_json(conf_json)
-        if S3Storage.__get_href_key_static(conf, href):
+        LOGGER.info("__head_object")
+        conf = self.get_configuration()
+        if self.__get_href_key(href):
             try:
-                return S3Storage.get_storage_parameters_static(conf)["client"].head_object(
+                return self.get_storage_parameters()["client"].head_object(
                     Bucket=conf.bucket,
-                    Key=S3Storage.__get_href_key_static(conf, href))
+                    Key=self.__get_href_key(href))
             except:
                 return None
         else:
@@ -127,22 +116,19 @@ class S3Storage(AbstractStorage):
         except botocore.exceptions.ClientError:
             return False
 
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __list_objects(self, href: str):
-        return S3Storage.__list_objects_cached(self.get_configuration().model_dump_json(), href)
-
-    @staticmethod
-    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
-    def __list_objects_cached(conf_json: str, href: str):
-        conf: S3StorageConfiguration = S3StorageConfiguration.model_validate_json(conf_json)
+        LOGGER.info("__list_objects")
+        conf = self.get_configuration()
         params = {
             "Bucket": conf.bucket,
             "Delimiter": "/",
             "MaxKeys": conf.max_objects
         }
-        prefix = S3Storage.__get_href_key_static(conf, href).removesuffix("/") + "/"
+        prefix = self.__get_href_key(href).removesuffix("/") + "/"
         if prefix != "/":
             params["Prefix"] = prefix
-        return S3Storage.get_storage_parameters_static(conf)["client"].list_objects_v2(**params)
+        return self.get_storage_parameters()["client"].list_objects_v2(**params)
 
     def is_dir(self, href: str) -> bool:
         objects = self.__list_objects(href)
