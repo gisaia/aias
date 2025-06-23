@@ -271,7 +271,6 @@ services:
     build:
       context: '../../'
       dockerfile: docker/Dockerfile-fam
-#    image: fam:latest
     container_name: 'fam-service'
     environment:
       - INGESTED_FOLDER=/inputs
@@ -285,21 +284,39 @@ services:
     ports:
       - "8005:8005"
 
-  fam-bucket-service:
+  fam-gs-service:
     networks:
       - aias
     build:
       context: '../../'
       dockerfile: docker/Dockerfile-fam
-#    image: fam:latest
-    container_name: 'fam-bucket-service'
+    container_name: 'fam-gs-service'
     environment:
       - INGESTED_FOLDER=gs://gisaia-public/
       - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
       - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}
       - FAM_CORS_METHODS=${FAM_CORS_METHODS:-*}
       - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
-      - FAM_LOGGER_LEVEL=${FAM_LOGGER_LEVEL:-INFO}
+      - FAM_LOGGER_LEVEL=${FAM_LOGGER_LEVEL:-DEBUG}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
     ports:
       - "8006:8005"
+
+
+  fam-s3-service:
+    networks:
+      - aias
+    build:
+      context: '../../'
+      dockerfile: docker/Dockerfile-fam
+    container_name: 'fam-s3-service'
+    environment:
+      - INGESTED_FOLDER=http://minio:9000/archives/inputs
+      - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
+      - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}
+      - FAM_CORS_METHODS=${FAM_CORS_METHODS:-*}
+      - FAM_CORS_HEADERS=${FAM_CORS_HEADERS:-*}
+      - FAM_LOGGER_LEVEL=${FAM_LOGGER_LEVEL:-DEBUG}
+      - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
+    ports:
+      - "8007:8005"

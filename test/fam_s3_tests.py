@@ -12,7 +12,7 @@ from fam.core.model import Archive, File, PathRequest
 class Tests(FAMTests):
 
     def setUp(self):
-        FAMTests.URL = "http://fam-bucket-service:8005/arlas/fam"
+        FAMTests.URL = "http://fam-s3-service:8005/arlas/fam"
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,8 +15,13 @@ echo "run test.agate_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.agate_tests
 
 echo "run test.fam_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_bucket_tests
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_tests
+
+echo "run test.fam_tests s3"
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_s3_tests
+
+echo "run test.fam_tests gs"
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_gs_tests
 
 echo "run test.aproc_ingest_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests
-

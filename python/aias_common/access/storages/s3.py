@@ -3,12 +3,12 @@ from urllib.parse import urlparse, urlunparse
 
 from aias_common.access.configuration import S3StorageConfiguration
 from aias_common.access.file import File
+from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
-from aias_common.access.logger import Logger
-
 
 LOGGER = Logger.logger
+
 
 class S3Storage(AbstractStorage):
 
@@ -17,25 +17,29 @@ class S3Storage(AbstractStorage):
         return self.storage_configuration
 
     def get_storage_parameters(self):
+        return S3Storage.get_storage_parameters_static(self.get_configuration())
+
+    @staticmethod
+    def get_storage_parameters_static(conf: S3StorageConfiguration):
         import boto3
 
-        if self.get_configuration().is_anon_client:
+        if conf.is_anon_client:
             from botocore import UNSIGNED
             from botocore.client import Config
 
             client = boto3.client(
                 "s3",
-                region_name=self.get_configuration().region,
-                endpoint_url=self.get_configuration().endpoint,
+                region_name=conf.region,
+                endpoint_url=conf.endpoint,
                 config=Config(signature_version=UNSIGNED)
             )
         else:
             client = boto3.client(
                 "s3",
-                region_name=self.get_configuration().region,
-                endpoint_url=self.get_configuration().endpoint,
-                aws_access_key_id=self.get_configuration().api_key.access_key,
-                aws_secret_access_key=self.get_configuration().api_key.secret_key,
+                region_name=conf.region,
+                endpoint_url=conf.endpoint,
+                aws_access_key_id=conf.api_key.access_key,
+                aws_secret_access_key=conf.api_key.secret_key,
             )
 
         return {"client": client}
@@ -77,12 +81,17 @@ class S3Storage(AbstractStorage):
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/")
 
+    @staticmethod
+    def __get_href_key_static(conf: S3StorageConfiguration, href: str):
+        return urlparse(href).path.removeprefix(f"/{conf.bucket}").removeprefix("/")
+
+
     def pull(self, href: str, dst: str):
         import botocore.client
 
         super().pull(href, dst)
 
-        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        client: botocore.client.BaseClient = S3Storage.get_storage_parameters_static(self.get_configuration())["client"]
 
         obj = client.get_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
         with open(dst, "wb") as f:
@@ -94,35 +103,57 @@ class S3Storage(AbstractStorage):
         raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
 
     def __head_object(self, href: str):
-        print("__head_object {}".format(href))
-        return self.get_storage_parameters()["client"].head_object(
-            Bucket=self.get_configuration().bucket,
-            Key=self.__get_href_key(href))
+        return S3Storage.__head_object_cached(self.get_configuration().model_dump_json(), href)
+
+    @staticmethod
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
+    def __head_object_cached(conf_json: str, href: str):
+        conf: S3StorageConfiguration = S3StorageConfiguration.model_validate_json(conf_json)
+        if S3Storage.__get_href_key_static(conf, href):
+            try:
+                return S3Storage.get_storage_parameters_static(conf)["client"].head_object(
+                    Bucket=conf.bucket,
+                    Key=S3Storage.__get_href_key_static(conf, href))
+            except:
+                return None
+        else:
+            return None
 
     def is_file(self, href: str):
         import botocore.exceptions
         try:
-            return self.__head_object(href)['ResponseMetadata']['HTTPStatusCode'] == 200
+            response = self.__head_object(href)
+            return (response is not None) and response['ResponseMetadata']['HTTPStatusCode'] == 200
         except botocore.exceptions.ClientError:
             return False
 
     def __list_objects(self, href: str):
+        return S3Storage.__list_objects_cached(self.get_configuration().model_dump_json(), href)
+
+    @staticmethod
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
+    def __list_objects_cached(conf_json: str, href: str):
+        conf: S3StorageConfiguration = S3StorageConfiguration.model_validate_json(conf_json)
         params = {
-            "Bucket": self.get_configuration().bucket,
+            "Bucket": conf.bucket,
             "Delimiter": "/",
-            "MaxKeys": self.get_configuration().max_objects
+            "MaxKeys": conf.max_objects
         }
-        prefix = self.__get_href_key(href).removesuffix("/") + "/"
+        prefix = S3Storage.__get_href_key_static(conf, href).removesuffix("/") + "/"
         if prefix != "/":
             params["Prefix"] = prefix
-        return self.get_storage_parameters()["client"].list_objects_v2(**params)
+        return S3Storage.get_storage_parameters_static(conf)["client"].list_objects_v2(**params)
 
-    def is_dir(self, href: str):
+    def is_dir(self, href: str) -> bool:
         objects = self.__list_objects(href)
-        return objects['KeyCount'] > 0 or len(objects.get('CommonPrefixes', [])) > 0
+        return (objects is not None) and (objects['KeyCount'] > 0 or len(objects.get('CommonPrefixes', [])) > 0)
 
     def get_file_size(self, href: str):
-        return self.__head_object(href)['ContentLength']
+        response = self.__head_object(href)
+        if response:
+            return self.__head_object(href)['ContentLength']
+        else:
+            return None
 
     def __update_url__(self, source: str, path: str):
         url = urlparse(source)
@@ -154,7 +185,10 @@ class S3Storage(AbstractStorage):
     def get_last_modification_time(self, href: str):        
         import botocore.exceptions
         try:
-            return self.__head_object(href)['LastModified'].timestamp()
+            response = self.__head_object(href)
+            if response:
+                return response['LastModified'].timestamp()
+            return None
         except botocore.exceptions.ClientError:
             return None
         except botocore.exceptions.ParamValidationError:  # key LastModified does not exists for root
