@@ -6,7 +6,7 @@ import tempfile
 
 from pydantic import BaseModel, Field
 
-from airs.core.models.model import AssetFormat, Item, ItemFormat
+from airs.core.models.model import AssetFormat, Item, ItemFormat, MimeType, Role
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.download.drivers.download_driver import \
     DownloadDriver
@@ -47,17 +47,15 @@ class Driver(DownloadDriver):
             target_projection = item.properties.proj__epsg
 
         import rasterio
-        import rasterio.enums
-        import rasterio.warp
         import rioxarray
         import xarray as xr
 
-        from extensions.aproc.proc.dc3build.utils.raster import resample_raster
-
         asset_href = self.get_asset_href(item)
         tmp_asset = None
+        is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
 
-        if AccessManager.is_download_required(asset_href):
+        # Downloading all bands one by one is heavily discouraged
+        if is_asset_zip and AccessManager.is_download_required(asset_href):
             self.LOGGER.info("Downloading archive for Zarr creation.")
 
             # Create tmp file where data will be downloaded
@@ -67,39 +65,22 @@ class Driver(DownloadDriver):
 
             # Download archive then extract it
             AccessManager.pull(asset_href, tmp_asset)
-            raster_files = self.__find_raster_files(tmp_asset)
+            raster_files = self.__find_raster_files_in_zip(tmp_asset)
 
             asset_href = f"file://{tmp_asset}"
         else:
-            self.LOGGER.info("Streaming archive for Zarr creation.")
-            with AccessManager.stream(asset_href) as fb:
-                raster_files = self.__find_raster_files(fb)
-
-        zarr_res = self.__get_zarr_resolution()
+            if is_asset_zip:
+                self.LOGGER.info("Streaming archive for Zarr creation.")
+                with AccessManager.stream(asset_href) as fb:
+                    raster_files = self.__find_raster_files_in_zip(fb)
+            else:
+                raster_files = self.__find_all_bands_but_main(item)
 
         with rasterio.Env(**AccessManager.get_rasterio_session(asset_href)):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
             for ri, rf in enumerate(raster_files):
-                with rasterio.open("zip+" + asset_href + "!" + rf) as src:
-                    # In case no projection is defined, get the one of any of the band
-                    if target_projection is None:
-                        target_projection = src.crs
-
-                    data, transform = resample_raster(src, src.read(), zarr_res)
-
-                    profile = src.profile
-                    profile.update(transform=transform, driver="JP2OpenJPEG",
-                                   height=data.shape[1], width=data.shape[2])
-
-                    temporary_raster = tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False)
-                    with rasterio.open(temporary_raster.name, "w", **profile, quality=100, reversible=True) as dst:
-                        dst.write(data)
-
-                    extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
-                            target_projection, "/".join(tmp_files[ri].split("/")[:-1]),
-                            tmp_files[ri].split("/")[-1])
-                os.remove(temporary_raster.name)  # !DELETE!
+                self.__transform_band("zip+" + asset_href + "!" + rf, crop_wkt, "/".join(tmp_files[ri].split("/")[:-1]), tmp_files[ri].split("/")[-1])
 
         zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
@@ -128,7 +109,31 @@ class Driver(DownloadDriver):
         with tarfile.open(archive_path, "w") as tar:
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
-    def __find_raster_files(self, fb: str | io.TextIOWrapper):
+    def __transform_band(self, input_band: str, crop_wkt: str, target_projection: str, target_directory: str, target_file: str):
+        import rasterio
+
+        from extensions.aproc.proc.dc3build.utils.raster import resample_raster
+
+        with rasterio.open(input_band) as src:
+            # In case no projection is defined, get the one of any of the band
+            if target_projection is None:
+                target_projection = src.crs
+
+            data, transform = resample_raster(src, src.read(), self.__get_zarr_resolution())
+
+            profile = src.profile
+            profile.update(transform=transform, driver="JP2OpenJPEG",
+                           height=data.shape[1], width=data.shape[2])
+
+            temporary_raster = tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False)
+            with rasterio.open(temporary_raster.name, "w", **profile, quality=100, reversible=True) as dst:
+                dst.write(data)
+
+            extract([], crop_wkt, temporary_raster.name, "JP2OpenJPEG",
+                    target_projection, target_directory, target_file)
+        os.remove(temporary_raster.name)  # !DELETE!
+
+    def __find_raster_files_in_zip(self, fb: str | io.TextIOWrapper):
         from extensions.aproc.proc.dc3build.utils.raster import \
             find_raster_files
 
@@ -137,3 +142,12 @@ class Driver(DownloadDriver):
     def __get_zarr_resolution(self):
         # TODO: with band selection, it will depend on the highest resolution SELECTED band
         return 10
+
+    def __find_all_bands_but_main(self, item: Item):
+        raster_files = []
+        # Get all the assets that are not the main one
+        for a in item.assets.values():
+            if a.roles.index(Role.data.value) >= 0 and a.name != Role.data.value:
+                raster_files.append(a.href)
+
+        return raster_files

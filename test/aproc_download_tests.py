@@ -134,6 +134,9 @@ class Tests(unittest.TestCase):
     def test_download_zarr_from_zip(self):
         self.__download_zarr(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM)
 
+    def test_download_zarr_from_folder(self):
+        self.__download_zarr(SENTINEL_2_ID, SENTINEL_2_ITEM)
+
     def test_download_cancelled(self):
         # test 1 : cancel before it's running
         r = self.send_download_request(InputDownloadProcess(requests=[{"collection": COLLECTION, "item_id": ID}], crop_wkt="", target_format=AssetFormat.jpg2000.value, target_projection=EPSG_27572, raw_archive=False))
