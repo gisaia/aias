@@ -63,15 +63,21 @@ class Driver(EnrichDriver):
                 self.LOGGER.info("Building cog for {}".format(item.id))
 
                 from osgeo import gdal
-                start = time()
-                tci_file_path = self.__download_TCI(href)
-                self.LOGGER.info("Fetching the data took {} s".format(time() - start))
+                is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
+                if is_asset_zip:
+                    start = time()
+                    tci_file_path = self.__download_TCI(href)
+                    self.LOGGER.info("Fetching the data took {} s".format(time() - start))
+                else:
+                    tci_file_path = href
 
                 start = time()
                 kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
                 gdal.Warp(asset_location, tci_file_path, **kwargs)
                 self.LOGGER.info("Creating COG took {} s".format(time() - start))
-                os.remove(tci_file_path)  # !DELETE!
+
+                if is_asset_zip:
+                    os.remove(tci_file_path)  # !DELETE!
             else:
                 raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
         else:

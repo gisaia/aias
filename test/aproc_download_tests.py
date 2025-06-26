@@ -3,7 +3,7 @@ import os
 import unittest
 from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
                         COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
-                        MINIO_ID, MINIO_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM,
+                        MINIO_ID, MINIO_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM, SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM,
                         SMTP_SERVER, TOKEN, add_item, create_arlas_collection,
                         setUpTest)
 from time import sleep
@@ -121,15 +121,18 @@ class Tests(unittest.TestCase):
         sleep(2)
         self.__download_project_3857_format_jp2_crop(MINIO_ID)
 
-    def test_download_zarr(self):
-        add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
+    def __download_zarr(self, id: str, item: str):
+        add_item(self, item, id)
         sleep(3)
 
         crop_wkt = "POLYGON ((0.087547 42.794645, 0.087547 42.832926, 0.176811 42.832926, 0.176811 42.794645, 0.087547 42.794645))"
 
-        self.download_and_check_result(ids=[SENTINEL_2_ID], crop_wkt=crop_wkt, target_format=AssetFormat.zarr.value,
+        self.download_and_check_result(ids=[id], crop_wkt=crop_wkt, target_format=AssetFormat.zarr.value,
                                        target_projection="native", raw_archive=False,
                                        expected_files=["S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.ZARR.tar"])
+
+    def test_download_zarr_from_zip(self):
+        self.__download_zarr(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM)
 
     def test_download_cancelled(self):
         # test 1 : cancel before it's running
