@@ -96,7 +96,6 @@ class S3Storage(AbstractStorage):
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
-        LOGGER.info("__head_object")
         conf = self.get_configuration()
         if self.__get_href_key(href):
             try:
@@ -118,7 +117,6 @@ class S3Storage(AbstractStorage):
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __list_objects(self, href: str):
-        LOGGER.info("__list_objects")
         conf = self.get_configuration()
         params = {
             "Bucket": conf.bucket,
