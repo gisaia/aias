@@ -40,7 +40,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(archive.name, "IMG_SPOT6_MS_001_A")
         self.assertEqual(archive.path, os.path.join(root.path, "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"))
         self.assertTrue(archive.is_dir)
-        self.assertIn(archive.id, ["148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71", "7fb3088260c163c8bdf37f9b56b35b0232ab8adbb556f9fbfd8d547d26bc20d1"])
+        self.assertIn(archive.id, ["148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71", "7fb3088260c163c8bdf37f9b56b35b0232ab8adbb556f9fbfd8d547d26bc20d1", "a75c9fc5a9fee985be7bd967ef713a20df65e7163f660bf6607436845fb48f4b"])
         self.assertEqual(archive.driver_name, "dimap")
 
 if __name__ == '__main__':

@@ -271,7 +271,7 @@ class AccessManager:
         storage = AccessManager.resolve_storage(href)
 
         if not storage.is_dir(href):
-            raise ValueError("Given href does not point to a directory")
+            raise ValueError("Given href does not point to a directory ({})".format(href))
 
         return storage.listdir(href)
 
