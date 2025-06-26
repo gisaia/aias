@@ -106,7 +106,7 @@ class S3StorageConfiguration(StorageConfiguration):
         return self.api_key is None
 
 
-class HttpsStorageConfiguration(StorageConfiguration):
+class HttpsStorageConfiguration(HttpStorageConfiguration):
     type: Literal["https"] = "https"
 
 
