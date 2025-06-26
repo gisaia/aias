@@ -80,7 +80,11 @@ class Driver(DownloadDriver):
             tmp_files = [tempfile.NamedTemporaryFile("w+", suffix=".jp2", delete=False).name for _ in raster_files]
 
             for ri, rf in enumerate(raster_files):
-                self.__transform_band("zip+" + asset_href + "!" + rf, crop_wkt, "/".join(tmp_files[ri].split("/")[:-1]), tmp_files[ri].split("/")[-1])
+                if is_asset_zip:
+                    href = "zip+" + asset_href + "!" + rf
+                else:
+                    href = rf
+                self.__transform_band(href, crop_wkt, target_projection, tmp_files[ri])
 
         zarr_name = os.path.splitext(os.path.basename(asset_href))[0] + "." + target_format
         band_names = map(lambda x: x.split("/")[-1][-7:-4], raster_files)
@@ -109,10 +113,13 @@ class Driver(DownloadDriver):
         with tarfile.open(archive_path, "w") as tar:
             tar.add(zarr_path, arcname=os.path.basename(zarr_path))
 
-    def __transform_band(self, input_band: str, crop_wkt: str, target_projection: str, target_directory: str, target_file: str):
+    def __transform_band(self, input_band: str, crop_wkt: str, target_projection: str, target_path: str):
         import rasterio
 
         from extensions.aproc.proc.dc3build.utils.raster import resample_raster
+
+        target_directory = os.path.dirname(target_path)
+        target_file = os.path.basename(target_path)
 
         with rasterio.open(input_band) as src:
             # In case no projection is defined, get the one of any of the band

@@ -1,7 +1,7 @@
 import json
 import os
 import unittest
-from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, SENTINEL2_BANDS
+from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION
 
 import requests
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
@@ -77,11 +77,6 @@ class Tests(IngestTests):
         url = "/inputs/nogeo.tiff"
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
         self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
-
-    def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
-        url = "/inputs/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
-        item_id = "8377d47a086d935e0573db7affa2a0bbd4fba50f458fb9f0fbeae30b6043c3e5"
-        self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS], archive=False)
 
     def test_ingest_directory(self):  # Test Folder ingestion
         self.ingest_directory(os.path.join(ROOT, DIMAP), collection=COLLECTION, catalog=CATALOG)

@@ -99,7 +99,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit_direction=orbit_direction,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tci_path))
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
 
         return item

@@ -1,0 +1,71 @@
+{
+  "collection": "digitalearth.africa",
+  "catalog": "theia-snow",
+  "id": "a264f89a-aec2-4477-905f-dfbe5faa98c0",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.533710858868519,
+          43.32625697177811
+        ],
+        [
+          0.818123703686377,
+          43.28908179915951
+        ],
+        [
+          0.757858445321509,
+          42.30245161555175
+        ],
+        [
+          -0.572704451248113,
+          42.33837210189082
+        ],
+        [
+          -0.533710858868519,
+          43.32625697177811
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.572704451248113,
+    42.30245161555175,
+    0.818123703686377,
+    43.32625697177811
+  ],
+  "centroid": [
+    0.117381093457826,
+    42.8153496213546
+  ],
+  "assets": {
+    "data": {
+      "name": "data",
+      "size": 135582033,
+      "href": "/inputs/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_TCI.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "data",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "properties": {
+    "datetime": "2024-08-27T10:50:21.024000",
+    "start_datetime": "2024-08-27T10:50:21.024000",
+    "end_datetime": "2024-08-27T10:50:21.024000",
+    "constellation": "Sentinel 2",
+    "satellite": "Sentinel-2A",
+    "item_format": "SAFE",
+    "main_asset_format": "JPG2000",
+    "main_asset_name": "data",
+    "observation_type": "OPTIC",
+    "processing__level": "Level-1C",
+    "acq__acquisition_orbit_direction": "DESCENDING",
+    "proj__epsg": 32630
+  }
+}
