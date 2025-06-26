@@ -40,14 +40,196 @@
     42.8153496213546
   ],
   "assets": {
+    "metadata": {
+      "name": "metadata",
+      "size": 46038,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/MTD_MSIL1C.xml",
+      "asset_type": "OTHER",
+      "asset_format": "XML",
+      "airs__managed": false,
+      "description": "metadata",
+      "type": "text/xml",
+      "roles": [
+        "metadata"
+      ]
+    },
     "data": {
       "name": "data",
       "size": 135582033,
-      "href": "/inputs/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_TCI.jp2",
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_TCI.jp2",
       "asset_type": "GRIDDED",
       "asset_format": "JPG2000",
       "airs__managed": false,
       "description": "data",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B08": {
+      "name": "B08",
+      "size": 1620026,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B08.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B08",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B03": {
+      "name": "B03",
+      "size": 1351614,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B03.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B03",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B07": {
+      "name": "B07",
+      "size": 414438,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B07.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B07",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B09": {
+      "name": "B09",
+      "size": 43766,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B09.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B09",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B11": {
+      "name": "B11",
+      "size": 411003,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B11.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B11",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B10": {
+      "name": "B10",
+      "size": 17231,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B10.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B10",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B01": {
+      "name": "B01",
+      "size": 40304,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B01.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B01",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B05": {
+      "name": "B05",
+      "size": 376411,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B05.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B05",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B8A": {
+      "name": "B8A",
+      "size": 420419,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B8A.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B8A",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B04": {
+      "name": "B04",
+      "size": 1387854,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B04.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B04",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B02": {
+      "name": "B02",
+      "size": 1257505,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B02.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B02",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B06": {
+      "name": "B06",
+      "size": 400312,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B06.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B06",
+      "type": "image/jp2",
+      "roles": [
+        "data"
+      ]
+    },
+    "B12": {
+      "name": "B12",
+      "size": 387572,
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_B12.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "B12",
       "type": "image/jp2",
       "roles": [
         "data"
@@ -66,6 +248,12 @@
     "observation_type": "OPTIC",
     "processing__level": "Level-1C",
     "acq__acquisition_orbit_direction": "DESCENDING",
-    "proj__epsg": 32630
+    "proj__epsg": 32630,
+    "generated__has_overview": false,
+    "generated__has_thumbnail": false,
+    "generated__has_metadata": false,
+    "generated__has_data": false,
+    "generated__has_cog": false,
+    "generated__has_zarr": false
   }
 }

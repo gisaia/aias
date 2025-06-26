@@ -154,7 +154,10 @@ class Driver(DownloadDriver):
         raster_files = []
         # Get all the assets that are not the main one
         for a in item.assets.values():
-            if a.roles.index(Role.data.value) >= 0 and a.name != Role.data.value:
-                raster_files.append(a.href)
+            try:
+                if a.roles.index(Role.data.value) >= 0 and a.name != Role.data.value:
+                    raster_files.append(a.href)
+            except Exception:
+                ...
 
         return raster_files

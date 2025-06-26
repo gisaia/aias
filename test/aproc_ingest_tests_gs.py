@@ -55,7 +55,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, "test-aias", SENTINEL2)
-        item_id = "8377d47a086d935e0573db7affa2a0bbd4fba50f458fb9f0fbeae30b6043c3e5"
+        item_id = "eee16f1452c0ff3897d2a3b6595348bd151993aedc95104246accec3a00f05d1"
         self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS], archive=False)
 
 

@@ -129,7 +129,7 @@ class Tests(unittest.TestCase):
 
         self.download_and_check_result(ids=[id], crop_wkt=crop_wkt, target_format=AssetFormat.zarr.value,
                                        target_projection="native", raw_archive=False,
-                                       expected_files=["S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.ZARR.tar"])
+                                       expected_files=["T30TYN_20240827T105021_TCI.ZARR.tar"])
 
     def test_download_zarr_from_zip(self):
         self.__download_zarr(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM)

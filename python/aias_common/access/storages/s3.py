@@ -166,7 +166,7 @@ class S3Storage(AbstractStorage):
 
         return files + dirs
 
-    def get_last_modification_time(self, href: str):        
+    def get_last_modification_time(self, href: str):
         import botocore.exceptions
         try:
             response = self.__head_object(href)

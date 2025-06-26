@@ -108,7 +108,6 @@ class Driver(IngestDriver):
         self.__init__()
         if AccessManager.is_dir(path):
             for file in AccessManager.listdir(path):
-
                 if not file.is_dir:
                     if file.name.endswith('-ql.jpg'):
                         self.quicklook_path = file.path

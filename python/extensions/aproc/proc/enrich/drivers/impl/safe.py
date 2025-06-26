@@ -69,7 +69,8 @@ class Driver(EnrichDriver):
                     tci_file_path = self.__download_TCI(href)
                     self.LOGGER.info("Fetching the data took {} s".format(time() - start))
                 else:
-                    tci_file_path = href
+                    tci_file_path = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+                    AccessManager.pull(href, tci_file_path)
 
                 start = time()
                 kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
