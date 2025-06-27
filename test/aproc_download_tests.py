@@ -121,7 +121,7 @@ class Tests(unittest.TestCase):
         sleep(2)
         self.__download_project_3857_format_jp2_crop(MINIO_ID)
 
-    def __download_zarr(self, id: str, item: str):
+    def __download_zarr(self, id: str, item: str, output_name: str):
         add_item(self, item, id)
         sleep(3)
 
@@ -129,13 +129,13 @@ class Tests(unittest.TestCase):
 
         self.download_and_check_result(ids=[id], crop_wkt=crop_wkt, target_format=AssetFormat.zarr.value,
                                        target_projection="native", raw_archive=False,
-                                       expected_files=["T30TYN_20240827T105021_TCI.ZARR.tar"])
+                                       expected_files=[output_name])
 
     def test_download_zarr_from_zip(self):
-        self.__download_zarr(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM)
+        self.__download_zarr(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM, "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.ZARR.tar")
 
     def test_download_zarr_from_folder(self):
-        self.__download_zarr(SENTINEL_2_ID, SENTINEL_2_ITEM)
+        self.__download_zarr(SENTINEL_2_ID, SENTINEL_2_ITEM, "T30TYN_20240827T105021_TCI.ZARR.tar")
 
     def test_download_cancelled(self):
         # test 1 : cancel before it's running
