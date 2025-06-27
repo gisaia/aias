@@ -98,6 +98,7 @@ class MimeType(Enum):
     KML = "application/vnd.google-earth.kml+xml"
     ZARR = "application/vnd+zarr"  # https://github.com/openMetadataInitiative/openMINDS_core/blob/v4/instances/data/contentTypes/zarr.jsonld
     NETCDF = "application/netcdf"  # https://github.com/Unidata/netcdf/issues/42#issuecomment-1007618822
+    ZIP = "application/zip"
 
 
 class ProcessingLevel(Enum):

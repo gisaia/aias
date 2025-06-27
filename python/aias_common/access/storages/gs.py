@@ -112,8 +112,8 @@ class GoogleStorage(AbstractStorage):
         return len(list(filter(lambda f: f.path == href and not f.is_dir, files))) == 1
 
     def is_dir(self, href: str):
-        files = self.__list_blobs(href)
-        return len(list(filter(lambda f: os.path.dirname(f.path).removesuffix("/") == href.removesuffix("/") and (f.is_dir or os.path.basename(f.path)), files))) > 0
+        files = self.__list_blobs(href.removesuffix("/") + "/")
+        return len(list(filter(lambda f: f.path.removesuffix("/") != href.removesuffix("/"), files))) > 0
 
     def get_file_size(self, href: str):
         return self.__get_blob(href).size

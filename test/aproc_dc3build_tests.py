@@ -3,7 +3,7 @@ import json
 import time
 import unittest
 from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, MAX_ITERATIONS,
-                        SENTINEL_2_ID, SENTINEL_2_ITEM, TOKEN, add_item,
+                        SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM, TOKEN, add_item,
                         create_arlas_collection, setUpTest)
 from time import sleep
 
@@ -39,7 +39,7 @@ class Tests(unittest.TestCase):
                         ItemReference(
                             dc3__alias="s2",
                             dc3__collection=COLLECTION,
-                            dc3__id=SENTINEL_2_ID,
+                            dc3__id=SENTINEL_2_ZIP_ID,
                         )
                     ]
                 ),
@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
                         ItemReference(
                             dc3__alias="s2",
                             dc3__collection=COLLECTION,
-                            dc3__id=SENTINEL_2_ID,
+                            dc3__id=SENTINEL_2_ZIP_ID,
                         )
                     ]
                 ),
@@ -59,7 +59,7 @@ class Tests(unittest.TestCase):
                         ItemReference(
                             dc3__alias="s2",
                             dc3__collection=COLLECTION,
-                            dc3__id=SENTINEL_2_ID,
+                            dc3__id=SENTINEL_2_ZIP_ID,
                         )
                     ]
                 ),
@@ -114,7 +114,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(ARLASServicesHelper.asset_in_airs(airs_endpoint=AIRS_URL, collection=result["collection"], item_id=result["id"], asset_name=Role.datacube.value))
 
     def ingest_sentinel(self) -> Item:
-        item = add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
+        item = add_item(self, SENTINEL_2_ZIP_ITEM, SENTINEL_2_ZIP_ID)
         time.sleep(3)
         create_arlas_collection(self)
         return item

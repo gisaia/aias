@@ -1,5 +1,4 @@
 import json
-import os
 import unittest
 from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
                         setUpTest)
@@ -15,8 +14,6 @@ from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 
-
-
 DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
 IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
 WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
@@ -25,6 +22,7 @@ TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
 RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
 TIF = "cog.tiff"
 JP2000 = "jpeg2000.jpg2"
+SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 
 
 class IngestTests(unittest.TestCase):

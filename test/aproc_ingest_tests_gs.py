@@ -1,9 +1,9 @@
-import json
 import os
 import unittest
-from test.utils import (CATALOG, COLLECTION)
 from test.aproc_ingest_tests import (AST, DIMAP, IKONOS, JP2000, RAPID_EYE,
-                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
+                                     SENTINEL2, TERRASARX, TIF, WORLDVIEW,
+                                     IngestTests)
+from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
 ROOT = "gs://gisaia-public"
 
@@ -52,6 +52,12 @@ class Tests(IngestTests):
 
     def test_ingest_directory_cloud(self):  # Test Folder in cloud ingestion
         self.ingest_directory(os.path.join(ROOT, "test-aias/"), collection=COLLECTION, catalog=CATALOG)
+
+    def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
+        url = os.path.join(ROOT, "test-aias", SENTINEL2)
+        item_id = "eee16f1452c0ff3897d2a3b6595348bd151993aedc95104246accec3a00f05d1"
+        self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS], archive=False)
+
 
 if __name__ == '__main__':
     unittest.main()

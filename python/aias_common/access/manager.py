@@ -116,7 +116,7 @@ class AccessManager:
         storage.pull(href, dst)
 
     @staticmethod
-    def __http_to_s3__(href:str):
+    def __http_to_s3__(href: str):
         url = urlparse(href)
         components = list(url[:])
         if len(components) == 5:
