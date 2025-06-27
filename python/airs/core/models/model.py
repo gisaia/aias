@@ -332,7 +332,7 @@ class Asset(BaseModel, extra=Extra.allow):
     airs__object_store_key: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store key of the asset object.")
     title: str | None = Field(default=None, title="[STAC] Optional displayed title for clients and users.", max_length=300)
     description: str | None = Field(default=None, title="[STAC] A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
-    type: str | None = Field(default=None, title="[STAC] Optional description of the media type. Registered Media Types are preferred. See MediaType for common media types.", max_length=300)
+    type: str | None = Field(default=None, title="[STAC] Optional description of the media type. Registered Media Types are preferred. See MimeType for common media types.", max_length=300)
     roles: List[str] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
     extra_fields: Dict[str, Any] | None = Field(default=None, title="[ARLAS] Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.")
     gsd: float | None = Field(default=None, title="[deprecated, use eo:gsd instead] Ground Sampling Distance (resolution) of the asset")
