@@ -3,13 +3,30 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid, setup_gdal)
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+
+
+BANDS_NAME = {
+    "B01": "Coastal aerosol",
+    "B02": "Blue",
+    "B03": "Green",
+    "B04": "Red",
+    "B05": "Vegetation red edge",
+    "B06": "Vegetation red edge",
+    "B07": "Vegetation red edge",
+    "B08": "NIR",
+    "B8A": "Narrow NIR",
+    "B09": "Water vapour",
+    "B10": "Cirrus",
+    "B11": "SWIR",
+    "B12": "SWIR"
+}
 
 
 class Driver(IngestDriver):
@@ -25,12 +42,13 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets: list[Asset] = []
 
-        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview,
+        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.thumbnail,
                                     MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
@@ -41,13 +59,24 @@ class Driver(IngestDriver):
             matches = re.findall(r"_(B.{2})\.jp2$", band)
             if len(matches) > 0:
                 name = matches[0]
-                assets.append(Asset(href=band, size=AccessManager.get_size(band),
-                                    roles=[Role.data.value], name=name, type=MimeType.JPEG2000.value,
-                                    description=name, airs__managed=False, asset_format=AssetFormat.jpg2000.value, asset_type=ResourceType.gridded.value))
+
+                assets.append(Asset(href=band, size=AccessManager.get_size(band), roles=[Role.data.value],
+                                    name=name, type=MimeType.JPEG2000.value, description=name,
+                                    airs__managed=False, asset_format=AssetFormat.jpg2000.value,
+                                    asset_type=ResourceType.gridded.value,
+                                    eo__bands=[Band(name=name, eo__common_name=BANDS_NAME[name])]))
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
+        AccessManager.makedir(overview_folder)
+        overview_path = overview_folder + '/overview.jpg'
+        # File is processed locally as it significantly speeds up processing time
+        with AccessManager.make_local(self.tci_path) as local_tci_path:
+            geotiff_to_jpg(local_tci_path, 10, 10, overview_path, [1, 2, 3])
+        ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+
         return assets
 
     # Implements drivers method
@@ -68,8 +97,15 @@ class Driver(IngestDriver):
                 stop_time = Driver.__get_property(p_info, 'PRODUCT_STOP_TIME')
                 stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%fZ")
                 level = Driver.__get_property(p_info, 'PROCESSING_LEVEL')
+                secondary_id = Driver.__get_property(p_info, "PRODUCT_URI")
                 satellite = Driver.__get_property(p_info, 'Datatake/SPACECRAFT_NAME')
                 orbit_direction = Driver.__get_property(p_info, 'Datatake/SENSING_ORBIT_DIRECTION')
+                orbit_number = Driver.__get_property(p_info, "Datatake/SENSING_ORBIT_NUMBER")
+
+            for p_info in root.iter('Cloud_Coverage_Assessment'):
+                cloud_cover = p_info.text
+            for p_info in root.iter('Snow_Coverage_Assessment'):
+                snow_cover = p_info.text
 
             for coords in root.iter('EXT_POS_LIST'):
                 corners = coords.text.removesuffix(' ').split(' ')
@@ -79,6 +115,17 @@ class Driver(IngestDriver):
                 geometry, bbox, centroid = get_geom_bbox_centroid(
                     lons[0], lats[0], lons[1], lats[1], lons[2], lats[2], lons[3], lats[3]
                 )
+
+            eo__bands: list[Band] = []
+            for bands in root.iter("Spectral_Information_List"):
+                for band in bands.iter('Spectral_Information'):
+                    band_id = band.get('bandId')
+                    eo__bands.append(Band(
+                        asset=band.get('physicalBand'),
+                        name=band.get('physicalBand'),
+                        eo__common_name=BANDS_NAME.get(band_id, ''),
+                        eo__center_wavelength=Driver.__get_property(band, 'Wavelength/CENTRAL')
+                    ))
 
         item = Item(
             id=self.get_item_id(url),
@@ -91,12 +138,16 @@ class Driver(IngestDriver):
                 end_datetime=stop_time,
                 constellation="Sentinel 2",
                 satellite=satellite,
+                secondary_id=secondary_id,
                 item_format=ItemFormat.safe,
                 main_asset_format=AssetFormat.jpg2000,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic,
+                eo__cloud_cover=cloud_cover,
+                eo__snow_cover=snow_cover,
                 processing__level=level,
                 acq__acquisition_orbit_direction=orbit_direction,
+                acq__acquisition_orbit=orbit_number,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tci_path))
             ),
             assets=dict([(asset.name, asset) for asset in assets])
