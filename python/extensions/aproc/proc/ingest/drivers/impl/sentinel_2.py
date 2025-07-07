@@ -11,15 +11,15 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
-
+RED_EDGE = "Vegetation red edge"
 BANDS_NAME = {
     "B01": "Coastal aerosol",
     "B02": "Blue",
     "B03": "Green",
     "B04": "Red",
-    "B05": "Vegetation red edge",
-    "B06": "Vegetation red edge",
-    "B07": "Vegetation red edge",
+    "B05": RED_EDGE,
+    "B06": RED_EDGE,
+    "B07": RED_EDGE,
     "B08": "NIR",
     "B8A": "Narrow NIR",
     "B09": "Water vapour",

@@ -55,14 +55,14 @@ class EnrichDriver(AbstractDriver):
         return data.href if data else None
 
     @abstractmethod
-    def create_asset(self, item: Item, asset_type: str) -> tuple[Asset, str]:
-        """Create the asset metadata (Asset) and data (file) for a given item
+    def create_assets(self, item: Item, asset_type: str) -> list[Asset]:
+        """Create the assets metadata (Asset) and data (file) for a given item
 
         Args:
             item (Item): The item to be enriched
             asset_type (str): name of the asset type to create, e.g. 'cog'
 
         Returns:
-            tuple[Asset, str]: a tuple containing the Asset metadata and the file location
+            list[Asset]: the list of the created assets
         """
         ...

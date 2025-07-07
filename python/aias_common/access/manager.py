@@ -203,7 +203,7 @@ class AccessManager:
         # If not, pull it, store dst and tag the iteration as pulled. Otherwise, store href and tag as not pulled.
         # Once all local, will yield the list of local paths
         # Cleanup will only remove the files that were pulled
-        local_href_list = []
+        local_href_list: list[str] = []
         was_pulled = []
         try:
             for href, dst in zip(href_list, dst_list):

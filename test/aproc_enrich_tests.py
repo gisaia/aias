@@ -35,12 +35,14 @@ class Tests(unittest.TestCase):
         # check that the item has the new asset
         item = mapper.item_from_dict(requests.get("/".join([AIRS_URL, "collections", COLLECTION, "items", id])).json())
         self.assertIsNotNone(item.assets.get("cog"))
+        return item
 
     def test_enrich_cog_from_zip(self):
         self.__enrich_cog(SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM)
 
     def test_enrich_cog_from_folder(self):
-        self.__enrich_cog(SENTINEL_2_ID, SENTINEL_2_ITEM)
+        item = self.__enrich_cog(SENTINEL_2_ID, SENTINEL_2_ITEM)
+        self.assertIsNotNone(item.assets.get("all_bands_cog"))
 
 
 if __name__ == '__main__':
