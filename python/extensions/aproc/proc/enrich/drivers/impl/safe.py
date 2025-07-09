@@ -29,62 +29,68 @@ class Driver(EnrichDriver):
         return item.properties.item_format and item.properties.item_format.lower() == ItemFormat.safe.value.lower()
 
     # Implements drivers method
-    def create_asset(self, item: Item, asset_type: str) -> tuple[Asset, str]:
+    def create_assets(self, item: Item, asset_type: str) -> list[Asset]:
         if asset_type:
             if asset_type.lower() in Driver.SUPPORTED_ASSET_TYPES:
                 self.LOGGER.info("adding {} to item {}".format(asset_type, item.id))
-                asset = Asset(
-                    name=Role.cog.value,
-                    size=0,     # set once asset created
-                    href=None,  # set below
-                    asset_type=ResourceType.gridded.value,
-                    asset_format=AssetFormat.geotiff.value,
-                    roles=[Role.cog.value],
-                    type=MimeType.TIFF.value,
-                    title="{} for {}/{}".format(asset_type, item.collection, item.id),
-                    description="{} for {}/{}".format(asset_type, item.collection, item.id),
-                    proj__epsg=3857,
-                    airs__managed=True
-                )
-                asset_location = self.get_asset_filepath(item.id, asset)
-                asset.href = asset_location
-                self.__build_asset(item, asset_type, asset_location)
-                asset.size = AccessManager.get_size(asset_location)
-                return asset, asset_location
+                assets = [self.__create_TCI_asset(item, asset_type)]
+
+                # If the data asset is not zipped, create all bands COG
+                if item.assets.get(Role.data.value).type != MimeType.ZIP.value:
+                    assets.append(self.__create_all_bands_asset(item))
+                return assets
             else:
                 raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
         else:
             raise DriverException("Asset type must be provided.")
 
-    def __build_asset(self, item: Item, asset_type: str, asset_location: str):
-        if asset_type.lower() == "cog":
-            href = self.get_asset_href(item)
-            if href:
-                self.LOGGER.info("Building cog for {}".format(item.id))
+    def __create_TCI_asset(self, item: Item, asset_type: str):
+        asset = Asset(
+            name=Role.cog.value,
+            size=0,     # set once asset created
+            href=None,  # set below
+            asset_type=ResourceType.gridded.value,
+            asset_format=AssetFormat.geotiff.value,
+            roles=[Role.cog.value],
+            type=MimeType.TIFF.value,
+            title="{} for {}/{}".format(asset_type, item.collection, item.id),
+            description="{} for {}/{}".format(asset_type, item.collection, item.id),
+            proj__epsg=3857,
+            airs__managed=True
+        )
+        asset_location = self.get_asset_filepath(item.id, asset)
+        asset.href = asset_location
+        self.__build_TCI_COG(item, asset_location)
+        asset.size = AccessManager.get_size(asset_location)
+        return asset
 
-                from osgeo import gdal
-                is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
-                if is_asset_zip:
-                    start = time()
-                    tci_file_path = self.__download_TCI(href)
-                    self.LOGGER.info("Fetching the data took {} s".format(time() - start))
-                else:
-                    tci_file_path = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
-                    AccessManager.pull(href, tci_file_path)
+    def __build_TCI_COG(self, item: Item, asset_location: str):
+        href = self.get_asset_href(item)
+        if href:
+            self.LOGGER.info("Building cog for {}".format(item.id))
 
+            from osgeo import gdal
+            is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
+            if is_asset_zip:
                 start = time()
-                kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
-                gdal.Warp(asset_location, tci_file_path, **kwargs)
-                self.LOGGER.info("Creating COG took {} s".format(time() - start))
-
-                if is_asset_zip:
-                    os.remove(tci_file_path)  # !DELETE!
+                tci_file_path = self.__download_TCI_from_zip(href)
+                self.LOGGER.info("Fetching the data took {} s".format(time() - start))
             else:
-                raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
-        else:
-            raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
+                start = time()
+                tci_file_path = os.path.join(AccessManager.tmp_dir, os.path.basename(href))
+                AccessManager.pull(href, tci_file_path)
+                self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-    def __download_TCI(self, href: str):
+            start = time()
+            kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
+            gdal.Warp(asset_location, tci_file_path, **kwargs)
+            self.LOGGER.info("Creating COG took {} s".format(time() - start))
+
+            os.remove(tci_file_path)  # !DELETE!
+        else:
+            raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
+
+    def __download_TCI_from_zip(self, href: str):
         storage = AccessManager.resolve_storage(href)
 
         # With GS, it has been observed that performances for extracting a file directly from the zip remotely
@@ -95,17 +101,17 @@ class Driver(EnrichDriver):
 
             # Download archive then extract it
             storage.pull(href, tmp_file)
-            tci_file_path = self.__extract(tmp_file)
+            tci_file_path = self.__extract_TCI(tmp_file)
 
             # Clean-up
             os.remove(tmp_file)  # !DELETE!
         else:
             with AccessManager.stream(href) as fb:
-                tci_file_path = self.__extract(fb)
+                tci_file_path = self.__extract_TCI(fb)
 
         return tci_file_path
 
-    def __extract(self, zip_file: str | io.TextIOWrapper):
+    def __extract_TCI(self, zip_file: str | io.TextIOWrapper):
         with zipfile.ZipFile(zip_file) as raster_zip:
             file_names = raster_zip.namelist()
             raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI.jp2", f), file_names))
@@ -119,3 +125,50 @@ class Driver(EnrichDriver):
             raster_zip.extract(raster_files[0], AccessManager.tmp_dir)
 
         return tci_file_path
+
+    def __create_all_bands_asset(self, item: Item):
+        asset = Asset(
+            name='all_bands_cog',
+            size=0,     # set once asset created
+            href=None,  # set below
+            asset_type=ResourceType.gridded.value,
+            asset_format=AssetFormat.geotiff.value,
+            roles=[Role.cog.value],
+            type=MimeType.TIFF.value,
+            title="all bands COG for {}/{}".format(item.collection, item.id),
+            description="all bands COG for {}/{}".format(item.collection, item.id),
+            proj__epsg=3857,
+            airs__managed=True
+        )
+        asset_location = self.get_asset_filepath(item.id, asset)
+        asset.href = asset_location
+        self.__build_all_bands_COG(item, asset_location)
+        asset.size = AccessManager.get_size(asset_location)
+
+        return asset
+
+    def __build_all_bands_COG(self, item: Item, asset_location: str):
+        secondary_data_assets = list(filter(lambda a: Role.data.value in a.roles and a.name != Role.data.value, item.assets.values()))
+        secondary_data_href = [a.href for a in secondary_data_assets]
+
+        if secondary_data_href:
+            secondary_data_href.sort()
+            self.LOGGER.info("Building all bands cog for {}".format(item.id))
+            vrt_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
+
+            from osgeo import gdal
+            with AccessManager.make_local_list(secondary_data_href) as local_assets:
+                start = time()
+
+                # Build VRT to facilitate COG built
+                kwargs = {"separate": True, "resolution": "highest", "outputSRS": "EPSG:3857"}
+                gdal.BuildVRT(vrt_file, local_assets, **kwargs)
+
+                # Build COG from VRT
+                kwargs = {'format': 'COG'}
+                gdal.Translate(asset_location, vrt_file, **kwargs)
+                self.LOGGER.info("Creating all bands COG took {} s".format(time() - start))
+
+            os.remove(vrt_file)  # !DELETE!
+        else:
+            raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))

@@ -7,7 +7,7 @@ from celery import shared_task
 from pydantic import BaseModel, Field
 
 from airs.core.models import mapper
-from airs.core.models.model import Asset, Item
+from airs.core.models.model import Item
 from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -110,29 +110,29 @@ class AprocProcess(Process):
             driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
             if driver is not None:
                 try:
-                    LOGGER.info("ingestion: 1 - enrichment will be done by {}".format(driver.name))
+                    LOGGER.debug("ingestion: 1 - enrichment will be done by {}".format(driver.name))
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
                     LOGGER.info("Build asset {}".format(asset_type))
                     start = time()
-                    asset, asset_location = driver.create_asset(
+                    assets = driver.create_assets(
                         item=item,
                         asset_type=asset_type)
                     end = time()
                     LOGGER.info("took {} ms".format(end - start))
-                    asset: Asset = asset
-                    asset.href = asset_location
-                    item.assets[asset.name] = asset
-                    if item.properties.keywords is None:
-                        item.properties.keywords = []
-                    item.properties.keywords.append("has_{}".format(asset_type))
                     LOGGER.info("Enrichment success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "success", EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
 
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
-                    Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
-                    start = time()
-                    ARLASServicesHelper.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
-                    end = time()
-                    LOGGER.info("took {} ms".format(end - start))
+                    for asset in assets:
+                        item.assets[asset.name] = asset
+                        if item.properties.keywords is None:
+                            item.properties.keywords = []
+                        item.properties.keywords.append("has_{}".format(asset_type))
+
+                        Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
+                        start = time()
+                        ARLASServicesHelper.upload_asset_if_managed(item, asset, AprocConfiguration.settings.airs_endpoint)
+                        end = time()
+                        LOGGER.info("took {} ms".format(end - start))
 
                     LOGGER.debug("ingestion: 3 - update")
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'update_item', "ACTION": "ENRICH", "TARGET": item_id})
