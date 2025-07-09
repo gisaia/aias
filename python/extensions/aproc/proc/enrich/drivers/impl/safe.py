@@ -33,18 +33,18 @@ class Driver(EnrichDriver):
         if asset_type:
             if asset_type.lower() in Driver.SUPPORTED_ASSET_TYPES:
                 self.LOGGER.info("adding {} to item {}".format(asset_type, item.id))
-                assets = [self.__create_TCI_COG(item, asset_type)]
+                assets = [self.__create_TCI_asset(item, asset_type)]
 
                 # If the data asset is not zipped, create all bands COG
                 if item.assets.get(Role.data.value).type != MimeType.ZIP.value:
-                    assets.append(self.__create_all_bands_COG(item))
+                    assets.append(self.__create_all_bands_asset(item))
                 return assets
             else:
                 raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
         else:
             raise DriverException("Asset type must be provided.")
 
-    def __create_TCI_COG(self, item: Item, asset_type: str):
+    def __create_TCI_asset(self, item: Item, asset_type: str):
         asset = Asset(
             name=Role.cog.value,
             size=0,     # set once asset created
@@ -126,7 +126,7 @@ class Driver(EnrichDriver):
 
         return tci_file_path
 
-    def __create_all_bands_COG(self, item: Item):
+    def __create_all_bands_asset(self, item: Item):
         asset = Asset(
             name='all_bands_cog',
             size=0,     # set once asset created
