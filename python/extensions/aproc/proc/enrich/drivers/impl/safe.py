@@ -161,14 +161,14 @@ class Driver(EnrichDriver):
                 start = time()
 
                 # Build VRT to facilitate COG built
-                kwargs = {"separate": True, "resolution": "highest", "outputSRS": "EPSG:3857"}
+                kwargs = {"separate": True, "resolution": "highest"}
                 gdal.BuildVRT(vrt_file, local_assets, **kwargs)
 
                 # Build COG from VRT
-                kwargs = {'format': 'COG'}
-                gdal.Translate(asset_location, vrt_file, **kwargs)
+                kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
+                gdal.Warp(asset_location, vrt_file, **kwargs)
                 self.LOGGER.info("Creating all bands COG took {} s".format(time() - start))
 
-            os.remove(vrt_file)  # !DELETE!
+            AccessManager.clean(vrt_file)  # !DELETE!
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
