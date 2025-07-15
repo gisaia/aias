@@ -75,7 +75,7 @@ class S3Storage(AbstractStorage):
         return params
 
     def __get_href_key(self, href: str):
-        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") + "/"
+        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
 
 
     def pull(self, href: str, dst: str):
@@ -123,7 +123,7 @@ class S3Storage(AbstractStorage):
             "Delimiter": "/",
             "MaxKeys": conf.max_objects
         }
-        prefix = self.__get_href_key(href)
+        prefix = self.__get_href_key(href) + "/"
         if prefix != "/":
             params["Prefix"] = prefix
         return self.get_storage_parameters()["client"].list_objects_v2(**params)
