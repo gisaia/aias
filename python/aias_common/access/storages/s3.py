@@ -155,14 +155,13 @@ class S3Storage(AbstractStorage):
                 name=os.path.basename(c["Key"]),
                 path=self.__update_url__(source, c["Key"]),
                 is_dir=False,
-                last_modification_date=c["LastModified"]), filter(lambda x: x.get("Key") != self.__get_href_key(source), objects["Contents"])))
+                last_modification_date=c["LastModified"]), filter(lambda x: os.path.basename(x["Key"]), objects["Contents"])))
         dirs = []
         if objects.get("CommonPrefixes"):
             dirs = list(map(lambda d: File(
                 name=os.path.basename(d["Prefix"].removesuffix("/")),
                 path=self.__update_url__(source, d["Prefix"]),
                 is_dir=True), objects["CommonPrefixes"]))
-
         return files + dirs
 
     def get_last_modification_time(self, href: str):
