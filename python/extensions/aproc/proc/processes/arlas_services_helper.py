@@ -11,6 +11,9 @@ from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import ConnectionException, RegisterException
 from requests_toolbelt import MultipartEncoder
 
+from aias_common.access.storages.file import FileStorage
+
+
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
 
@@ -108,14 +111,17 @@ class ARLASServicesHelper(ABC):
         if asset.airs__managed is True:
             with AccessManager.stream(asset.href) as filedesc:
                 try:
-                    m = MultipartEncoder(
-                        fields={
-                            'file': (asset.name, filedesc, asset.type)
-                        }
-                    )
-                    headers = {'Content-Type': m.content_type}
                     url = os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name)
-                    r = requests.post(url=url, data=m, headers=headers)
+                    file = {'file': (asset.name, filedesc, asset.type)}
+                    if isinstance(AccessManager.resolve_storage(asset.href), FileStorage ):
+                        # optimize memory consumption if file. Does not work for smartopen descriptor :=(
+                        m = MultipartEncoder(
+                            fields=file
+                        )
+                        headers = {'Content-Type': m.content_type}
+                        r = requests.post(url=url, data=m, headers=headers)
+                    else:
+                        r = requests.post(url=url, files=file)
                     if r.ok:
                         Process.LOGGER.debug("asset {} uploaded successfully on {}".format(asset.href, url))
                     else:
