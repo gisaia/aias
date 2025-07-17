@@ -39,6 +39,7 @@ COPY ./conf /app/conf
 COPY ./python/assets /app/assets
 COPY ./python/airs/core /app/airs/core
 COPY ./docker/materials/scripts/aproc-proc/start.sh /app/
+COPY ./docker/materials/scripts/aproc-proc/ping.sh /app/
 
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json

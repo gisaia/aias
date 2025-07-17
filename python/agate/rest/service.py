@@ -25,7 +25,13 @@ async def urbac(request: Request):
     authorization = request.headers[Configuration.settings.urbac.jwt_header]
     LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
     if authorization:
-        token = jwt.decode(authorization.removeprefix("Bearer ").removeprefix("bearer "), options={"verify_signature": False})  # NOSONAR
+        try:
+            token = jwt.decode(authorization.removeprefix("Bearer ").removeprefix("bearer "), options={"verify_signature": False})  # NOSONAR
+        except Exception as e:
+            msg = "Invalid authorization header value {}".format(e)
+            LOGGER.error(msg)
+            LOGGER.debug(authorization)
+            return Response(status_code=status.HTTP_403_FORBIDDEN, content=msg)
         user_roles = token.get("resource_access", {}).get("arlas-backend", {}).get("roles", [])
         LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
         for n, r in Configuration.settings.urbac.roles.technicalRoles.items():
