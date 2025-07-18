@@ -113,7 +113,7 @@ class ARLASServicesHelper(ABC):
                 try:
                     url = os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name)
                     file = {'file': (asset.name, filedesc, asset.type)}
-                    if isinstance(AccessManager.resolve_storage(asset.href), FileStorage ):
+                    if isinstance(AccessManager.resolve_storage(asset.href), FileStorage):
                         # optimize memory consumption if file. Does not work for smartopen descriptor :=(
                         m = MultipartEncoder(
                             fields=file
