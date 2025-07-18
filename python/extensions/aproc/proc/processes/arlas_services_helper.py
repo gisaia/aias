@@ -9,6 +9,10 @@ from aproc.core.processes.process import Process
 from airs.core.settings import S3 as S3Configuration
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import ConnectionException, RegisterException
+from requests_toolbelt import MultipartEncoder
+
+from aias_common.access.storages.file import FileStorage
+
 
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
@@ -106,13 +110,22 @@ class ARLASServicesHelper(ABC):
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint):
         if asset.airs__managed is True:
             with AccessManager.stream(asset.href) as filedesc:
-                file = {'file': (asset.name, filedesc, asset.type)}
                 try:
-                    r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name), files=file)
-                    if r.ok:
-                        Process.LOGGER.debug("asset uploaded successfully")
+                    url = os.path.join(airs_endpoint, "collections", item.collection, "items", item.id, "assets", asset.name)
+                    file = {'file': (asset.name, filedesc, asset.type)}
+                    if isinstance(AccessManager.resolve_storage(asset.href), FileStorage):
+                        # optimize memory consumption if file. Does not work for smartopen descriptor :=(
+                        m = MultipartEncoder(
+                            fields=file
+                        )
+                        headers = {'Content-Type': m.content_type}
+                        r = requests.post(url=url, data=m, headers=headers)
                     else:
-                        msg = "Failed to upload asset: {} - {} on {}".format(r.status_code, r.content, airs_endpoint)
+                        r = requests.post(url=url, files=file)
+                    if r.ok:
+                        Process.LOGGER.debug("asset {} uploaded successfully on {}".format(asset.href, url))
+                    else:
+                        msg = "Failed to upload asset {}: {} - {} on {}".format(asset.href, r.status_code, r.content, url)
                         Process.LOGGER.error(msg)
                         raise RegisterException(msg)
                 except requests.exceptions.ConnectionError:
