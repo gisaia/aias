@@ -294,7 +294,16 @@ class Processes:
         if Processes.__REDIS_CONNECTION__ is None:
             uri = urlparse(Configuration.settings.celery_result_backend)
             if uri.scheme == "redis":
-                Processes.__REDIS_CONNECTION__ = Redis(host=uri.hostname, port=uri.port, decode_responses=True)
+                params = {
+                    "host": uri.hostname,
+                    "port": uri.port,
+                    "decode_responses": True
+                }
+                if uri.username:
+                    params["username"] = uri.username
+                if uri.password:
+                    params["username"] = uri.password
+                Processes.__REDIS_CONNECTION__ = Redis(**params)
             else:
                 raise Exception("Unsupported backend {}".format(uri.scheme))
         return Processes.__REDIS_CONNECTION__
