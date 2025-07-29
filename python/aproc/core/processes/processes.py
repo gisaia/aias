@@ -29,6 +29,8 @@ Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
 APROC_CELERY_APP = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)
 
+APROC_JOBS_INDEX="idx:aproc_jobs"
+
 
 class Processes:
     processes: list[Process] = []
@@ -197,7 +199,7 @@ class Processes:
 
     @staticmethod
     def __retrieve_status_info_by_resource_id__(resource_id: str) -> list[StatusInfo]:
-        docs = Processes.__get_redis_client__().ft("idx:airs_jobs").search(query="@resource_id:{'" + resource_id.replace("-", "\\-") + "'}").docs
+        docs = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX).search(query="@resource_id:{'" + resource_id.replace("-", "\\-") + "'}").docs
         return list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), docs))
 
     @staticmethod
@@ -210,7 +212,7 @@ class Processes:
         if (not process_id) and (not status):
             query_str = "*"
         q = Query(query_str).paging(offset=offset, num=limit).sort_by("modification_date", asc=False)
-        r = Processes.__get_redis_client__().ft("idx:airs_jobs").search(q)
+        r = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX).search(q)
         return StatusInfoList(total=r.total, status_list=list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), r.docs)))
 
     @staticmethod
@@ -267,7 +269,7 @@ class Processes:
     def __init_redis__():
         # At startup we clear and recreate the index.
         try:
-            Processes.__get_redis_client__().ft("idx:airs_jobs").dropindex()
+            Processes.__get_redis_client__().ft(APROC_JOBS_INDEX).dropindex()
         except Exception:
             ...
         schema = (
@@ -281,13 +283,17 @@ class Processes:
             TagField("$.status", as_name="status"),
             TextField("$.message", as_name="message")
         )
-        rs = Processes.__get_redis_client__().ft("idx:airs_jobs")
-        rs.create_index(schema,
-                        definition=IndexDefinition(
-                            prefix=[Processes.__REDIS_PREFIX__],
-                            index_type=IndexType.JSON
-                        )
-                        )
+        rs = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX)
+        indices = rs.execute_command("FT._LIST")
+        if APROC_JOBS_INDEX.encode() not in indices:
+            rs.create_index(schema,
+                            definition=IndexDefinition(
+                                prefix=[Processes.__REDIS_PREFIX__],
+                                index_type=IndexType.JSON
+                            )
+                            )
+        else:
+            LOGGER.info("Index {} exists".format(APROC_JOBS_INDEX))
 
     @staticmethod
     def __get_redis_client__() -> Redis:
