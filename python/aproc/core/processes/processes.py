@@ -302,7 +302,7 @@ class Processes:
                 if uri.username:
                     params["username"] = uri.username
                 if uri.password:
-                    params["username"] = uri.password
+                    params["password"] = uri.password
                 Processes.__REDIS_CONNECTION__ = Redis(**params)
             else:
                 raise Exception("Unsupported backend {}".format(uri.scheme))
