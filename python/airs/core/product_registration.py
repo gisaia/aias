@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime
 from typing import List
+from aias_common.access.configuration import S3StorageConfiguration
 import elasticsearch
 import pygeohash as pgh
 import pytz
@@ -9,7 +10,6 @@ import requests
 
 import airs.core.exceptions as exceptions
 import airs.core.geo as geo
-import airs.core.s3 as s3
 import airs.core.utils as utils
 from airs.core.models.mapper import (
     to_json,
@@ -132,15 +132,24 @@ def upload_item(item: Item):
     return __upload_item(key, item)
 
 
-def __upload_file(key, file, content_type) -> str:
+def __get_s3_path(key: str, s3_conf: S3StorageConfiguration):
+    """
+
+    Args:
+        key (str): Key of the object in the S3 storage
+        s3_conf (S3StorageConfiguration): S3 storage configuration
+
+    Returns:
+        str: Full path to the object in the S3 storage
+    """
+    return os.path.join(s3_conf.endpoint, key)
+
+
+def __upload_file(key: str, file: str, content_type) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
-        s3.get_client().upload_fileobj(
-            file,
-            Configuration.settings.s3.bucket,
-            key,
-            ExtraArgs={"ContentType": content_type},
-        )
+        # TODO: add content_type ?
+        Configuration.settings.storage.push(file, __get_s3_path(key, Configuration.settings.s3))
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -150,10 +159,10 @@ def __upload_file(key, file, content_type) -> str:
         raise exceptions.InternalError("storage", msg, e)
 
 
-def __delete_file(key):
+def __delete_file(key: str):
     try:
         LOGGER.info("deleting {} ...".format(key))
-        s3.get_client().delete_object(Bucket=Configuration.settings.s3.bucket, Key=key)
+        Configuration.settings.storage.clean(__get_s3_path(key, Configuration.settings.s3))
         LOGGER.info(__DELETED_MSG__.format(key))
     except Exception as e:
         msg = "Failed to delete {} ".format(key)
@@ -162,18 +171,13 @@ def __delete_file(key):
         raise exceptions.InternalError("storage", msg, e)
 
 
-def __delete_prefix(prefix: str):
+def __delete_folder(prefix: str):
     try:
         LOGGER.info("deleting {} ...".format(prefix))
-        objects = s3.get_client().list_objects(
-            Bucket=Configuration.settings.s3.bucket, Prefix=prefix
-        )
-        for object in objects["Contents"]:
-            LOGGER.info("deleting {} ...".format(object["Key"]))
-            objects = s3.get_client().delete_object(
-                Bucket=Configuration.settings.s3.bucket, Key=object["Key"]
-            )
-            LOGGER.info(__DELETED_MSG__.format(object["Key"]))
+        for f in Configuration.settings.storage.listdir(__get_s3_path(prefix, Configuration.settings.s3)):
+            LOGGER.info("deleting {} ...".format(f.name))
+            Configuration.settings.storage.clean(f.path)
+            LOGGER.info(__DELETED_MSG__.format(f.name))
         LOGGER.info(__DELETED_MSG__.format(prefix))
     except Exception as e:
         msg = "Failed to delete {} ".format(prefix)
@@ -182,15 +186,14 @@ def __delete_prefix(prefix: str):
         raise exceptions.InternalError("storage", msg, e)
 
 
-def __upload_item(key, item: Item) -> str:
+def __upload_item(key: str, item: Item) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
-        s3.get_client().put_object(
-            Bucket=Configuration.settings.s3.bucket,
-            Key=key,
-            Body=to_json(item),
-            ContentType=MimeType.JSON.value,
-        )
+        tmp_file = os.path.join(Configuration.settings.tmp_dir, os.path.basename(key))
+        with open(tmp_file, "w") as f:
+            f.write(to_json(item))
+        Configuration.settings.storage.push(tmp_file, __get_s3_path(key, Configuration.settings.s3))
+        os.remove(tmp_file)  # !DELETE!
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -213,15 +216,7 @@ def asset_exists(collection: str, item_id: str, asset_name: str) -> bool:
         bool: True if found on the S3, False otherwise
     """
     key = get_asset_relative_path(collection, item_id, asset_name)
-    try:
-        h = s3.get_client().head_object(
-            Bucket=Configuration.settings.s3.bucket, Key=key
-        )
-        LOGGER.info(h)
-        return True
-    except Exception as e:
-        LOGGER.debug(e)
-        return False
+    return Configuration.settings.storage.exists(__get_s3_path(key, Configuration.settings.s3))
 
 
 def delete_item(collection: str, item_id: str):
@@ -229,15 +224,15 @@ def delete_item(collection: str, item_id: str):
         raise exceptions.InvalidItemsException(
             [item_id], reason="Collection does not exist"
         )
-    r = __getES().delete(index=__get_es_index_name(collection), id=item_id)
-    prefix = get_assets_relative_path(collection, item_id)
-    __delete_prefix(prefix)
-    LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
-    s3.get_client().delete_object(
-        Bucket=Configuration.settings.s3.bucket,
-        Key=get_item_relative_path(collection, item_id),
-    )
-    LOGGER.info(__DELETED_MSG__.format(get_item_relative_path(collection, item_id)))
+    __getES().delete(index=__get_es_index_name(collection), id=item_id)
+
+    assets_folder = get_assets_relative_path(collection, item_id)
+    __delete_folder(assets_folder)
+
+    item_relative_path = get_item_relative_path(collection, item_id)
+    LOGGER.info("deleting {} ...".format(item_relative_path))
+    Configuration.settings.storage.clean(__get_s3_path(item_relative_path, Configuration.settings.s3))
+    LOGGER.info(__DELETED_MSG__.format(item_relative_path))
 
 
 def __fetch_mapping__():
@@ -320,18 +315,13 @@ def reindex(collection: str):
     Args:
         collection (str): name of the collection to reindex
     """
-    keys = s3.get_matching_s3_objects(
-        Configuration.settings.s3.bucket, collection, ITEM_ARLAS_SUFFIX
-    )
+    keys = Configuration.settings.storage.get_matching_objects(
+        collection, ITEM_ARLAS_SUFFIX)
     LOGGER.info("Start reindexing collection {}".format(collection))
     for key in keys:
         tmp_file = "tmp" + ITEM_ARLAS_SUFFIX
         LOGGER.info("Reindexing item from {}".format(key))
-        LOGGER.info(
-            s3.get_client().download_file(
-                Configuration.settings.s3.bucket, key, tmp_file
-            )
-        )
+        Configuration.settings.storage.pull(__get_s3_path(key, Configuration.settings.s3), tmp_file)
         with open(tmp_file, "r") as f:
             item = item_from_json_file(f)
             LOGGER.debug(item)
@@ -414,7 +404,7 @@ def __add_generated_fields(item: Item) -> Item:
     acquisition = datetime.fromtimestamp(item.properties.datetime)
     try:
         acquisition = pytz.UTC.localize(acquisition)
-    except Exception as e:
+    except Exception:
         ...  # LOGGER.error("Can not localize {}: {}".format(acquisition, e))
     item.properties.generated__day_of_week = acquisition.weekday()
     item.properties.generated__day_of_year = int(acquisition.strftime("%j"))
@@ -457,6 +447,8 @@ def __add_generated_fields(item: Item) -> Item:
 
 
 def __set_assets_links(item: Item) -> Item:
+    storage = Configuration.settings.storage
+
     for asset_name in item.assets:
         asset = item.assets[asset_name]
         if asset.airs__managed is True:
@@ -465,20 +457,20 @@ def __set_assets_links(item: Item) -> Item:
                 item.collection, item.id, asset_name
             )
             asset.name = asset_name
-            asset.href = Configuration.settings.s3.asset_http_endpoint_url.format(
-                Configuration.settings.s3.bucket, object_relative_path
+            asset.href = Configuration.settings.asset_http_endpoint_url.format(
+                storage.bucket, object_relative_path
             )
-            asset.airs__object_store_bucket = Configuration.settings.s3.bucket
+            asset.airs__object_store_bucket = storage.bucket
             asset.airs__object_store_key = object_relative_path
-            asset.storage__platform = Configuration.settings.s3.platform
-            asset.storage__tier = Configuration.settings.s3.tier
+            asset.storage__platform = storage.platform
+            asset.storage__tier = storage.tier
         else:
             LOGGER.info("Asset {} is not maneged".format(asset_name))
     item_relative_path = get_item_relative_path(item.collection, item.id)
     item.assets[Role.airs_item.value] = Asset(
         name=Role.airs_item.value,
-        href=Configuration.settings.s3.asset_http_endpoint_url.format(
-            Configuration.settings.s3.bucket, item_relative_path
+        href=Configuration.settings.asset_http_endpoint_url.format(
+            storage.bucket, item_relative_path
         ),
         description="ARLAS item for {}".format(item.id),
         title="ARLAS item for {}".format(item.id),
@@ -486,14 +478,10 @@ def __set_assets_links(item: Item) -> Item:
         roles=[Role.airs_item.value],
     )
     item.assets[Role.airs_item.value].airs__managed = True
-    item.assets[Role.airs_item.value].airs__object_store_bucket = (
-        Configuration.settings.s3.bucket
-    )
+    item.assets[Role.airs_item.value].airs__object_store_bucket = storage.bucket
     item.assets[Role.airs_item.value].airs__object_store_key = item_relative_path
-    item.assets[Role.airs_item.value].storage__platform = (
-        Configuration.settings.s3.platform
-    )
-    item.assets[Role.airs_item.value].storage__tier = Configuration.settings.s3.tier
+    item.assets[Role.airs_item.value].storage__platform = storage.platform
+    item.assets[Role.airs_item.value].storage__tier = storage.tier
     return item
 
 

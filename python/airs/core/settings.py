@@ -1,19 +1,10 @@
-from pydantic import BaseModel, Field
-from envyaml import EnvYAML
+from aias_common.access.configuration import AccessManagerSettings, S3StorageConfiguration
+from aias_common.access.storages.s3 import S3Storage
 from airs.core.logger import Logger
+from envyaml import EnvYAML
+from pydantic import BaseModel, Field, computed_field
 
 LOGGER = Logger.logger
-
-
-class S3(BaseModel):
-    access_key_id: str | None = Field(None, title="Access key", description="S3 access key")
-    secret_access_key: str | None = Field(None, title="Secret", description="S3 access secret")
-    platform: str | None = Field(None, title="Platform", description="S3 platform (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
-    tier: str = Field("Standard", title="Storage tiers", description="Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
-    region: str | None = Field(None, title="Storage region", description="The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)")
-    asset_http_endpoint_url: str | None = Field(None, title="Asset URL endpoint", description="Asset URL endpoint with placeholders for bucket and collection names (e.g. http://minio:9000/{}/{})")
-    endpoint_url: str | None = Field(None, title="URL endpoint", description="URL endpoint (e.g. http://minio:9000)")
-    bucket: str | None = Field(None, title="Bucket name", description="Bucket name")
 
 
 class Index(BaseModel, extra="allow"):
@@ -23,11 +14,22 @@ class Index(BaseModel, extra="allow"):
     pwd: str | None = Field(title="ES pwd", description="Elasticsearch password")
 
 
+class S3AccessManagerSettings(AccessManagerSettings):
+    storages: list[S3StorageConfiguration] = Field(title="S3 storage list. Only one element", description="List of configurations for the available storages", min_length=1, max_length=1)
+
+
 class Settings(BaseModel, extra="allow"):
-    s3: S3 = Field(title="S3 Configuration", description="Configuration of the S3 bucket that will contain the STAC items and assets.")
+    s3: S3StorageConfiguration = Field(title="S3 Configuration", description="Configuration of the S3 bucket that will contain the STAC items and assets.")
+    tmp_dir: str = Field(title="Temporary directory", description="Temporary directory in which to write files that will be deleted")
     index: Index = Field(title="", description="")
     arlaseo_mapping_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/9/mapping.json"
     arlaseo_collection_url: str = "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json"
+    asset_http_endpoint_url: str | None = Field(None, title="Asset URL endpoint", description="Asset URL endpoint with placeholders for bucket and collection names (e.g. http://minio:9000/{}/{})")
+
+    @computed_field
+    @property
+    def storage(self) -> S3Storage:
+        return S3Storage(self.s3)
 
 
 class Configuration:

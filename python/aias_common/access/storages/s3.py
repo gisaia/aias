@@ -75,8 +75,7 @@ class S3Storage(AbstractStorage):
         return params
 
     def __get_href_key(self, href: str):
-        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
-
+        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/")
 
     def pull(self, href: str, dst: str):
         import botocore.client
@@ -102,7 +101,7 @@ class S3Storage(AbstractStorage):
                 return self.get_storage_parameters()["client"].head_object(
                     Bucket=conf.bucket,
                     Key=self.__get_href_key(href))
-            except:
+            except Exception:
                 return None
         else:
             return None
@@ -185,6 +184,7 @@ class S3Storage(AbstractStorage):
             raise PermissionError("Creating a folder on a remote storage is not permitted")
 
     def clean(self, href: str):
+        # TODO: to code
         raise PermissionError("Deleting files on a remote storage is not permitted")
 
     def get_gdal_stream_options(self):
@@ -219,3 +219,22 @@ class S3Storage(AbstractStorage):
             href = href.replace(config.endpoint, "/vsis3")
 
         return href
+
+    # TODO: to test thoroughly
+    @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
+    def get_matching_objects(self, prefix: str, suffix: str):
+        conf = self.get_configuration()
+        params = {
+            "Bucket": conf.bucket,
+            "Delimiter": "/",
+            "MaxKeys": conf.max_objects,
+            "Prefix": prefix
+        }
+        objects = self.get_storage_parameters()["client"].list_objects_v2(**params)
+
+        results: list[str] = []
+        if objects.get("Contents"):
+            results = [o["Key"] for o in objects["Contents"]]
+            results = list(filter(lambda k: k.endswith(suffix), results))
+
+        return results

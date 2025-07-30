@@ -1,10 +1,10 @@
+from aias_common.access.configuration import S3StorageConfiguration
 from airs.core.models.model import Item, Role
-from airs.core.settings import S3
 from envyaml import EnvYAML
 from extensions.aproc.proc.drivers.driver_configuration import \
     DriverConfiguration as DriverConfiguration
 from extensions.aproc.proc.drivers.exceptions import DriverException
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
 
 
 class Driver(DriverConfiguration):
@@ -25,7 +25,7 @@ class SMPTConfiguration(BaseModel, extra='allow'):
     from_addr: str = Field(title="From", description="Emails address of the system that sends the emails")
 
 
-class Index(BaseModel, extra=Extra.allow):
+class Index(BaseModel, extra='allow'):
     index_name: str = Field(title="Index name", description="Elasticsearch index name for indexing download requests")
     endpoint_url: str = Field(title="ES endpoint", description="Elasticsearch URL for indexing download requests")
     login: str = Field("", title="login", description="Elasticsearch login")
@@ -36,7 +36,7 @@ class Settings(BaseModel, extra='allow'):
     arlas_url_search: str = Field(title="Search template", description="ARLAS URL Search (ex http://arlas-server:9999/arlas/explore/{collection}/_search?f=id:eq:{item})")
     drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the download drivers")
     outbox_directory: str = Field(title="Outbox location", description="Directory where the downloads will be placed. Must be configured, even so you enabled outbox_s3")
-    outbox_s3: S3 | None = Field(title="S3 outbox configuration", description="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
+    outbox_s3: S3StorageConfiguration | None = Field(title="S3 outbox configuration", description="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
     clean_outbox_directory: bool = Field(True, title="Clean after S3 copy", description="Clean outbox directory once files copied on S3")
     notification_admin_emails: str = Field("", title="Admin's email", description="List of admin emails for receiving download notifications, comma seperated.")
     smtp: SMPTConfiguration | None = Field(None, title="SMTP Configuration", description="Emails address of the system that sends the emails")

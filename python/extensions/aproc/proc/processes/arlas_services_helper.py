@@ -2,6 +2,7 @@ import mimetypes
 import os
 from abc import ABC
 
+from airs.core.product_registration import __get_s3_path
 import requests
 from aias_common.access.manager import AccessManager
 from aias_common.access.multipart_encoder import MultipartEncoder
@@ -97,13 +98,8 @@ class ARLASServicesHelper(ABC):
             local_path = os.path.join(directory, key.strip("/"))
             destpath = os.path.join(s3_dir, key.strip("/"))
             mime_type, __ = mimetypes.guess_type(local_path, strict=False)
-            if mime_type:
-                extra = {"ContentType": mime_type}
-            else:
-                extra = None
             Process.LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, mime_type, s3_conf.bucket, destpath))
-            with open(local_path, 'rb') as file:
-                s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
+            AccessManager.push(local_path, __get_s3_path(key.strip("/")))
 
     @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint: str):

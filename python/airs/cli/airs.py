@@ -26,6 +26,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
         host: str = typer.Argument(default=AIRS_HOST, help="host"),
         port: int = typer.Argument(default=AIRS_PORT, help="port")):
     Configuration.init(configuration_file=configuration_file)
+
     api = FastAPI(version=AIAS_VERSION, title='ARLAS Item Product Registration Service',
                   description='ARLAS Item Registration Service API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=AIRS_CORS_ORIGINS.split(","),

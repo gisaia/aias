@@ -4,20 +4,24 @@ index:
   login: $AIRS_INDEX_LOGIN
   pwd: $AIRS_INDEX_PWD
 
-s3:
-  bucket: $AIRS_S3_BUCKET|arlaseo
-  access_key_id: $AIRS_S3_ACCESS_KEY_ID
-  secret_access_key: $AIRS_S3_SECRET_ACCESS_KEY
-  region: $AIRS_S3_REGION|None
-  tier: $AIRS_S3_TIER|"Standard"
-  platform: $AIRS_S3_PLATFORM
+access_manager:
+  tmp_dir: /tmp/
+  storages:
+    -
+      type: s3
+      bucket: $AIRS_S3_BUCKET|arlaseo
+      region: $AIRS_S3_REGION|None
+      # if you don't use aws s3, then please prov
+      endpoint: $AIRS_S3_ENDPOINT_URL
+      api_key:
+        access_key: $AIRS_S3_ACCESS_KEY_ID
+        secret_key: $AIRS_S3_SECRET_ACCESS_KEY
+      tier: $AIRS_S3_TIER|"Standard"
+      platform: $AIRS_S3_PLATFORM
 
 # asset_http_endpoint_url must look like https://storage.googleapis.com/{}/{}
 # first element is the bucket, second is the path to the object
-  asset_http_endpoint_url: $AIRS_S3_ASSET_HTTP_ENDPOINT_URL
-
-# if you don't use aws s3, then please prov
-  endpoint_url: $AIRS_S3_ENDPOINT_URL
+asset_http_endpoint_url: $AIRS_S3_ASSET_HTTP_ENDPOINT_URL
 
 arlaseo_mapping_url: $ARLASEO_MAPPING_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/mapping.json"
 arlaseo_collection_url: $AIRS_COLLECTION_URL|"https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.9/collection.json"

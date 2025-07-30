@@ -37,14 +37,17 @@ class GoogleStorageApiKey(BaseModel):
     private_key: str = Field(title="Private Key", description="The private key content in PEM format")
     client_email: str = Field(title="Client Email", description="Service account email address")
     client_id: str | None = Field(default=None, title="Client ID", description="Optional client ID of the service account")
-    auth_uri: Literal[GoogleStorageConstants.AUTH_URI] = Field(default=GoogleStorageConstants.AUTH_URI.value,
+    auth_uri: Literal[GoogleStorageConstants.AUTH_URI] = Field(
+        default=GoogleStorageConstants.AUTH_URI.value,
         title="Auth URI", description="OAuth2 auth endpoint URI")
-    token_uri: Literal[GoogleStorageConstants.TOKEN_URI] = Field(default=GoogleStorageConstants.TOKEN_URI.value,
+    token_uri: Literal[GoogleStorageConstants.TOKEN_URI] = Field(
+        default=GoogleStorageConstants.TOKEN_URI.value,
         title="Token URI", description="OAuth2 token endpoint URI")
     auth_provider_x509_cert_url: Literal[GoogleStorageConstants.AUTH_PROVIDER_CERT_URL] = Field(
         default=GoogleStorageConstants.AUTH_PROVIDER_CERT_URL.value,
         title="Provider X.509 Cert URL", description="URL for the provider's X.509 certificate")
-    universe_domain: Literal[GoogleStorageConstants.UNIVERSE_DOMAIN] = Field(default=GoogleStorageConstants.UNIVERSE_DOMAIN.value,
+    universe_domain: Literal[GoogleStorageConstants.UNIVERSE_DOMAIN] = Field(
+        default=GoogleStorageConstants.UNIVERSE_DOMAIN.value,
         title="Universe Domain", description="Domain of the target universe (typically 'googleapis.com')")
 
     @computed_field
@@ -82,8 +85,7 @@ class HttpStorageConfiguration(StorageConfiguration):
     is_local: Literal[False] = Field(default=False, title='Is a local storage', description="Whether the storage is local or remote")
     headers: dict[str, str] = Field(default={}, title="Headers", description="Additional HTTP headers to include in each request")
     domain: str = Field(title="Domain", description="Domain used for HTTP storage endpoint, e.g. 'example.com'")
-    force_download: bool = Field(default=False, title="Force Download", description="If true, always download the file instead of caching."
-    )
+    force_download: bool = Field(default=False, title="Force Download", description="If true, always download the file instead of caching.")
 
 
 class S3ApiKey(BaseModel):
@@ -99,6 +101,8 @@ class S3StorageConfiguration(StorageConfiguration):
     endpoint: str = Field(title="Endpoint", description="Endpoint to access S3 storage")
     api_key: S3ApiKey | None = Field(title="API Key", description="API key for storage authentication", default=None)
     max_objects: int = Field(default=1000, title="Max object", description="Maximum number of objects to fetch when listing elements in a directory")
+    platform: str | None = Field(None, title="Platform", description="S3 platform (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
+    tier: str = Field("Standard", title="Storage tier", description="Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
 
     @computed_field
     @property
