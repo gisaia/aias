@@ -1,14 +1,14 @@
-## AIAS Configuration
+## APROC Configuration
 
-The AIAS Configuration is done in the following files:
+The APROC Configuration is done in the following files:
 
 - [`conf/aproc.yaml`](#aproc-configuration-reference-documentation) for configuring the APROC framework, the drivers registrations and the storage access manager.
 - [`conf/drivers.yaml`](#aproc-ingestion-drivers-reference-documentation) for configuring the ingestion process
 - [`conf/download.yaml`](#aproc-download-drivers-reference-documentation) for configuring the download process
-- [`conf/enrich.yaml`](#aproc-enrich-drivers-reference-documentation) for configuring the enrichement process
+- [`conf/enrich.yaml`](#aproc-enrich-drivers-reference-documentation) for configuring the enrichment process
 - [`conf/dc3build.yaml`](#aproc-datacube-build-drivers-reference-documentation) for configuring the datacube building process
 
-## APROC Configuration
+## Framework Configuration
 
 The [`conf/aproc.yaml`](#aproc-configuration-reference-documentation) set the configuration of the APROC framework for:
 - framework's dependencies on celery and AIRS
