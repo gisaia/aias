@@ -26,7 +26,7 @@ celery_result_backend: redis://127.0.0.1:6379/0
 airs_endpoint: http://127.0.0.1:8000/arlas/airs
 ```
 
-The APROC driver registration section lists the Processes drivers and their respective configuration files, e.g. :
+The APROC driver registration section lists the Processes drivers and their respective configuration files, e.g.:
 
 ```yaml
 processes:
