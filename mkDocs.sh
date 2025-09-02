@@ -32,6 +32,10 @@ cp python/aias_common/access/configuration.py target/generated-docs/aias_common/
 cp python/airs/core/settings.py target/generated-docs/airs/settings.py
 cp python/aproc/core/settings.py target/generated-docs/aproc/settings.py
 cp python/fam/core/settings.py target/generated-docs/fam/settings.py
+cp python/extensions/aproc/proc/ingest/settings.py target/generated-docs/aproc/ingest.py
+cp python/extensions/aproc/proc/download/settings.py target/generated-docs/aproc/download.py
+cp python/extensions/aproc/proc/enrich/settings.py target/generated-docs/aproc/enrich.py
+cp python/extensions/aproc/proc/dc3build/settings.py target/generated-docs/aproc/dc3build.py
 
 pip3.10 install lazydocs
 

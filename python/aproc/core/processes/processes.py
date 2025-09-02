@@ -284,16 +284,15 @@ class Processes:
             TextField("$.message", as_name="message")
         )
         rs = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX)
-        indices = rs.execute_command("FT._LIST")
-        if APROC_JOBS_INDEX.encode() not in indices:
+        try:
             rs.create_index(schema,
                             definition=IndexDefinition(
                                 prefix=[Processes.__REDIS_PREFIX__],
                                 index_type=IndexType.JSON
                             )
                             )
-        else:
-            LOGGER.info("Index {} exists".format(APROC_JOBS_INDEX))
+        except Exception as e:
+            LOGGER.info("Index not created ({})".format(e))
 
     @staticmethod
     def __get_redis_client__() -> Redis:
