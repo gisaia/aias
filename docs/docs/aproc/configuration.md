@@ -66,6 +66,7 @@ access_manager:
 ```
 
 Four types of storage are available:
+
 - [`file`](#aias_common.configuration.FileStorageConfiguration): local file storage
 - [`gs`](#aias_common.configuration.GoogleStorageConfiguration): google cloud object storage
 - [`s3`](#aias_common.configuration.S3StorageConfiguration): S3 compliant object storage
