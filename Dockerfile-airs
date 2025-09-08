@@ -4,6 +4,19 @@ COPY ./airs/requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
+RUN apt-get remove -y git && \
+    apt-get remove -y imagemagick libmagickwand-dev libmagickcore-dev && \
+    apt-get remove -y libbluetooth-dev libbluetooth3 && \
+    apt-get remove -y libxslt1.1 && \
+    apt-get remove -y linux-libc-dev
+
+    RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+
+RUN pip install --upgrade setuptools>=69.0.3
 RUN pip install -r requirements.txt
 
 COPY ./airs /app/airs
