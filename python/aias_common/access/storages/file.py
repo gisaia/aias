@@ -43,7 +43,7 @@ class FileStorage(AbstractStorage):
 
         shutil.copy(href, dst)
 
-    def push(self, href: str, dst: str):
+    def push(self, href: str, dst: str, content_type: str | None = None):
         super().push(href, dst)
 
         if not self.is_path_authorized(dst, AccessType.WRITE):
@@ -99,5 +99,5 @@ class FileStorage(AbstractStorage):
     def get_gdal_stream_options(self):
         return {}
 
-    def gdal_transform_href_vsi(self, href: str):
+    def gdal_transform_href_vsi(self, href: str) -> str:
         return href

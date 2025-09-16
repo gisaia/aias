@@ -84,13 +84,19 @@ def setUpTest():
     except Exception:
         ...
     try:
-        # Clean the bucket
         objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(COLLECTION, ID))
         for object in objects["Contents"]:
             get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
         get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
     except Exception as e:
-        print(e)
+        ...
+    try:
+        objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(COLLECTION, ID_MANAGED))
+        for object in objects["Contents"]:
+            get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
+        get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
+    except Exception as e:
+        ...
 
 
 def dir_to_list(dirname, parent={}):
@@ -146,19 +152,16 @@ def filter_data(arr):
 
 
 def add_item(calling_test: unittest.TestCase, item_path: str, id: str) -> Item:
-    print(f"create item {id}")
     with open(item_path, 'r') as file:
         data = file.read()
         r = requests.post(url="/".join([AIRS_URL, "collections", COLLECTION, "items"]), data=data, headers={"Content-Type": "application/json"})
         calling_test.assertTrue(r.ok, msg=r.content)
-    print("item created")
     r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", id]))
     calling_test.assertTrue(r.ok, msg=r.content)
     return mapper.item_from_json(r.content)
 
 
 def create_arlas_collection(calling_test: unittest.TestCase):
-    print(f"Creating collection {ARLAS_COLLECTION}")
     r = requests.put("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]), headers={"Content-Type": MimeType.JSON.value},
                      data=json.dumps({
                         "index_name": index_collection_prefix + "_" + ARLAS_COLLECTION,
@@ -168,4 +171,3 @@ def create_arlas_collection(calling_test: unittest.TestCase):
                         "timestamp_path": "properties.datetime"
                      }))
     calling_test.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
-    print("Collection created")

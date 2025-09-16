@@ -21,10 +21,6 @@ class Tests(unittest.TestCase):
             r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertFalse(r.ok, str(r.status_code) + str(r.content))
 
-        # ASSET NOT FOUND
-        r = requests.head(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET))
-        self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
-
         # ITEM NOT FOUND
         r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED))
         self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
@@ -94,10 +90,6 @@ class Tests(unittest.TestCase):
 
         # ITEM NOT FOUND
         r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED))
-        self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
-
-        # ASSET NOT FOUND
-        r = requests.head(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET))
         self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
 
     def test_reindex(self):

@@ -5,13 +5,13 @@ from abc import ABC
 import requests
 from aias_common.access.manager import AccessManager
 from aias_common.access.multipart_encoder import MultipartEncoder
-from airs.core import s3
 from airs.core.models import mapper
 from airs.core.models.model import Asset, Item
 from airs.core.settings import S3 as S3Configuration
 from aproc.core.processes.process import Process
 from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       RegisterException)
+from aias_common.access.storages.s3 import S3Storage
 
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
@@ -85,9 +85,7 @@ class ARLASServicesHelper(ABC):
         return (send_to, user_id)
 
     @staticmethod
-    def dir2s3(directory: str, s3_dir: str, s3_conf: S3Configuration):
-        s3_client = s3.get_client_from_configuration(s3_conf)
-
+    def dir2s3(directory: str, s3_dir: str, storage: S3Storage):        
         upload_file_names = []
         for (source_dir, dirname, files) in os.walk(directory):
             for file in files:
@@ -97,13 +95,8 @@ class ARLASServicesHelper(ABC):
             local_path = os.path.join(directory, key.strip("/"))
             destpath = os.path.join(s3_dir, key.strip("/"))
             mime_type, __ = mimetypes.guess_type(local_path, strict=False)
-            if mime_type:
-                extra = {"ContentType": mime_type}
-            else:
-                extra = None
-            Process.LOGGER.info("Copy {} ({}) to {}/{}".format(local_path, mime_type, s3_conf.bucket, destpath))
-            with open(local_path, 'rb') as file:
-                s3_client.upload_fileobj(file, s3_conf.bucket, destpath, ExtraArgs=extra)
+            Process.LOGGER.info("Copy {} ({}) to {}".format(local_path, mime_type, destpath))
+            storage.push(local_path, destpath, mime_type)
 
     @staticmethod
     def upload_asset_if_managed(item: Item, asset: Asset, airs_endpoint: str):

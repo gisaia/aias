@@ -43,11 +43,11 @@ class S3Storage(AbstractStorage):
     def supports(self, href: str):
         scheme = urlparse(href).scheme
         netloc = urlparse(href).netloc
-
+        path = urlparse(href).path
         if scheme == "s3":
             return netloc == self.get_configuration().bucket
         elif scheme == "http" or scheme == "https":
-            return f"{scheme}://{netloc}" == self.get_configuration().endpoint
+            return f"{scheme}://{netloc}" == self.get_configuration().endpoint and len(path.split("/")) > 1 and path.split("/")[1] == self.get_configuration().bucket
         return False
 
     def exists(self, href: str):
@@ -77,10 +77,8 @@ class S3Storage(AbstractStorage):
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
 
-
     def pull(self, href: str, dst: str):
         import botocore.client
-
         super().pull(href, dst)
 
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
@@ -90,10 +88,30 @@ class S3Storage(AbstractStorage):
             for chunk in obj['Body'].iter_chunks(50 * 1024):
                 f.write(chunk)
 
-    def push(self, href: str, dst: str):
+    def push(self, href: str, dst: str, content_type: str | None = None):
+        import botocore.client
         super().push(href, dst)
-        raise NotImplementedError("'push' method has not been implemented yet for s3 storage")
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        extraArgs = {}
+        if content_type:
+            extraArgs["ContentType"] = content_type
+        client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
 
+    def push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
+        """push source file like object on destination
+
+        Args:
+            file_obj: A source file like object (https://docs.python.org/3/glossary.html#term-file-object)
+            dst (str): target destination for coping the content of file_obj
+            content_type (str | None, optional): content type of the source file. Defaults to None.
+        """
+        import botocore.client
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        extraArgs = {}
+        if content_type:
+            extraArgs["ContentType"] = content_type
+        client.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
+        
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
         conf = self.get_configuration()
@@ -185,7 +203,9 @@ class S3Storage(AbstractStorage):
             raise PermissionError("Creating a folder on a remote storage is not permitted")
 
     def clean(self, href: str):
-        raise PermissionError("Deleting files on a remote storage is not permitted")
+        import botocore.client
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        client.delete_object(Bucket=self.get_configuration().bucket, Key=href)
 
     def get_gdal_stream_options(self):
         config = self.get_configuration()
@@ -210,7 +230,7 @@ class S3Storage(AbstractStorage):
             params["AWS_HTTPS"] = "FALSE"
         return params
 
-    def gdal_transform_href_vsi(self, href: str):
+    def gdal_transform_href_vsi(self, href: str) -> str:
         config = self.get_configuration()
 
         if urlparse(href).scheme == "s3":
@@ -219,3 +239,36 @@ class S3Storage(AbstractStorage):
             href = href.replace(config.endpoint, "/vsis3")
 
         return href
+
+    def get_matching_s3_objects(self, prefix="", suffix="", s3_client=None):
+
+        import botocore.client
+        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        paginator = client.get_paginator("list_objects_v2")
+
+        kwargs = {'Bucket': self.get_configuration().bucket}
+
+        # We can pass the prefix directly to the S3 API.  If the user has passed
+        # a tuple or list of prefixes, we go through them one by one.
+        if isinstance(prefix, str):
+            prefixes = (prefix, )
+        else:
+            prefixes = prefix
+
+        for key_prefix in prefixes:
+            kwargs["Prefix"] = key_prefix
+
+            for page in paginator.paginate(**kwargs):
+                try:
+                    contents = page["Contents"]
+                except KeyError:
+                    break
+
+                for obj in contents:
+                    key = obj["Key"]
+                    if key.endswith(suffix):
+                        yield key
+
+    def get_matching_s3_keys(self, prefix="", suffix=""):
+        for obj in self.get_matching_s3_objects(prefix, suffix):
+            yield obj["Key"]
