@@ -81,7 +81,7 @@ class AbstractStorage(ABC):
             raise ValueError("Destination must be on the local filesystem")
 
     @abstractmethod
-    def push(self, href: str, dst: str):
+    def push(self, href: str, dst: str, content_type: str | None = None):
         """Copy/upload the desired file from local to write it on the file system
 
         Args:
@@ -193,7 +193,7 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def gdal_transform_href_vsi(self, href: str):
+    def gdal_transform_href_vsi(self, href: str) -> str:
         """Transform the archive's href into a format manageable by GDAL's virtual file systems
 
         Args:

@@ -78,14 +78,14 @@ class GoogleStorage(AbstractStorage):
 
         blob.download_to_filename(dst)
 
-    def push(self, href: str, dst: str):
+    def push(self, href: str, dst: str, content_type: str | None = None):
         super().push(href, dst)
 
         blob = self.__create_blob(dst)
         if blob is None:
             raise LookupError(f"Can't create blob: {dst}")
 
-        blob.upload_from_filename(href)
+        blob.upload_from_filename(href, content_type=content_type)
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=1024)
     def __list_blobs(self, source: str) -> list[File]:
@@ -153,5 +153,5 @@ class GoogleStorage(AbstractStorage):
 
         return params
 
-    def gdal_transform_href_vsi(self, href: str):
+    def gdal_transform_href_vsi(self, href: str) -> str:
         return href.replace("gs://", "/vsigs/")

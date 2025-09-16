@@ -34,7 +34,7 @@ class HttpStorage(AbstractStorage):
         super().pull(href, dst)
         requests_get(href, dst, self.get_configuration().headers)
 
-    def push(self, href: str, dst: str):
+    def push(self, href: str, dst: str, content_type: str | None = None):
         super().push(href, dst)
         raise NotImplementedError("'push' method is not available for http storage")
 
@@ -73,5 +73,5 @@ class HttpStorage(AbstractStorage):
 
         return params
 
-    def gdal_transform_href_vsi(self, href: str):
+    def gdal_transform_href_vsi(self, href: str) -> str:
         return "/vsicurl/" + href

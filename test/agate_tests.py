@@ -56,7 +56,6 @@ class Tests(unittest.TestCase):
         self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
 
     def __add_item__(self) -> Item:
-        print("create item")
         # UPLOAD ASSET
         with open(ASSET_PATH, 'rb') as file:
             file = {'file': (ASSET, file, "image/tiff")}
@@ -65,7 +64,6 @@ class Tests(unittest.TestCase):
             data = file.read()
             r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok, msg=r.content)
-        print("item created")
         r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID))
         self.assertTrue(r.ok, msg=r.content)
         sleep(3)

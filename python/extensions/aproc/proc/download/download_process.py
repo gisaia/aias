@@ -33,6 +33,8 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              USER_EMAIL_KEY, USER_ID_KEY)
 from pydantic import BaseModel, Field
 
+from aias_common.access.storages.s3 import S3Storage
+
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
@@ -185,7 +187,9 @@ class AprocProcess(Process):
                         target_format=target_format,
                         raw_archive=raw_archive)
                     if DownloadConfiguration.settings.outbox_s3 and DownloadConfiguration.settings.outbox_s3.bucket:
-                        ARLASServicesHelper.dir2s3(target_directory, relative_target_directory, DownloadConfiguration.settings.outbox_s3)
+                        ARLASServicesHelper.dir2s3(target_directory,
+                                                   relative_target_directory,
+                                                   AccessManager.resolve_storage("/".join([DownloadConfiguration.settings.outbox_s3.endpoint_url, DownloadConfiguration.settings.outbox_s3.bucket])))
                         if DownloadConfiguration.settings.clean_outbox_directory:
                             LOGGER.debug("clean {}".format(target_directory))
                             shutil.rmtree(target_directory)

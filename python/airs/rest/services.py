@@ -121,7 +121,7 @@ def get_item(collection: str, id: str) -> str:
 
 @ROUTER.post('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Upload an asset.")
 async def upload_asset(collection: str, item_id: str, asset_name: str, file: UploadFile = File(...)):
-    upload_obj = rs.upload_asset(collection=collection, item_id=item_id, asset_name=asset_name, file=file.file, content_type=file.content_type)
+    upload_obj = rs.upload_asset(collection=collection, item_id=item_id, asset_name=asset_name, file_obj=file.file, content_type=file.content_type)
     if upload_obj:
         return JSONResponse(content={"msg": "Object has been uploaded to bucket successfully"},
                             status_code=status.HTTP_201_CREATED)

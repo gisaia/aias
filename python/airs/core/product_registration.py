@@ -6,10 +6,10 @@ import elasticsearch
 import pygeohash as pgh
 import pytz
 import requests
+import tempfile
 
 import airs.core.exceptions as exceptions
 import airs.core.geo as geo
-import airs.core.s3 as s3
 import airs.core.utils as utils
 from airs.core.models.mapper import (
     to_json,
@@ -21,6 +21,8 @@ from airs.core.models.mapper import (
 from airs.core.models.model import Asset, Item, MimeType, Properties, Band, Role
 from airs.core.settings import Configuration
 from airs.core.logger import Logger
+from aias_common.access.storages.s3 import S3Storage
+from aias_common.access.configuration import S3ApiKey, S3StorageConfiguration
 
 ASSETS_NOT_FOUND = "Asset(s) not found"
 ITEM_ARLAS_SUFFIX = ".airs.json"
@@ -76,7 +78,7 @@ def get_item_relative_path(collection: str, item_id: str) -> str:
 
 
 def upload_asset(
-    collection: str, item_id: str, asset_name: str, file, content_type: str
+    collection: str, item_id: str, asset_name: str, file_obj, content_type: str
 ) -> str:
     """upload the asset file to the configured S3
 
@@ -95,7 +97,7 @@ def upload_asset(
         str: key, None if not uploaded
     """
     key = get_asset_relative_path(collection, item_id, asset_name)
-    return __upload_file(key, file, content_type)
+    return __upload_file(key, file_obj, content_type)
 
 
 def delete_asset(collection: str, item_id: str, asset_name: str):
@@ -132,15 +134,17 @@ def upload_item(item: Item):
     return __upload_item(key, item)
 
 
-def __upload_file(key, file, content_type) -> str:
+def __s3storage() -> S3Storage:
+    return S3Storage(S3StorageConfiguration(
+        bucket=Configuration.settings.s3.bucket, 
+        endpoint=Configuration.settings.s3.endpoint_url,
+        api_key=S3ApiKey(access_key=Configuration.settings.s3.access_key_id, secret_key=Configuration.settings.s3.secret_access_key)))
+
+
+def __upload_file(key, file_obj, content_type) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
-        s3.get_client().upload_fileobj(
-            file,
-            Configuration.settings.s3.bucket,
-            key,
-            ExtraArgs={"ContentType": content_type},
-        )
+        __s3storage().push_file_obj(file_obj=file_obj, dst=key, content_type=content_type)
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -153,7 +157,7 @@ def __upload_file(key, file, content_type) -> str:
 def __delete_file(key):
     try:
         LOGGER.info("deleting {} ...".format(key))
-        s3.get_client().delete_object(Bucket=Configuration.settings.s3.bucket, Key=key)
+        __s3storage().clean(key)
         LOGGER.info(__DELETED_MSG__.format(key))
     except Exception as e:
         msg = "Failed to delete {} ".format(key)
@@ -162,35 +166,14 @@ def __delete_file(key):
         raise exceptions.InternalError("storage", msg, e)
 
 
-def __delete_prefix(prefix: str):
-    try:
-        LOGGER.info("deleting {} ...".format(prefix))
-        objects = s3.get_client().list_objects(
-            Bucket=Configuration.settings.s3.bucket, Prefix=prefix
-        )
-        for object in objects["Contents"]:
-            LOGGER.info("deleting {} ...".format(object["Key"]))
-            objects = s3.get_client().delete_object(
-                Bucket=Configuration.settings.s3.bucket, Key=object["Key"]
-            )
-            LOGGER.info(__DELETED_MSG__.format(object["Key"]))
-        LOGGER.info(__DELETED_MSG__.format(prefix))
-    except Exception as e:
-        msg = "Failed to delete {} ".format(prefix)
-        LOGGER.error(msg)
-        LOGGER.exception(e)
-        raise exceptions.InternalError("storage", msg, e)
-
-
 def __upload_item(key, item: Item) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
-        s3.get_client().put_object(
-            Bucket=Configuration.settings.s3.bucket,
-            Key=key,
-            Body=to_json(item),
-            ContentType=MimeType.JSON.value,
-        )
+        with tempfile.TemporaryDirectory() as td:
+            fn = os.path.join(td, 'item')
+            with open(fn, 'w') as f:
+                f.write(to_json(item))
+            __s3storage().push(fn, key, MimeType.JSON.value)
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -213,15 +196,7 @@ def asset_exists(collection: str, item_id: str, asset_name: str) -> bool:
         bool: True if found on the S3, False otherwise
     """
     key = get_asset_relative_path(collection, item_id, asset_name)
-    try:
-        h = s3.get_client().head_object(
-            Bucket=Configuration.settings.s3.bucket, Key=key
-        )
-        LOGGER.info(h)
-        return True
-    except Exception as e:
-        LOGGER.debug(e)
-        return False
+    return __s3storage().exists(key)
 
 
 def delete_item(collection: str, item_id: str):
@@ -230,13 +205,9 @@ def delete_item(collection: str, item_id: str):
             [item_id], reason="Collection does not exist"
         )
     r = __getES().delete(index=__get_es_index_name(collection), id=item_id)
-    prefix = get_assets_relative_path(collection, item_id)
-    __delete_prefix(prefix)
+    # the item is dereferenced from ES and the STAC json file is deleted, not the rest.
     LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
-    s3.get_client().delete_object(
-        Bucket=Configuration.settings.s3.bucket,
-        Key=get_item_relative_path(collection, item_id),
-    )
+    __s3storage().clean(get_item_relative_path(collection, item_id))
     LOGGER.info(__DELETED_MSG__.format(get_item_relative_path(collection, item_id)))
 
 
@@ -320,18 +291,14 @@ def reindex(collection: str):
     Args:
         collection (str): name of the collection to reindex
     """
-    keys = s3.get_matching_s3_objects(
-        Configuration.settings.s3.bucket, collection, ITEM_ARLAS_SUFFIX
+    keys = __s3storage().get_matching_s3_objects(
+        collection, ITEM_ARLAS_SUFFIX
     )
     LOGGER.info("Start reindexing collection {}".format(collection))
     for key in keys:
         tmp_file = "tmp" + ITEM_ARLAS_SUFFIX
         LOGGER.info("Reindexing item from {}".format(key))
-        LOGGER.info(
-            s3.get_client().download_file(
-                Configuration.settings.s3.bucket, key, tmp_file
-            )
-        )
+        __s3storage().pull(key, tmp_file)
         with open(tmp_file, "r") as f:
             item = item_from_json_file(f)
             LOGGER.debug(item)
