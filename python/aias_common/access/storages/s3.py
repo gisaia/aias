@@ -98,6 +98,13 @@ class S3Storage(AbstractStorage):
         client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
 
     def push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
+        """push source file like object on destination
+
+        Args:
+            file_obj: A source file like object (https://docs.python.org/3/glossary.html#term-file-object)
+            dst (str): target destination for coping the content of file_obj
+            content_type (str | None, optional): content type of the source file. Defaults to None.
+        """
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         extraArgs = {}
