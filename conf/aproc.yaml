@@ -63,3 +63,7 @@ access_manager:
       type: s3
       bucket: downloads
       endpoint: "http://minio:9000"
+      readable_paths:
+        - http://minio:9000/archives/downloads
+      writable_paths:
+        - http://minio:9000/archives/downloads

@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse, urlunparse
 
-from aias_common.access.configuration import S3StorageConfiguration
+from aias_common.access.configuration import AccessType, S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
@@ -11,6 +11,25 @@ LOGGER = Logger.logger
 
 
 class S3Storage(AbstractStorage):
+
+    def is_path_authorized(self, href: str, action: AccessType) -> bool:
+        if action == AccessType.WRITE:
+            paths = self.get_configuration().writable_paths
+        else:
+            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+
+        prefix = "/".join([self.__noslash(self.get_configuration().endpoint), self.__noslash(self.get_configuration().bucket)])
+        h = self.__endslash(href)
+        return any(list(map(lambda p: h.startswith(self.__endslash("/".join([prefix, self.__noslash(p)]))), paths)))
+
+    def __noslash(self, txt: str) -> str:
+        return txt.removeprefix("/").removesuffix("/")
+
+    def __endslash(self, txt: str) -> str:
+        return txt.removesuffix("/") + "/"
+
+    def to_string(self) -> str:
+        return "object storage on bucket {} from {}".format(self.get_configuration().bucket, self.get_configuration().endpoint)
 
     def get_configuration(self) -> S3StorageConfiguration:
         assert isinstance(self.storage_configuration, S3StorageConfiguration)
@@ -53,7 +72,7 @@ class S3Storage(AbstractStorage):
     def exists(self, href: str):
         return self.is_dir(href) or self.is_file(href)
 
-    def get_rasterio_session(self):
+    def get_rasterio_session(self, href):
         import rasterio.session
 
         params = {}
@@ -79,7 +98,6 @@ class S3Storage(AbstractStorage):
 
     def pull(self, href: str, dst: str):
         import botocore.client
-        super().pull(href, dst)
 
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
 
@@ -90,7 +108,6 @@ class S3Storage(AbstractStorage):
 
     def push(self, href: str, dst: str, content_type: str | None = None):
         import botocore.client
-        super().push(href, dst)
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         extraArgs = {}
         if content_type:
@@ -182,7 +199,7 @@ class S3Storage(AbstractStorage):
                 is_dir=True), objects["CommonPrefixes"]))
         return files + dirs
 
-    def get_last_modification_time(self, href: str):
+    def get_last_modification_time(self, href: str) -> float | None:
         import botocore.exceptions
         try:
             response = self.__head_object(href)
@@ -194,7 +211,7 @@ class S3Storage(AbstractStorage):
         except botocore.exceptions.ParamValidationError:  # key LastModified does not exists for root
             return None
 
-    def get_creation_time(self, href: str):
+    def get_creation_time(self, href: str) -> float | None:
         # There is no difference in s3 between last update and creation date
         return self.get_last_modification_time(href)
 

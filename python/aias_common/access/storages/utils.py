@@ -19,6 +19,7 @@ def requests_head(href: str, headers: dict) -> requests.Response:
 
 def requests_exists(href: str, headers: dict) -> bool:
     r = requests_head(href, headers)
+    print("request on  {}".format(href))
     return r.status_code >= 200 and r.status_code < 300
 
 

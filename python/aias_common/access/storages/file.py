@@ -11,6 +11,16 @@ from aias_common.access.storages.abstract import AbstractStorage
 
 class FileStorage(AbstractStorage):
 
+    def to_string(self) -> str:
+        return "file system storage"
+
+    def is_path_authorized(self, href: str, action: AccessType) -> bool:
+        if action == AccessType.WRITE:
+            paths = self.get_configuration().writable_paths
+        else:
+            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+        return any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
+
     def get_configuration(self) -> FileStorageConfiguration:
         assert isinstance(self.storage_configuration, FileStorageConfiguration)
         return self.storage_configuration
@@ -25,7 +35,7 @@ class FileStorage(AbstractStorage):
     def exists(self, href: str):
         return Path(href).exists()
 
-    def get_rasterio_session(self):
+    def get_rasterio_session(self, href):
         return {}
 
     def pull(self, href: str, dst: str):
@@ -58,10 +68,10 @@ class FileStorage(AbstractStorage):
             f.path = f.path.removesuffix("/") + "/"
         return f
 
-    def get_last_modification_time(self, href: str):
+    def get_last_modification_time(self, href: str) -> float | None:
         return os.path.getmtime(href)
 
-    def get_creation_time(self, href: str):
+    def get_creation_time(self, href: str) -> float | None:
         return os.path.getctime(href)
 
     def makedir(self, href: str, strict=False):

@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse, urlunparse
 
-from aias_common.access.configuration import GoogleStorageConfiguration
+from aias_common.access.configuration import AccessType, GoogleStorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
@@ -10,6 +10,19 @@ from google.oauth2 import service_account
 
 
 class GoogleStorage(AbstractStorage):
+
+    def to_string(self) -> str:
+        return "google cloud object storage on bucket {}".format(self.get_configuration().bucket)
+
+    def is_path_authorized(self, href: str, action: AccessType) -> bool:
+        if action == AccessType.WRITE:
+            paths = self.get_configuration().writable_paths
+        else:
+            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+
+        prefix = "gs://" + self.get_configuration().bucket.removeprefix("/").removesuffix("/")
+        h = href.removesuffix("/") + "/"
+        return any(list(map(lambda p: h.startswith("/".join([prefix, p.removeprefix("/") + "/"])), paths)))
 
     def get_configuration(self) -> GoogleStorageConfiguration:
         assert isinstance(self.storage_configuration, GoogleStorageConfiguration)
@@ -50,7 +63,7 @@ class GoogleStorage(AbstractStorage):
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
 
-    def get_rasterio_session(self):
+    def get_rasterio_session(self, href):
         import rasterio.session
 
         params = {
@@ -121,14 +134,14 @@ class GoogleStorage(AbstractStorage):
     def listdir(self, href: str) -> list[File]:
         return self.__list_blobs(href.removesuffix("/") + "/")
 
-    def get_last_modification_time(self, href: str):
+    def get_last_modification_time(self, href: str) -> float | None:
         blob = self.__get_blob(href)
         if blob:
             mod_time = blob.updated
             return mod_time.timestamp() if mod_time is not None else 0
         return 0
 
-    def get_creation_time(self, href: str):
+    def get_creation_time(self, href: str) -> float | None:
         blob = self.__get_blob(href)
         if blob:
             creation_time = blob.time_created

@@ -1,19 +1,61 @@
+from contextlib import contextmanager
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from urllib.parse import urlparse
 
 from aias_common.access.configuration import AnyStorageConfiguration, AccessType
 from aias_common.access.file import File
 from aias_common.access.storages.utils import remote_path_starts_with
+from aias_common.access.logger import Logger
+from urllib.parse import urlparse, urlunparse
+
+LOGGER = Logger.logger
 
 
 class AbstractStorage(ABC):
     cache_tt = 60 * 5
     cache_size = 2048
+    DO_NOT_PROTECT_METHODS = ["is_path_authorized", "get_configuration", "get_storage_parameters", "to_string", "supports"]
 
     def __init__(self, storage_configuration: AnyStorageConfiguration):
         self.storage_configuration = storage_configuration
+
+    def _check_read_write_wrapper(self, storage, attr, index, action):
+        def wrapper(*args, **kwargs):
+            href = args[index]
+            if storage.is_path_authorized(href, action):
+                return attr(*args, **kwargs)
+            LOGGER.warning("{} on {} is not permitted on {}".format(action.value, self.to_string(), href))
+            raise PermissionError("{} access on {} is not permitted on {}".format(action.value, href, self.to_string()))
+        return wrapper
+
+    def __getattribute__(self, name):
+        attr = object.__getattribute__(self, name)
+        if callable(attr) and not name.startswith("_"):
+            match name:
+                case "is_dir" | "is_file" | "exists" | "listdir" | "get_file_size" | "get_rasterio_session" | "get_last_modification_time" | "get_creation_time" | "dirname" | "get_gdal_stream_options" | "gdal_transform_href_vsi" | "get_gdal_src" | "get_gdal_info" | "stream":
+                    return self._check_read_write_wrapper(self, attr, 0, AccessType.READ)
+                case "makedir" | "clean":
+                    return self._check_read_write_wrapper(self, attr, 0, AccessType.WRITE)
+                case "pull":
+                    return self._check_read_write_wrapper(self, attr, 0, AccessType.READ)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 1, AccessType.WRITE)
+                case "push":
+                    return self._check_read_write_wrapper(self, attr, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
+                case "push_file_obj":
+                    return self._check_read_write_wrapper(self, attr, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
+                case _:
+                    if name not in AbstractStorage.DO_NOT_PROTECT_METHODS:
+                        raise Exception("Invalid implementation {} of AbstractStorage: method {} is public and not protected for READ/WRITE permission check.".format(self.__class__.__name__, name))
+        return attr
+
+    @abstractmethod
+    def to_string(self) -> str:
+        """Returns the storage to_string description
+
+        Returns:
+            str: a description that can be displayed
+        """
+        ...
 
     @abstractmethod
     def get_configuration(self) -> AnyStorageConfiguration:
@@ -25,11 +67,12 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def get_storage_parameters(self) -> dict:
+    def get_storage_parameters(self, href) -> dict:
         """Based on the type of storage and its characteristics, gives storage-specific parameters to use to access data
         """
         ...
 
+    @abstractmethod
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
         """Check whether a given action is permitted on the specified path.
 
@@ -40,19 +83,6 @@ class AbstractStorage(ABC):
         Returns:
             bool: True if the action is authorized, False otherwise
         """
-        # Get the list of accessible paths for the given action
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        if action == AccessType.READ:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
-        # Check if the given path is a sub-path of the authorized paths
-        if self.storage_configuration.is_local:
-            is_authorized = any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
-        else:
-            is_authorized =  any(list(map(lambda p: remote_path_starts_with(path=href, prefix=p), paths)))
-        return is_authorized
-
-
 
     @abstractmethod
     def supports(self, href: str) -> bool:
@@ -79,7 +109,7 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def get_rasterio_session(self) -> dict:
+    def get_rasterio_session(self, href) -> dict:
         """Return a rasterio Session and potential variables to access data remotely
 
         Args:
@@ -98,10 +128,7 @@ class AbstractStorage(ABC):
             href (str): File to fetch
             dst (str): Destination of the file
         """
-        # Check that dst is local
-        scheme = urlparse(dst).scheme
-        if scheme != "" and scheme != "file":
-            raise ValueError("Destination must be on the local filesystem")
+        ...
 
     @abstractmethod
     def push(self, href: str, dst: str, content_type: str | None = None):
@@ -111,10 +138,7 @@ class AbstractStorage(ABC):
             href (str): File to upload
             dst (str): Destination of the file
         """
-        # Check that href is local
-        scheme = urlparse(href).scheme
-        if scheme != "" and scheme != "file":
-            raise ValueError("Source file to upload must be on the local filesystem")
+        ...
 
     @abstractmethod
     def is_file(self, href: str) -> bool:
@@ -159,7 +183,7 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def get_last_modification_time(self, href: str) -> float:
+    def get_last_modification_time(self, href: str) -> float | None:
         """Returns the last modification time of the specified href
 
         Args:
@@ -171,7 +195,7 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def get_creation_time(self, href: str) -> float:
+    def get_creation_time(self, href: str) -> float | None:
         """Returns the creation time of the specified href
 
         Args:
@@ -207,8 +231,7 @@ class AbstractStorage(ABC):
         Args:
             href(str): The href to delete
         """
-        if not self.is_path_authorized(href, AccessType.WRITE):
-            raise PermissionError(f'The desired path ({href}) is not authorized to write (for deletion)')
+        ...
 
     @abstractmethod
     def get_gdal_stream_options(self) -> dict:
@@ -248,3 +271,23 @@ class AbstractStorage(ABC):
 
         with gdal.config_options(self.get_gdal_stream_options()):
             return gdal.Info(self.gdal_transform_href_vsi(href), options=gdal_options)
+
+    def __http_to_s3__(self, href: str):
+        url = urlparse(href)
+        components = list(url[:])
+        if len(components) == 5:
+            components.append('')
+        components[0] = "s3"
+        components[1] = ""
+        components[2] = components[2].removeprefix("/")
+        s3url = urlunparse(tuple(components))
+        return s3url
+
+    @contextmanager
+    def stream(self, href: str):
+        import smart_open
+        params = self.get_storage_parameters()
+        if self.get_configuration().type.lower() == "s3":
+            href = self.__http_to_s3__(href)
+        with smart_open.open(href, "rb", transport_params=params) as f:
+            yield f

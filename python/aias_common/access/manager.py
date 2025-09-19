@@ -9,6 +9,7 @@ from pydantic import Field
 from aias_common.access.configuration import AccessManagerSettings
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
+from aias_common.access.storages.abstract import AbstractStorage
 from aias_common.access.storages.file import AccessType, FileStorage
 from aias_common.access.storages.gs import GoogleStorage
 from aias_common.access.storages.http import HttpStorage
@@ -23,7 +24,9 @@ LOGGER = Logger.logger
 class AccessManager:
     storages: list[AnyStorage]
     tmp_dir: str
-
+    cache_ttl: int = 60 * 60 * 24
+    cache_size = 1024
+    
     @staticmethod
     def init(ams: AccessManagerSettings):
         LOGGER.info("Initializing storages Access Manager")
@@ -65,7 +68,18 @@ class AccessManager:
                     return s
             except Exception:
                 ...
-        raise NotImplementedError(f"Storage for {href} is not configured")
+        raise PermissionError(f"Storage for {href} is not configured")
+
+    @staticmethod
+    def get_local_storage() -> FileStorage:
+        """
+        Based on the defined storages, returns the one that is a file storage
+        """
+
+        for s in AccessManager.storages:
+            if s.get_configuration().is_local:
+                return s
+        raise Exception("No local storage configured")
 
     @staticmethod
     def get_storage_parameters(href: str):
@@ -78,8 +92,7 @@ class AccessManager:
         """
         Checks that the path is a writable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.WRITE),AccessManager.storages))
-        if not is_authorized:
+        if not AccessManager.resolve_storage(href=href).is_path_authorized(href, AccessType.WRITE):
             raise PermissionError(f"Path '{href}' is not writable")
 
     @staticmethod
@@ -87,8 +100,7 @@ class AccessManager:
         """
         Checks that the path is a readable path for at least one of the file storages
         """
-        is_authorized = any(map(lambda s: s.is_path_authorized(href, AccessType.READ),AccessManager.storages))
-        if not is_authorized:
+        if not AccessManager.resolve_storage(href=href).is_path_authorized(href, AccessType.READ):
             raise PermissionError(f"Path '{href}' is not readable")
 
     @staticmethod
@@ -97,8 +109,10 @@ class AccessManager:
         Push a file from a local storage to write it in a storage.
         If the destination storage is local, then it is a copy. Otherwise it is an upload.
         """
-        AccessManager.check_path_readable(href)
-        AccessManager.check_path_writable(dst)
+        # Check that href is local
+        scheme = urlparse(href).scheme
+        if scheme != "" and scheme != "file":
+            raise ValueError("Source file to upload must be on the local filesystem")
 
         storage = AccessManager.resolve_storage(dst)
         storage.push(href, dst)
@@ -109,42 +123,26 @@ class AccessManager:
         Pulls a file from a storage to write it in the local storage.
         If the input storage is local, then it is a copy. Otherwise it is a download.
         """
-        AccessManager.check_path_readable(href)
-        AccessManager.check_path_writable(dst)
+        # Check that dst is local
+        scheme = urlparse(dst).scheme
+        if scheme != "" and scheme != "file":
+            raise ValueError("Destination must be on the local filesystem")
 
         storage = AccessManager.resolve_storage(href)
         storage.pull(href, dst)
 
     @staticmethod
-    def __http_to_s3__(href: str):
-        url = urlparse(href)
-        components = list(url[:])
-        if len(components) == 5:
-            components.append('')
-        components[0] = "s3"
-        components[1] = ""
-        components[2] = components[2].removeprefix("/")
-        s3url = urlunparse(tuple(components))
-        return s3url
-
-    @staticmethod
-    @contextmanager
     def stream(href: str):
-        import smart_open
         """
         Reads the content of a file in a storage without downloading it.
         """
-        params = AccessManager.get_storage_parameters(href)
-        if AccessManager.resolve_storage(href).get_configuration().type.lower() == "s3":
-            href = AccessManager.__http_to_s3__(href)
-        with smart_open.open(href, "rb", transport_params=params) as f:
-            yield f
+        yield AccessManager.resolve_storage(href=href).stream(href)
 
     @staticmethod
     def get_rasterio_session(href: str):
         storage = AccessManager.resolve_storage(href)
-
-        return storage.get_rasterio_session()
+        AccessManager.check_path_readable(href)
+        return storage.get_rasterio_session(href)
 
     @staticmethod
     def exists(href: str) -> bool:
@@ -228,11 +226,8 @@ class AccessManager:
 
     @staticmethod
     def clean(href: str):
-        try:
-            storage = AccessManager.resolve_storage(href)
-            storage.clean(href)  # !DELETE!
-        except Exception:
-            LOGGER.warning(f"Unable to remove file {href}")
+        storage = AccessManager.resolve_storage(href)
+        storage.clean(href)  # !DELETE!
 
     @staticmethod
     def zip(href: str, zip_path: str):
@@ -276,12 +271,12 @@ class AccessManager:
         return storage.listdir(href)
 
     @staticmethod
-    def get_last_modification_time(href: str):
+    def get_last_modification_time(href: str) -> float | None:
         storage = AccessManager.resolve_storage(href)
         return storage.get_last_modification_time(href)
 
     @staticmethod
-    def get_creation_time(href: str):
+    def get_creation_time(href: str) -> float | None:
         storage = AccessManager.resolve_storage(href)
         return storage.get_creation_time(href)
 
