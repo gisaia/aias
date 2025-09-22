@@ -170,7 +170,7 @@ class S3Storage(AbstractStorage):
     def get_file_size(self, href: str):
         response = self.__head_object(href)
         if response:
-            return self.__head_object(href)['ContentLength']
+            return response['ContentLength']
         else:
             return None
 
@@ -222,7 +222,7 @@ class S3Storage(AbstractStorage):
     def clean(self, href: str):
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
-        client.delete_object(Bucket=self.get_configuration().bucket, Key=href)
+        client.delete_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
 
     def get_gdal_stream_options(self):
         config = self.get_configuration()

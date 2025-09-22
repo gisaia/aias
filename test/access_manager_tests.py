@@ -7,101 +7,189 @@ import aias_common.access.storages.file as fs
 import aias_common.access.storages.http as http
 import aias_common.access.storages.gs as gs
 from pathlib import Path
+import os.path as p
 
+MINIO_HOST = "minio"
+
+
+###########################
+# FILES AND DIR VARIABLES
+###########################
+
+S3_RO_DIR_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/"
+S3_RO_DIR_NO_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/ast"
+S3_RO_FILE = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+S3_RO_DIR = "http://" + MINIO_HOST + ":9000/downloads/readonly/"
+S3_RW_DIR = "http://" + MINIO_HOST + ":9000/downloads/readwrite/"
+S3_RW_FILE = "http://" + MINIO_HOST + ":9000/downloads/readwrite/a_file"
+
+GS_RO_DIR_NO_SLASH = "gs://gisaia-public/test-aias/ast"
+GS_RO_DIR_SLASH = "gs://gisaia-public/test-aias/DIMAP/"
+GS_RO_FILE = "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+
+HTTPS_RO_FILE = "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md"
+
+FS_RO_DIR_NO_SLASH = "/tmp/readonly"
+FS_RW_DIR_SLASH = "/tmp/readwrite/"
+
+FS_RO_FILE = "/tmp/readonly/file"
+FS_RW_FILE = "/tmp/readwrite/file"
+
+GDAL_FILES = [
+    "https://storage.googleapis.com/gisaia-public/test-aias/jpeg2000.jpg2", "gs:///gisaia-public/test-aias/jpeg2000.jpg2"
+]
+
+
+###########################
+# PARAMETER MATRICES
+###########################
 
 CAN_READ = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/",
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast",
-    "gs://gisaia-public/test-aias/DIMAP/",
-    "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "/tmp",
-    "/tmp/",
+    GS_RO_FILE,
+    GS_RO_DIR_SLASH,
+    GS_RO_DIR_NO_SLASH,
+
+    HTTPS_RO_FILE,
+
+    S3_RO_DIR_SLASH,
+    S3_RO_DIR_NO_SLASH,
+    S3_RO_FILE,
+    S3_RO_DIR,
+    S3_RW_DIR,
+
+    FS_RO_DIR_NO_SLASH,
+    FS_RW_DIR_SLASH,
+    FS_RO_FILE,
+    FS_RW_FILE,
 ]
 
 GET_SIZE = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast",
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast",
-    "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
-]
+    GS_RO_FILE,
+    GS_RO_DIR_SLASH,
+    GS_RO_DIR_NO_SLASH,
 
+    HTTPS_RO_FILE,
+
+    S3_RO_DIR_SLASH,
+    S3_RO_DIR_NO_SLASH,
+    S3_RO_FILE,
+    S3_RO_DIR,
+    S3_RW_DIR,
+
+    FS_RO_DIR_NO_SLASH,
+    FS_RW_DIR_SLASH,
+    FS_RO_FILE,
+    FS_RW_FILE,
+]
 
 FILES = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "/tmp/tobepushed"
+    GS_RO_FILE,
+    S3_RO_FILE,
+    HTTPS_RO_FILE,
+    FS_RO_FILE,
+    FS_RW_FILE,
 ]
 
+
 DIRS = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/",
-    "gs://gisaia-public/test-aias/ast",
-    "gs://gisaia-public/test-aias/DIMAP/",
-    "/tmp",
-    "/tmp/",
+    GS_RO_DIR_SLASH,
+    GS_RO_DIR_NO_SLASH,
+
+    S3_RO_DIR_SLASH,
+    S3_RO_DIR_NO_SLASH,
+    S3_RO_DIR,
+    S3_RW_DIR,
+
+    FS_RO_DIR_NO_SLASH,
+    FS_RW_DIR_SLASH,
 ]
 
 MKDIRS = [
-    "/tmp/dir_for_tests",
+    FS_RW_DIR_SLASH + "dir_for_mkdir_test",
 ]
 
 CAN_NOT_READ = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/astsomething",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAPsomething/",
-    "https://raw.githubusercontent.com/something",
-    "gs://gisaia-public/test-aias/astsomething",
-    "gs://gisaia-public/test-aias/DIMAPsomething/",
-    "/tmpsomething",
-    "/tmpsomething/",
-    "https://storage.googleapis.com/gisaia-public/test-aias/",
-    "https://storage.googleapis.com/gisaia-public/",
-    "https://storage.googleapis.com/",
-    "gs://gisaia-public/test-aias/astsomething",
-    "gs://gisaia-public/test-aias/DIMAPsomething/",
-    "gs://gisaia-public/test-aias/",
-    "gs://gisaia-public/",
-    "/tmpsomething",
-    "/tmpsomething/",
+    GS_RO_DIR_NO_SLASH + "something",
+    GS_RO_DIR_NO_SLASH + "andsomethingelse/",
+    p.dirname(GS_RO_DIR_NO_SLASH),
+    p.dirname(p.dirname(GS_RO_DIR_NO_SLASH)),
+
+    HTTPS_RO_FILE.replace("ARLAS-Exploration-stack", "ARLAS-Exploration-stack-something"),
+
+    S3_RO_DIR_SLASH.replace("DIMAP", "DIMAP-something"),
+    S3_RO_DIR_NO_SLASH + "something",
+    p.dirname(S3_RO_DIR_NO_SLASH),
+    p.dirname(p.dirname(S3_RO_DIR_NO_SLASH)),
+
+    p.dirname(FS_RO_DIR_NO_SLASH),
+    FS_RO_DIR_NO_SLASH + "something",
+    FS_RO_DIR_NO_SLASH + "andsomethingelse/",
     "/",
     "",
 ]
 
 CAN_WRITE = [
-    "/tmp",
-    "/tmp/"
+    FS_RW_DIR_SLASH,
+    S3_RW_DIR,
 ]
 
 CAN_NOT_WRITE = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/",
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/something",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/something",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/",
-    "gs://gisaia-public/test-aias/ast",
-    "gs://gisaia-public/test-aias/DIMAP/",
-    "gs://gisaia-public/test-aias/ast/something",
-    "gs://gisaia-public/test-aias/DIMAP/something",
+    GS_RO_DIR_SLASH,
+    GS_RO_DIR_NO_SLASH,
+    GS_RO_DIR_NO_SLASH + "something",
+    GS_RO_DIR_NO_SLASH + "andsomethingelse/",
+    p.dirname(GS_RO_DIR_NO_SLASH),
+    p.dirname(p.dirname(GS_RO_DIR_NO_SLASH)),
+
+    S3_RO_DIR_SLASH,
+    S3_RO_DIR_NO_SLASH,
+    S3_RO_DIR,
+    p.dirname(S3_RO_DIR_NO_SLASH),
+    p.dirname(p.dirname(S3_RO_DIR_NO_SLASH)),
+
+    FS_RO_DIR_NO_SLASH,
+    p.dirname(FS_RO_DIR_NO_SLASH),
+    FS_RO_DIR_NO_SLASH + "something",
+    FS_RO_DIR_NO_SLASH + "andsomethingelse/",
+]
+
+
+CAN_CLEAN = [
+    S3_RW_FILE,
+    FS_RW_FILE
+]
+
+CAN_NOT_CLEAN = [
+    GS_RO_DIR_NO_SLASH + "something",
+    GS_RO_DIR_NO_SLASH + "andsomethingelse/",
+    S3_RO_DIR_NO_SLASH,
+
+    FS_RO_DIR_NO_SLASH,
+    FS_RO_DIR_NO_SLASH + "something",
+    FS_RO_DIR_NO_SLASH + "andsomethingelse/",
 ]
 
 NOT_EXISTS = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/something",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/something/",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/something/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast/something",
-    "gs://gisaia-public/test-aias/DIMAP/something/",
-    "/tmp/something",
-    "/tmp/something/"
+    GS_RO_FILE + "something",
+    GS_RO_DIR_SLASH + "something",
+
+    HTTPS_RO_FILE + "something",
+
+    S3_RO_DIR_SLASH + "something",
+    S3_RO_FILE + "something",
+    S3_RO_DIR + "something",
+    S3_RW_DIR + "something",
+
+    FS_RO_DIR_NO_SLASH + "/something",
+    FS_RW_DIR_SLASH + "something",
+    FS_RO_FILE + "something",
+    FS_RW_FILE + "something",
 ]
 
 CAN_PULL = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw",
-    "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+    GS_RO_FILE,
+    S3_RO_FILE,
+    HTTPS_RO_FILE,
 ]
 
 CAN_NOT_PULL = [
@@ -112,46 +200,56 @@ CAN_NOT_PULL = [
 
 
 CAN_PUSH_ON = [
-    "http://localhost:9000/downloads/readwrite/pushed"
+    S3_RW_DIR + "pushed"
 ]
 
 
 CAN_NOT_PUSH_ON = [
-    "http://localhost:9000/downloads/read/pushed",
-    "http://localhost:9000/downloads/pushed",
-    "https://storage.googleapis.com/gisaia-public/test-aias/ast",
-    "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/",
+    S3_RO_DIR + "pushed",
+    S3_RO_DIR_SLASH + "pushed",
+    S3_RO_DIR_NO_SLASH + "/pushed",
     "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md",
-    "gs://gisaia-public/test-aias/ast",
-    "gs://gisaia-public/test-aias/DIMAP/"
+    GS_RO_DIR_SLASH + "pushed",
+    GS_RO_DIR_NO_SLASH + "/pushed",
 ]
 
 
+###########################
+# FIXTURES
+###########################
+
 @pytest.fixture(scope="class")
 def fixture_am():
+    os.makedirs(FS_RO_DIR_NO_SLASH, exist_ok=True)
+    os.makedirs(FS_RW_DIR_SLASH, exist_ok=True)
+    Path(FS_RO_FILE).touch()
+    Path(FS_RW_FILE).touch()
+
+    minios3conf = s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite", "readonly"])
+    minios3 = s3.S3Storage(minios3conf)
+    minios3.push(FS_RO_FILE, S3_RO_DIR + "a_file")
+    minios3.push(FS_RO_FILE, S3_RW_FILE)
+
     manager.AccessManager.init(AccessManagerSettings(
         storages=[
-            s3.S3StorageConfiguration(bucket="downloads", endpoint="http://localhost:9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]),
+            s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]),
             s3.S3StorageConfiguration(bucket="gisaia-public", endpoint="https://storage.googleapis.com", readable_paths=["/test-aias/ast", "test-aias/DIMAP"]),
-            fs.FileStorageConfiguration(readable_paths=["/tmp/"], writable_paths=["/tmp/"]),
+            fs.FileStorageConfiguration(readable_paths=["/tmp/readonly"], writable_paths=["/tmp/readwrite"]),
             HttpsStorageConfiguration(domain="raw.githubusercontent.com", readable_paths=["/gisaia/ARLAS-Exploration-stack"], writable_paths=[]),
             gs.GoogleStorageConfiguration(bucket="gisaia-public", readable_paths=["/test-aias/ast", "test-aias/DIMAP"])
         ],
-        tmp_dir="/tmp/"
+        tmp_dir="/tmp/readwrite"
     ))
 
 
 @pytest.fixture(scope="class")
 def fixture_objectstore() -> s3.S3Storage:
-    return s3.S3Storage(s3.S3StorageConfiguration(bucket="downloads", endpoint="http://localhost:9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]))
+    return s3.S3Storage(s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]))
 
 
-@pytest.fixture(scope="class")
-def fixture_tobepushed():
-    fl = os.path.join(manager.AccessManager.tmp_dir, "tobepushed")
-    Path(fl).touch()
-    return fl
-
+###########################
+# CAN READ
+###########################
 
 @pytest.mark.parametrize("href", CAN_READ)
 def test_can_read(fixture_am, href: str):
@@ -164,6 +262,10 @@ def test_can_not_read(fixture_am, href: str):
         manager.AccessManager.check_path_readable(href)
 
 
+###########################
+# CAN WRITE
+###########################
+
 @pytest.mark.parametrize("href", CAN_WRITE)
 def test_can_write(fixture_am, href: str):
     manager.AccessManager.check_path_writable(href)
@@ -175,6 +277,10 @@ def test_can_not_write(fixture_am, href: str):
         manager.AccessManager.check_path_writable(href)
 
 
+###########################
+# EXISTS
+###########################
+
 @pytest.mark.parametrize("href", CAN_READ)
 def test_exists(fixture_am, href: str):
     assert manager.AccessManager.exists(href)
@@ -184,6 +290,10 @@ def test_exists(fixture_am, href: str):
 def test_not_exists(fixture_am, href: str):
     assert not manager.AccessManager.exists(href)
 
+
+###########################
+# PULL
+###########################
 
 @pytest.mark.parametrize("href", CAN_PULL)
 def test_pull(fixture_am, href: str):
@@ -196,32 +306,40 @@ def test_not_pull(fixture_am, href: str):
         manager.AccessManager.pull(href, os.path.join(manager.AccessManager.tmp_dir, "pulled"))
 
 
+###########################
+# PUSH
+###########################
+
 @pytest.mark.parametrize("href", CAN_PUSH_ON)
-def test_push(fixture_am, fixture_tobepushed, href: str):
-    manager.AccessManager.push(fixture_tobepushed, href)
+def test_push(fixture_am, href: str):
+    manager.AccessManager.push(FS_RO_FILE, href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_WRITE)
-def test_not_push(fixture_am, fixture_tobepushed, href: str):
+def test_not_push(fixture_am, href: str):
     with pytest.raises(PermissionError):
-        manager.AccessManager.push(fixture_tobepushed, href)
+        manager.AccessManager.push(FS_RO_FILE, href)
 
 
 @pytest.mark.parametrize("href", CAN_PUSH_ON)
-def test_push_fo(fixture_am, fixture_tobepushed, fixture_objectstore: s3.S3Storage, href: str):
-    with open(fixture_tobepushed, 'rb') as fo:
+def test_push_fo(fixture_am, fixture_objectstore: s3.S3Storage, href: str):
+    with open(FS_RO_FILE, 'rb') as fo:
         fixture_objectstore.push_file_obj(fo, href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_WRITE)
-def test_not_push_fo(fixture_am, fixture_tobepushed, fixture_objectstore: s3.S3Storage, href: str):
+def test_not_push_fo(fixture_am, fixture_objectstore: s3.S3Storage, href: str):
     with pytest.raises(PermissionError):
-        with open(fixture_tobepushed, 'rb') as fo:
+        with open(FS_RO_FILE, 'rb') as fo:
             fixture_objectstore.push_file_obj(fo, href)
 
 
+###########################
+# IS FILE / DIR
+###########################
+
 @pytest.mark.parametrize("href", FILES)
-def test_is_file(fixture_am, fixture_tobepushed, href: str):
+def test_is_file(fixture_am, href: str):
     assert manager.AccessManager.is_file(href)
 
 
@@ -232,7 +350,7 @@ def test_is_file_fail(fixture_am, href: str):
 
 
 @pytest.mark.parametrize("href", DIRS)
-def test_is_dir(fixture_am, fixture_tobepushed, href: str):
+def test_is_dir(fixture_am, href: str):
     assert manager.AccessManager.is_dir(href)
 
 
@@ -242,9 +360,13 @@ def test_is_dir_fail(fixture_am, href: str):
         manager.AccessManager.is_dir(href)
 
 
+###########################
+# GET SIZE
+###########################
+
 @pytest.mark.parametrize("href", GET_SIZE)
-def test_get_size(fixture_am, fixture_tobepushed, href: str):
-    assert manager.AccessManager.get_size(href)
+def test_get_size(fixture_am, href: str):
+    manager.AccessManager.get_size(href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_READ)
@@ -253,8 +375,12 @@ def test_get_size_fail(fixture_am, href: str):
         manager.AccessManager.get_size(href)
 
 
+###########################
+# raster io
+###########################
+
 @pytest.mark.parametrize("href", FILES)
-def test_get_rasterio_session(fixture_am, fixture_tobepushed, href: str):
+def test_get_rasterio_session(fixture_am, href: str):
     manager.AccessManager.get_rasterio_session(href)
 
 
@@ -264,8 +390,12 @@ def test_get_rasterio_session_fail(fixture_am, href: str):
         manager.AccessManager.get_rasterio_session(href)
 
 
+###########################
+# LIST DIR
+###########################
+
 @pytest.mark.parametrize("href", DIRS)
-def test_listdir(fixture_am, fixture_tobepushed, href: str):
+def test_listdir(fixture_am, href: str):
     manager.AccessManager.listdir(href)
 
 
@@ -275,8 +405,12 @@ def test_listdir_fail(fixture_am, href: str):
         manager.AccessManager.listdir(href)
 
 
+###########################
+# GET DATES
+###########################
+
 @pytest.mark.parametrize("href", FILES)
-def test_get_last_modification_time(fixture_am, fixture_tobepushed, href: str):
+def test_get_last_modification_time(fixture_am, href: str):
     print(manager.AccessManager.get_last_modification_time(href))
 
 
@@ -287,7 +421,7 @@ def test_get_last_modification_time_fail(fixture_am, href: str):
 
 
 @pytest.mark.parametrize("href", FILES)
-def test_get_creation_time(fixture_am, fixture_tobepushed, href: str):
+def test_get_creation_time(fixture_am, href: str):
     print(manager.AccessManager.get_creation_time(href))
 
 
@@ -297,8 +431,12 @@ def test_get_creation_time_fail(fixture_am, href: str):
         manager.AccessManager.get_creation_time(href)
 
 
+###########################
+# MKDIR
+###########################
+
 @pytest.mark.parametrize("href", MKDIRS)
-def test_makedir(fixture_am, fixture_tobepushed, href: str):
+def test_makedir(fixture_am, href: str):
     manager.AccessManager.makedir(href)
 
 
@@ -308,8 +446,12 @@ def test_makedir_fail(fixture_am, href: str):
         manager.AccessManager.makedir(href)
 
 
+###########################
+# DIRNAME
+###########################
+
 @pytest.mark.parametrize("href", DIRS)
-def test_dirname(fixture_am, fixture_tobepushed, href: str):
+def test_dirname(fixture_am, href: str):
     manager.AccessManager.dirname(href)
 
 
@@ -319,12 +461,33 @@ def test_dirname_fail(fixture_am, href: str):
         manager.AccessManager.dirname(href)
 
 
-@pytest.mark.parametrize("href", DIRS)
-def test_clean(fixture_am, fixture_tobepushed, href: str):
-    manager.AccessManager.dirname(href)
+###########################
+# CLEAN
+###########################
+
+@pytest.mark.parametrize("href", CAN_CLEAN)
+def test_clean(fixture_am, href: str):
+    print(href)
+    manager.AccessManager.clean(href)
+
+
+@pytest.mark.parametrize("href", CAN_NOT_CLEAN)
+def test_clean_fail(fixture_am, href: str):
+    with pytest.raises(PermissionError):
+        manager.AccessManager.clean(href)
+
+
+###########################
+# ZIP
+###########################
+
+@pytest.mark.parametrize("href", FILES)
+def test_zip(fixture_am, href: str):
+    manager.AccessManager.zip(href, FS_RW_DIR_SLASH + "file.zip")
 
 
 @pytest.mark.parametrize("href", CAN_NOT_READ)
-def test_dirname_fail(fixture_am, href: str):
+def test_zip_fail(fixture_am, href: str):
     with pytest.raises(PermissionError):
-        manager.AccessManager.dirname(href)
+        manager.AccessManager.zip(href, FS_RW_DIR_SLASH + "file.zip")
+
