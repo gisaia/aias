@@ -5,7 +5,6 @@ from pathlib import Path
 
 from aias_common.access.configuration import AnyStorageConfiguration, AccessType
 from aias_common.access.file import File
-from aias_common.access.storages.utils import remote_path_starts_with
 from aias_common.access.logger import Logger
 from urllib.parse import urlparse, urlunparse
 
