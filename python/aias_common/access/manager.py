@@ -132,11 +132,13 @@ class AccessManager:
         storage.pull(href, dst)
 
     @staticmethod
+    @contextmanager
     def stream(href: str):
         """
         Reads the content of a file in a storage without downloading it.
         """
-        yield AccessManager.resolve_storage(href=href).stream(href)
+        with AccessManager.resolve_storage(href=href).stream(href) as f:
+            yield f
 
     @staticmethod
     def get_rasterio_session(href: str):

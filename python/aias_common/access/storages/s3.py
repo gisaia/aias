@@ -1,3 +1,4 @@
+import logging
 import os
 from urllib.parse import urlparse, urlunparse
 
@@ -19,7 +20,7 @@ class S3Storage(AbstractStorage):
             paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
 
         prefix = "/".join([self.__noslash(self.get_configuration().endpoint), self.__noslash(self.get_configuration().bucket)])
-        h = self.__endslash(href)
+        h = self.__endslash(self.__noslash(href))
         return any(list(map(lambda p: h.startswith(self.__endslash("/".join([prefix, self.__noslash(p)]))), paths)))
 
     def __noslash(self, txt: str) -> str:
@@ -92,6 +93,12 @@ class S3Storage(AbstractStorage):
             )
 
         return params
+
+    def get_full_href(self, path: str):
+        if self.get_configuration().endpoint:
+            return self.get_configuration().endpoint + "/" + self.get_configuration().bucket + "/" + path.removeprefix("/")
+        else:
+            return "s3://" + self.get_configuration().bucket + "/" + path.removeprefix("/")
 
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
@@ -257,34 +264,27 @@ class S3Storage(AbstractStorage):
 
         return href
 
-    def get_matching_s3_objects(self, prefix="", suffix="", s3_client=None):
+    def get_matching_s3_objects(self, path, suffix="", s3_client=None):
 
+        prefix = self.__noslash(urlparse(path).path.removeprefix("/" + self.get_configuration().bucket))
+        LOGGER.debug("Search for objects in bucket %s with prefix %s and suffix %s", self.get_configuration().bucket, prefix, suffix)
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         paginator = client.get_paginator("list_objects_v2")
 
         kwargs = {'Bucket': self.get_configuration().bucket}
+        kwargs["Prefix"] = prefix
 
-        # We can pass the prefix directly to the S3 API.  If the user has passed
-        # a tuple or list of prefixes, we go through them one by one.
-        if isinstance(prefix, str):
-            prefixes = (prefix, )
-        else:
-            prefixes = prefix
+        for page in paginator.paginate(**kwargs):
+            try:
+                contents = page["Contents"]
+            except KeyError:
+                break
 
-        for key_prefix in prefixes:
-            kwargs["Prefix"] = key_prefix
-
-            for page in paginator.paginate(**kwargs):
-                try:
-                    contents = page["Contents"]
-                except KeyError:
-                    break
-
-                for obj in contents:
-                    key = obj["Key"]
-                    if key.endswith(suffix):
-                        yield key
+            for obj in contents:
+                key = obj["Key"]
+                if key.endswith(suffix):
+                    yield key
 
     def get_matching_s3_keys(self, prefix="", suffix=""):
         for obj in self.get_matching_s3_objects(prefix, suffix):

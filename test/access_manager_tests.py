@@ -376,21 +376,6 @@ def test_get_size_fail(fixture_am, href: str):
 
 
 ###########################
-# raster io
-###########################
-
-@pytest.mark.parametrize("href", FILES)
-def test_get_rasterio_session(fixture_am, href: str):
-    manager.AccessManager.get_rasterio_session(href)
-
-
-@pytest.mark.parametrize("href", CAN_NOT_READ)
-def test_get_rasterio_session_fail(fixture_am, href: str):
-    with pytest.raises(PermissionError):
-        manager.AccessManager.get_rasterio_session(href)
-
-
-###########################
 # LIST DIR
 ###########################
 

@@ -93,7 +93,7 @@ class ARLASServicesHelper(ABC):
 
         for key in upload_file_names:
             local_path = os.path.join(directory, key.strip("/"))
-            destpath = os.path.join(s3_dir, key.strip("/"))
+            destpath = storage.get_full_href("/".join([s3_dir, key.strip("/")]))
             mime_type, __ = mimetypes.guess_type(local_path, strict=False)
             Process.LOGGER.info("Copy {} ({}) to {}".format(local_path, mime_type, destpath))
             storage.push(local_path, destpath, mime_type)

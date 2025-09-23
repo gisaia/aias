@@ -15,13 +15,15 @@ LOGGER = Logger.logger
 class AbstractStorage(ABC):
     cache_tt = 60 * 5
     cache_size = 2048
-    DO_NOT_PROTECT_METHODS = ["is_path_authorized", "get_configuration", "get_storage_parameters", "to_string", "supports"]
+    DO_NOT_PROTECT_METHODS = ["is_path_authorized", "get_configuration", "get_storage_parameters", "to_string", "supports", "get_full_href", "get_gdal_stream_options"]
 
     def __init__(self, storage_configuration: AnyStorageConfiguration):
         self.storage_configuration = storage_configuration
 
     def _check_read_write_wrapper(self, storage, attr, index, action):
         def wrapper(*args, **kwargs):
+            if len(kwargs) > 0:
+                LOGGER.warning("Dangerous call: positional arguments only should be used on {}, found: {}".format(self.__class__.__name__, kwargs))
             href = args[index]
             if storage.is_path_authorized(href, action):
                 return attr(*args, **kwargs)
@@ -33,7 +35,7 @@ class AbstractStorage(ABC):
         attr = object.__getattribute__(self, name)
         if callable(attr) and not name.startswith("_"):
             match name:
-                case "is_dir" | "is_file" | "exists" | "listdir" | "get_file_size" | "get_rasterio_session" | "get_last_modification_time" | "get_creation_time" | "dirname" | "get_gdal_stream_options" | "gdal_transform_href_vsi" | "get_gdal_src" | "get_gdal_info" | "stream":
+                case "get_matching_s3_objects" | "is_dir" | "is_file" | "exists" | "listdir" | "get_file_size" | "get_rasterio_session" | "get_last_modification_time" | "get_creation_time" | "dirname" | "gdal_transform_href_vsi" | "get_gdal_src" | "get_gdal_info" | "stream":
                     return self._check_read_write_wrapper(self, attr, 0, AccessType.READ)
                 case "makedir" | "clean":
                     return self._check_read_write_wrapper(self, attr, 0, AccessType.WRITE)
@@ -45,7 +47,7 @@ class AbstractStorage(ABC):
                     return self._check_read_write_wrapper(self, attr, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
                 case _:
                     if name not in AbstractStorage.DO_NOT_PROTECT_METHODS:
-                        raise Exception("Invalid implementation {} of AbstractStorage: method {} is public and not protected for READ/WRITE permission check.".format(self.__class__.__name__, name))
+                        raise Exception("Invalid implementation {} of AbstractStorage: method {} is public and not protected for READ/WRITE permission check.".format(self.__class__.__name__, name))
         return attr
 
     @abstractmethod

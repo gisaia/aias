@@ -14,6 +14,8 @@ class S3(BaseModel):
     asset_http_endpoint_url: str | None = Field(None, title="Asset URL endpoint", description="Asset URL endpoint with placeholders for bucket and collection names (e.g. http://minio:9000/{}/{})")
     endpoint_url: str | None = Field(None, title="URL endpoint", description="URL endpoint (e.g. http://minio:9000)")
     bucket: str | None = Field(None, title="Bucket name", description="Bucket name")
+    writable_paths: list[str] = Field(default=[], title="Writable Paths", description="List of paths where files can be written")
+    readable_paths: list[str] = Field(default=[], title="Readable Paths", description="List of paths from which files can be read")
 
 
 class Index(BaseModel, extra="allow"):

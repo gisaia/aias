@@ -42,7 +42,7 @@ access_manager:
     -
       type: gs
       readable_paths:
-        - gs://gisaia-public
+        - /test-aias
       bucket: gisaia-public
       # api_key:
       #   project_id: $APROC_INPUT_STORAGE_API_KEY_PROJECT
@@ -51,7 +51,7 @@ access_manager:
     -
       type: s3
       readable_paths:
-        - http://minio:9000/archives/inputs
+        - /inputs
       bucket: archives
       endpoint: "http://minio:9000"
     # -
@@ -64,6 +64,6 @@ access_manager:
       bucket: downloads
       endpoint: "http://minio:9000"
       readable_paths:
-        - http://minio:9000/archives/downloads
+        - "/"
       writable_paths:
-        - http://minio:9000/archives/downloads
+        - "/"
