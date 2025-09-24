@@ -138,13 +138,16 @@ def __s3storage() -> S3Storage:
     return S3Storage(S3StorageConfiguration(
         bucket=Configuration.settings.s3.bucket, 
         endpoint=Configuration.settings.s3.endpoint_url,
+        readable_paths=Configuration.settings.s3.readable_paths,
+        writable_paths=Configuration.settings.s3.writable_paths,
         api_key=S3ApiKey(access_key=Configuration.settings.s3.access_key_id, secret_key=Configuration.settings.s3.secret_access_key)))
 
 
 def __upload_file(key, file_obj, content_type) -> str:
     try:
         LOGGER.info("uploading {} ...".format(key))
-        __s3storage().push_file_obj(file_obj=file_obj, dst=key, content_type=content_type)
+        dst = __s3storage().get_full_href(key)
+        __s3storage().push_file_obj(file_obj, dst, content_type)
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -157,7 +160,7 @@ def __upload_file(key, file_obj, content_type) -> str:
 def __delete_file(key):
     try:
         LOGGER.info("deleting {} ...".format(key))
-        __s3storage().clean(key)
+        __s3storage().clean(__s3storage().get_full_href(key))
         LOGGER.info(__DELETED_MSG__.format(key))
     except Exception as e:
         msg = "Failed to delete {} ".format(key)
@@ -173,7 +176,8 @@ def __upload_item(key, item: Item) -> str:
             fn = os.path.join(td, 'item')
             with open(fn, 'w') as f:
                 f.write(to_json(item))
-            __s3storage().push(fn, key, MimeType.JSON.value)
+            dst = __s3storage().get_full_href(key)
+            __s3storage().push(fn, dst, MimeType.JSON.value)
         LOGGER.info("{} uploaded.".format(key))
         return key
     except Exception as e:
@@ -196,7 +200,7 @@ def asset_exists(collection: str, item_id: str, asset_name: str) -> bool:
         bool: True if found on the S3, False otherwise
     """
     key = get_asset_relative_path(collection, item_id, asset_name)
-    return __s3storage().exists(key)
+    return __s3storage().exists(__s3storage().get_full_href(key))
 
 
 def delete_item(collection: str, item_id: str):
@@ -207,7 +211,7 @@ def delete_item(collection: str, item_id: str):
     r = __getES().delete(index=__get_es_index_name(collection), id=item_id)
     # the item is dereferenced from ES and the STAC json file is deleted, not the rest.
     LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
-    __s3storage().clean(get_item_relative_path(collection, item_id))
+    __s3storage().clean(__s3storage().get_full_href(get_item_relative_path(collection, item_id)))
     LOGGER.info(__DELETED_MSG__.format(get_item_relative_path(collection, item_id)))
 
 
@@ -292,13 +296,13 @@ def reindex(collection: str):
         collection (str): name of the collection to reindex
     """
     keys = __s3storage().get_matching_s3_objects(
-        collection, ITEM_ARLAS_SUFFIX
+        __s3storage().get_full_href(collection), ITEM_ARLAS_SUFFIX
     )
     LOGGER.info("Start reindexing collection {}".format(collection))
     for key in keys:
         tmp_file = "tmp" + ITEM_ARLAS_SUFFIX
         LOGGER.info("Reindexing item from {}".format(key))
-        __s3storage().pull(key, tmp_file)
+        __s3storage().pull(__s3storage().get_full_href(key), tmp_file)
         with open(tmp_file, "r") as f:
             item = item_from_json_file(f)
             LOGGER.debug(item)

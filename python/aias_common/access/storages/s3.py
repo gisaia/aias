@@ -1,22 +1,34 @@
 import os
 from urllib.parse import urlparse, urlunparse
 
-from aias_common.access.configuration import S3StorageConfiguration
+from aias_common.access.configuration import AccessType, S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
+
+from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
 LOGGER = Logger.logger
 
 
 class S3Storage(AbstractStorage):
 
+    def is_path_authorized(self, href: str, action: AccessType) -> bool:
+        paths = self.get_authorized_pathes(href, action)
+
+        prefix = join_pathes(self.get_configuration().endpoint, self.get_configuration().bucket)
+        h = endslash(noslash(href))
+        return any(list(map(lambda p: h.startswith(endslash(join_pathes(prefix, p))), paths)))
+
+    def to_string(self) -> str:
+        return "object storage on bucket {} from {}".format(self.get_configuration().bucket, self.get_configuration().endpoint)
+
     def get_configuration(self) -> S3StorageConfiguration:
         assert isinstance(self.storage_configuration, S3StorageConfiguration)
         return self.storage_configuration
 
-    def get_storage_parameters(self):
+    def get_storage_parameters(self) -> dict:
         import boto3
         conf = self.get_configuration()
         if conf.is_anon_client:
@@ -53,7 +65,7 @@ class S3Storage(AbstractStorage):
     def exists(self, href: str):
         return self.is_dir(href) or self.is_file(href)
 
-    def get_rasterio_session(self):
+    def get_rasterio_session(self, href: str):
         import rasterio.session
 
         params = {}
@@ -74,12 +86,17 @@ class S3Storage(AbstractStorage):
 
         return params
 
+    def get_full_href(self, path: str):
+        if self.get_configuration().endpoint:
+            return join_pathes(self.get_configuration().endpoint, self.get_configuration().bucket, path)
+        else:
+            return "s3://" + join_pathes(self.get_configuration().bucket, path)
+
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
 
     def pull(self, href: str, dst: str):
         import botocore.client
-        super().pull(href, dst)
 
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
 
@@ -90,7 +107,6 @@ class S3Storage(AbstractStorage):
 
     def push(self, href: str, dst: str, content_type: str | None = None):
         import botocore.client
-        super().push(href, dst)
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         extraArgs = {}
         if content_type:
@@ -153,7 +169,7 @@ class S3Storage(AbstractStorage):
     def get_file_size(self, href: str):
         response = self.__head_object(href)
         if response:
-            return self.__head_object(href)['ContentLength']
+            return response['ContentLength']
         else:
             return None
 
@@ -182,7 +198,7 @@ class S3Storage(AbstractStorage):
                 is_dir=True), objects["CommonPrefixes"]))
         return files + dirs
 
-    def get_last_modification_time(self, href: str):
+    def get_last_modification_time(self, href: str) -> float | None:
         import botocore.exceptions
         try:
             response = self.__head_object(href)
@@ -194,7 +210,7 @@ class S3Storage(AbstractStorage):
         except botocore.exceptions.ParamValidationError:  # key LastModified does not exists for root
             return None
 
-    def get_creation_time(self, href: str):
+    def get_creation_time(self, href: str) -> float | None:
         # There is no difference in s3 between last update and creation date
         return self.get_last_modification_time(href)
 
@@ -205,7 +221,7 @@ class S3Storage(AbstractStorage):
     def clean(self, href: str):
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
-        client.delete_object(Bucket=self.get_configuration().bucket, Key=href)
+        client.delete_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
 
     def get_gdal_stream_options(self):
         config = self.get_configuration()
@@ -240,34 +256,27 @@ class S3Storage(AbstractStorage):
 
         return href
 
-    def get_matching_s3_objects(self, prefix="", suffix="", s3_client=None):
+    def get_matching_s3_objects(self, path: str, suffix: str = "", s3_client=None):
 
+        prefix = noslash(urlparse(path).path.removeprefix("/" + self.get_configuration().bucket))
+        LOGGER.debug("Search for objects in bucket %s with prefix %s and suffix %s", self.get_configuration().bucket, prefix, suffix)
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         paginator = client.get_paginator("list_objects_v2")
 
         kwargs = {'Bucket': self.get_configuration().bucket}
+        kwargs["Prefix"] = prefix
 
-        # We can pass the prefix directly to the S3 API.  If the user has passed
-        # a tuple or list of prefixes, we go through them one by one.
-        if isinstance(prefix, str):
-            prefixes = (prefix, )
-        else:
-            prefixes = prefix
+        for page in paginator.paginate(**kwargs):
+            try:
+                contents = page["Contents"]
+            except KeyError:
+                break
 
-        for key_prefix in prefixes:
-            kwargs["Prefix"] = key_prefix
-
-            for page in paginator.paginate(**kwargs):
-                try:
-                    contents = page["Contents"]
-                except KeyError:
-                    break
-
-                for obj in contents:
-                    key = obj["Key"]
-                    if key.endswith(suffix):
-                        yield key
+            for obj in contents:
+                key = obj["Key"]
+                if key.endswith(suffix):
+                    yield key
 
     def get_matching_s3_keys(self, prefix="", suffix=""):
         for obj in self.get_matching_s3_objects(prefix, suffix):

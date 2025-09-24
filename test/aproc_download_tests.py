@@ -50,10 +50,8 @@ class Tests(unittest.TestCase):
     @staticmethod
     def __download_found(url: str):
         if url.startswith("http"):
-            print("downloads placed on s3")
             return requests.head(url).status_code == 200
         else:
-            print("downloads placed in directory")
             return os.path.exists("./" + url)
 
     def test_download_project_native_format_native_nocrop(self):

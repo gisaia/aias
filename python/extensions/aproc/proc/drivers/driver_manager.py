@@ -27,7 +27,7 @@ class DriverManager():
                 raise DriverException("Driver {} not found".format(driver_configuration.class_name))
 
             try:
-                AccessManager.check_local_path_writable(driver_class.assets_dir)
+                AccessManager.check_path_writable(driver_class.assets_dir)
                 if driver_class.assets_dir == "/":
                     raise ValueError("Driver {} assets_dir is not authorized for writing".format(driver_configuration.class_name))
             except ValueError as e:
