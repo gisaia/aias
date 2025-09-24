@@ -65,7 +65,7 @@ class S3Storage(AbstractStorage):
     def exists(self, href: str):
         return self.is_dir(href) or self.is_file(href)
 
-    def get_rasterio_session(self, href):
+    def get_rasterio_session(self, href: str):
         import rasterio.session
 
         params = {}

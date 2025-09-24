@@ -143,7 +143,6 @@ class AccessManager:
     @staticmethod
     def get_rasterio_session(href: str):
         storage = AccessManager.resolve_storage(href)
-        AccessManager.check_path_readable(href)
         return storage.get_rasterio_session(href)
 
     @staticmethod

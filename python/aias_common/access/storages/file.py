@@ -32,17 +32,13 @@ class FileStorage(AbstractStorage):
     def exists(self, href: str):
         return Path(href).exists()
 
-    def get_rasterio_session(self, href):
+    def get_rasterio_session(self, href: str):
         return {}
 
     def pull(self, href: str, dst: str):
-        super().pull(href, dst)
-
         shutil.copy(href, dst)
 
     def push(self, href: str, dst: str, content_type: str | None = None):
-        super().push(href, dst)
-
         shutil.copy(href, dst)
 
     def is_file(self, href: str):
@@ -83,7 +79,6 @@ class FileStorage(AbstractStorage):
         return os.path.dirname(os.path.abspath(href))
 
     def clean(self, href: str):
-        super().clean(href=href)
         if self.is_dir(href):
             shutil.rmtree(href)  # !DELETE!
         else:

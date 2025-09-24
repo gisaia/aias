@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import os
 from abc import ABC, abstractmethod
+from typing import Callable
 
 from aias_common.access.configuration import AnyStorageConfiguration, AccessType
 from aias_common.access.file import File
@@ -19,7 +20,7 @@ class AbstractStorage(ABC):
     def __init__(self, storage_configuration: AnyStorageConfiguration):
         self.storage_configuration = storage_configuration
 
-    def _check_read_write_wrapper(self, storage, attr, index: int, action: AccessType):
+    def _check_read_write_wrapper(self, fct: Callable, index: int, action: AccessType):
         """Checks whether the action is permitted on the specified path before calling the function.
 
         Args:
@@ -32,13 +33,13 @@ class AbstractStorage(ABC):
             if len(kwargs) > 0:
                 LOGGER.warning("Dangerous call: positional arguments only should be used on {}, found: {}".format(self.__class__.__name__, kwargs))
             href = args[index]
-            if storage.is_path_authorized(href, action):
-                return attr(*args, **kwargs)
+            if self.is_path_authorized(href, action):
+                return fct(*args, **kwargs)
             LOGGER.error("{} on {} is not permitted on {}".format(action.value, self.to_string(), href))
             raise PermissionError("{} access on {} is not permitted on {}".format(action.value, href, self.to_string()))
         return wrapper
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str):
         """Intercepts calls to public methods to check read/write permissions before executing them.
 
         Args:
@@ -50,23 +51,23 @@ class AbstractStorage(ABC):
         Returns:
             _type_: The method being accessed
         """
-        attr = object.__getattribute__(self, name)
-        if callable(attr) and not name.startswith("_"):
+        fct = object.__getattribute__(self, name)
+        if callable(fct) and not name.startswith("_"):
             match name:
                 case "get_matching_s3_objects" | "is_dir" | "is_file" | "exists" | "listdir" | "get_file_size" | "get_rasterio_session" | "get_last_modification_time" | "get_creation_time" | "dirname" | "gdal_transform_href_vsi" | "get_gdal_src" | "get_gdal_info" | "stream":
-                    return self._check_read_write_wrapper(self, attr, 0, AccessType.READ)
+                    return self._check_read_write_wrapper(fct, 0, AccessType.READ)
                 case "makedir" | "clean":
-                    return self._check_read_write_wrapper(self, attr, 0, AccessType.WRITE)
+                    return self._check_read_write_wrapper(fct, 0, AccessType.WRITE)
                 case "pull":
-                    return self._check_read_write_wrapper(self, attr, 0, AccessType.READ)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 1, AccessType.WRITE)
+                    return self._check_read_write_wrapper(fct, 0, AccessType.READ)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 1, AccessType.WRITE)
                 case "push":
-                    return self._check_read_write_wrapper(self, attr, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
+                    return self._check_read_write_wrapper(fct, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
                 case "push_file_obj":
-                    return self._check_read_write_wrapper(self, attr, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
+                    return self._check_read_write_wrapper(fct, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
                 case _:
                     if name not in AbstractStorage.DO_NOT_PROTECT_METHODS:
                         raise Exception("Invalid implementation {} of AbstractStorage: method {} is public and not protected for READ/WRITE permission check.".format(self.__class__.__name__, name))
-        return attr
+        return fct
 
     def get_authorized_pathes(self, href: str, action: AccessType) -> list[str]:
         """ Returns the list of authorized pathes for the specified action, if the href is supported by the storage.
