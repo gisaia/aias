@@ -55,6 +55,10 @@ access_manager:
     -
       type: gs
       bucket: gisaia-public
+      readable_paths:
+        - "/"
+      writable_paths:
+        - "/test-aias"
     -
       type: s3
       bucket: arlas
@@ -63,6 +67,8 @@ access_manager:
       api_key:
         access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         secret_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      readable_paths:
+        - "/"
 ```
 
 Four types of storage are available:
@@ -71,6 +77,11 @@ Four types of storage are available:
 - [`gs`](#aias_common.configuration.GoogleStorageConfiguration): google cloud object storage
 - [`s3`](#aias_common.configuration.S3StorageConfiguration): S3 compliant object storage
 - [`http`](#aias_common.configuration.HttpStorageConfiguration): HTTP/HTTPS storage
+
+For each storage, the list of readable and writable pathes must be provided. Any read access must be done on a path that has a prefix in `readable_paths` or `writable_paths`. Any write access must be done on a path that has a prefix in `writable_paths`. 
+
+In the previous example, for the google storage, it is possible to read anything that is prefixed by `gs://gisaia-public/` but writes can be done only on pathes prefixed by `gs://gisaia-public/test-aias/`.
+
 
 ## Ingest drivers
 
