@@ -1,12 +1,10 @@
 from contextlib import contextmanager
 import os
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 from aias_common.access.configuration import AnyStorageConfiguration, AccessType
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
-from urllib.parse import urlparse, urlunparse
 
 from aias_common.access.storages.path_helper import http_href_to_s3
 
@@ -16,7 +14,7 @@ LOGGER = Logger.logger
 class AbstractStorage(ABC):
     cache_tt = 60 * 5
     cache_size = 2048
-    DO_NOT_PROTECT_METHODS = ["is_path_authorized", "get_configuration", "get_storage_parameters", "to_string", "supports", "get_full_href", "get_gdal_stream_options"]
+    DO_NOT_PROTECT_METHODS = ["get_authorized_pathes", "is_path_authorized", "get_configuration", "get_storage_parameters", "to_string", "supports", "get_full_href", "get_gdal_stream_options"]
 
     def __init__(self, storage_configuration: AnyStorageConfiguration):
         self.storage_configuration = storage_configuration
@@ -70,8 +68,7 @@ class AbstractStorage(ABC):
                         raise Exception("Invalid implementation {} of AbstractStorage: method {} is public and not protected for READ/WRITE permission check.".format(self.__class__.__name__, name))
         return attr
 
-
-    def __get_authorized_pathes(self, href: str, action: AccessType) -> list[str]:
+    def get_authorized_pathes(self, href: str, action: AccessType) -> list[str]:
         """ Returns the list of authorized pathes for the specified action, if the href is supported by the storage.
 
         Args:
@@ -84,13 +81,10 @@ class AbstractStorage(ABC):
         Returns:
             list[str]: The list of authorized pathes for the specified action
         """
-        if not self.supports(href=href):
-            raise PermissionError("{} not on {}".format(self.to_string(), href))
         if action == AccessType.WRITE:
             return self.get_configuration().writable_paths
         else:
             return list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
-
 
     @abstractmethod
     def to_string(self) -> str:
@@ -111,7 +105,7 @@ class AbstractStorage(ABC):
         ...
 
     @abstractmethod
-    def get_storage_parameters(self, href) -> dict:
+    def get_storage_parameters(self) -> dict:
         """Based on the type of storage and its characteristics, gives storage-specific parameters to use to access data
         """
         ...

@@ -1,4 +1,3 @@
-import logging
 import os
 from urllib.parse import urlparse, urlunparse
 
@@ -8,7 +7,7 @@ from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
 
-from aias_common.access.storages.path_helper import endslash, noslash
+from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
 LOGGER = Logger.logger
 
@@ -16,12 +15,11 @@ LOGGER = Logger.logger
 class S3Storage(AbstractStorage):
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        paths = self.__get_authorized_pathes(href, action)
+        paths = self.get_authorized_pathes(href, action)
 
-        prefix = "/".join([noslash(self.get_configuration().endpoint), noslash(self.get_configuration().bucket)])
+        prefix = join_pathes(self.get_configuration().endpoint, self.get_configuration().bucket)
         h = endslash(noslash(href))
-        return any(list(map(lambda p: h.startswith(endslash("/".join([prefix, noslash(p)]))), paths)))
-
+        return any(list(map(lambda p: h.startswith(endslash(join_pathes(prefix, p))), paths)))
 
     def to_string(self) -> str:
         return "object storage on bucket {} from {}".format(self.get_configuration().bucket, self.get_configuration().endpoint)
@@ -30,7 +28,7 @@ class S3Storage(AbstractStorage):
         assert isinstance(self.storage_configuration, S3StorageConfiguration)
         return self.storage_configuration
 
-    def get_storage_parameters(self):
+    def get_storage_parameters(self) -> dict:
         import boto3
         conf = self.get_configuration()
         if conf.is_anon_client:
@@ -90,9 +88,9 @@ class S3Storage(AbstractStorage):
 
     def get_full_href(self, path: str):
         if self.get_configuration().endpoint:
-            return join_pathes(self.get_configuration().endpoint + "/" + self.get_configuration().bucket + "/" + path.removeprefix("/"))
+            return join_pathes(self.get_configuration().endpoint, self.get_configuration().bucket, path)
         else:
-            return "s3://" + self.get_configuration().bucket + "/" + path.removeprefix("/")
+            return "s3://" + join_pathes(self.get_configuration().bucket, path)
 
     def __get_href_key(self, href: str):
         return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
@@ -260,7 +258,7 @@ class S3Storage(AbstractStorage):
 
     def get_matching_s3_objects(self, path: str, suffix: str = "", s3_client=None):
 
-        prefix = self.__noslash(urlparse(path).path.removeprefix("/" + self.get_configuration().bucket))
+        prefix = noslash(urlparse(path).path.removeprefix("/" + self.get_configuration().bucket))
         LOGGER.debug("Search for objects in bucket %s with prefix %s and suffix %s", self.get_configuration().bucket, prefix, suffix)
         import botocore.client
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]

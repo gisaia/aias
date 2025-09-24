@@ -15,7 +15,7 @@ class GoogleStorage(AbstractStorage):
         return "google cloud object storage on bucket {}".format(self.get_configuration().bucket)
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        paths = self.__get_authorized_pathes(href, action)
+        paths = self.get_authorized_pathes(href, action)
 
         prefix = "gs://" + self.get_configuration().bucket.removeprefix("/").removesuffix("/")
         h = href.removesuffix("/") + "/"
@@ -25,7 +25,7 @@ class GoogleStorage(AbstractStorage):
         assert isinstance(self.storage_configuration, GoogleStorageConfiguration)
         return self.storage_configuration
 
-    def get_storage_parameters(self):
+    def get_storage_parameters(self) -> dict:
         if self.get_configuration().is_anon_client:
             client = Client.create_anonymous_client()
         else:

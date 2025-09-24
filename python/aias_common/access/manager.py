@@ -82,7 +82,7 @@ class AccessManager:
         raise Exception("No local storage configured")
 
     @staticmethod
-    def get_storage_parameters(href: str):
+    def get_storage_parameters(href: str) -> dict:
         storage = AccessManager.resolve_storage(href)
 
         return storage.get_storage_parameters()

@@ -15,14 +15,14 @@ class FileStorage(AbstractStorage):
         return "file system storage"
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        paths = self.__get_authorized_pathes(href, action)
+        paths = self.get_authorized_pathes(href, action)
         return any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
 
     def get_configuration(self) -> FileStorageConfiguration:
         assert isinstance(self.storage_configuration, FileStorageConfiguration)
         return self.storage_configuration
 
-    def get_storage_parameters(self):
+    def get_storage_parameters(self) -> dict:
         return {}
 
     def supports(self, href: str):
