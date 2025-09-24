@@ -15,10 +15,7 @@ class FileStorage(AbstractStorage):
         return "file system storage"
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        else:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+        paths = self.__get_authorized_pathes(href, action)
         return any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
 
     def get_configuration(self) -> FileStorageConfiguration:

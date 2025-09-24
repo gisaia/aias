@@ -34,7 +34,7 @@ def test_gdal_fail(fixture_am, href: str):
 # raster io
 ###########################
 
-@pytest.mark.parametrize("href", FILES)
+@pytest.mark.parametrize("href", GDAL_FILES)
 def test_get_rasterio_session(fixture_am, href: str):
     manager.AccessManager.get_rasterio_session(href)
 

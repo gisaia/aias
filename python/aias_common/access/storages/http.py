@@ -11,14 +11,7 @@ from aias_common.access.storages.utils import (requests_exists, requests_get,
 class HttpStorage(AbstractStorage):
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if not self.supports(href=href):
-            raise PermissionError("{} not on {}".format(self.to_string(), href))
-
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        else:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
-
+        paths = self.__get_authorized_pathes(href, action)
         path = urlparse(href).path
         return any(list(map(lambda p: path.startswith(p.removesuffix("/") + "/"), paths)))
 
@@ -67,7 +60,6 @@ class HttpStorage(AbstractStorage):
 
     def get_last_modification_time(self, href: str) -> float | None:
         r = requests_head(href, self.get_configuration().headers)
-        print(r.headers)
         if r.headers.get("Last-Modified"):
             return time.mktime(time.strptime(r.headers.get("Last-Modified"), "%a, %d %b %Y %H:%M:%S %Z"))
         return None

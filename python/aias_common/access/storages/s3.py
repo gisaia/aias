@@ -8,26 +8,20 @@ from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
 
+from aias_common.access.storages.path_helper import endslash, noslash
+
 LOGGER = Logger.logger
 
 
 class S3Storage(AbstractStorage):
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        else:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+        paths = self.__get_authorized_pathes(href, action)
 
-        prefix = "/".join([self.__noslash(self.get_configuration().endpoint), self.__noslash(self.get_configuration().bucket)])
-        h = self.__endslash(self.__noslash(href))
-        return any(list(map(lambda p: h.startswith(self.__endslash("/".join([prefix, self.__noslash(p)]))), paths)))
+        prefix = "/".join([noslash(self.get_configuration().endpoint), noslash(self.get_configuration().bucket)])
+        h = endslash(noslash(href))
+        return any(list(map(lambda p: h.startswith(endslash("/".join([prefix, noslash(p)]))), paths)))
 
-    def __noslash(self, txt: str) -> str:
-        return txt.removeprefix("/").removesuffix("/")
-
-    def __endslash(self, txt: str) -> str:
-        return txt.removesuffix("/") + "/"
 
     def to_string(self) -> str:
         return "object storage on bucket {} from {}".format(self.get_configuration().bucket, self.get_configuration().endpoint)
@@ -96,7 +90,7 @@ class S3Storage(AbstractStorage):
 
     def get_full_href(self, path: str):
         if self.get_configuration().endpoint:
-            return self.get_configuration().endpoint + "/" + self.get_configuration().bucket + "/" + path.removeprefix("/")
+            return join_pathes(self.get_configuration().endpoint + "/" + self.get_configuration().bucket + "/" + path.removeprefix("/"))
         else:
             return "s3://" + self.get_configuration().bucket + "/" + path.removeprefix("/")
 
@@ -264,7 +258,7 @@ class S3Storage(AbstractStorage):
 
         return href
 
-    def get_matching_s3_objects(self, path, suffix="", s3_client=None):
+    def get_matching_s3_objects(self, path: str, suffix: str = "", s3_client=None):
 
         prefix = self.__noslash(urlparse(path).path.removeprefix("/" + self.get_configuration().bucket))
         LOGGER.debug("Search for objects in bucket %s with prefix %s and suffix %s", self.get_configuration().bucket, prefix, suffix)

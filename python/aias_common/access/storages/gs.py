@@ -15,10 +15,7 @@ class GoogleStorage(AbstractStorage):
         return "google cloud object storage on bucket {}".format(self.get_configuration().bucket)
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
-        if action == AccessType.WRITE:
-            paths = self.get_configuration().writable_paths
-        else:
-            paths = list([*self.get_configuration().readable_paths, *self.get_configuration().writable_paths])
+        paths = self.__get_authorized_pathes(href, action)
 
         prefix = "gs://" + self.get_configuration().bucket.removeprefix("/").removesuffix("/")
         h = href.removesuffix("/") + "/"
@@ -63,7 +60,7 @@ class GoogleStorage(AbstractStorage):
     def exists(self, href: str):
         return self.is_file(href) or self.is_dir(href)
 
-    def get_rasterio_session(self, href):
+    def get_rasterio_session(self, href: str):
         import rasterio.session
 
         params = {

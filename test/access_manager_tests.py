@@ -1,10 +1,9 @@
 import os
 import pytest
-from aias_common.access.configuration import AccessManagerSettings, AccessType, HttpsStorageConfiguration
+from aias_common.access.configuration import AccessManagerSettings, HttpsStorageConfiguration
 import aias_common.access.storages.s3 as s3
 import aias_common.access.manager as manager
 import aias_common.access.storages.file as fs
-import aias_common.access.storages.http as http
 import aias_common.access.storages.gs as gs
 from pathlib import Path
 import os.path as p
@@ -36,7 +35,7 @@ FS_RO_FILE = "/tmp/readonly/file"
 FS_RW_FILE = "/tmp/readwrite/file"
 
 GDAL_FILES = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/jpeg2000.jpg2", "gs:///gisaia-public/test-aias/jpeg2000.jpg2"
+    "https://storage.googleapis.com/gisaia-public/test-aias/jpeg2000.jpg2", "gs://gisaia-public/test-aias/jpeg2000.jpg2"
 ]
 
 
@@ -63,24 +62,7 @@ CAN_READ = [
     FS_RW_FILE,
 ]
 
-GET_SIZE = [
-    GS_RO_FILE,
-    GS_RO_DIR_SLASH,
-    GS_RO_DIR_NO_SLASH,
-
-    HTTPS_RO_FILE,
-
-    S3_RO_DIR_SLASH,
-    S3_RO_DIR_NO_SLASH,
-    S3_RO_FILE,
-    S3_RO_DIR,
-    S3_RW_DIR,
-
-    FS_RO_DIR_NO_SLASH,
-    FS_RW_DIR_SLASH,
-    FS_RO_FILE,
-    FS_RW_FILE,
-]
+GET_SIZE = CAN_READ
 
 FILES = [
     GS_RO_FILE,
