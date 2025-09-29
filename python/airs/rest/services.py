@@ -5,7 +5,7 @@ import airs.core.product_registration as rs
 from airs.core import exceptions
 from airs.core.models.mapper import to_json
 from airs.core.models.model import Item
-from aias_common.rest.exception import BadRequest, Conflict, NotFound, ServerError
+from aias_common.rest.exception import BadRequest, Conflict, NotFound
 
 ROUTER = APIRouter()
 
@@ -15,7 +15,7 @@ __INVALID_ITEM_MSG__ = "Invalid items {}: {}"
 
 
 @ROUTER.post('/collections/{collection}/_init', description="Init a collection.")
-def init_collection(collection: str, request: Request) -> str:
+async def init_collection(collection: str, request: Request) -> str:
     if not collection:
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
     return JSONResponse(content={"created": rs.init_collection(collection)},
@@ -24,7 +24,7 @@ def init_collection(collection: str, request: Request) -> str:
 
 
 @ROUTER.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)")
-def create_item(collection: str, item: Item, request: Request) -> str:
+async def create_item(collection: str, item: Item, request: Request) -> str:
     """ From https://github.com/stac-api-extensions/transaction:
         POST
         When the body is a partial Item:
@@ -56,7 +56,7 @@ def create_item(collection: str, item: Item, request: Request) -> str:
 
 
 @ROUTER.put('/collections/{collection}/items/{id}', description="Update an item. Asset should/must exist (depends on the server configuration)")
-def update_item(collection: str, id: str, item: Item, request: Request) -> str:
+async def update_item(collection: str, id: str, item: Item, request: Request) -> str:
     """ From https://github.com/stac-api-extensions/transaction:
         PUT
         Must populate the id and collection fields in the Item from the URI.
@@ -89,7 +89,7 @@ def update_item(collection: str, id: str, item: Item, request: Request) -> str:
 
 
 @ROUTER.delete('/collections/{collection}/items/{id}', description="Delete an item and its assets (depends on the server configuration)")
-def delete_item(collection: str, id: str) -> str:
+async def delete_item(collection: str, id: str) -> str:
     """ From https://github.com/stac-api-extensions/transaction:
         DELETE
         Must return 200 or 204 for a successful operation.
@@ -108,7 +108,7 @@ def delete_item(collection: str, id: str) -> str:
 
 
 @ROUTER.get('/collections/{collection}/items/{id}', description="Retrieve an item")
-def get_item(collection: str, id: str) -> str:
+async def get_item(collection: str, id: str) -> str:
     if not rs.item_exists(collection, id):
         raise NotFound(detail="Item does not exist")
     try:
@@ -121,12 +121,9 @@ def get_item(collection: str, id: str) -> str:
 
 @ROUTER.post('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Upload an asset.")
 async def upload_asset(collection: str, item_id: str, asset_name: str, file: UploadFile = File(...)):
-    upload_obj = rs.upload_asset(collection=collection, item_id=item_id, asset_name=asset_name, file_obj=file.file, content_type=file.content_type)
-    if upload_obj:
-        return JSONResponse(content={"msg": "Object has been uploaded to bucket successfully"},
-                            status_code=status.HTTP_201_CREATED)
-    else:
-        raise ServerError(detail="File could not be uploaded")
+    await rs.upload_asset(collection=collection, item_id=item_id, asset_name=asset_name, file_obj=file.file, content_type=file.content_type)
+    return JSONResponse(content={"msg": "Object has been uploaded to bucket successfully"},
+                        status_code=status.HTTP_201_CREATED)
 
 
 @ROUTER.head('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Tests if an asset exists.")

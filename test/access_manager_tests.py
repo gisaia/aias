@@ -304,16 +304,16 @@ def test_not_push(fixture_am, href: str):
 
 
 @pytest.mark.parametrize("href", CAN_PUSH_ON)
-def test_push_fo(fixture_am, fixture_objectstore: s3.S3Storage, href: str):
+async def test_push_fo(fixture_am, fixture_objectstore: s3.S3Storage, href: str):
     with open(FS_RO_FILE, 'rb') as fo:
-        fixture_objectstore.push_file_obj(fo, href)
+        await fixture_objectstore.async_push_file_obj(fo, href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_WRITE)
 def test_not_push_fo(fixture_am, fixture_objectstore: s3.S3Storage, href: str):
     with pytest.raises(PermissionError):
         with open(FS_RO_FILE, 'rb') as fo:
-            fixture_objectstore.push_file_obj(fo, href)
+            fixture_objectstore.async_push_file_obj(fo, href)
 
 
 ###########################
@@ -457,4 +457,3 @@ def test_zip(fixture_am, href: str):
 def test_zip_fail(fixture_am, href: str):
     with pytest.raises(PermissionError):
         manager.AccessManager.zip(href, FS_RW_DIR_SLASH + "file.zip")
-
