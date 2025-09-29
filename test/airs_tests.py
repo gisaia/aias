@@ -33,11 +33,10 @@ class Tests(unittest.TestCase):
 
     def test_upload(self):
         # UPLOAD ASSET
-        f = open(ASSET_PATH, 'rb')
-        file = {'file': (ASSET, f, "image/tiff")}
-        r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET), files=file)
-        f.close()
-        self.assertTrue(r.ok, str(r.status_code) + str(r.content))
+        with open(ASSET_PATH, 'rb') as f:
+            file = {'file': (ASSET, f, "image/tiff")}
+            r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET), files=file)
+            self.assertTrue(r.ok, str(r.status_code) + str(r.content))
         # ASSET FOUND
         r = requests.head(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))
