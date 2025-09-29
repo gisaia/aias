@@ -14,5 +14,5 @@ setuptools.setup(
     python_requires='>=3.10',
     package_dir={'': 'src'},
     install_requires=['ecs_logging', 'google-cloud-storage==2.5.0', 'pydantic==2.10.6', 'requests==2.32.4',
-                      'smart_open==6.2.0', 'boto3==1.24.89', 'fastapi_utilities']
+                      'smart_open==6.2.0', 'boto3==1.39.11', 'fastapi_utilities']
 )

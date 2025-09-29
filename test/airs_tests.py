@@ -36,8 +36,8 @@ class Tests(unittest.TestCase):
         f = open(ASSET_PATH, 'rb')
         file = {'file': (ASSET, f, "image/tiff")}
         r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET), files=file)
-        self.assertTrue(r.ok, str(r.status_code) + str(r.content))
         f.close()
+        self.assertTrue(r.ok, str(r.status_code) + str(r.content))
         # ASSET FOUND
         r = requests.head(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))

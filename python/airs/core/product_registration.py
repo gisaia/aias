@@ -77,9 +77,9 @@ def get_item_relative_path(collection: str, item_id: str) -> str:
     return os.path.join(collection, "items", item_id, item_id + ITEM_ARLAS_SUFFIX)
 
 
-def upload_asset(
+async def upload_asset(
     collection: str, item_id: str, asset_name: str, file_obj, content_type: str
-) -> str:
+):
     """upload the asset file to the configured S3
 
     Args:
@@ -97,7 +97,7 @@ def upload_asset(
         str: key, None if not uploaded
     """
     key = get_asset_relative_path(collection, item_id, asset_name)
-    return __upload_file(key, file_obj, content_type)
+    await __upload_file(key, file_obj, content_type)
 
 
 def delete_asset(collection: str, item_id: str, asset_name: str):
@@ -143,13 +143,12 @@ def __s3storage() -> S3Storage:
         api_key=S3ApiKey(access_key=Configuration.settings.s3.access_key_id, secret_key=Configuration.settings.s3.secret_access_key)))
 
 
-def __upload_file(key, file_obj, content_type) -> str:
+async def __upload_file(key, file_obj, content_type):
     try:
         LOGGER.info("uploading {} ...".format(key))
         dst = __s3storage().get_full_href(key)
-        __s3storage().push_file_obj(file_obj, dst, content_type)
+        await __s3storage().async_push_file_obj(file_obj, dst, content_type)
         LOGGER.info("{} uploaded.".format(key))
-        return key
     except Exception as e:
         msg = "Failed to upload {}".format(key)
         LOGGER.error(msg)

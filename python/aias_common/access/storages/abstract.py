@@ -62,7 +62,7 @@ class AbstractStorage(ABC):
                     return self._check_read_write_wrapper(fct, 0, AccessType.READ)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 1, AccessType.WRITE)
                 case "push":
                     return self._check_read_write_wrapper(fct, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
-                case "push_file_obj":
+                case "async_push_file_obj":
                     return self._check_read_write_wrapper(fct, 1, AccessType.WRITE)  # TODO need to solve circular import: and self._check_read_write_wrapper(AccessManager.get_local_storage(), attr, 0, AccessType.READ)
                 case _:
                     if name not in AbstractStorage.DO_NOT_PROTECT_METHODS:

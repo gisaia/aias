@@ -6,6 +6,7 @@ from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
+import aioboto3
 
 from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
@@ -51,6 +52,29 @@ class S3Storage(AbstractStorage):
             )
 
         return {"client": client}
+
+    def __aioboto3_client(self):
+        conf = self.get_configuration()
+        if conf.is_anon_client:
+            from botocore import UNSIGNED
+            from botocore.client import Config
+            session = aioboto3.Session()
+            client = session.client(
+                "s3",
+                region_name=conf.region,
+                endpoint_url=conf.endpoint,
+                config=Config(signature_version=UNSIGNED)
+            )
+        else:
+            session = aioboto3.Session()
+            client = session.client(
+                "s3",
+                region_name=conf.region,
+                endpoint_url=conf.endpoint,
+                aws_access_key_id=conf.api_key.access_key,
+                aws_secret_access_key=conf.api_key.secret_key,
+            )
+        return client
 
     def supports(self, href: str):
         scheme = urlparse(href).scheme
@@ -113,7 +137,7 @@ class S3Storage(AbstractStorage):
             extraArgs["ContentType"] = content_type
         client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
 
-    def push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
+    async def async_push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
         """push source file like object on destination
 
         Args:
@@ -121,12 +145,12 @@ class S3Storage(AbstractStorage):
             dst (str): target destination for coping the content of file_obj
             content_type (str | None, optional): content type of the source file. Defaults to None.
         """
-        import botocore.client
-        client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
-        extraArgs = {}
+        extra_args = {}
         if content_type:
-            extraArgs["ContentType"] = content_type
-        client.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
+            extra_args["ContentType"] = content_type
+
+        async with self.__aioboto3_client() as s3:
+            await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args)
         
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
