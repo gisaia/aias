@@ -1,4 +1,3 @@
-from time import sleep
 import os
 import pytest
 from aias_common.access.configuration import AccessManagerSettings, HttpsStorageConfiguration
