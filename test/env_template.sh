@@ -100,3 +100,7 @@ export FAM_CORS_ORIGINS="*"
 export FAM_CORS_METHODS="*"
 export FAM_CORS_HEADERS="*"
 export PLATFORM='amd64'
+
+# AUTH
+
+export VERIFY_JWT=false

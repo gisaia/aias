@@ -287,7 +287,7 @@ class AccessManager:
         Create if needed (and possible) the specified dir
         """
         storage = AccessManager.resolve_storage(href)
-        return storage.makedir(href, strict=strict)
+        return storage.makedir(href, strict)
 
     @staticmethod
     def dirname(href: str):

@@ -7,6 +7,7 @@ from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
 import aioboto3
+from memory_profiler import profile
 
 from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
@@ -137,6 +138,7 @@ class S3Storage(AbstractStorage):
             extraArgs["ContentType"] = content_type
         client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
 
+    @profile
     async def async_push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
         """push source file like object on destination
 
@@ -148,9 +150,19 @@ class S3Storage(AbstractStorage):
         extra_args = {}
         if content_type:
             extra_args["ContentType"] = content_type
+        total = 0
+        nb_calls = 0
+        
+        def log_progress(bytes_amount):
+            nonlocal total
+            nonlocal nb_calls
+            total = total + bytes_amount
+            if nb_calls % 10 != 0:
+                LOGGER.debug(f"{total / 1000000} bytes transfered so far")
+            nb_calls = nb_calls + 1
 
         async with self.__aioboto3_client() as s3:
-            await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args)
+            await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args, Callback=log_progress)
         
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
@@ -205,20 +217,20 @@ class S3Storage(AbstractStorage):
         components[2] = os.path.join(self.get_configuration().bucket, path)
         return urlunparse(tuple(components))
 
-    def listdir(self, source: str) -> list[File]:
-        objects = self.__list_objects(source)
+    def listdir(self, href: str) -> list[File]:
+        objects = self.__list_objects(href)
         files = []
         if objects.get("Contents"):
             files = list(map(lambda c: File(
                 name=os.path.basename(c["Key"]),
-                path=self.__update_url__(source, c["Key"]),
+                path=self.__update_url__(href, c["Key"]),
                 is_dir=False,
                 last_modification_date=c["LastModified"]), filter(lambda x: os.path.basename(x["Key"]), objects["Contents"])))
         dirs = []
         if objects.get("CommonPrefixes"):
             dirs = list(map(lambda d: File(
                 name=os.path.basename(d["Prefix"].removesuffix("/")),
-                path=self.__update_url__(source, d["Prefix"]),
+                path=self.__update_url__(href, d["Prefix"]),
                 is_dir=True), objects["CommonPrefixes"]))
         return files + dirs
 
@@ -305,3 +317,4 @@ class S3Storage(AbstractStorage):
     def get_matching_s3_keys(self, prefix="", suffix=""):
         for obj in self.get_matching_s3_objects(prefix, suffix):
             yield obj["Key"]
+

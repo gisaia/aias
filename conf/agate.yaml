@@ -2,6 +2,11 @@ arlas_url_search: $ARLAS_URL_SEARCH|http://arlas-server:9999/arlas/explore/{coll
 agate_prefix: $AGATE_PREFIX|/arlas/agate
 host: $AGATE_HOST|127.0.0.1
 port: $AGATE_PORT|8004
+open_id_provider: $OPEN_ID_PROVIDER|
+verify_jwt: $VERIFY_JWT|true
+verify_ssl: $VERIFY_SSL|true
+jwt_audience: $JWT_AUDIENCE|arias-backend
+
 services:
   airs:
     url_patterns:
