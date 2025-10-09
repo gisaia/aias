@@ -2,29 +2,33 @@ arlas_url_search: $ARLAS_URL_SEARCH|http://arlas-server:9999/arlas/explore/{coll
 agate_prefix: $AGATE_PREFIX|/arlas/agate
 host: $AGATE_HOST|127.0.0.1
 port: $AGATE_PORT|8004
-open_id_provider: $OPEN_ID_PROVIDER|
-verify_jwt: $VERIFY_JWT|true
-verify_ssl: $VERIFY_SSL|true
-jwt_audience: $JWT_AUDIENCE|arias-backend
-
+url_header: X-Forwarded-Uri
+headers_for_arlas:
+  - authorization
+  - arlas-org-filter
 services:
   airs:
-    url_patterns:
-      - $ASSET_MINIO_PATTERN|(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)
-    public_url_patterns: 
-      - $ASSET_MINIO_PUBLIC_PATTERN|(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail
-    url_header: $AGATE_URL_HEADER|X-Forwarded-Uri
-    url_header_prefix: $AGATE_URL_HEADER_PREFIX
-    pattern_target:
+    jwt_name: authorization
+    jwt_location: 
+      - headers
+    private:
+      - pattern: (/object/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)
+        part: path
+    public:
+      - pattern: (/object/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/thumbnail
+        part: path
   titiler:
-    url_patterns:
-      - $TITILER_PATTERN|(/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)
-    public_url_patterns: 
-    url_header: $AGATE_URL_HEADER|X-Forwarded-Uri
-    url_header_prefix: $AGATE_URL_HEADER_PREFIX
-    pattern_target: $TITILER_PATTERN_TARGET|query.url.url.path # takes the query parametters, use it as a url, then extract the path
+    jwt_name: authorization
+    jwt_location:
+      - headers
+      - query_params
+    private:
+      - pattern: (/object/collections/)(?P<collection>[^/]+)/items/(?P<item>[^/]+)/assets/(?P<asset>[^/]+)
+        part: query.url.url.path # takes the query parametters, use it as a url, then extract the path
 urbac:
-  url_header: $AGATE_URL_HEADER|x-forwarded-uri
-  method_header: $AGATE_METHOD_HEADER|x-forwarded-method
-  jwt_header: $AGATE_JWT_HEADER|authorization
   role_file: conf/roles.yaml
+  open_id_provider: $OPEN_ID_PROVIDER|
+  verify_jwt: $VERIFY_JWT|true
+  verify_ssl: $VERIFY_SSL|true
+  jwt_audience: arlas-backend
+  jwt_header: authorization

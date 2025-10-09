@@ -1,18 +1,17 @@
 
 import re
-import jwt
-import requests
+from urllib import parse
 from fastapi import APIRouter, Request, status
 from fastapi.responses import Response
 
 from agate.logger import Logger
-from agate.rest.key_ring import KeyRing
-from agate.settings import Configuration, Service
-from urllib import parse
+from agate.rest.authorizations import Authorizations
+from agate.settings import Configuration, ParamLocation, Service
 
 LOGGER = Logger.logger
 ROUTER = APIRouter()
 MISSING_MSG = "{} missing"
+
 
 @ROUTER.get("/url-role-based-authorization")
 async def urbac(request: Request):
@@ -22,35 +21,23 @@ async def urbac(request: Request):
     if not authorization:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.jwt_header))
 
-    request_path = request.headers.get(Configuration.settings.urbac.url_header)
+    request_path = request.headers.get(Configuration.settings.url_header)
     if not authorization:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.url_header))
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.url_header))
 
-    request_method = request.headers.get(Configuration.settings.urbac.method_header)
+    request_method = request.headers.get(Configuration.settings.method_header)
     if not request_method:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.method_header))
+        return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.method_header))
     LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
-    encoded_token = authorization.removeprefix("Bearer ").removeprefix("bearer ")
+
     try:
-        if not Configuration.settings.verify_jwt:
-            token = jwt.decode(encoded_token, options={"verify_signature": False})
-            LOGGER.warning("JWT verification is disabled, this should never be the case in production.")
-        else:
-            jwt_headers = jwt.get_unverified_header(encoded_token)
-            LOGGER.debug("Key ring contains keys: {}".format(", ".join(KeyRing.keys.keys())))
-            key = KeyRing.keys.get(jwt_headers['kid'])
-            if key:
-                token = jwt.decode(encoded_token, key, audience=Configuration.settings.jwt_audience.split(","), algorithms=[jwt_headers['alg']])
-            else:
-                msg = "Key {} not found".format(jwt_headers['kid'])
-                LOGGER.error(msg)
-                return Response(status_code=status.HTTP_403_FORBIDDEN, content=msg)
+        user_roles = Authorizations.get_user_roles(authorization)
     except Exception as e:
         msg = "Invalid authorization header value {}".format(e)
         LOGGER.error(msg)
-        LOGGER.debug(encoded_token)
+        LOGGER.debug(authorization)
         return Response(status_code=status.HTTP_403_FORBIDDEN, content=msg)
-    user_roles = token.get("resource_access", {}).get("arlas-backend", {}).get("roles", [])
+    
     LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
     for n, r in Configuration.settings.urbac.roles.technicalRoles.items():
         if n in user_roles:
@@ -75,80 +62,34 @@ async def urbac(request: Request):
 
 @ROUTER.get("/authorization/{service}")
 async def authorization(request: Request, service: str):
-    service: Service = Configuration.settings.services.get(service)
-    if not service:
+    service_conf: Service = Configuration.settings.services.get(service)
+    if not service_conf:
         msg = "Service {} not found".format(service)
         LOGGER.error(msg)
         return Response(status_code=status.HTTP_404_NOT_FOUND, content=msg)
-    requested_path = request.headers[service.url_header]
+
+    requested_path: str = request.headers[Configuration.settings.url_header]
     LOGGER.debug("Incoming URI: {}".format(requested_path))
-    if service.pattern_target:
-        LOGGER.debug("Using {} for computing the target".format(service.pattern_target))
-        if service.pattern_target.startswith("query."):
-            param_name = service.pattern_target.split(".")[1]
-            LOGGER.debug("Using query parameter {} as target".format(param_name))
-            query = parse.urlparse(requested_path).query
-            param = parse.parse_qs(query).get(param_name)
-            if param is None or len(param) < 1:
-                msg = "Parameter {} not found in query {} for service {}".format(param_name, query, service)
-                LOGGER.error(msg)
-                return Response(status_code=status.HTTP_404_NOT_FOUND, content=msg)
-            else:
-                param = param[0]
-            LOGGER.debug("{}={}".format(param_name, param))
-            if service.pattern_target.endswith(".path") or service.pattern_target.endswith(".query"):
-                url: parse.ParseResult = parse.urlparse(param)
-                if service.pattern_target.endswith(".url.path"):
-                    LOGGER.debug("Using path of url {} as target".format(param))
-                    target = url.path
-                elif service.pattern_target.endswith(".url.query"):
-                    LOGGER.debug("Using query of url {} as target".format(param))
-                    target = url.query
-            else:
-                LOGGER.debug("Using query parameter {} as target".format(param_name))
-                target = parse.urlparse(requested_path).query
-        else:
-            msg = "Invalid configuration '{}' for pattern_target of {}".format(service.pattern_target, service)
-            LOGGER.error(msg)
-            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=msg)
+    
+    if Authorizations.at_least_one_rule_match_on_path(service_conf.public, requested_path, arlas_control=False):
+        return Response(status_code=status.HTTP_202_ACCEPTED)
     else:
-        LOGGER.debug("Using path as target")
-        target = requested_path
-    if service.url_header_prefix:
-        target = target.removeprefix(service.url_header_prefix)
-    LOGGER.debug("Pattern matching on: {}".format(target))
-    patterns = service.url_patterns
-    public_patterns = service.public_url_patterns
-    if public_patterns:
-        for pattern in public_patterns:
-            LOGGER.debug("test against public pattern {}".format(pattern))
-            matches = re.finditer(pattern=pattern, string=target)
-            for match in matches:
-                if match.start() == 0:
-                    return Response(status_code=status.HTTP_202_ACCEPTED)
-    if not patterns:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content="Invalid configuration: not pattern configured for {}".format(service))
-    for pattern in patterns:
-        LOGGER.debug("test against {}".format(pattern))
-        matches = re.finditer(pattern=pattern, string=target)
-        for match in matches:
-            if match.start() == 0:
-                LOGGER.debug("{} matches {}".format(target, pattern))
-                try:
-                    r = requests.get(Configuration.settings.arlas_url_search.format(collection=match.group("collection"), item=match.group("item")), headers={"authorization": request.headers.get("authorization"), "arlas-org-filter": request.headers.get("arlas-org-filter")})
-                    if r.ok:
-                        response = r.json()
-                        if response["hits"] is not None and len(response["hits"]) > 0:
-                            LOGGER.debug("ARLAS returned {} result(s) for {}".format(len(response["hits"]), target))
-                            return Response(status_code=status.HTTP_202_ACCEPTED)
-                        else:
-                            LOGGER.debug("ARLAS returned zero results for {}".format(target))
-                    else:
-                        LOGGER.error("ARLAS failed to answer {}: {}".format(str(r.status_code), str(r.content)))
-                        return Response(status_code=r.status_code)
-                except Exception as e:
-                    LOGGER.exception(e)
-                    return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        LOGGER.debug("No public rule matches {}".format(requested_path))
+
+    headers: dict[str, str] = {}
+    for h in Configuration.settings.headers_for_arlas:
+        headers[h] = request.headers.get(h, "")
+    if (not headers.get(service_conf.jwt_name, None)) and ParamLocation.query_params in service_conf.jwt_locations:
+        try:
+            v = parse.parse_qs(requested_path).get(service_conf.jwt_name, "")
+            if len(v) > 0:
+                headers[service_conf.jwt_name] = v[0]
             else:
-                LOGGER.debug("Match not starting at the begining.")
+                LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
+        except:
+            LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
+    if Authorizations.at_least_one_rule_match_on_path(service_conf.private, requested_path, arlas_control=True, headers=headers):
+        return Response(status_code=status.HTTP_202_ACCEPTED)
+    else:
+        LOGGER.debug("No private rule matches {}".format(requested_path))
     return Response(status_code=status.HTTP_403_FORBIDDEN)
