@@ -1,4 +1,4 @@
-FROM python:3.10.18-alpine3.22
+FROM python:3.12-alpine3.22
 RUN pip3 install --no-cache-dir --upgrade pip setuptools
 
 ARG version="0.0"
