@@ -8,7 +8,7 @@ LABEL io.arlas.airs.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS AIRS"
 
-RUN apk update && apk add --no-cache curl
+RUN apk update && apk add --no-cache curl gcc python3-dev musl-dev linux-headers
 
 RUN addgroup -g 1000 arlasgroup && \
     adduser -D -u 1000 -G arlasgroup arlasuser
