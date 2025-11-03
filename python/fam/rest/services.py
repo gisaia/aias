@@ -2,6 +2,7 @@ import datetime
 import os
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.concurrency import run_in_threadpool
 
 from aias_common.access.manager import AccessManager
 from fam.core.fam import Fam
@@ -52,7 +53,8 @@ async def archives(path_request: PathRequest, timeout: int = 10):
     path_request.size = min(path_request.size, MAX_SIZE)
     file_path = path_request.path.removesuffix("/")
     __check_file_path__(file_path)
-    return Fam.list_archives(file_path, max_size=path_request.size, timeout_in_seconds=timeout, start_timestamp=datetime.datetime.now().timestamp())
+    archives = await run_in_threadpool(Fam.list_archives, file_path, max_size=path_request.size, timeout_in_seconds=timeout)
+    return archives
 
 
 def __check_file_path__(file_path: str):
