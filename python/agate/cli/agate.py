@@ -36,10 +36,10 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
     if not Configuration.settings.urbac.verify_jwt:
         LOGGER.warning("JWT verification is disabled, this should never be the case in production.")
     else:
-        if Configuration.settings.urbac.open_id_provider:
+        if Configuration.settings.urbac.jwks_uri:
             if not Configuration.settings.urbac.verify_ssl:
                 LOGGER.warning("SSL verification is disabled, this should never be the case in production.")
-            Authorizations.load_keys_from_openid_configuration(Configuration.settings.urbac.open_id_provider, Configuration.settings.urbac.verify_ssl)
+            Authorizations.load_keys_from_jwks_uri(Configuration.settings.urbac.jwks_uri, Configuration.settings.urbac.verify_ssl)
         else:
             raise Exception("JWT verification is enabled but no Open ID Provider provided, JWT won't be accepted.")
     uvicorn.run(api, host=Configuration.settings.host, port=Configuration.settings.port)

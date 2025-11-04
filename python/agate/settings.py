@@ -29,7 +29,7 @@ class URBAC(BaseModel, extra=Extra.allow):
     roles: Roles = Field(default=Roles(technicalRoles={}), title="Roles", description="Definition of the endpoints and of the authorized roles. This is automatically filled from role_file")
     role_file: str = Field(title="Role file", description="File location containing the roles")
     verify_jwt: bool = Field(True, title="Verify JWT", description="Whether to verify the JWT signature. Should be True in production.")
-    open_id_provider: str | None = Field("", title="Open ID Provider url", description="Must be provided for production. Open ID Provider url (ex https://keycloak.example.com/auth/realms/master/.well-known/openid-configuration).")
+    jwks_uri: str | None = Field("", title="jwks url", description="Must be provided for production.")
     verify_ssl: bool = Field(True, title="Verify SSL", description="Whether to verify SSL certificates when fetching the OpenID configuration and JWKS. Should be True in production.")
     jwt_audience: str = Field("", title="JWT Audience", description="Expected audience in the JWT. If not set, no audience verification is done.")
     jwt_header: str = Field("authorization", title="JWT header name", description="The name of the header parameter containing the JWT")
