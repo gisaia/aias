@@ -4,15 +4,20 @@ import os
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from fam.core.model import Archive, File
+from fam.core.model import Archive
 from fam.core.logger import Logger
 
 LOGGER = Logger.logger
 
+
 class Fam():
 
     @staticmethod
-    def list_archives(path: str, size: int = 0, max_size: int = 10, start_timestamp: float = 0.0, timeout_in_seconds: int = 60) -> list[Archive]:
+    def list_archives(path: str, max_size: int = 10, timeout_in_seconds: int = 60) -> list[Archive]:
+        return Fam.__list_archives(path, size=0, max_size=max_size, timeout_in_seconds=timeout_in_seconds, start_timestamp=datetime.datetime.now().timestamp())
+
+    @staticmethod
+    def __list_archives(path: str, size: int = 0, max_size: int = 10, start_timestamp: float = 0.0, timeout_in_seconds: int = 60) -> list[Archive]:
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
         driver: IngestDriver = DriverManager.solve("ingest", path)
@@ -39,7 +44,7 @@ class Fam():
                     return []
                 archives: list[Archive] = []
                 for file in AccessManager.listdir(path):
-                    sub_archives = Fam.list_archives(file.path, size=size, max_size=max_size, start_timestamp=start_timestamp, timeout_in_seconds=timeout_in_seconds)
+                    sub_archives = Fam.__list_archives(file.path, size=size, max_size=max_size, start_timestamp=start_timestamp, timeout_in_seconds=timeout_in_seconds)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives
                 return archives
