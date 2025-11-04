@@ -3,7 +3,7 @@ aioboto3==15.1.0
 elasticsearch==8.9.0
 pydantic==2.10.6
 python-dateutil==2.8.2
-fastapi==0.128.0
+fastapi==0.121.0
 python-multipart==0.0.20
 envyaml==1.10.211231
 requests==2.32.4
