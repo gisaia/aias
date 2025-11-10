@@ -41,7 +41,7 @@ class IngestTests(unittest.TestCase):
     def ingest(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        self.wait_for(status)
+        status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
         return status
 
@@ -58,7 +58,7 @@ class IngestTests(unittest.TestCase):
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        self.wait_for(status)
+        status = self.wait_for(status)
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
     def async_ingest(self, url, id, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
