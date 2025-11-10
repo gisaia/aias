@@ -29,19 +29,28 @@ class IngestTests(unittest.TestCase):
     def setUp(self):
         setUpTest()
 
+    def wait_for(self, status: StatusInfo) -> StatusInfo:
+        i: int = 0
+        s = status
+        while s.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
+            sleep(1)
+            i = i + 1
+            s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
+        return s
+    
     def ingest(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+        r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
+        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        self.wait_for(status)
+        self.assertEqual(status.status, expected, status.model_dump_json())
+        return status
+
+    def ingest_no_wait(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
-        status: StatusInfo = StatusInfo(**json.loads(r.content))
-        i: int = 0
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
-            sleep(1)
-            i = i + 1
-            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
-        self.assertEqual(status.status, expected, status.model_dump_json())
-        return status
+        return r
 
     def ingest_directory(self, url, collection, catalog):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
@@ -49,11 +58,7 @@ class IngestTests(unittest.TestCase):
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
-        i: int = 0
-        while status.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
-            sleep(1)
-            i = i + 1
-            status: StatusInfo = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID])).content))
+        self.wait_for(status)
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
     def async_ingest(self, url, id, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):

@@ -67,7 +67,7 @@ def get_job(jobId: str):
                 }
             })
 def delete_job(jobId: str):
-    return Processes.inerrupt(jobId)
+    return Processes.interrupt(jobId)
 
 
 @ROUTER.get("/jobs/{jobId}/results",

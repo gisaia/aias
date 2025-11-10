@@ -5,12 +5,14 @@ from aias_common.access.configuration import AccessManagerSettings
 from aproc.core.logger import Logger
 
 LOGGER = Logger.logger
+DEFAULT_PROCESS_QUEUE_NAME = "aproc_default_queue"
 
 
 class ProcessSettings(BaseModel, extra='allow'):
     name: str | None = Field(title="Process Name", description="Name of the process")
     class_name: str | None = Field(title="Process class", description="Name of the process class")
     configuration: dict | None = Field(title="Process configuration", description="Configuration that is specific the process (dictionary key/value)")
+    queue_name: str = Field(default=DEFAULT_PROCESS_QUEUE_NAME, title="Process queue name", description="Name of the queue to use for this process")
 
 
 class Settings(BaseModel, extra='allow'):
