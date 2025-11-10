@@ -8,8 +8,7 @@ from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION
 import requests
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from test.aproc_ingest_tests import (AST, DIMAP, IKONOS, JP2000, RAPID_EYE,
-                                     TERRASARX, TIF, WORLDVIEW, SENTINEL2, IngestTests)
-from test.utils import SENTINEL2_BANDS
+                                     TERRASARX, TIF, WORLDVIEW, IngestTests)
 
 ROOT = "/inputs"
 
