@@ -27,7 +27,10 @@ LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
-APROC_CELERY_APP = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)
+APROC_CELERY_APP = Celery(
+    name='aproc',
+    broker=Configuration.settings.celery_broker_url,
+    backend=Configuration.settings.celery_result_backend)
 
 APROC_JOBS_INDEX="idx:aproc_jobs"
 
