@@ -76,14 +76,20 @@ drivers:
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 11
-
+  -
+    name: iceye
+    class_name: extensions.aproc.proc.ingest.drivers.impl.iceye
+    assets_dir: /tmp/aproc/iceye
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 12
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
     assets_dir: /tmp/aproc/tiff
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 12
+    priority: 13
 
   -
     name: jpeg2000
@@ -91,7 +97,7 @@ drivers:
     assets_dir: /tmp/aproc/jpeg2000
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 13
+    priority: 14
 
   -
     name: sentinel2
@@ -99,4 +105,4 @@ drivers:
     assets_dir: /tmp/aproc/sentinel2
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 14
+    priority: 15

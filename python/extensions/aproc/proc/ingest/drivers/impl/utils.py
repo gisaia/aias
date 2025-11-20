@@ -59,6 +59,7 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
     Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages
     """
     from osgeo import gdal
+
     # Open input file
     dataset = AccessManager.get_gdal_src(input_path)
     output_types = [gdal.GDT_Byte, gdal.GDT_UInt16, gdal.GDT_Float32]
@@ -86,3 +87,25 @@ def get_epsg(proj):
     except Exception:
         ...
     return None
+
+
+def get_epsg_from_gdal_info(path: str):
+    from osgeo import gdal
+
+    info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
+    return get_epsg(info["gcps"]["coordinateSystem"]["wkt"])
+
+
+def downsample_image(image_path: str, downsampled_image_path: str, block_size: int):
+    """
+    Downsamples an image by the given block_size factor
+    """
+    import numpy as np
+    from PIL import Image
+    from skimage.measure import block_reduce
+
+    image = Image.open(image_path)
+    image_data = np.asarray(image)
+    reduced_image = block_reduce(image_data, block_size=block_size, func=np.average)
+
+    Image.fromarray(np.asarray(reduced_image, image_data.dtype), image.mode).save(downsampled_image_path)

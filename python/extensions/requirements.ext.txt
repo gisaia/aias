@@ -13,4 +13,5 @@ rioxarray==0.17.0
 numpy==1.26.4
 dask==2024.10.0
 matplotlib==3.9.0
+scikit-image==0.25.2
 -r requirements.storage.txt

@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid)
+    get_epsg_from_gdal_info, get_geom_bbox_centroid)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -62,8 +62,6 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import gdal
-
         ns = {
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
             "gml": "http://www.opengis.net/gml",
@@ -110,13 +108,12 @@ class Driver(IngestDriver):
                 sensor_type=SensorType.SAR,
                 item_format=ItemFormat.safe,
                 main_asset_format=AssetFormat.geotiff,
-                main_asset_name=self.main_asset_path,
+                main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar,
                 processing__level=level,
                 acq__acquisition_orbit_direction=orbit_direction,
                 acq__acquisition_orbit=orbit_number,
-                # Unable to find the proj with get_gdal_proj
-                proj__epsg=get_epsg(AccessManager.get_gdal_info(self.main_asset_path, gdal.InfoOptions(format="json"))["gcps"]["coordinateSystem"]["wkt"])
+                proj__epsg=get_epsg_from_gdal_info(self.main_asset_path)
             ),
             assets=dict([(asset.name, asset) for asset in assets])
         )
