@@ -169,6 +169,7 @@ class AssetFormat(Enum):
     cog = "COG"
     zarr = "ZARR"
     gif = "GIF"
+    h5 = "H5"
 
 
 class SensorType(str, Enum):

@@ -1,4 +1,4 @@
-FROM ghcr.io/osgeo/gdal:ubuntu-small-3.10.3
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.10.3
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
@@ -15,7 +15,7 @@ RUN apt-get update --no-install-recommends \
     && apt-get install -y g++ make libtiff-dev imagemagick \
     && apt-get install -y python3.12-venv \
     && apt-get upgrade -y \
-    && apt-get clean && apt-get remove -y --auto-remove curl 
+    && apt-get clean && apt-get remove -y --auto-remove curl
 
 USER 1000
 WORKDIR /app

@@ -311,7 +311,6 @@ class AbstractStorage(ABC):
         with gdal.config_options(self.get_gdal_stream_options()):
             return gdal.Info(self.gdal_transform_href_vsi(href), options=gdal_options)
 
-
     @contextmanager
     def stream(self, href: str):
         import smart_open
