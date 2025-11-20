@@ -19,14 +19,17 @@ async def urbac(request: Request):
 
     authorization = request.headers.get(Configuration.settings.urbac.jwt_header)
     if not authorization:
+        LOGGER.debug("{} not found in headers".format(Configuration.settings.urbac.jwt_header))
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.urbac.jwt_header))
 
     request_path = request.headers.get(Configuration.settings.url_header)
-    if not authorization:
+    if not request_path:
+        LOGGER.debug("{} not found in headers".format(Configuration.settings.url_header))
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.url_header))
 
     request_method = request.headers.get(Configuration.settings.method_header)
     if not request_method:
+        LOGGER.debug("{} not found in headers".format(Configuration.settings.method_header))
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.method_header))
     LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
 

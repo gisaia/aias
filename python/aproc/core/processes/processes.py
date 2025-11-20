@@ -27,7 +27,12 @@ LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
-APROC_CELERY_APP = Celery(name='aproc', broker=Configuration.settings.celery_broker_url, backend=Configuration.settings.celery_result_backend)
+APROC_CELERY_APP = Celery(
+    name='aproc',
+    broker=Configuration.settings.celery_broker_url,
+    backend=Configuration.settings.celery_result_backend)
+LOGGER.debug("Celery broker: {}".format(Configuration.settings.celery_broker_url))
+LOGGER.debug("Celery backend: {}".format(Configuration.settings.celery_result_backend))
 
 APROC_JOBS_INDEX="idx:aproc_jobs"
 
@@ -55,14 +60,15 @@ class Processes:
                     else:
                         status_info.status = Processes.__to_status_info_code__(event.get('state'))
                         status_info.updated = round(datetime.now().timestamp())
+                        res = AsyncResult(task_id, app=APROC_CELERY_APP)
                         if status_info.status.is_final():
                             status_info.finished = round(datetime.now().timestamp())
-                            if event.get('state') == states.SUCCESS:
-                                status_info.message = json.dumps(AsyncResult(task_id).result, default=serialize_datetime)
+                            if res.status == states.SUCCESS:
+                                status_info.message = json.dumps(AsyncResult(task_id, app=APROC_CELERY_APP).result, default=serialize_datetime)
                             else:
-                                status_info.message = str(AsyncResult(task_id).result)
+                                status_info.message = str(AsyncResult(task_id, app=APROC_CELERY_APP).result)
                         else:
-                            if event.get('state') == states.STARTED:
+                            if res.status == states.STARTED:
                                 status_info.started = round(datetime.now().timestamp())
                         Processes.__save_status_info__(status_info)
                 else:
