@@ -5,10 +5,12 @@ from celery import Task
 from pydantic import BaseModel
 
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
+from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME
 
 
 class Process(ABC):
     name: str = ""
+    queue_name: str = DEFAULT_PROCESS_QUEUE_NAME
     LOGGER = logging.getLogger(__name__)
     input_model: type[BaseModel]
     __task_name__: str = ""

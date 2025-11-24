@@ -22,7 +22,7 @@ from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
                                        StatusInfoList)
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process
-from aproc.core.settings import Configuration
+from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME, Configuration
 
 LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
@@ -106,19 +106,24 @@ class Processes:
         if is_service:
             Processes.__init_redis__()
         Processes.processes = []
+        queue_names = set()
+        queue_names.add(DEFAULT_PROCESS_QUEUE_NAME)
         for configuration in Configuration.settings.processes:
             try:
                 process: Process = importlib.import_module(configuration.class_name).AprocProcess
                 process.name = configuration.name
                 LOGGER.info("Register {} as {}".format(configuration.class_name, process.name))
                 process.init(configuration.configuration)
+                if configuration.queue_name:
+                    process.queue_name = configuration.queue_name
+                    queue_names.add(process.queue_name)
                 task = importlib.import_module(configuration.class_name).Process.execute
                 process.__task_name__ = ".".join([configuration.class_name, "execute"])
                 APROC_CELERY_APP.task(task)
                 Processes.processes.append(process)
             except ModuleNotFoundError:
                 raise ProcessException(f"Process {configuration.class_name} not found.")
-
+        LOGGER.info("Configured queues: {}".format(", ".join(queue_names)))
         if is_service:
             Thread(target=Processes.__listen_status__).start()
 
@@ -130,8 +135,8 @@ class Processes:
         raise ProcessException(f"Process {process_name} not found.")
 
     @staticmethod
-    def send_task(task_name: str, kwargs: dict) -> str:
-        job: AsyncResult = APROC_CELERY_APP.send_task(name=task_name, kwargs=kwargs)
+    def send_task(task_name: str, queue_name: str, kwargs: dict) -> str:
+        job: AsyncResult = APROC_CELERY_APP.send_task(name=task_name, queue=queue_name, kwargs=kwargs)
         return job.task_id
 
     @staticmethod
@@ -143,7 +148,7 @@ class Processes:
             return None
 
     @staticmethod
-    def inerrupt(task_id: str):
+    def interrupt(task_id: str):
         res = AsyncResult(task_id, app=APROC_CELERY_APP)
         res.revoke(terminate=True, signal='SIGKILL')
         return Processes.__retrieve_status_info__(task_id)
@@ -157,8 +162,8 @@ class Processes:
         LOGGER.debug("before_execute {}".format(process_name))
         extra = process.before_execute(**kwargs)
         kwargs.update(extra)
-        LOGGER.debug("send task {}".format(process.__task_name__))
-        job_id = Processes.send_task(task_name=process.__task_name__, kwargs=kwargs)
+        LOGGER.debug("send task {} on {}".format(process.__task_name__, process.queue_name))
+        job_id = Processes.send_task(task_name=process.__task_name__, queue_name=process.queue_name, kwargs=kwargs)
         LOGGER.debug("create and save status info")
         status_info: StatusInfo = StatusInfo(
             processID=process_name,
