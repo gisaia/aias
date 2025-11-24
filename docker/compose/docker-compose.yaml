@@ -296,7 +296,7 @@ services:
       - ${PWD}/test/inputs:/inputs:ro
       - ${PWD}/outbox/:/outbox:wr
     depends_on:
-      redis:
+      sentinel1:
           condition: service_healthy
       rabbitmq:
           condition: service_healthy
