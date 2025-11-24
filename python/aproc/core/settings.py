@@ -14,8 +14,9 @@ class ProcessSettings(BaseModel, extra='allow'):
 
 
 class Settings(BaseModel, extra='allow'):
-    celery_broker_url: str | None = Field(title="Celery's broker url", description="Celery's broker url of the form of transport://userid:password@hostname:port/virtual_host")
-    celery_result_backend: str | None = Field(title="Celery's backend", description="Celery's backend used to store task results")
+    celery_broker_url: str = Field(title="Celery's broker url", description="Celery's broker url of the form of transport://userid:password@hostname:port/virtual_host")
+    celery_result_backend: str = Field(title="Celery's backend", description="Celery's backend used to store task results")
+    celery_result_backend_transport_options: dict | None = Field({}, title="Transport options", description="Celery's result backend transport options", examples="master_name: mymaster and sentinel_password: your-strong-password")
     processes: list[ProcessSettings] = Field(title="List of processes", description="List of APROC processes")
     airs_endpoint: str | None = Field(title="AIRS endpoint", description="ARLAS Item Registration Service endpoint")
     access_manager: AccessManagerSettings = Field(title="AccessManager configuration", description="Configuration for the AccessManager")

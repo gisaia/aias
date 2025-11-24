@@ -55,6 +55,20 @@ services:
       timeout: 30s
       retries: 10
 
+  flower:
+    image: mher/flower:1.2.0
+    container_name: flower
+    environment:
+      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - FLOWER_PORT=5555
+      - FLOWER_BASIC_AUTH=admin:your_flower_password
+    ports:
+      - "5555:5555"
+    networks:
+      - aias
+    depends_on:
+      - redis-master
+
   smtp4dev:
     image: rnwood/smtp4dev:linux-${PLATFORM}-3.2.0-ci20221023104
     platform: linux/${PLATFORM}
@@ -67,15 +81,110 @@ services:
       #Specifies the server hostname. Used in auto-generated TLS certificate if enabled.
       - ServerOptions__HostName=smtp4dev
 
-  redis:
-    image: redis/redis-stack:${REDIS_VERSION:-7.2.0-v2}
+  # redis:
+  #   image: redis/redis-stack:${REDIS_VERSION:-7.2.0-v2}
+  #   networks:
+  #     - aias
+  #   container_name: redis
+  #   ports:
+  #     - 6379:6379
+  #   healthcheck:
+  #     test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+  # Redis Master
+  redis-master:
+    container_name: redis-master
+    image: redis:latest
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
     networks:
       - aias
-    container_name: redis
-    ports:
-      - 6379:6379
+
+  redis-slave-1:
+    container_name: redis-slave-1
+    image: redis:latest
+    depends_on:
+      - redis-master
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    networks:
+      - aias
+
+  redis-slave-2:
+    container_name: redis-slave-2
+    image: redis:latest
+    depends_on:
+      - redis-master
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    networks:
+      - aias
+
+  redis-slave-3:
+    container_name: redis-slave-3
+    image: redis:latest
+    depends_on:
+      - redis-master
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    networks:
+      - aias
+
+  sentinel1:
+    container_name: sentinel1
+    image: redis:latest
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+      - redis-slave-3
+    command: >
+      sh -c 'echo "sentinel resolve-hostnames yes" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel'
+    networks:
+      - aias
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ["CMD", "redis-cli", "-p", "26379", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+
+  sentinel2:
+    container_name: sentinel2
+    image: redis:latest
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+      - redis-slave-3
+    command: >
+      sh -c 'echo "sentinel resolve-hostnames yes" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel'
+    networks:
+      - aias
+
+  sentinel3:
+    container_name: sentinel3
+    image: redis:latest
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+      - redis-slave-3
+    command: >
+      sh -c 'echo "sentinel resolve-hostnames yes" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster redis-master 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel'
+    networks:
+      - aias
 
   airs-server:
     networks:
@@ -138,8 +247,6 @@ services:
       - APROC_ENDPOINT_FROM_APROC=$APROC_ENDPOINT_FROM_APROC
       - ARLAS_URL_SEARCH=$ARLAS_URL_SEARCH
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
-      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
       - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
       - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
@@ -188,7 +295,7 @@ services:
       - ${PWD}/test/inputs:/inputs:ro
       - ${PWD}/outbox/:/outbox:wr
     depends_on:
-      redis:
+      sentinel1:
           condition: service_healthy
       rabbitmq:
           condition: service_healthy
@@ -204,7 +311,7 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-      redis:
+      sentinel1:
           condition: service_healthy
       rabbitmq:
           condition: service_healthy
@@ -216,8 +323,6 @@ services:
       - APROC_CORS_METHODS=${APROC_CORS_METHODS:-*}
       - APROC_CORS_HEADERS=${APROC_CORS_HEADERS:-*}
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
-      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AIRS_ENDPOINT=http://airs-server:8000/arlas/airs
       - AIRS_INDEX_COLLECTION_PREFIX=${AIRS_INDEX_COLLECTION_PREFIX:-airs}
       - ARLAS_SMTP_ACTIVATED=${ARLAS_SMTP_ACTIVATED}
@@ -320,3 +425,9 @@ services:
       - APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
     ports:
       - "8007:8005"
+
+
+volumes:
+  redis-master-data:
+  redis-replica1-data:
+  redis-replica2-data:

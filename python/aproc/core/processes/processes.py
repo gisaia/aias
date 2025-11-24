@@ -10,6 +10,7 @@ from celery import Celery, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
 from redis import Redis
+from redis.sentinel import Sentinel
 from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
@@ -27,20 +28,22 @@ LOGGER = Logger.logger
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
+
+LOGGER.debug("Celery broker: {}".format(Configuration.settings.celery_broker_url))
+LOGGER.debug("Celery backend: {}".format(Configuration.settings.celery_result_backend))
+LOGGER.debug("Celery backend transport options: {}".format(Configuration.settings.celery_result_backend_transport_options))
+
 APROC_CELERY_APP = Celery(
     name='aproc',
     broker=Configuration.settings.celery_broker_url,
-    backend=Configuration.settings.celery_result_backend)
-LOGGER.debug("Celery broker: {}".format(Configuration.settings.celery_broker_url))
-LOGGER.debug("Celery backend: {}".format(Configuration.settings.celery_result_backend))
+    backend=Configuration.settings.celery_result_backend,
+    result_backend_transport_options=Configuration.settings.celery_result_backend_transport_options)
 
 APROC_JOBS_INDEX="idx:aproc_jobs"
-
 
 class Processes:
     processes: list[Process] = []
     __REDIS_PREFIX__ = "airs_job_id:"
-    __REDIS_CONNECTION__: Redis = None
 
     @staticmethod
     def __listen_status__():
@@ -302,22 +305,39 @@ class Processes:
 
     @staticmethod
     def __get_redis_client__() -> Redis:
-        if Processes.__REDIS_CONNECTION__ is None:
-            uri = urlparse(Configuration.settings.celery_result_backend)
-            if uri.scheme == "redis":
-                params = {
-                    "host": uri.hostname,
-                    "port": uri.port,
-                    "decode_responses": True
-                }
-                if uri.username:
-                    params["username"] = uri.username
-                if uri.password:
-                    params["password"] = uri.password
-                Processes.__REDIS_CONNECTION__ = Redis(**params)
-            else:
-                raise Exception("Unsupported backend {}".format(uri.scheme))
-        return Processes.__REDIS_CONNECTION__
-
+        uri = urlparse(Configuration.settings.celery_result_backend)
+        if uri.scheme == "redis":
+            params = {
+                "host": uri.hostname,
+                "port": uri.port,
+                "decode_responses": True
+            }
+            if uri.username:
+                params["username"] = uri.username
+            if uri.password:
+                params["password"] = uri.password
+            LOGGER.debug(f"Using directly redis: {params}")
+            return Redis(**params)
+        elif uri.scheme == "sentinel":
+            LOGGER.debug(f"Using sentinels for retrieving redis master")
+            celery_result_backend_transport_options = Configuration.settings.celery_result_backend_transport_options
+            if celery_result_backend_transport_options is None or celery_result_backend_transport_options.get("master_name") is None:
+                raise Exception("Invalid configuration: master_name and sentinel_password must be provided")
+            
+            sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
+            LOGGER.debug(f"Fetching master from sentinels {sentinels}")
+            host, port = Sentinel(sentinels).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
+            LOGGER.debug(f"Connect to {host}:{port}")
+            con = {
+                "host": host,
+                "port": port,
+                "decode_responses": True,
+            }
+            pwd = celery_result_backend_transport_options.get("sentinel_password", "")
+            if pwd:
+                con["password"] = pwd
+            return Redis(**con)
+        else:
+            raise Exception("Unsupported backend {}".format(uri.scheme))
 
 Processes.init()
