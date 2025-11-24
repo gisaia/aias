@@ -319,10 +319,10 @@ class Processes:
             LOGGER.debug(f"Using directly redis: {params}")
             return Redis(**params)
         elif uri.scheme == "sentinel":
-            LOGGER.debug(f"Using sentinels for retrieving redis master")
+            LOGGER.debug("Using sentinels for retrieving redis master")
             celery_result_backend_transport_options = Configuration.settings.celery_result_backend_transport_options
             if celery_result_backend_transport_options is None or celery_result_backend_transport_options.get("master_name") is None:
-                raise Exception("Invalid configuration: master_name and sentinel_password must be provided")
+                raise ConnectionError("Invalid configuration: master_name and sentinel_password must be provided")
             
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
             LOGGER.debug(f"Fetching master from sentinels {sentinels}")
