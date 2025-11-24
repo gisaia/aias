@@ -38,21 +38,21 @@ class IngestTests(unittest.TestCase):
             s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
         return s
     
-    def ingest(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+    def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
-        status: StatusInfo = StatusInfo(**json.loads(r.content))
+        status = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
         return status
 
-    def ingest_no_wait(self, url, collection, catalog, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+    def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         return r
 
-    def ingest_directory(self, url, collection, catalog):
+    def ingest_directory(self, url: str, collection: str, catalog: str):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
@@ -61,7 +61,7 @@ class IngestTests(unittest.TestCase):
         status = self.wait_for(status)
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
-    def async_ingest(self, url, id, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
@@ -84,7 +84,7 @@ class IngestTests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, id, assets: list, archive=True):
+    def check_result(self, item: Item, id: str, assets: list, archive=True):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertEqual(item.id, id)
