@@ -76,7 +76,7 @@ class Driver(IngestDriver):
                 satellite=constellation,
                 instrument=constellation,
                 sensor=sensor,
-                sensor_type=SensorType.SAR,
+                sensor_type=SensorType.OPTIC,
                 gsd=gsd,
                 item_format=ItemFormat.bsg.value,
                 main_asset_format=AssetFormat.geotiff.value,

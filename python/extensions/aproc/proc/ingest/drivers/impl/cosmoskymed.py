@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -9,7 +10,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid)
+    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -19,13 +20,12 @@ class Driver(IngestDriver):
     def __init__(self):
         super().__init__()
         self.data_path = None
-        self.data_format: AssetFormat.geotiff | AssetFormat.h5 = None
+        self.data_format: Literal[AssetFormat.geotiff] | Literal[AssetFormat.h5] = None
 
         self.tfw_path = None
         self.met_path = None
         self.attr_path = None
         self.browse_path = None
-        self.prefix_key = None
         self.h5met_path = None
         self.h5pdf_path = None
         self.quicklook_path = None
@@ -42,16 +42,16 @@ class Driver(IngestDriver):
         assets = []
 
         assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
-                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value if self.data_format == AssetFormat.geotiff.value else MimeType.HDF5.value,
+                            roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value if self.data_format == AssetFormat.geotiff else MimeType.HDF5.value,
                             description=Role.data.value, airs__managed=False, asset_format=self.data_format, asset_type=ResourceType.gridded.value))
         assets.append(Asset(href=self.h5met_path, size=AccessManager.get_size(self.h5met_path),
                             roles=[Role.metadata.value], name="h5", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
 
-        # Define other assets
-        assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
-                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
-                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        if self.met_path:
+            assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
+                                roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if self.attr_path:
             assets.append(Asset(href=self.attr_path, size=AccessManager.get_size(self.attr_path),
                                 roles=[Role.metadata.value], name="attributes", type=MimeType.XML.value,
@@ -69,19 +69,45 @@ class Driver(IngestDriver):
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.browse_path is not None:
-            thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
-            AccessManager.makedir(thumbnail_path)
-            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+            self.__prepare_thumbnail__(url)
             geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
-            quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
-            AccessManager.makedir(quicklook_path)
-            self.quicklook_path = quicklook_path + '/quicklook.jpg'
+            self.__prepare_quicklook__(url)
             geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
-            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        elif self.data_format == AssetFormat.h5:
+            import h5py
+            import numpy as np
+            from PIL import Image
 
-        # TODO: generate quicklook and thumbnail for h5
+            self.__prepare_quicklook__(url)
+
+            with AccessManager.stream(self.data_path) as f:
+                with h5py.File(f) as h5f:
+                    max_height = -np.inf
+                    values = []
+
+                    # Find QLK in HDF5 file
+                    for v in h5f.values():
+                        data: np.ndarray = v['QLK'][()]
+                        max_height = max(max_height, data.shape[0])
+                        values.append(data)
+
+                    for idx, data in enumerate(values):
+                        if data.shape[0] < max_height:
+                            values[idx] = np.pad(data, pad_width=(max_height - data.shape[0], 0), mode='edge')
+
+                    img = Image.fromarray(np.concatenate(values, axis=1))
+                    img.save(self.quicklook_path)
+
+            # Downsample quicklook for thumbnail
+            self.__prepare_thumbnail__(url)
+            downsample_image(self.quicklook_path, self.thumbnail_path, 8)
+        else:
+            return assets
+
+        # Register assets
+        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
         return assets
 
@@ -91,29 +117,35 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        with AccessManager.make_local(self.met_path) as local_met_path:
-            tree = ET.parse(local_met_path)
-            root = tree.getroot()
-        ul_lat = self.__get_coord__(root, "Top_Left_Geodetic_Coordinates", 0)
-        ul_lon = self.__get_coord__(root, "Top_Left_Geodetic_Coordinates", 1)
-        ur_lat = self.__get_coord__(root,  "Top_Right_Geodetic_Coordinates", 0)
-        ur_lon = self.__get_coord__(root, "Top_Right_Geodetic_Coordinates", 1)
-        lr_lat = self.__get_coord__(root, "Bottom_Right_Geodetic_Coordinates", 0)
-        lr_lon = self.__get_coord__(root, "Bottom_Right_Geodetic_Coordinates", 1)
-        ll_lat = self.__get_coord__(root, "Bottom_Left_Geodetic_Coordinates", 0)
-        ll_lon = self.__get_coord__(root, "Bottom_Left_Geodetic_Coordinates", 1)
-        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
-        x_pixel_size = float(self.__get_metadata__(root, "Column_Spacing"))
-        y_pixel_size = float(self.__get_metadata__(root, "Line_Spacing"))
-        gsd = (x_pixel_size + y_pixel_size) / 2
-        instrument = self.__get_metadata__(root, "Satellite_ID")
+        from osgeo import gdal
+
+        options = gdal.InfoOptions(format="json")
+        info = AccessManager.get_gdal_info(self.data_path, options)
+        metadata = info["metadata"][""]
+
+        geometry, bbox, centroid = self.__get_geometries__(info)
+
+        try:
+            near_incidence_angle = float(metadata["MBI_Near_Incidence_Angle"])
+            far_incidence_angle = float(metadata["MBI_Far_Incidence_Angle"])
+            view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
+        except Exception:
+            near_incidence_angle = None
+            far_incidence_angle = None
+            view__incidence_angle = None
+
+        gsd = float(metadata["Ground_Range_Geometric_Resolution"])
+        instrument = metadata["Satellite_ID"]
         sensor = instrument
-        near_incidence_angle = float(self.__get_metadata__(root,  "Near_Incidence_Angle"))
-        far_incidence_angle = float(self.__get_metadata__(root, "Far_Incidence_Angle"))
-        view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
-        date_time = int(datetime.strptime(self.__get_metadata__(root, "Scene_Sensing_Start_UTC")[:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-        h5_tree = ET.parse(self.h5met_path)
-        h5_root = h5_tree.getroot()
+
+        date_time = int(datetime.strptime(metadata["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+
+        orbit_direction = metadata["Orbit_Direction"]
+        orbit_number = metadata["Orbit_Number"]
+
+        with AccessManager.make_local(self.h5met_path) as local_h5met_path:
+            h5_tree = ET.parse(local_h5met_path)
+            h5_root = h5_tree.getroot()
         processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
 
         item = Item(
@@ -125,7 +157,7 @@ class Driver(IngestDriver):
                 datetime=date_time,
                 processing__level=processing__level,
                 gsd=gsd,
-                proj__epsg=self.__get_proj__(root, centroid),
+                proj__epsg=self.__get_proj__(metadata, centroid),
                 instrument=instrument,
                 constellation="COSMO-SkyMed",
                 sensor=sensor,
@@ -133,9 +165,11 @@ class Driver(IngestDriver):
                 view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,
-                main_asset_format=self.data_format,
+                main_asset_format=self.data_format.value,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.radar.value
+                observation_type=ObservationType.radar.value,
+                acq__acquisition_orbit_direction=orbit_direction,
+                acq__acquisition_orbit=orbit_number
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
@@ -150,10 +184,14 @@ class Driver(IngestDriver):
         if AccessManager.is_file(file_path):
             condition = True
 
+            met_path = file_path + '.aux.xml'
+            if AccessManager.is_file(met_path):
+                self.met_path = met_path
+
             # If the CSK archive is tif based
             if file_name.endswith(".tif") and file_name.find(".QLK.") < 0:
                 self.data_path = file_path
-                self.data_format = AssetFormat.geotiff.value
+                self.data_format = AssetFormat.geotiff
 
                 browse_path = path + '/' + file_name.split(".")[0] + "." + file_name.split(".")[1] + '.QLK.tif'
                 if AccessManager.is_file(browse_path):
@@ -167,25 +205,17 @@ class Driver(IngestDriver):
                 if AccessManager.exists(tfw_path):
                     self.tfw_path = tfw_path
 
-                if len(file_name.split(".")) > 2:
-                    self.prefix_key = file_name.split(".")[1] + "_" + file_name.split(".")[2] + "_"
-
                 condition = (
                     self.attr_path is not None
                     and self.browse_path is not None
+                    and self.met_path is not None
                 )
             # If the CSK archive is h5 based
             elif file_name.endswith(".h5"):
                 self.data_path = file_path
-                self.data_format = AssetFormat.h5.value
-                # No prefix key
-                self.prefix_key = ''
+                self.data_format = AssetFormat.h5
             else:
                 return False
-
-            met_path = file_path + '.aux.xml'
-            if AccessManager.is_file(met_path):
-                self.met_path = met_path
 
             h5met_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.xml"
             if AccessManager.is_file(h5met_path):
@@ -199,27 +229,63 @@ class Driver(IngestDriver):
                 condition
                 and self.data_path is not None
                 and self.data_format is not None
-                and self.met_path is not None
                 and self.h5met_path is not None
-                and self.prefix_key is not None
             )
         return False
 
-    def __get_metadata__(self, root: ET.Element, key: str):
-        return root.find(f".//Metadata/MDI[@key='{self.prefix_key + key}']").text
-
-    def __get_coord__(self, root: ET.Element, key: str, index: int):
-        return float(self.__get_metadata__(root, key).split(" ")[index])
-
-    def __get_proj__(self, root: ET.Element, centroid: tuple[float, float]):
-        if self.data_format == AssetFormat.geotiff.value:
+    def __get_proj__(self, metadata: object, centroid: tuple[float, float]):
+        if self.data_format == AssetFormat.geotiff:
             return get_epsg(AccessManager.get_gdal_proj(self.data_path))
         else:
-            from pyproj import CRS
+            try:
+                from pyproj import CRS
 
-            proj_id: str = root.find(f".//Metadata/MDI[@key='{self.prefix_key}Projection_ID']").text
-            proj_zone = int(root.find(f".//Metadata/MDI[@key='{self.prefix_key}Map_Projection_Zone']").text)
-            is_south = centroid[1] < 0
+                proj_id: str = metadata["Projection_ID"]
+                proj_zone = int(metadata["Map_Projection_Zone"])
+                is_south = centroid[1] < 0
 
-            crs = CRS.from_dict({'proj': proj_id.lower(), 'zone': proj_zone, 'south': is_south})
-            return int(crs.to_authority()[1])
+                crs = CRS.from_dict({'proj': proj_id.lower(), 'zone': proj_zone, 'south': is_south})
+                return int(crs.to_authority()[1])
+            except Exception:
+                return None
+
+    def __get_geometries__(self, gdal_info_json: object):
+        metadata = gdal_info_json["metadata"][""]
+        try:
+            ul_lat = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
+            ul_lon = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
+            ur_lat = float(metadata["MBI_Top_Right_Geodetic_Coordinates"].split(" ")[0])
+            ur_lon = float(metadata["MBI_Top_Right_Geodetic_Coordinates"].split(" ")[1])
+            lr_lat = float(metadata["MBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[0])
+            lr_lon = float(metadata["MBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[1])
+            ll_lat = float(metadata["MBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[0])
+            ll_lon = float(metadata["MBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[1])
+        except Exception:
+            # Not all products have those coordinates in this format
+            # Some have their measures split up in multiple scenes
+
+            # 2 datasets per scene, with each a name and description
+            last_scene = int(len(gdal_info_json["metadata"]["SUBDATASETS"]) / 4)
+
+            # Top left and bottom left of first scene
+            ul_lat = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
+            ul_lon = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
+            ll_lat = float(metadata["S01_SBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[0])
+            ll_lon = float(metadata["S01_SBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[1])
+            # Top right and bottom right of last scene
+            ur_lat = float(metadata[f"S0{last_scene}_SBI_Top_Right_Geodetic_Coordinates"].split(" ")[0])
+            ur_lon = float(metadata[f"S0{last_scene}_SBI_Top_Right_Geodetic_Coordinates"].split(" ")[1])
+            lr_lat = float(metadata[f"S0{last_scene}_SBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[0])
+            lr_lon = float(metadata[f"S0{last_scene}_SBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[1])
+
+        return get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+
+    def __prepare_quicklook__(self, url: str):
+        quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
+        AccessManager.makedir(quicklook_path)
+        self.quicklook_path = quicklook_path + '/quicklook.jpg'
+
+    def __prepare_thumbnail__(self, url: str):
+        thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
+        AccessManager.makedir(thumbnail_path)
+        self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'

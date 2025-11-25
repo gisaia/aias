@@ -24,6 +24,10 @@ TIF = "cog.tiff"
 JP2000 = "jpeg2000.jpg2"
 SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 
+CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
+SENTINEL1 = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
+ICEYE = "ICEYE-Scan-mode/2631255"
+
 
 class IngestTests(unittest.TestCase):
     def setUp(self):
@@ -61,12 +65,12 @@ class IngestTests(unittest.TestCase):
         status = self.wait_for(status)
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
 
-    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
-        self.check_result(item, id, assets, archive)
+        self.check_result(item, id, assets, archive, check_epsg)
         return status
 
     def test_processes_list(self):
@@ -84,7 +88,7 @@ class IngestTests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, id: str, assets: list, archive=True):
+    def check_result(self, item: Item, id: str, assets: list, archive=True, check_epsg=True):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertEqual(item.id, id)
@@ -114,7 +118,8 @@ class IngestTests(unittest.TestCase):
             self.assertIsNotNone(item.properties.gsd)
         self.assertIsNotNone(item.properties.main_asset_format)
         self.assertIsNotNone(item.properties.main_asset_name)
-        self.assertIsNotNone(item.properties.proj__epsg)
+        if check_epsg:
+            self.assertIsNotNone(item.properties.proj__epsg)
 
     def test_landing_page(self):
         landing_page = json.loads(requests.get(APROC_ENDPOINT).content)

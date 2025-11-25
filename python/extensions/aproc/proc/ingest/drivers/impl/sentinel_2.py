@@ -141,7 +141,6 @@ class Driver(IngestDriver):
                 secondary_id=secondary_id,
                 item_format=ItemFormat.safe,
                 main_asset_format=AssetFormat.jpg2000,
-                # TODO: use correct name for main_asset_name
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic,
                 eo__cloud_cover=cloud_cover,

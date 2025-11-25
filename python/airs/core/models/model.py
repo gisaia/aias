@@ -174,6 +174,7 @@ class AssetFormat(Enum):
 
 class SensorType(str, Enum):
     SAR = "SAR"
+    OPTIC = "OPTIC"
 
 
 class Role(Enum):

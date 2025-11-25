@@ -21,6 +21,7 @@ class Driver(IngestDriver):
         self.md_path = None
         self.tif_path = None
         self.quicklook_path = None
+        self.thumbnail_path = None
 
     # Implements drivers method
     @staticmethod
@@ -38,17 +39,22 @@ class Driver(IngestDriver):
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
         ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview,
                                     MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
+
+        if self.thumbnail_path:
+            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
+                                        MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        thumbnail_folder = os.path.join(Driver.output_folder, self.get_item_id(url), 'thumbnail')
-        AccessManager.makedir(thumbnail_folder)
-        thumbnail_path = os.path.join(thumbnail_folder, "thumbnail.png")
+        if self.thumbnail_path is None:
+            thumbnail_folder = os.path.join(Driver.output_folder, self.get_item_id(url), 'thumbnail')
+            AccessManager.makedir(thumbnail_folder)
+            self.thumbnail_path = os.path.join(thumbnail_folder, "thumbnail.png")
 
-        downsample_image(self.quicklook_path, thumbnail_path, 8)
-        ImageDriverHelper.add_asset(assets, thumbnail_path, Role.thumbnail,
-                                    MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
+            downsample_image(self.quicklook_path, self.thumbnail_path, 8)
+            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
+                                        MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
 
         return assets
 
@@ -116,14 +122,16 @@ class Driver(IngestDriver):
     def __check_path__(self, path: str):
         self.__init__()
 
-        if os.path.basename(path).startswith("ICEYE") and AccessManager.is_dir(path):
+        if AccessManager.is_dir(path):
             for file in AccessManager.listdir(path):
                 if file.name.startswith("ICEYE") and file.name.endswith(".tif"):
                     self.tif_path = file.path
                 elif file.name.startswith("ICEYE") and file.name.endswith(".xml"):
                     self.md_path = file.path
-                elif file.name.startswith("ICEYE_QUICKLOOK") and file.name.endswith(".png"):
+                elif file.name.startswith("ICEYE") and file.name.find("QUICKLOOK") != -1 and file.name.endswith(".png"):
                     self.quicklook_path = file.path
+                elif file.name.startswith("ICEYE") and file.name.find("THUMBNAIL") != -1 and file.name.endswith(".png"):
+                    self.thumbnail_path = file.path
 
             return self.tif_path is not None \
                 and self.md_path is not None \
