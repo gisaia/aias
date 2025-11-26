@@ -2,10 +2,12 @@
 celery_broker_url: pyamqp://guest:guest@rabbitmq:5672//
 
 # Redis connection with a sentinel:               
-celery_result_backend: sentinel://sentinel1:26379;sentinel://sentinel2:26379;sentinel://sentinel3:26379
+celery_result_backend: sentinel://:yourpassword@sentinel1:26379;sentinel://:yourpassword@sentinel2:26379;sentinel://:yourpassword@sentinel3:26379
+#celery_result_backend: redis+sentinel://:yourpassword@sentinel1:26379;sentinel2:26379;sentinel3:26379/mymaster
 celery_result_backend_transport_options:
-   master_name: mymaster
-#   sentinel_password: your-strong-password
+  master_name: mymaster
+  sentinel_kwargs:
+    password: yourpassword
 
 # alternatively, without sentinels: 
 # celery_result_backend: redis://redis-master:6379
