@@ -94,7 +94,7 @@ services:
   redis-master:
     container_name: redis-master
     image: redis:latest
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no", "--requirepass", "yourpassword"]
     networks:
       - aias
 
@@ -103,7 +103,7 @@ services:
     image: redis:latest
     depends_on:
       - redis-master
-    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no", "--masterauth", "yourpassword", "--requirepass", "yourpassword"]
     networks:
       - aias
 
@@ -112,7 +112,7 @@ services:
     image: redis:latest
     depends_on:
       - redis-master
-    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no", "--masterauth", "yourpassword", "--requirepass", "yourpassword"]
     networks:
       - aias
 
@@ -121,7 +121,7 @@ services:
     image: redis:latest
     depends_on:
       - redis-master
-    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no"]
+    command: ["redis-server", "--replicaof", "redis-master", "6379", "--protected-mode", "no", "--masterauth", "yourpassword", "--requirepass", "yourpassword"]
     networks:
       - aias
 
@@ -139,7 +139,8 @@ services:
             echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
             echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
-            redis-server /etc/sentinel.conf --sentinel'
+            echo "sentinel auth-pass mymaster yourpassword" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel --requirepass yourpassword'
     networks:
       - aias
     healthcheck:
@@ -164,7 +165,8 @@ services:
             echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
             echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
-            redis-server /etc/sentinel.conf --sentinel'
+            echo "sentinel auth-pass mymaster yourpassword" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel --requirepass yourpassword'
     networks:
       - aias
 
@@ -182,7 +184,8 @@ services:
             echo "sentinel down-after-milliseconds mymaster 1000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 5000" >> /etc/sentinel.conf &&
             echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
-            redis-server /etc/sentinel.conf --sentinel'
+            echo "sentinel auth-pass mymaster yourpassword" >> /etc/sentinel.conf &&
+            redis-server /etc/sentinel.conf --sentinel --requirepass yourpassword'
     networks:
       - aias
 

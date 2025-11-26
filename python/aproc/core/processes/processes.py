@@ -331,14 +331,14 @@ class Processes:
             
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
             LOGGER.debug(f"Fetching master from sentinels {sentinels}")
-            host, port = Sentinel(sentinels).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
+            host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
             LOGGER.debug(f"Connect to {host}:{port}")
             con = {
                 "host": host,
                 "port": port,
                 "decode_responses": True,
             }
-            pwd = celery_result_backend_transport_options.get("sentinel_password", "")
+            pwd = celery_result_backend_transport_options.get("sentinel_kwargs", {}).get("password")
             if pwd:
                 con["password"] = pwd
             return Redis(**con)
