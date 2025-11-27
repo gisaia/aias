@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from urllib.parse import urlparse
 
-from celery import Celery, states
+from celery import Celery, Task, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
 from redis import Redis
@@ -14,6 +14,9 @@ from redis.sentinel import Sentinel
 from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
+from celery.signals import task_postrun
+from celery.signals import Signal
+import requests
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.mapper import serialize_datetime
@@ -21,7 +24,7 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
                                        StatusInfoList)
 from aproc.core.processes.exception import ProcessException
-from aproc.core.processes.process import Process
+from aproc.core.processes.process import InputProcess, Process, Subscriber
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME, Configuration
 
 LOGGER = Logger.logger
@@ -102,6 +105,44 @@ class Processes:
                 sleep(sleep_time)
 
     @staticmethod
+    def __notify(subscriber: str, result):
+        try:
+            LOGGER.debug(f"notify {subscriber} of success with result {result}")
+            requests.post(url=subscriber, data=result, timeout=Configuration.settings.subscriber_post_timeout)
+        except Exception as e:
+            LOGGER.error(f"can not notify {subscriber}")
+            LOGGER.exception(e)
+
+    @staticmethod
+    def __subscriber_from_kwargs(kwargs) -> Subscriber | None:
+        if kwargs is not None and type(kwargs) is dict:
+            inputs: dict = kwargs.get("kwargs")
+            if inputs is not None:
+                ip = InputProcess(**inputs)
+                if ip is not None and ip.subscriber is not None:
+                    return ip.subscriber
+        return None
+
+    @staticmethod
+    @task_postrun.connect
+    def afer_task_handler(sender, task_id: str, task: Task, state: str, signal: Signal, **kwargs):
+        s = Processes.__subscriber_from_kwargs(kwargs)
+        if s is not None:
+            match state:
+                case states.SUCCESS:
+                    if s.successUri:
+                        Processes.__notify(s.successUri, Processes.result(task_id))
+                case states.FAILURE:
+                    if s.failedUri:
+                        Processes.__notify(s.failedUri, Processes.result(task_id))
+                case None:
+                    ...
+                case _:
+                    if s.inProgressUri:
+                        Processes.__notify(s.inProgressUri, Processes.result(task_id))
+
+
+    @staticmethod
     def init(is_service: bool = False):
         if is_service:
             Processes.__init_redis__()
@@ -124,6 +165,7 @@ class Processes:
             except ModuleNotFoundError:
                 raise ProcessException(f"Process {configuration.class_name} not found.")
         LOGGER.info("Configured queues: {}".format(", ".join(queue_names)))
+        task_postrun.connect(Processes.afer_task_handler, sender=APROC_CELERY_APP)
         if is_service:
             Thread(target=Processes.__listen_status__).start()
 
@@ -154,7 +196,7 @@ class Processes:
         return Processes.__retrieve_status_info__(task_id)
 
     @staticmethod
-    def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
+    def execute(process_name, headers: dict[str, str], input: InputProcess = None) -> StatusInfo | BaseModel:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump(exclude_none=True, exclude_unset=True)
@@ -306,7 +348,7 @@ class Processes:
                             )
                             )
         except Exception as e:
-            LOGGER.info("Index not created ({})".format(e))
+            LOGGER.error("Index not created ({})".format(e))
 
     @staticmethod
     def __get_redis_client__() -> Redis:
@@ -331,6 +373,7 @@ class Processes:
             
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
             LOGGER.debug(f"Fetching master from sentinels {sentinels}")
+            LOGGER.debug("sentinel_kwargs:{}".format(celery_result_backend_transport_options.get("sentinel_kwargs")))
             host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
             LOGGER.debug(f"Connect to {host}:{port}")
             con = {

@@ -29,6 +29,7 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              EVENT_KIND_KEY, EVENT_MODULE_KEY,
                                              EVENT_OUTCOME_KEY, EVENT_REASON,
                                              EVENT_TYPE_KEY, USER_ACTION_KEY)
+from extensions.aproc.proc.processes.process_model import InputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -96,7 +97,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         item_locations = []
         for request in requests:
             collection: str = request.get("collection")

@@ -1,5 +1,6 @@
 import json
 import unittest
+from aproc.core.models.ogc.execute import Subscriber
 from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
                         setUpTest)
 from time import sleep
@@ -47,7 +48,7 @@ class IngestTests(unittest.TestCase):
 
     def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=Subscriber(successUri="http://somewhere:8080/success", failedUri="http://somewhere:8080/failure", inProgressUri="http://somewhere:8080/progress"))
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         return r

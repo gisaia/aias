@@ -33,7 +33,6 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              USER_EMAIL_KEY, USER_ID_KEY)
 from pydantic import BaseModel, Field
 
-from aias_common.access.storages.s3 import S3Storage
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -144,7 +143,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []

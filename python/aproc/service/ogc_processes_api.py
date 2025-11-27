@@ -10,7 +10,7 @@ from aproc.core.models.ogc import (Conforms, ExceptionType, Execute,
                                    ProcessSummary, StatusInfo)
 from aproc.core.models.ogc.job import StatusInfoList
 from aproc.core.processes.exception import ProcessException
-from aproc.core.processes.process import Process
+from aproc.core.processes.process import Process, Subscriber
 from aproc.core.processes.processes import Processes
 from aias_common.rest.exception import OGCException, RESTException
 
@@ -218,7 +218,16 @@ def post_process_execute(process_id: str, execute: Execute, request: Request):
         if hasattr(process, "input_model"):
             inputs = execute.model_dump(exclude_none=True, exclude_unset=True).get("inputs")
             context = dict(map(lambda v: v, request.headers.items()))
-            job: StatusInfo = Processes.execute(process_name=process_id, headers=context, input=process.input_model(**inputs))
+            p_input = process.input_model(**inputs)
+            p_input.subscriber = Subscriber()
+            if execute.subscriber:
+                if execute.subscriber.successUri is not None:
+                    p_input.subscriber.successUri = execute.subscriber.successUri
+                if execute.subscriber.inProgressUri is not None:
+                    p_input.subscriber.inProgressUri = execute.subscriber.inProgressUri
+                if execute.subscriber.failedUri is not None:
+                    p_input.subscriber.failedUri = execute.subscriber.failedUri
+            job: StatusInfo = Processes.execute(process_name=process_id, headers=context, input=p_input)
             job.processID = process_id
             return JSONResponse(content=job.model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_201_CREATED)
         return JSONResponse(content=process.execute().model_dump(exclude_none=True, exclude_unset=True), status_code=status.HTTP_200_OK)
