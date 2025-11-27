@@ -328,7 +328,8 @@ class Processes:
             celery_result_backend_transport_options = Configuration.settings.celery_result_backend_transport_options
             if celery_result_backend_transport_options is None or celery_result_backend_transport_options.get("master_name") is None:
                 raise ConnectionError("Invalid configuration: master_name and sentinel_password must be provided")
-            
+            sentinel_kwargs = celery_result_backend_transport_options.get("sentinel_kwargs")
+            LOGGER.debug("sentinel_kwargs:{}".format(sentinel_kwargs))
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
             LOGGER.debug(f"Fetching master from sentinels {sentinels}")
             host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
