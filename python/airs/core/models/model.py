@@ -145,6 +145,7 @@ class ItemFormat(Enum):
     rapideye = "RAPIDEYE"
     safe = "SAFE"
     shape = "SHAPE"
+    skysat = "SKYSAT"
     spot5 = "SPOT5"
     spot6_7 = "SPOT6_7"
     terrasar = "TerraSAR-X"

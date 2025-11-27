@@ -30,8 +30,9 @@ class ImageDriverHelper:
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
+    # TODO: replace by geotiff_to_jpg ?
     @staticmethod
-    def add_overview_if_you_can(driver: AbstractDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
+    def add_overview_if_you_can(driver: IngestDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
         driver.LOGGER.debug("Try to create the thumbnail of {}".format(url))
         try:
             from PIL import Image
@@ -58,6 +59,12 @@ class ImageDriverHelper:
         assets.append(Asset(href=href, size=AccessManager.get_size(href),
                             roles=[role.value], name=role.value, type=type.value,
                             description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value))
+
+    # TODO: use it in other drivers
+    @staticmethod
+    def add_archive(assets: list[Asset], href: str):
+        assets.append(Asset(href=href, roles=[Role.archive.value], name=Role.archive.value, asset_format=AssetFormat.directory.value,
+                            type=MimeType.DIRECTORY.value, description=Role.archive.value, airs__managed=False))
 
     # Implements drivers method
     @staticmethod
