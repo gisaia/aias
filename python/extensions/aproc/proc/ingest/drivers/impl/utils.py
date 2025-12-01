@@ -109,3 +109,9 @@ def downsample_image(image_path: str, downsampled_image_path: str, block_size: i
     reduced_image = block_reduce(image_data, block_size=block_size, func=np.average)
 
     Image.fromarray(np.asarray(reduced_image, image_data.dtype), image.mode).save(downsampled_image_path)
+
+
+def get_epsg_from_gdal_info(path: str):
+    from osgeo import gdal
+    info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
+    return get_epsg(info["gcps"]["coordinateSystem"]["wkt"])
