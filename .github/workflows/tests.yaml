@@ -34,7 +34,7 @@ jobs:
 
 
   aias-tests-g1:
-    runs-on: ubuntu-latest
+    runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
