@@ -94,7 +94,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")

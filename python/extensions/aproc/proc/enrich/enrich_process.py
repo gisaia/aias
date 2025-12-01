@@ -87,7 +87,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         return {}
 
     @staticmethod
