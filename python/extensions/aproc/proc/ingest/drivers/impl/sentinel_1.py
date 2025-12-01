@@ -40,15 +40,14 @@ class Driver(IngestDriver):
 
         for measurement in self.measurements:
             # Polarization of the measure is used as name
-            name = os.path.basename(measurement).split('-')[3]
-            if measurement == self.main_asset_path:
-                name = Role.data.value
+            polarization = os.path.basename(measurement).split('-')[3]
+            name = ' '.join(os.path.basename(measurement).split('-')[1:4])
 
             # According to copernicus website, could end in .cog.tiff
             assets.append(Asset(href=measurement, size=AccessManager.get_size(measurement), roles=[Role.data.value],
                                 name=name, type=MimeType.TIFF.value, description=name,
                                 airs__managed=False, asset_format=AssetFormat.geotiff.value,
-                                asset_type=ResourceType.gridded.value))
+                                asset_type=ResourceType.gridded.value, sar__polarizations=[polarization.upper()]))
 
         return assets
 
@@ -142,14 +141,14 @@ class Driver(IngestDriver):
                             if measurement.name.endswith(".tiff"):
                                 self.measurements.append(measurement.path)
 
-                                # Arbitrarily choose the main asset as the one listed as first
-                                if measurement.name.find('-001') != -1:
+                                # Arbitrarily choose the main asset as the first one encountered
+                                if self.main_asset_path is None:
                                     self.main_asset_path = measurement.path
 
             return self.md_path is not None \
                 and self.quicklook_path is not None \
                 and self.thumbnail_path is not None \
                 and self.main_asset_path is not None \
-                and len(self.measurements) > 0  # Is there always 2?
+                and len(self.measurements) > 0
 
         return False

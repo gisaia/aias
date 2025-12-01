@@ -6,7 +6,7 @@ from time import sleep
 
 import requests
 from airs.core.models import mapper
-from airs.core.models.model import Item, Role
+from airs.core.models.model import Item
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
@@ -25,7 +25,8 @@ JP2000 = "jpeg2000.jpg2"
 SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 
 CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
-SENTINEL1 = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
+SENTINEL1_GRDH = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
+SENTINEL1_SLC = "S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
 ICEYE = "ICEYE-Scan-mode/2631255"
 
 
@@ -41,7 +42,7 @@ class IngestTests(unittest.TestCase):
             i = i + 1
             s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
         return s
-    
+
     def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
         status = StatusInfo(**json.loads(r.content))
@@ -96,7 +97,6 @@ class IngestTests(unittest.TestCase):
         self.assertIsNotNone(item.geometry.get("coordinates"))
         self.assertEqual(len(item.bbox), 4)
         self.assertEqual(len(item.centroid), 2)
-        self.assertIn(Role.data.value, item.assets.keys())
         self.assertIsNotNone(item.properties.item_format)
         for asset in assets:
             self.assertIsNotNone(item.assets.get(asset), asset)

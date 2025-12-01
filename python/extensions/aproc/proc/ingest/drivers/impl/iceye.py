@@ -87,7 +87,7 @@ class Driver(IngestDriver):
         gsd = (range_spacing + azimuth_spacing) / 2
         orbit_direction = root.find("orbit_direction").text
         orbit_number = root.find("orbit_absolute_number").text
-        polarizations = [root.find("polarization").text]
+        polarizations = [root.find("polarization").text.upper()]
 
         item = Item(
             id=self.get_item_id(url),

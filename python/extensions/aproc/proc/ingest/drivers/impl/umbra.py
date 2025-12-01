@@ -70,7 +70,7 @@ class Driver(IngestDriver):
         acq__request_id = data_take["taskId"]
         sar__frequency_band = data_take["radarBand"]
         sar__center_frequency = data_take["radarCenterFrequencyHz"]
-        sar__polarizations = data_take["polarizations"]
+        sar__polarizations = data_take["polarizations"].upper()
         sar__resolution_range = data_take["maxGroundResolution"]["rangeMeters"]
         sar__resolution_azimuth = data_take["maxGroundResolution"]["azimuthMeters"]
         sar__observation_direction = data_take["observationDirection"]

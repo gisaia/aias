@@ -1,7 +1,7 @@
 import os
 import unittest
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, ICEYE, IKONOS, JP2000,
-                                     RAPID_EYE, SENTINEL1, SENTINEL2,
+                                     RAPID_EYE, SENTINEL1_GRDH, SENTINEL1_SLC, SENTINEL2,
                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
@@ -63,10 +63,15 @@ class Tests(IngestTests):
         item_id = "5b1dbff1eaa5117872abc8f2612fb672b194a61d21c532191a13a7d5f062b12f"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False)
 
-    def test_async_ingest_sentinel1(self):  # Driver Sentinel 1
-        url = os.path.join(ROOT, SENTINEL1)
+    def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
+        url = os.path.join(ROOT, SENTINEL1_GRDH)
         item_id = "36c5e88bffde5ab72c50e94f43b40a6f938a6c3bf92f7c889d95879756da76a8"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"], archive=False)
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "iw grd vh", "iw grd vv", "metadata", "airs_item"], archive=False)
+
+    def test_async_ingest_sentinel1_slc(self):  # Driver Sentinel 1
+        url = os.path.join(ROOT, SENTINEL1_SLC)
+        item_id = "cee7d7833c946cc37062698a382a863ac1c3272d1e8ca115f846b55871fd7834"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", *[f"iw{i} slc {pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], archive=False)
 
     def test_async_ingest_iceye(self):  # Driver ICEYE
         url = os.path.join(ROOT, ICEYE)
