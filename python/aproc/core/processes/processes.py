@@ -66,7 +66,7 @@ class Processes:
                     else:
                         status_info.message = str(result)
                 Processes.__save_status_info__(status_info)
-                LOGGER.info(f"Task {task_id} updated to status {status_info.status}")
+                LOGGER.debug(f"Task {task_id} updated to status {status_info.status}")
                 if status_info.status.is_final():
                     if new_status == states.SUCCESS and subscriber.successUri:
                         Processes.__notify(subscriber.successUri.replace("{jobID}", task_id), json.dumps(result, default=serialize_datetime, indent=2))
