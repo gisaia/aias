@@ -2,14 +2,13 @@ import os
 import shutil
 from contextlib import contextmanager
 from typing import Annotated, Union
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse
 
 from pydantic import Field
 
 from aias_common.access.configuration import AccessManagerSettings
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
-from aias_common.access.storages.abstract import AbstractStorage
 from aias_common.access.storages.file import AccessType, FileStorage
 from aias_common.access.storages.gs import GoogleStorage
 from aias_common.access.storages.http import HttpStorage
@@ -26,7 +25,7 @@ class AccessManager:
     tmp_dir: str
     cache_ttl: int = 60 * 60 * 24
     cache_size = 1024
-    
+
     @staticmethod
     def init(ams: AccessManagerSettings):
         LOGGER.info("Initializing storages Access Manager")

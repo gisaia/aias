@@ -143,6 +143,7 @@ class ItemFormat(Enum):
     csk = "COSMO-SkyMed"
     umbra = "UMBRA"
     bsg = "BlackSkyGlobal"
+    iceye = "ICEYE"
 
 
 class AssetFormat(Enum):
@@ -169,10 +170,12 @@ class AssetFormat(Enum):
     cog = "COG"
     zarr = "ZARR"
     gif = "GIF"
+    h5 = "H5"
 
 
 class SensorType(str, Enum):
     SAR = "SAR"
+    OPTIC = "OPTIC"
 
 
 class Role(Enum):
@@ -341,7 +344,7 @@ class Asset(BaseModel, extra=Extra.allow):
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
     sar__frequency_band: str | None = Field(default=None, title="[STAC, extension sar] The common name for the frequency band to make it easier to search for bands across instruments. See section \"Common Frequency Band Names\" for a list of accepted names.")
     sar__center_frequency: float | None = Field(default=None, title="[STAC, extension sar] The center frequency of the instrument, in gigahertz (GHz).")
-    sar__polarizations: list[str] | None = Field(default=None, title="[STAC, extension sar] Any combination of polarizations.")
+    sar__polarizations: list[str] | None = Field(default=None, title="[STAC, extension sar] Any combination of polarizations. Must be in uppercase.")
     sar__product_type: str | None = Field(default=None, title="[STAC, extension sar] The product type, for example SSC, MGD, or SGC")
     sar__resolution_range: float | None = Field(default=None, title="[STAC, extension sar] The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).")
     sar__resolution_azimuth: float | None = Field(default=None, title="[STAC, extension sar] The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).")
@@ -432,7 +435,7 @@ class Properties(BaseModel, extra=Extra.allow):
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
     sar__frequency_band: str | None = Field(default=None, title="[STAC, extension sar] The common name for the frequency band to make it easier to search for bands across instruments. See section \"Common Frequency Band Names\" for a list of accepted names.")
     sar__center_frequency: float | None = Field(default=None, title="[STAC, extension sar] The center frequency of the instrument, in gigahertz (GHz).")
-    sar__polarizations: list[str] | None = Field(default=None, title="[STAC, extension sar] Any combination of polarizations.")
+    sar__polarizations: list[str] | None = Field(default=None, title="[STAC, extension sar] Any combination of polarizations. Must be in uppercase.")
     sar__product_type: str | None = Field(default=None, title="[STAC, extension sar] The product type, for example SSC, MGD, or SGC")
     sar__resolution_range: float | None = Field(default=None, title="[STAC, extension sar] The range resolution, which is the maximum ability to distinguish two adjacent targets perpendicular to the flight path, in meters (m).")
     sar__resolution_azimuth: float | None = Field(default=None, title="[STAC, extension sar] The azimuth resolution, which is the maximum ability to distinguish two adjacent targets parallel to the flight path, in meters (m).")

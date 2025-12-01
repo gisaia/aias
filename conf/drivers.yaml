@@ -56,27 +56,40 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 8
   -
+    name: sentinel1
+    class_name: extensions.aproc.proc.ingest.drivers.impl.sentinel_1
+    assets_dir: /tmp/aproc/sentinel1
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 9
+  -
     name: umbra
     class_name: extensions.aproc.proc.ingest.drivers.impl.umbra
     assets_dir: /tmp/aproc/umbra
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 9
+    priority: 10
   -
     name: bsg
     class_name: extensions.aproc.proc.ingest.drivers.impl.bsg
     assets_dir: /tmp/aproc/bsg
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 10
-
+    priority: 11
+  -
+    name: iceye
+    class_name: extensions.aproc.proc.ingest.drivers.impl.iceye
+    assets_dir: /tmp/aproc/iceye
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 12
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
     assets_dir: /tmp/aproc/tiff
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 11
+    priority: 13
 
   -
     name: jpeg2000
@@ -84,7 +97,7 @@ drivers:
     assets_dir: /tmp/aproc/jpeg2000
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 12
+    priority: 14
 
   -
     name: sentinel2
@@ -92,4 +105,4 @@ drivers:
     assets_dir: /tmp/aproc/sentinel2
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
-    priority: 13
+    priority: 15

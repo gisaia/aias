@@ -34,7 +34,7 @@ jobs:
 
 
   aias-tests-g1:
-    runs-on: ubuntu-latest
+    runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
@@ -47,8 +47,16 @@ jobs:
       run: test/start_stack.sh
     - name: Run g1 tests
       run: test/tests_g1.sh
-
-
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
+      
   aias-tests-g2:
     runs-on: ubuntu-latest
     steps:
@@ -63,7 +71,16 @@ jobs:
       run: test/start_stack.sh
     - name: Run g2 tests
       run: test/tests_g2.sh
-  
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
+
 
   aias-tests-g3:
     runs-on: ubuntu-latest
@@ -79,6 +96,15 @@ jobs:
       run: test/start_stack.sh
     - name: Run g3 tests
       run: test/tests_g3.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
   
 
   aias-tests-g4-fs:
@@ -95,6 +121,15 @@ jobs:
       run: test/start_stack.sh
     - name: Run g4 tests fs
       run: test/tests_g4_fs.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
   
 
   aias-tests-g4-gs:
@@ -111,6 +146,15 @@ jobs:
       run: test/start_stack.sh gs
     - name: Run g4 tests gs
       run: test/tests_g4_gs.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
   
 
   aias-tests-g4-minio:
@@ -127,6 +171,15 @@ jobs:
       run: test/start_stack.sh minio
     - name: Run g4 tests minio
       run: test/tests_g4_minio.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
   
 
   geodes-stac-test:

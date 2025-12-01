@@ -101,7 +101,7 @@ class Driver(IngestDriver):
                 root_gml = tree_gml.getroot()
                 for srs in root_gml.iter():
                     if len(srs.items()) > 0 and srs.items()[0][0] == "srsName":
-                        # We suppose to the first word in the srs expression is the EPSG code
+                        # We suppose that the first word in the srs expression is the EPSG code
                         # Because the string in the GML is not a classic SRS expression
                         in_spatial_ref_code = srs.items()[0][1].split(" ")[0]
                         break
