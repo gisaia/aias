@@ -143,6 +143,7 @@ class ItemFormat(Enum):
     csk = "COSMO-SkyMed"
     umbra = "UMBRA"
     bsg = "BlackSkyGlobal"
+    iceye = "ICEYE"
 
 
 class AssetFormat(Enum):
