@@ -258,7 +258,7 @@ class Processes:
                                                      "finished_date": status_info.finished,
                                                      "creation_date": status_info.created,
                                                      "status": status_info.status.value,
-                                                     "message": status_info.message}, )
+                                                     "message": status_info.message})
 
     @staticmethod
     def __retrieve_status_info__(job_id) -> StatusInfo:
@@ -303,30 +303,25 @@ class Processes:
 
     @staticmethod
     def __to_status_info_code__(code: str) -> StatusCode:
-        status_code = StatusCode.accepted
-        if code == states.RECEIVED:
-            status_code = StatusCode.accepted
-
-        if code == states.PENDING:
-            status_code = StatusCode.accepted
-
-        if code == states.REVOKED:
-            status_code = StatusCode.dismissed
-
-        if code == states.REJECTED:
-            status_code = StatusCode.dismissed
-
-        if code == states.STARTED:
-            status_code = StatusCode.running
-
-        if code == states.RETRY:
-            status_code = StatusCode.accepted
-
-        if code == states.FAILURE:
-            status_code = StatusCode.failed
-
-        if code == states.SUCCESS:
-            status_code = StatusCode.successful
+        match code:
+            case states.RECEIVED:
+                status_code = StatusCode.accepted
+            case states.PENDING:
+                status_code = StatusCode.accepted
+            case states.REVOKED:
+                status_code = StatusCode.dismissed
+            case states.REJECTED:
+                status_code = StatusCode.dismissed
+            case states.STARTED:
+                status_code = StatusCode.running
+            case states.RETRY:
+                status_code = StatusCode.accepted
+            case states.FAILURE:
+                status_code = StatusCode.failed
+            case states.SUCCESS:
+                status_code = StatusCode.successful
+            case _:
+                status_code = StatusCode.accepted
         return status_code
 
     @staticmethod
