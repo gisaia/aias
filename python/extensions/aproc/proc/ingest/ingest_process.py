@@ -93,7 +93,7 @@ class AprocProcess(Process):
         raise DriverException("No driver found for  {}".format(url))
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion

@@ -45,9 +45,9 @@ class InlineOrRefData(RootModel):
 
 
 class Subscriber(BaseModel):
-    successUri: AnyUrl | None = Field(default=None)
-    inProgressUri: AnyUrl | None = Field(default=None)
-    failedUri: AnyUrl | None = Field(default=None)
+    successUri: str | None = Field(default=None)
+    inProgressUri: str | None = Field(default=None)
+    failedUri: str | None = Field(default=None)
 
 
 class Execute(BaseModel):

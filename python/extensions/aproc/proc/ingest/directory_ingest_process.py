@@ -10,7 +10,8 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
-from aproc.core.processes.process import Process as Process
+from aproc.core.processes.process import Process as Process, Subscriber
+from aproc.core.models.ogc.execute import Subscriber as OGCSubscriber
 from aproc.core.utils import base_model2description
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
@@ -21,13 +22,14 @@ from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
 from extensions.aproc.proc.ingest.settings import \
     Configuration as IngestConfiguration
+from extensions.aproc.proc.processes.process_model import InputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.logger
 
 
-class InputDirectoryIngestProcess(BaseModel):
+class InputDirectoryIngestProcess(InputProcess):
     collection: str = Field(title="Collection name", description="Name of the collection where the items will be registered", minOccurs=1, maxOccurs=1)
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered", minOccurs=1, maxOccurs=1)
     directory: str = Field(title="Directory URL", description="URL pointing at a directory containing one or more archives", minOccurs=1, maxOccurs=1)
@@ -83,7 +85,7 @@ class AprocProcess(Process):
         return InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         # self is a celery task because bind=True
         """ ingest the archives contained in the directory url. Every archive ingestion becomes a new process
 
@@ -106,7 +108,7 @@ class AprocProcess(Process):
             LOGGER.info(archive.model_dump_json(exclude_none=True, exclude_unset=True))
             try:
                 inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-                execute = Execute(inputs=inputs.model_dump())
+                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_unset=True, exclude_none=True)), subscriber=OGCSubscriber(**subscriber))
                 r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
                     msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))

@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from urllib.parse import urlparse
 
-from celery import Celery, states
+from celery import Celery, Task, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
 from redis import Redis
@@ -14,6 +14,10 @@ from redis.sentinel import Sentinel
 from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
+from celery.signals import task_postrun, task_prerun
+
+from celery.signals import Signal
+import requests
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.mapper import serialize_datetime
@@ -21,7 +25,7 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
                                        StatusInfoList)
 from aproc.core.processes.exception import ProcessException
-from aproc.core.processes.process import Process
+from aproc.core.processes.process import InputProcess, Process, Subscriber
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME, Configuration
 
 LOGGER = Logger.logger
@@ -46,10 +50,52 @@ class Processes:
     __REDIS_PREFIX__ = "airs_job_id:"
 
     @staticmethod
+    def __update_satus(task_id: str, new_status: str, result, message: str, subscriber: Subscriber = Subscriber()):
+        if new_status:
+            status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
+            if status_info is None:
+                sleep(5)  # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
+                status_info = Processes.__retrieve_status_info__(task_id)
+            if status_info.status is None or not status_info.status.is_final():
+                status_info.status = Processes.__to_status_info_code__(new_status)
+                status_info.updated = round(datetime.now().timestamp())
+                if status_info.status.is_final():
+                    status_info.finished = round(datetime.now().timestamp())
+                    if new_status == states.SUCCESS:
+                        status_info.message = json.dumps(result, default=serialize_datetime, indent=2)
+                    else:
+                        status_info.message = str(result)
+                Processes.__save_status_info__(status_info)
+                LOGGER.debug(f"Task {task_id} updated to status {status_info.status}")
+                if status_info.status.is_final():
+                    if new_status == states.SUCCESS and subscriber.successUri:
+                        Processes.__notify(subscriber.successUri.replace("{jobID}", task_id), json.dumps(result, default=serialize_datetime, indent=2))
+                    if new_status == states.FAILURE and subscriber.failedUri:
+                        result = Processes.result(task_id)
+                        Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True, exclude_unset=True))
+                LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()  }")
+            else:
+                LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
+
+    @staticmethod
+    @task_prerun.connect
+    def before_run_task(task_id: str = "", **kwargs):
+        if task_id:
+            s = Processes.__subscriber_from_kwargs(kwargs)
+            Processes.__update_satus(task_id, states.STARTED, None, "", s)
+
+    @staticmethod
+    @task_postrun.connect
+    def after_run_task(task_id: str = "", state: str = "", retval=None, **kwargs):
+        if task_id and state:
+            s = Processes.__subscriber_from_kwargs(kwargs)
+            Processes.__update_satus(task_id, state, retval, "", s)
+
+    @staticmethod
     def __listen_status__():
         state = APROC_CELERY_APP.events.State()
 
-        def update_status_fct(event):
+        def update_status_from_event_fct(event):
             try:
                 state.event(event)
                 task_id = event.get('uuid', None)
@@ -61,19 +107,7 @@ class Processes:
                     if status_info is None:
                         LOGGER.warn("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
                     else:
-                        status_info.status = Processes.__to_status_info_code__(event.get('state'))
-                        status_info.updated = round(datetime.now().timestamp())
-                        res = AsyncResult(task_id, app=APROC_CELERY_APP)
-                        if status_info.status.is_final():
-                            status_info.finished = round(datetime.now().timestamp())
-                            if res.status == states.SUCCESS:
-                                status_info.message = json.dumps(AsyncResult(task_id, app=APROC_CELERY_APP).result, default=serialize_datetime)
-                            else:
-                                status_info.message = str(AsyncResult(task_id, app=APROC_CELERY_APP).result)
-                        else:
-                            if res.status == states.STARTED:
-                                status_info.started = round(datetime.now().timestamp())
-                        Processes.__save_status_info__(status_info)
+                        Processes.__update_satus(task_id, event.get('state'), None, "")
                 else:
                     LOGGER.warn("Task id not found in event {}".format(event))
             except Exception as e:
@@ -85,12 +119,8 @@ class Processes:
             try:
                 with APROC_CELERY_APP.connection() as connection:
                     recv = APROC_CELERY_APP.events.Receiver(connection, handlers={
-                        'task-failed': update_status_fct,
-                        'task-succeeded': update_status_fct,
-                        'task-sent': update_status_fct,
-                        'task-received': update_status_fct,
-                        'task-revoked': update_status_fct,
-                        'task-started': update_status_fct,
+                        'task-sent': update_status_from_event_fct,
+                        'task-revoked': update_status_from_event_fct,
                     }, app=APROC_CELERY_APP)
                     LOGGER.info("Capturing events for status tracking ...")
                     recv.capture(limit=None, timeout=None, wakeup=True)
@@ -100,6 +130,29 @@ class Processes:
                 sleep_time = min(sleep_time + 5, 300)
                 LOGGER.error("Sleep {} seconds and try to connect again ...".format(sleep_time))
                 sleep(sleep_time)
+
+    @staticmethod
+    def __notify(subscriber: str, result):
+        try:
+            LOGGER.debug(f"notify {subscriber} with result {result}")
+            r = requests.post(url=subscriber, data=result, timeout=Configuration.settings.subscriber_post_timeout)
+            if r.status_code >= 200 and r.status_code < 300:
+                LOGGER.debug(f"notified {subscriber} successfully")
+            else:
+                LOGGER.warning(f"Notification post to {subscriber} returned status code {r.status_code}, response: {r.content}")
+        except Exception as e:
+            LOGGER.error(f"can not notify {subscriber}")
+            LOGGER.exception(e)
+
+    @staticmethod
+    def __subscriber_from_kwargs(kwargs) -> Subscriber:
+        if kwargs is not None and type(kwargs) is dict:
+            inputs: dict = kwargs.get("kwargs")
+            if inputs is not None:
+                ip = InputProcess(**inputs)
+                if ip is not None and ip.subscriber is not None:
+                    return ip.subscriber
+        return Subscriber()
 
     @staticmethod
     def init(is_service: bool = False):
@@ -154,7 +207,7 @@ class Processes:
         return Processes.__retrieve_status_info__(task_id)
 
     @staticmethod
-    def execute(process_name, headers: dict[str, str], input: BaseModel = None) -> StatusInfo | BaseModel:
+    def execute(process_name, headers: dict[str, str], input: InputProcess = None) -> StatusInfo | BaseModel:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump(exclude_none=True, exclude_unset=True)
@@ -249,34 +302,26 @@ class Processes:
             return None
 
     @staticmethod
-    def __to_status_info_code__(code: states) -> StatusCode:
-        status_code = StatusCode.accepted
-        if code == states.EXCEPTION_STATES:
-            status_code = StatusCode.failed
-
-        if code == states.RECEIVED:
-            status_code = StatusCode.accepted
-
-        if code == states.PENDING:
-            status_code = StatusCode.accepted
-
-        if code == states.REVOKED:
-            status_code = StatusCode.dismissed
-
-        if code == states.REJECTED:
-            status_code = StatusCode.dismissed
-
-        if code == states.STARTED:
-            status_code = StatusCode.running
-
-        if code == states.RETRY:
-            status_code = StatusCode.accepted
-
-        if code == states.FAILURE:
-            status_code = StatusCode.failed
-
-        if code == states.SUCCESS:
-            status_code = StatusCode.successful
+    def __to_status_info_code__(code: str) -> StatusCode:
+        match code:
+            case states.RECEIVED:
+                status_code = StatusCode.accepted
+            case states.PENDING:
+                status_code = StatusCode.accepted
+            case states.REVOKED:
+                status_code = StatusCode.dismissed
+            case states.REJECTED:
+                status_code = StatusCode.dismissed
+            case states.STARTED:
+                status_code = StatusCode.running
+            case states.RETRY:
+                status_code = StatusCode.accepted
+            case states.FAILURE:
+                status_code = StatusCode.failed
+            case states.SUCCESS:
+                status_code = StatusCode.successful
+            case _:
+                status_code = StatusCode.accepted
         return status_code
 
     @staticmethod
@@ -306,7 +351,7 @@ class Processes:
                             )
                             )
         except Exception as e:
-            LOGGER.info("Index not created ({})".format(e))
+            LOGGER.error("Index not created ({})".format(e))
 
     @staticmethod
     def __get_redis_client__() -> Redis:
@@ -321,19 +366,15 @@ class Processes:
                 params["username"] = uri.username
             if uri.password:
                 params["password"] = uri.password
-            LOGGER.debug(f"Using directly redis: {params}")
             return Redis(**params)
         elif uri.scheme == "sentinel":
-            LOGGER.debug("Using sentinels for retrieving redis master")
             celery_result_backend_transport_options = Configuration.settings.celery_result_backend_transport_options
             if celery_result_backend_transport_options is None or celery_result_backend_transport_options.get("master_name") is None:
                 raise ConnectionError("Invalid configuration: master_name and sentinel_password must be provided")
             sentinel_kwargs = celery_result_backend_transport_options.get("sentinel_kwargs")
             LOGGER.debug("sentinel_kwargs:{}".format(sentinel_kwargs))
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
-            LOGGER.debug(f"Fetching master from sentinels {sentinels}")
             host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
-            LOGGER.debug(f"Connect to {host}:{port}")
             con = {
                 "host": host,
                 "port": port,

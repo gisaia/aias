@@ -1,5 +1,10 @@
 import json
+import threading
 import unittest
+
+from fastapi import FastAPI, Request
+import uvicorn
+from aproc.core.models.ogc.execute import Subscriber
 from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
                         setUpTest)
 from time import sleep
@@ -23,6 +28,25 @@ RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
 TIF = "cog.tiff"
 JP2000 = "jpeg2000.jpg2"
 SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
+SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   #NOSONAR 
+
+callback_job_status = {}
+
+app = FastAPI()
+
+
+@app.post("/subscriber/{status}/{id}")
+async def callback(status, id, request: Request):
+    r = await request.json()
+    callback_job_status[id] = status
+
+
+def run_server(port=8080):
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
+
+# Start the server in a separate thread
+threading.Thread(target=run_server, daemon=True).start()
 
 
 class IngestTests(unittest.TestCase):
@@ -33,6 +57,7 @@ class IngestTests(unittest.TestCase):
         i: int = 0
         s = status
         while s.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
+            print(f"Waiting for job {s.jobID} status {s.status}...", flush=True)
             sleep(1)
             i = i + 1
             s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
@@ -43,23 +68,25 @@ class IngestTests(unittest.TestCase):
         status = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
+        self.assertEqual(status.status, callback_job_status[status.jobID])
         return status
 
     def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         return r
 
     def ingest_directory(self, url: str, collection: str, catalog: str):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
         r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
+        self.assertEqual(status.status, callback_job_status[status.jobID])
 
     def async_ingest(self, url: str, id: str, assets: list[str], archive=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)

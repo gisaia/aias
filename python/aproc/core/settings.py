@@ -22,10 +22,11 @@ class Settings(BaseModel, extra='allow'):
     processes: list[ProcessSettings] = Field(title="List of processes", description="List of APROC processes")
     airs_endpoint: str | None = Field(title="AIRS endpoint", description="ARLAS Item Registration Service endpoint")
     access_manager: AccessManagerSettings = Field(title="AccessManager configuration", description="Configuration for the AccessManager")
+    subscriber_post_timeout: float = Field(default=10, title="Http post request timeout for subscriber notifications")
 
 
 class Configuration:
-    settings: Settings | None = Field(title="APROC Service configuration", description="The configuration of the APROC Service")
+    settings: Settings = Field(title="APROC Service configuration", description="The configuration of the APROC Service")
 
     @staticmethod
     def init(configuration_file: str):
