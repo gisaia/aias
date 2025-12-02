@@ -1,6 +1,6 @@
 import hashlib
 import os
-
+import re
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
 
@@ -115,3 +115,90 @@ def get_epsg_from_gdal_info(path: str):
     from osgeo import gdal
     info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
     return get_epsg(info["gcps"]["coordinateSystem"]["wkt"])
+
+
+#Level-1 Product Family Summary Table Dictionary
+level1_summary = {
+    'SM': {
+        'SLC': {'resolution': '1.7–3.6 m × 4.3–4.9 m', 'pixel_spacing': '1.5–3.1 m × 3.6–4.1 m', 'looks': '1 × 1', 'ENL': 1},
+        'GRD_FR': {'resolution': '9 × 9 m', 'pixel_spacing': '3.5 × 3.5 m', 'looks': '2 × 2', 'ENL': 3.7},
+        'GRD_HR': {'resolution': '23 × 23 m', 'pixel_spacing': '10 × 10 m', 'looks': '6 × 6', 'ENL': 29.7},
+        'GRD_MR': {'resolution': '84 × 84 m', 'pixel_spacing': '40 × 40 m', 'looks': '22 × 22', 'ENL': 398.4},
+    },
+    'IW': {
+        'SLC': {'resolution': '2.7–3.5 m × 22 m', 'pixel_spacing': '2.3 m × 14.1 m', 'looks': '1 × 1', 'ENL': 1},
+        'GRD_HR': {'resolution': '20 × 22 m', 'pixel_spacing': '10 × 10 m', 'looks': '5 × 1', 'ENL': 4.4},
+        'GRD_MR': {'resolution': '88 × 87 m', 'pixel_spacing': '40 × 40 m', 'looks': '22 × 5', 'ENL': 81.8},
+    },
+    'EW': {
+        'SLC': {'resolution': '7.9–15 m × 43 m', 'pixel_spacing': '5.9 × 19.9 m', 'looks': '1 × 1', 'ENL': 1},
+        'GRD_HR': {'resolution': '50 × 50 m', 'pixel_spacing': '25 × 25 m', 'looks': '3 × 1', 'ENL': 2.8},
+        'GRD_MR': {'resolution': '93 × 87 m', 'pixel_spacing': '40 × 40 m', 'looks': '6 × 2', 'ENL': 10.7},
+    },
+    'WV': {
+        'SLC': {'resolution': '2.0–3.1 m × 4.8 m', 'pixel_spacing': '1.7–2.7 m × 4.1 m', 'looks': '1 × 1', 'ENL': 1},
+        'GRD_MR': {'resolution': '52 × 51 m', 'pixel_spacing': '25 × 25 m', 'looks': '13 × 13', 'ENL': 123.7},
+    }
+}
+
+def parse_sentinel1_filename(filename):
+    base = filename.split('/')[-1]
+    parts = base.split('_')
+
+    if len(parts) < 3:
+        raise ValueError("Invalid name File")
+
+    satellite = parts[0]  # S1A, S1B, S1C
+    mode = parts[1]       # SM, IW, EW, WV
+    product_type = parts[2]  # SLC, GRD
+
+    res_pol = parts[3] if len(parts) > 3 else ''
+
+    return satellite, mode, product_type, res_pol
+
+def extract_pixel_spacing_numbers(pixel_spacing_str):
+    """
+    Extracts the numerical values ​​of the pixel spacing (range × azimuth)
+    """
+    # Remove the units and separate by ×
+    nums = re.findall(r'[\d\.]+', pixel_spacing_str)
+    if len(nums) >= 2:
+        return float(nums[0]), float(nums[1])
+    else:
+        return float(nums[0]), float(nums[0])  # if only one number, we repeat
+
+def get_product_values(filename):
+    sat, mode, prod_type, res_pol = parse_sentinel1_filename(filename)
+
+    if prod_type.startswith('GRD'):
+        if 'FR' in filename:
+            prod_key = 'GRD_FR'
+        elif 'HR' in filename:
+            prod_key = 'GRD_HR'
+        elif 'MR' in filename:
+            prod_key = 'GRD_MR'
+        else:
+            prod_key = 'GRD_MR'
+    else:
+        prod_key = prod_type
+
+    try:
+        values = level1_summary[mode][prod_key]
+    except KeyError:
+        raise ValueError(f"Mode {mode} or type {prod_key} unknown in the Level-1 array.")
+
+    range_ps, azimuth_ps = extract_pixel_spacing_numbers(values['pixel_spacing'])
+    max_pixel_spacing = max(range_ps, azimuth_ps)
+
+    result = {
+        'satellite': sat,
+        'mode': mode,
+        'product_type': prod_type,
+        'resolution': values['resolution'],
+        'pixel_spacing': values['pixel_spacing'],
+        'looks': values['looks'],
+        'ENL': values['ENL'],
+        'max_pixel_spacing': max_pixel_spacing
+    }
+
+    return result
