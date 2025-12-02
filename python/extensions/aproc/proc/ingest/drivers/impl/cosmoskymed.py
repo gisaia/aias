@@ -40,6 +40,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
 
         assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value if self.data_format == AssetFormat.geotiff else MimeType.HDF5.value,

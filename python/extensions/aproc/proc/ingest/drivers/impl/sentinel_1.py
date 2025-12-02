@@ -9,13 +9,14 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid)
+    get_epsg_from_gdal_info, get_geom_bbox_centroid, get_product_values)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
     def __init__(self):
         super().__init__()
+        self.name = None
         self.md_path = None
         self.quicklook_path = None
         self.thumbnail_path = None
@@ -30,6 +31,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
 
         ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
                                     MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
@@ -45,7 +57,7 @@ class Driver(IngestDriver):
 
             # According to copernicus website, could end in .cog.tiff
             assets.append(Asset(href=measurement, size=AccessManager.get_size(measurement), roles=[Role.data.value],
-                                name=name, type=MimeType.TIFF.value, description=name,
+                                name=name, type=MimeType.GEOTIFF.value, description=name,
                                 airs__managed=False, asset_format=AssetFormat.geotiff.value,
                                 asset_type=ResourceType.gridded.value, sar__polarizations=[polarization.upper()]))
 
@@ -116,7 +128,9 @@ class Driver(IngestDriver):
             ),
             assets=dict([(asset.name, asset) for asset in assets])
         )
-
+        product_values = get_product_values(self.name)
+        if product_values and "max_pixel_spacing" in product_values:
+            item.properties.gsd = product_values["max_pixel_spacing"]
         return item
 
     def __check_path__(self, path: str):
@@ -124,6 +138,7 @@ class Driver(IngestDriver):
         name = os.path.basename(path)
 
         if AccessManager.is_dir(path) and name.startswith("S1") and name.endswith(".SAFE"):
+            self.name = name
             for file in AccessManager.listdir(path):
                 if not file.is_dir and file.name == "manifest.safe":
                     self.md_path = file.path

@@ -60,6 +60,25 @@
         "roles": [
           "data"
         ]
+      },
+      "archive": {
+        "href": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
+        "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+        "title": "classification",
+        "eo:bands": [
+          {
+            "name": "data"
+          }
+        ],
+        "proj:epsg": 4326,
+        "proj:shape": [
+          36000,
+          36000
+        ],
+        "roles": [
+          "archive"
+        ],
+        "airs__managed": false
       }
     },
     "bbox": [

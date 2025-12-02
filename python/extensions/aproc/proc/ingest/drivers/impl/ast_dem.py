@@ -40,6 +40,17 @@ class Driver(IngestDriver):
         assets = []
         assets.append(
             Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
+        assets.append(
+            Asset(
                 href=self.tif_path,
                 size=AccessManager.get_size(self.tif_path),
                 roles=[Role.data.value],

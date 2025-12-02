@@ -20,7 +20,7 @@ class DownloadDriver(AbstractDriver):
     def get_asset_href(self, item: Item) -> str | None:
         if self.alternative_asset_href_field:
             return item.properties[self.alternative_asset_href_field]
-        data = item.assets.get(Role.data.value)
+        data = item.assets.get(Role.archive.value)
         return data.href if data else None
 
     @abstractmethod

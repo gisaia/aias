@@ -45,6 +45,17 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
         # If not None, then no thumbnail & quicklook ?
         if self.quicklook_path is None:
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets)
@@ -115,7 +126,7 @@ class Driver(IngestDriver):
                 item_format=ItemFormat.rapideye.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
+                observation_type=ObservationType.optic.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )
