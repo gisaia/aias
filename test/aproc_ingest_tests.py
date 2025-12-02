@@ -129,6 +129,7 @@ class IngestTests(unittest.TestCase):
         if data_key is not None:
             self.assertIn(data_key, item.assets.keys())
         self.assertIsNotNone(item.properties.item_format)
+        self.assertIn(Role.archive.value, item.assets.keys())
         for asset in assets:
             self.assertIsNotNone(item.assets.get(asset), asset)
             self.assertIsNotNone(item.assets.get(asset).name, asset)

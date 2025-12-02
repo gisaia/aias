@@ -30,6 +30,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
 
         ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
                                     MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
@@ -45,7 +56,7 @@ class Driver(IngestDriver):
 
             # According to copernicus website, could end in .cog.tiff
             assets.append(Asset(href=measurement, size=AccessManager.get_size(measurement), roles=[Role.data.value],
-                                name=name, type=MimeType.TIFF.value, description=name,
+                                name=name, type=MimeType.GEOTIFF.value, description=name,
                                 airs__managed=False, asset_format=AssetFormat.geotiff.value,
                                 asset_type=ResourceType.gridded.value, sar__polarizations=[polarization.upper()]))
 

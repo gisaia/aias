@@ -1,5 +1,5 @@
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat
+from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, MimeType, Role
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -21,6 +21,17 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.JPEG2000.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.jpg2000.value
+            )
+        )
         return ImageDriverHelper.fetch_assets(self, url, assets)
 
     # Implements drivers method

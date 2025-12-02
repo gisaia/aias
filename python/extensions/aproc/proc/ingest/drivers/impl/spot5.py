@@ -29,6 +29,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
@@ -103,7 +114,7 @@ class Driver(IngestDriver):
                 item_format=ItemFormat.spot5.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.image.value
+                observation_type=ObservationType.optic.value
             ),
             assets=dict(map(lambda asset: (asset.name, asset), assets))
         )

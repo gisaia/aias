@@ -50,6 +50,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.DIRECTORY.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.directory.value
+            )
+        )
         for pol in self.polarizations:
             assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']),proj__epsg=get_epsg_from_gdal_info(pol['path']),
                                 roles=[Role.data.value], name=pol['name'], type=MimeType.GEOTIFF.value,sar__polarizations=[pol['polarization']],
