@@ -77,7 +77,8 @@
         ],
         "roles": [
           "archive"
-        ]
+        ],
+        "airs__managed": false
       }
     },
     "bbox": [
