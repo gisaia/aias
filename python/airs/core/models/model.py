@@ -144,6 +144,7 @@ class ItemFormat(Enum):
     umbra = "UMBRA"
     bsg = "BlackSkyGlobal"
     iceye = "ICEYE"
+    radarsat2 = "RADARSAT-2",
 
 
 class AssetFormat(Enum):

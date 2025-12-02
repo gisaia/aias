@@ -2,7 +2,7 @@ import os
 import unittest
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, ICEYE, IKONOS, JP2000,
                                      RAPID_EYE, SENTINEL1_GRDH, SENTINEL1_SLC, SENTINEL2,
-                                     TERRASARX, TIF, WORLDVIEW, IngestTests)
+                                     TERRASARX, TIF, WORLDVIEW, IngestTests, RADARSAT2)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
 ROOT = "gs://gisaia-public/test-aias"
@@ -11,7 +11,7 @@ ROOT = "gs://gisaia-public/test-aias"
 class Tests(IngestTests):
 
     def test_async_ingest_dimap_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT,  DIMAP)
+        url = os.path.join(ROOT, DIMAP)
         item_id = "9c74339d7d73e441e61d1b61b660d92713a163f3c212bf7dca261e4bc1e03601"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
@@ -66,17 +66,22 @@ class Tests(IngestTests):
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)
         item_id = "36c5e88bffde5ab72c50e94f43b40a6f938a6c3bf92f7c889d95879756da76a8"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "iw grd vh", "iw grd vv", "metadata", "airs_item"], archive=False)
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "iw grd vh", "iw grd vv", "metadata", "airs_item"], archive=False, data_key=None)
 
     def test_async_ingest_sentinel1_slc(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_SLC)
         item_id = "cee7d7833c946cc37062698a382a863ac1c3272d1e8ca115f846b55871fd7834"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", *[f"iw{i} slc {pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], archive=False)
+        self.async_ingest(url, item_id, ["thumbnail", "overview", *[f"iw{i} slc {pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], archive=False, data_key=None)
 
     def test_async_ingest_iceye(self):  # Driver ICEYE
         url = os.path.join(ROOT, ICEYE)
         item_id = "7d999733dbcf3fe6afdf7fca6da1dcd87184bbad10ddaa6c5126dd34247f5501"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_radarsat2(self):  # Driver RADARSAT 2
+        url = os.path.join(ROOT, RADARSAT2)
+        item_id = "81fde97a25a2611b3806f314a73bdca6c59d655a74c0a58d6470bbe50247feab"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "Polarization HH", "metadata", "airs_item"], data_key="Polarization HH")
 
 
 if __name__ == '__main__':

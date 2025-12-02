@@ -30,7 +30,6 @@ class AccessManager:
     def init(ams: AccessManagerSettings):
         LOGGER.info("Initializing storages Access Manager")
         AccessManager.storages = []
-
         for s in ams.storages:
             match s.type:
                 case "file":

@@ -11,7 +11,7 @@ from time import sleep
 
 import requests
 from airs.core.models import mapper
-from airs.core.models.model import Item
+from airs.core.models.model import Item, Role
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
@@ -28,6 +28,8 @@ RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
 TIF = "cog.tiff"
 JP2000 = "jpeg2000.jpg2"
 SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
+RADARSAT2 = "RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
+
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   #NOSONAR 
 
 callback_job_status = {}
@@ -93,12 +95,12 @@ class IngestTests(unittest.TestCase):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
+    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
-        self.check_result(item, id, assets, archive, check_epsg)
+        self.check_result(item, id, assets, archive, check_epsg, data_key)
         return status
 
     def test_processes_list(self):
@@ -116,7 +118,7 @@ class IngestTests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, id: str, assets: list, archive=True, check_epsg=True):
+    def check_result(self, item: Item, id: str, assets: list, archive=True, check_epsg=True, data_key=Role.data.value):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertEqual(item.id, id)
@@ -124,6 +126,8 @@ class IngestTests(unittest.TestCase):
         self.assertIsNotNone(item.geometry.get("coordinates"))
         self.assertEqual(len(item.bbox), 4)
         self.assertEqual(len(item.centroid), 2)
+        if data_key is not None:
+            self.assertIn(data_key, item.assets.keys())
         self.assertIsNotNone(item.properties.item_format)
         for asset in assets:
             self.assertIsNotNone(item.assets.get(asset), asset)
