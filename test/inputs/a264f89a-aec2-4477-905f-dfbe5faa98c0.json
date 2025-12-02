@@ -66,6 +66,18 @@
         "data"
       ]
     },
+    "archive": {
+      "name": "archive",
+      "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE/GRANULE/L1C_T30TYN_A047953_20240827T105645/IMG_DATA/T30TYN_20240827T105021_TCI.jp2",
+      "asset_type": "GRIDDED",
+      "asset_format": "JPG2000",
+      "airs__managed": false,
+      "description": "data",
+      "type": "image/jp2",
+      "roles": [
+        "archive"
+      ]
+    },
     "B08": {
       "name": "B08",
       "size": 1620026,

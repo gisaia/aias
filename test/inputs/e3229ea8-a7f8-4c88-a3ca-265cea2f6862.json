@@ -49,6 +49,16 @@
           "data"
         ],
         "airs__managed": false
+      },
+      "archive": {
+        "href": "gs://gisaia-public/test-aias/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431_downsampled.zip",
+        "type": "application/zip",
+        "title": "archive",
+        "proj:epsg": 32630,
+        "roles": [
+          "archive"
+        ],
+        "airs__managed": false
       }
     },
     "bbox": [-0.5727044512579443, 42.302451615096686, 0.818123703703737, 43.32625697132075],

@@ -141,6 +141,10 @@ class IngestTests(unittest.TestCase):
             self.assertIsNotNone(item.assets.get(asset).type, asset)
             self.assertIsNotNone(item.assets.get(asset).description, asset)
             self.assertGreaterEqual(len(item.assets.get(asset).roles), 1, asset)
+        if Role.thumbnail.value in item.assets.keys():
+            self.assertTrue(item.assets.get(Role.thumbnail.value).airs__managed, f"thumbnail asset should be managed for {id}")
+        if Role.overview.value in item.assets.keys():
+            self.assertTrue(item.assets.get(Role.overview.value).airs__managed, f"overview asset should be managed for {id}")
         self.assertIsNotNone(item.properties.datetime, asset)
         if archive:
             self.assertIsNotNone(item.properties.constellation)
