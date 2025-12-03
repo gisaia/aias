@@ -16,7 +16,7 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 class Driver(IngestDriver):
     def __init__(self):
         super().__init__()
-        self.name = None
+        self.file_name = None
         self.md_path = None
         self.quicklook_path = None
         self.thumbnail_path = None
@@ -128,7 +128,7 @@ class Driver(IngestDriver):
             ),
             assets=dict([(asset.name, asset) for asset in assets])
         )
-        product_values = get_product_values(self.name)
+        product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:
             item.properties.gsd = product_values["max_pixel_spacing"]
         return item
@@ -138,7 +138,7 @@ class Driver(IngestDriver):
         name = os.path.basename(path)
 
         if AccessManager.is_dir(path) and name.startswith("S1") and name.endswith(".SAFE"):
-            self.name = name
+            self.file_name = name
             for file in AccessManager.listdir(path):
                 if not file.is_dir and file.name == "manifest.safe":
                     self.md_path = file.path
