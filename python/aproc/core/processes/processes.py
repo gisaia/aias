@@ -162,20 +162,23 @@ class Processes:
         queue_names = set()
         queue_names.add(DEFAULT_PROCESS_QUEUE_NAME)
         for configuration in Configuration.settings.processes:
-            try:
-                process: Process = importlib.import_module(configuration.class_name).AprocProcess
-                process.name = configuration.name
-                LOGGER.info("Register {} as {}".format(configuration.class_name, process.name))
-                process.init(configuration.configuration)
-                if configuration.queue_name:
-                    process.queue_name = configuration.queue_name
-                    queue_names.add(process.queue_name)
-                task = importlib.import_module(configuration.class_name).Process.execute
-                process.__task_name__ = ".".join([configuration.class_name, "execute"])
-                APROC_CELERY_APP.task(task)
-                Processes.processes.append(process)
-            except ModuleNotFoundError:
-                raise ProcessException(f"Process {configuration.class_name} not found.")
+            if not configuration.enabled:
+                LOGGER.info("Process {} is disabled. Skipping its registration.".format(configuration.name))
+            else:
+                try:
+                    process: Process = importlib.import_module(configuration.class_name).AprocProcess
+                    process.name = configuration.name
+                    LOGGER.info("Register {} as {}".format(configuration.class_name, process.name))
+                    process.init(configuration.configuration)
+                    if configuration.queue_name:
+                        process.queue_name = configuration.queue_name
+                        queue_names.add(process.queue_name)
+                    task = importlib.import_module(configuration.class_name).Process.execute
+                    process.__task_name__ = ".".join([configuration.class_name, "execute"])
+                    APROC_CELERY_APP.task(task)
+                    Processes.processes.append(process)
+                except ModuleNotFoundError:
+                    raise ProcessException(f"Process {configuration.class_name} not found.")
         LOGGER.info("Configured queues: {}".format(", ".join(queue_names)))
         if is_service:
             Thread(target=Processes.__listen_status__).start()

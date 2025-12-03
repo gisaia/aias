@@ -13,6 +13,7 @@ class ProcessSettings(BaseModel, extra='allow'):
     class_name: str | None = Field(title="Process class", description="Name of the process class")
     configuration: dict | None = Field(title="Process configuration", description="Configuration that is specific the process (dictionary key/value)")
     queue_name: str = Field(default=DEFAULT_PROCESS_QUEUE_NAME, title="Process queue name", description="Name of the queue to use for this process")
+    enabled: bool = Field(default=True, title="Process enabled", description="Whether the process is enabled or not")
 
 
 class Settings(BaseModel, extra='allow'):
