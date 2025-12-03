@@ -367,8 +367,13 @@ def __add_generated_fields(item: Item) -> Item:
         item.properties.generated__geohash5 = pgh.encode(
             item.centroid[1], item.centroid[0], precision=5
         )
+    item.properties.generated__asset_names = []
     if item.assets is not None:
         for asset in item.assets.values():
+            item.properties.generated__asset_names.append(asset.name)
+            item.properties.generated__asset_roles.extend(asset.roles)
+            if asset.name == "all_bands_cog":
+                item.properties.generated__has_all_bands_cog = True
             if Role.overview.value in asset.roles:
                 item.properties.generated__has_overview = True
             if Role.thumbnail.value in asset.roles:
