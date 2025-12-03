@@ -368,6 +368,7 @@ def __add_generated_fields(item: Item) -> Item:
             item.centroid[1], item.centroid[0], precision=5
         )
     item.properties.generated__asset_names = []
+    item.properties.generated__asset_roles = []
     if item.assets is not None:
         for asset in item.assets.values():
             item.properties.generated__asset_names.append(asset.name)
