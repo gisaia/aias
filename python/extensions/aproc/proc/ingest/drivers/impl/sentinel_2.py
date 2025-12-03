@@ -5,7 +5,7 @@ from datetime import datetime
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, setup_gdal)
@@ -97,7 +97,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         setup_gdal()
-
+        resolutions: list[float] = []
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
@@ -131,13 +131,15 @@ class Driver(IngestDriver):
             for bands in root.iter("Spectral_Information_List"):
                 for band in bands.iter('Spectral_Information'):
                     band_id = band.get('bandId')
+                    resolutions.append(Driver.__get_property(band, 'RESOLUTION'))
                     eo__bands.append(Band(
                         asset=band.get('physicalBand'),
                         name=band.get('physicalBand'),
                         eo__common_name=BANDS_NAME.get(band_id, ''),
                         eo__center_wavelength=Driver.__get_property(band, 'Wavelength/CENTRAL')
                     ))
-
+        if len(resolutions) > 0:
+            gsd = min(resolutions)
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -148,7 +150,10 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation="Sentinel 2",
+                instrument=satellite,
+                sensor=satellite,
                 satellite=satellite,
+                sensor_type=SensorType.OPTIC,
                 secondary_id=secondary_id,
                 item_format=ItemFormat.safe,
                 main_asset_format=AssetFormat.jpg2000,
@@ -163,6 +168,8 @@ class Driver(IngestDriver):
             ),
             assets=dict([(asset.name, asset) for asset in assets])
         )
+        if len(resolutions) > 0:
+            item.properties.gsd = gsd
 
         return item
 

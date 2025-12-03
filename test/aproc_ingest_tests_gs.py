@@ -56,7 +56,7 @@ class Tests(IngestTests):
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)
         item_id = "eee16f1452c0ff3897d2a3b6595348bd151993aedc95104246accec3a00f05d1"
-        self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS], archive=False)
+        self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS])
 
     def test_async_ingest_csk(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
@@ -66,12 +66,12 @@ class Tests(IngestTests):
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)
         item_id = "36c5e88bffde5ab72c50e94f43b40a6f938a6c3bf92f7c889d95879756da76a8"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "iw grd vh", "iw grd vv", "metadata", "airs_item"], archive=False, data_key=None)
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "iw grd vh", "iw grd vv", "metadata", "airs_item"], data_key=None)
 
     def test_async_ingest_sentinel1_slc(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_SLC)
         item_id = "cee7d7833c946cc37062698a382a863ac1c3272d1e8ca115f846b55871fd7834"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", *[f"iw{i} slc {pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], archive=False, data_key=None)
+        self.async_ingest(url, item_id, ["thumbnail", "overview", *[f"iw{i} slc {pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], data_key=None)
 
     def test_async_ingest_iceye(self):  # Driver ICEYE
         url = os.path.join(ROOT, ICEYE)
