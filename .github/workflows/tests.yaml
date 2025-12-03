@@ -11,7 +11,7 @@ on:
       run_all:
         description: 'Run All?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -20,7 +20,7 @@ on:
       run_hadolint:
         description: 'Run Hadolint?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -29,7 +29,7 @@ on:
       run_aias_am:
         description: 'Run AIAS AM tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -38,7 +38,7 @@ on:
       run_aias_g1:
         description: 'Run AIAS G1 tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -47,7 +47,7 @@ on:
       run_aias_g2:
         description: 'Run AIAS G2 tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -55,7 +55,7 @@ on:
       run_aias_g3:
         description: 'Run AIAS G3 tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -63,7 +63,7 @@ on:
       run_aias_g4_fs:
         description: 'Run AIAS G4 FS tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -71,7 +71,7 @@ on:
       run_aias_g4_gs:
         description: 'Run AIAS G4 GS tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -79,7 +79,7 @@ on:
       run_aias_g4_minio:
         description: 'Run AIAS G4 Minio tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
@@ -87,7 +87,7 @@ on:
       run_geodes_stac:
         description: 'Run Geodes STAC tests?'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
         - 'true'
