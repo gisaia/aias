@@ -1,9 +1,97 @@
 name: Test AIAS
 
-on: push
+on:
+  workflow_dispatch:
+    inputs:
+      run_all:
+        description: 'Run All?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
+      run_hadolint:
+        description: 'Run Hadolint?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
+      run_aias_am:
+        description: 'Run AIAS AM tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
+      run_aias_g1:
+        description: 'Run AIAS G1 tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
+      run_aias_g2:
+        description: 'Run AIAS G2 tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      run_aias_g3:
+        description: 'Run AIAS G3 tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      run_aias_g4_fs:
+        description: 'Run AIAS G4 FS tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      run_aias_g4_gs:
+        description: 'Run AIAS G4 GS tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      run_aias_g4_minio:
+        description: 'Run AIAS G4 Minio tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      run_geodes_stac:
+        description: 'Run Geodes STAC tests?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
 
 jobs:
   hadolint:
+    if: inputs.run_hadolint == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,6 +106,7 @@ jobs:
           dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
  
   aias-tests-am:
+    if: inputs.run_aias_am == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +123,7 @@ jobs:
 
 
   aias-tests-g1:
+    if: inputs.run_aias_g1 == 'true' || inputs.run_all == 'true'
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -58,6 +148,7 @@ jobs:
       if: always()
       
   aias-tests-g2:
+    if: inputs.run_aias_g2 == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -83,6 +174,7 @@ jobs:
 
 
   aias-tests-g3:
+    if: inputs.run_aias_g3 == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -108,6 +200,7 @@ jobs:
   
 
   aias-tests-g4-fs:
+    if: inputs.run_aias_g4_fs == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -133,6 +226,7 @@ jobs:
   
 
   aias-tests-g4-gs:
+    if: inputs.run_aias_g4_gs == 'true' || inputs.run_all == 'true'
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -158,6 +252,7 @@ jobs:
   
 
   aias-tests-g4-minio:
+    if: inputs.run_aias_g4_minio == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -183,6 +278,7 @@ jobs:
   
 
   geodes-stac-test:
+    if: inputs.run_geodes_stac == 'true' || inputs.run_all == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
