@@ -2,6 +2,7 @@ name: Test AIAS
 
 on:
   pull_request:
+    types: [opened, reopened]
     branches:
       - develop
       - master
@@ -66,7 +67,7 @@ on:
 
 jobs:
   hadolint:
-    if: inputs.run_hadolint || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_hadolint || inputs.run_all))
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -81,7 +82,7 @@ jobs:
           dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
  
   aias-tests-am:
-    if: inputs.run_aias_am || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_am || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -98,7 +99,7 @@ jobs:
 
 
   aias-tests-g1:
-    if: inputs.run_aias_g1 || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g1 || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -123,7 +124,7 @@ jobs:
       if: always()
       
   aias-tests-g2:
-    if: inputs.run_aias_g2 || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g2 || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -149,7 +150,7 @@ jobs:
 
 
   aias-tests-g3:
-    if: inputs.run_aias_g3 || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g3 || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -175,7 +176,7 @@ jobs:
   
 
   aias-tests-g4-fs:
-    if: inputs.run_aias_g4_fs || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_fs || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -201,7 +202,7 @@ jobs:
   
 
   aias-tests-g4-gs:
-    if: inputs.run_aias_g4_gs || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_gs || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -225,9 +226,8 @@ jobs:
       run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
       if: always()
   
-
   aias-tests-g4-minio:
-    if: inputs.run_aias_g4_minio || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_minio || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -253,7 +253,7 @@ jobs:
   
 
   geodes-stac-test:
-    if: inputs.run_geodes_stac || inputs.run_all
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_geodes_stac || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
