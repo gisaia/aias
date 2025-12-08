@@ -1,23 +1,23 @@
 import json
 import threading
 import unittest
-
-from fastapi import FastAPI, Request
-import uvicorn
-from aproc.core.models.ogc.execute import Subscriber
-from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
-                        setUpTest)
 from time import sleep
 
 import requests
+import uvicorn
+from fastapi import FastAPI, Request
+
 from airs.core.models import mapper
 from airs.core.models.model import Item, Role
 from aproc.core.models.ogc import Execute
+from aproc.core.models.ogc.execute import Subscriber
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
 from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
+from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
+                        setUpTest)
 
 DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
 IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
@@ -29,8 +29,13 @@ TIF = "cog.tiff"
 JP2000 = "jpeg2000.jpg2"
 SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 RADARSAT2 = "RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
+CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
+SENTINEL1_GRDH = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
+SENTINEL1_SLC = "S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
+ICEYE = "ICEYE-Scan-mode/2631255"
+SKYSAT = "skysat/"
 
-SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   #NOSONAR 
+SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   #NOSONAR
 
 callback_job_status = {}
 
@@ -49,11 +54,6 @@ def run_server(port=8080):
 
 # Start the server in a separate thread
 threading.Thread(target=run_server, daemon=True).start()
-
-CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
-SENTINEL1_GRDH = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
-SENTINEL1_SLC = "S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
-ICEYE = "ICEYE-Scan-mode/2631255"
 
 
 class IngestTests(unittest.TestCase):

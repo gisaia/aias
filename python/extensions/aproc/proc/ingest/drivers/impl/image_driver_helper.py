@@ -5,7 +5,6 @@ import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, Properties, ResourceType, Role)
-from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -30,8 +29,9 @@ class ImageDriverHelper:
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
+    # TODO: replace by geotiff_to_jpg ?
     @staticmethod
-    def add_overview_if_you_can(driver: AbstractDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
+    def add_overview_if_you_can(driver: IngestDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
         driver.LOGGER.debug("Try to create the thumbnail of {}".format(url))
         try:
             from PIL import Image
@@ -59,17 +59,26 @@ class ImageDriverHelper:
                             roles=[role.value], name=role.value, type=type.value,
                             description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value))
 
-    # Implements drivers method
+    @staticmethod
+    def add_archive(assets: list[Asset], href: str):
+        assets.append(Asset(href=href, roles=[Role.archive.value], name=Role.archive.value, asset_format=AssetFormat.directory.value,
+                            type=MimeType.DIRECTORY.value, description=Role.archive.value, airs__managed=False))
+
     @staticmethod
     def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
     @staticmethod
     def transform_assets(driver: IngestDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
+    @staticmethod
+    def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
+        preview = Asset(href=None, name= role.value, description=role.value, roles=[role.value],
+                        type=type.value, asset_format=format.value, asset_type=ResourceType.other.value)
+        preview.href = driver.get_asset_filepath(href, preview)
+        return preview
+
     @staticmethod
     def to_item(driver: IngestDriver, item_format: ItemFormat, asset_format: AssetFormat, url: str, assets: list[Asset]) -> Item:
         import rasterio
@@ -138,7 +147,7 @@ class ImageDriverHelper:
                 main_asset_name=Role.data.value,
                 description=description
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
         item.properties.instrument = None
         item.properties.constellation = None

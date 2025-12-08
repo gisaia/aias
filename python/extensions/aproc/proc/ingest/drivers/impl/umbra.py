@@ -24,17 +24,7 @@ class Driver(IngestDriver):
 
     def identify_assets(self, url: str):
         assets: list[Asset] = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
 
         if self.thumbnail_path:
             ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
@@ -118,7 +108,7 @@ class Driver(IngestDriver):
                 sar__observation_direction=sar__observation_direction,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
         return item
 

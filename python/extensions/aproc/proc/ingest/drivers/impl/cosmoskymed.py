@@ -40,17 +40,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
 
         assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value if self.data_format == AssetFormat.geotiff else MimeType.HDF5.value,
@@ -81,10 +71,10 @@ class Driver(IngestDriver):
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.browse_path is not None:
             self.__prepare_thumbnail__(url)
-            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
+            geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
 
             self.__prepare_quicklook__(url)
-            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
+            geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
         elif self.data_format == AssetFormat.h5:
             import h5py
             import numpy as np
@@ -182,7 +172,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit_direction=orbit_direction,
                 acq__acquisition_orbit=orbit_number
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
 
         return item

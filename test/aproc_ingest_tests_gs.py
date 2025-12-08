@@ -1,8 +1,9 @@
 import os
 import unittest
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, ICEYE, IKONOS, JP2000,
-                                     RAPID_EYE, SENTINEL1_GRDH, SENTINEL1_SLC, SENTINEL2,
-                                     TERRASARX, TIF, WORLDVIEW, IngestTests, RADARSAT2)
+                                     RADARSAT2, RAPID_EYE, SENTINEL1_GRDH,
+                                     SENTINEL1_SLC, SENTINEL2, SKYSAT,
+                                     TERRASARX, TIF, WORLDVIEW, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
 ROOT = "gs://gisaia-public/test-aias"
@@ -82,6 +83,11 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, RADARSAT2)
         item_id = "81fde97a25a2611b3806f314a73bdca6c59d655a74c0a58d6470bbe50247feab"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "Polarization HH", "metadata", "airs_item"], data_key="Polarization HH")
+
+    def test_async_ingest_skysat(self):  # Driver SKYSAT
+        url = os.path.join(ROOT, SKYSAT)
+        item_id = "66fc9856b9120c2d04c4ea4886368726bc0577bfb6bd79107d877005a9a46024"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "UDM2", "visual", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':

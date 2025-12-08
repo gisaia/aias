@@ -38,17 +38,8 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
+
         assets.append(
             Asset(
                 href=self.tif_path,
@@ -220,7 +211,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.dem.value,
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets)),
+            assets=dict([(asset.name, asset) for asset in assets]),
         )
 
         return item
