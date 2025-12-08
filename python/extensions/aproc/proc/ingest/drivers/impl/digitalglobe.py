@@ -6,6 +6,8 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     get_epsg, get_geom_bbox_centroid, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -31,17 +33,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
 
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,

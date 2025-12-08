@@ -5,7 +5,6 @@ import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, Properties, ResourceType, Role)
-from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -60,23 +59,27 @@ class ImageDriverHelper:
                             roles=[role.value], name=role.value, type=type.value,
                             description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value))
 
-    # TODO: use it in other drivers
     @staticmethod
     def add_archive(assets: list[Asset], href: str):
         assets.append(Asset(href=href, roles=[Role.archive.value], name=Role.archive.value, asset_format=AssetFormat.directory.value,
                             type=MimeType.DIRECTORY.value, description=Role.archive.value, airs__managed=False))
 
-    # Implements drivers method
     @staticmethod
     def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
     @staticmethod
     def transform_assets(driver: IngestDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
+    @staticmethod
+    def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
+        preview = Asset(href=None, name= role.value, description=role.value, roles=[role.value],
+                        type=type.value, asset_format=format.value, asset_type=ResourceType.other.value)
+        preview.href = driver.get_asset_filepath(href, preview)
+        return preview
+
+
     @staticmethod
     def to_item(driver: IngestDriver, item_format: ItemFormat, asset_format: AssetFormat, url: str, assets: list[Asset]) -> Item:
         import rasterio

@@ -68,7 +68,6 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-# TODO: review usages as width_pct might be misinterpreted
 def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
     """
     Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages

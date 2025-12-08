@@ -8,8 +8,9 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid,geotiff_to_jpg)
+    get_epsg_from_gdal_info, get_geom_bbox_centroid, geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+
 
 class Driver(IngestDriver):
     output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
@@ -24,6 +25,7 @@ class Driver(IngestDriver):
         self.polarizations = []
         self.browse_path = None
         self.url = None
+
     def _add_polarization(self, name: str, path: str):
         self.polarizations.append({
             'polarization': name,
@@ -41,6 +43,7 @@ class Driver(IngestDriver):
             MimeType.JPG, AssetFormat.jpg, ResourceType.other,
             airs__managed=True
         )
+
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
@@ -50,20 +53,11 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
+
         for pol in self.polarizations:
-            assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']),proj__epsg=get_epsg_from_gdal_info(pol['path']),
-                                roles=[Role.data.value], name=pol['name'], type=MimeType.GEOTIFF.value,sar__polarizations=[pol['polarization']],
+            assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']), proj__epsg=get_epsg_from_gdal_info(pol['path']),
+                                roles=[Role.data.value], name=pol['name'], type=MimeType.GEOTIFF.value, sar__polarizations=[pol['polarization']],
                                 description=pol['name'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
@@ -80,20 +74,21 @@ class Driver(IngestDriver):
                 assets, Role.overview, 100, "quicklook"
             )
         return assets
+
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"} #NOSONAR
+        ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
         tiepoints = []
         # Loop on tie points
         for tp in root.findall(".//rs2:imageTiePoint", ns):
-            line  = float(tp.find("rs2:imageCoordinate/rs2:line", ns).text)
+            line = float(tp.find("rs2:imageCoordinate/rs2:line", ns).text)
             pixel = float(tp.find("rs2:imageCoordinate/rs2:pixel", ns).text)
             lat = float(tp.find("rs2:geodeticCoordinate/rs2:latitude", ns).text)
             lon = float(tp.find("rs2:geodeticCoordinate/rs2:longitude", ns).text)
@@ -121,7 +116,7 @@ class Driver(IngestDriver):
 
         pixel_spacing = root.find(".//rs2:sampledPixelSpacing", ns).text
         line_spacing = root.find(".//rs2:sampledLineSpacing", ns).text
-        gsd = max(float(pixel_spacing),float(line_spacing))
+        gsd = max(float(pixel_spacing), float(line_spacing))
 
         orbit_data_file = root.find(".//rs2:orbitDataFile", ns).text
         orbit_number = orbit_data_file.split('_')[0]

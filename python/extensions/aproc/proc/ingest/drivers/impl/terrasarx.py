@@ -34,17 +34,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
 
         assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.TEXT.value,
@@ -64,13 +54,13 @@ class Driver(IngestDriver):
             thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
             AccessManager.makedir(thumbnail_path)
             self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path, 50, 50, self.thumbnail_path)
+            geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
             ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
             quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
             AccessManager.makedir(quicklook_path)
             self.quicklook_path = quicklook_path + '/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path, 250, 250, self.quicklook_path)
+            geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
             ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
         return assets
 

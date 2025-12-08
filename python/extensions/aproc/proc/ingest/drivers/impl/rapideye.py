@@ -31,6 +31,8 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
+        ImageDriverHelper.add_archive(assets, url)
+
         assets.append(Asset(href=self.xml_path, size=AccessManager.get_size(self.xml_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
@@ -45,17 +47,6 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.DIRECTORY.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.directory.value
-            )
-        )
         # If not None, then no thumbnail & quicklook ?
         if self.quicklook_path is None:
             ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets)

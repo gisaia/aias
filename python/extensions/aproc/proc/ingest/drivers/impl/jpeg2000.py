@@ -17,7 +17,19 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        return ImageDriverHelper.identify_assets(self, "image/jp2", url)
+        assets = ImageDriverHelper.identify_assets(self, "image/jp2", url)
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.JPEG2000.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.jpg2000.value
+            )
+        )
+        return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:

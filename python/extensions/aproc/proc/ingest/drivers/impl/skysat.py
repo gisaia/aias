@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
@@ -15,15 +14,12 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
-
     def __init__(self):
         super().__init__()
         self.md_path = None
         self.sr_path = None
         self.visual_tif_path = None
         self.thumbnail_path = None
-        self.quicklook_path = None
         # Mask with clear/snow/shadow/haze/cloud/confidence/...
         self.udm_path = None
 
@@ -31,7 +27,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -67,24 +62,18 @@ class Driver(IngestDriver):
             bands = [3, 2, 1]
             tif_path = self.sr_path
             stretch = True
-        # TODO: create utils method for that
-        quicklook_folder = os.path.join(Driver.output_folder, self.get_item_id(url), 'quicklook')
-        AccessManager.makedir(quicklook_folder)
-        self.quicklook_path = os.path.join(quicklook_folder, "quicklook.jpg")
 
-        geotiff_to_jpg(tif_path, 10, 10, output_path=self.quicklook_path,
+        quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+        geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href,
                        bands_list=bands, stretch=stretch)
-        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview,
-                                    MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        quicklook.size = AccessManager.get_size(quicklook.href)
+        assets.append(quicklook)
 
         if self.thumbnail_path is None:
-            thumbnail_folder = os.path.join(Driver.output_folder, self.get_item_id(url), 'thumbnail')
-            AccessManager.makedir(thumbnail_folder)
-            self.thumbnail_path = os.path.join(thumbnail_folder, "thumbnail.jpg")
-            downsample_image(self.quicklook_path, self.thumbnail_path, 4)
-
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
-                                        MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method
