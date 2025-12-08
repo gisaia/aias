@@ -125,7 +125,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
 
         return item
@@ -133,22 +133,24 @@ class Driver(IngestDriver):
     def __check_path__(self, path: str):
         self.__init__()
 
-        if AccessManager.is_dir(path):
-            for file in AccessManager.listdir(path):
-                if not file.is_dir:
-                    if file.name.find("_analytic_SR_") != -1 and file.name.endswith(".tif"):
-                        self.sr_path = file.path
-                    elif file.name.endswith("_metadata.json"):
-                        self.md_path = file.path
-                    elif file.name.find("_udm2") != -1 and file.name.endswith(".tif"):
-                        self.udm_path = file.path
-                    elif file.name.find("_visual_") != -1 and file.name.endswith(".thumbnail.png"):
-                        self.thumbnail_path = file.path
-                    elif file.name.find("_visual_") != -1 and file.name.endswith(".tif"):
-                        self.visual_tif_path = file.path
+        if not AccessManager.is_dir(path):
+            return False
 
-            return self.sr_path is not None \
-                and self.md_path is not None \
-                and self.udm_path is not None
+        for file in AccessManager.listdir(path):
+            if file.is_dir:
+                continue
 
-        return False
+            if file.name.find("_analytic_SR_") != -1 and file.name.endswith(".tif"):
+                self.sr_path = file.path
+            elif file.name.endswith("_metadata.json"):
+                self.md_path = file.path
+            elif file.name.find("_udm2") != -1 and file.name.endswith(".tif"):
+                self.udm_path = file.path
+            elif file.name.find("_visual_") != -1 and file.name.endswith(".thumbnail.png"):
+                self.thumbnail_path = file.path
+            elif file.name.find("_visual_") != -1 and file.name.endswith(".tif"):
+                self.visual_tif_path = file.path
+
+        return self.sr_path is not None \
+            and self.md_path is not None \
+            and self.udm_path is not None

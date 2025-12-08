@@ -172,7 +172,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit_direction=orbit_direction,
                 acq__acquisition_orbit=orbit_number
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
 
         return item

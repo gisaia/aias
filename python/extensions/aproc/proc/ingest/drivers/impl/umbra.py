@@ -108,7 +108,7 @@ class Driver(IngestDriver):
                 sar__observation_direction=sar__observation_direction,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
         return item
 

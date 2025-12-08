@@ -79,7 +79,6 @@ class ImageDriverHelper:
         preview.href = driver.get_asset_filepath(href, preview)
         return preview
 
-
     @staticmethod
     def to_item(driver: IngestDriver, item_format: ItemFormat, asset_format: AssetFormat, url: str, assets: list[Asset]) -> Item:
         import rasterio
@@ -148,7 +147,7 @@ class ImageDriverHelper:
                 main_asset_name=Role.data.value,
                 description=description
             ),
-            assets=dict(map(lambda asset: (asset.name, asset), assets))
+            assets=dict([(asset.name, asset) for asset in assets])
         )
         item.properties.instrument = None
         item.properties.constellation = None

@@ -37,10 +37,10 @@ def get_geom_bbox_centroid(ul_lon: float, ul_lat: float, ur_lon: float, ur_lat: 
 
 
 def get_bbox(coordinates: list[list[float]]):
-    return [min(map(lambda xy: xy[0], coordinates)),
-            min(map(lambda xy: xy[1], coordinates)),
-            max(map(lambda xy: xy[0], coordinates)),
-            max(map(lambda xy: xy[1], coordinates))]
+    return [min([xy[0] for xy in coordinates]),
+            min([xy[1] for xy in coordinates]),
+            max([xy[0] for xy in coordinates]),
+            max([xy[1] for xy in coordinates])]
 
 
 def get_centroid(geometry):
@@ -82,16 +82,16 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
         if dataset.RasterCount == 3:
             bands_list = [3, 2, 1]
 
-    scaleParams = None
+    scale_params = None
     if stretch:
-        scaleParams = []
+        scale_params = []
         for idx in bands_list:
             band_min, band_max = dataset.GetRasterBand(idx).ComputeRasterMinMax(approx_ok=True)
-            scaleParams.append([band_min, band_max])
+            scale_params.append([band_min, band_max])
 
     # Define output format and options
     options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
-                                    outputType=output_types[0], scaleParams=scaleParams)
+                                    outputType=output_types[0], scaleParams=scale_params)
 
     # Translate to JPEG
     if output_path is not None:
