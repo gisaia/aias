@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from typing import List
 import elasticsearch
+from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse
 import pygeohash as pgh
 import pytz
 import requests
@@ -308,6 +309,16 @@ def reindex(collection: str):
             register_item(item)
         os.remove(tmp_file)  # !DELETE!
     LOGGER.info("Done with reindexing collection {}".format(collection))
+
+
+def list_collections() -> CollectionDescriptionListResponse:
+    """ List all collections available
+    """
+    collections: list[CollectionDescription] = []
+    indices = __getES().indices.get(index=__get_es_index_name("*")).keys()
+    for i in indices:
+        collections.append(CollectionDescription(id=i, title=f"Collection {i}", description=f"Collection {i}", links=[]))
+    return CollectionDescriptionListResponse(collections=collections, links=[], numberMatched=len(indices), numberReturned=len(indices))
 
 
 def item_exists(collection: str, item_id: str) -> bool:
