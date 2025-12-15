@@ -6,11 +6,12 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
-from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, setup_gdal)
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates,
+    setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from shapely.geometry import Polygon
 
 RED_EDGE = "Vegetation red edge"
 BANDS_NAME = {
@@ -113,15 +114,8 @@ class Driver(IngestDriver):
                 coords_raw = coords.text.strip().split()
                 coords_float = list(map(float, coords_raw))
                 # WARNING IN EXT_POS_LIST order is lat lon , in geojson we need lon lat
-                points = [(coords_float[i+1], coords_float[i]) for i in range(0, len(coords_float), 2)]
-                poly = Polygon(points)
-                coords_geojson = [list(coord) for coord in poly.exterior.coords]
-                geometry = {
-                    "type": "Polygon",
-                    "coordinates": [coords_geojson]
-                }
-                bbox = list(poly.bounds)
-                centroid = [poly.centroid.x, poly.centroid.y]
+                points = [[coords_float[i+1], coords_float[i]] for i in range(0, len(coords_float), 2)]
+                geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(points)
 
             eo__bands: list[Band] = []
             for bands in root.iter("Spectral_Information_List"):

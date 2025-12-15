@@ -2,7 +2,7 @@ import os
 import unittest
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, ICEYE, IKONOS, JP2000,
                                      RADARSAT2, RAPID_EYE, SENTINEL1_GRDH,
-                                     SENTINEL1_SLC, SENTINEL2, SKYSAT,
+                                     SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
@@ -88,6 +88,11 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SKYSAT)
         item_id = "66fc9856b9120c2d04c4ea4886368726bc0577bfb6bd79107d877005a9a46024"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "UDM2", "visual", "metadata", "airs_item"])
+
+    def test_async_ingest_spot5(self):  # Driver SPOT5
+        url = os.path.join(ROOT, SPOT5)
+        item_id = "e3753718ee48324000b50a457444d0efd0881a8589da5bce4b9f3bc8d7648873"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':

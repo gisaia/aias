@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid, setup_gdal)
+    get_epsg, get_geom_bbox_centroid_from_corners, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -85,7 +85,7 @@ class Driver(IngestDriver):
         lr_lon = float(root.find("./TIL/TILE/LRLON").text)
         ll_lat = float(root.find("./TIL/TILE/LLLAT").text)
         ll_lon = float(root.find("./TIL/TILE/LLLON").text)
-        geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
 
         # Overwrite geometry and centroid if GIS_FILE is present with order shape file
         d = AccessManager.dirname(url)

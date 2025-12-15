@@ -19,7 +19,21 @@ def get_id(url: str):
     return url_id
 
 
-def get_geom_bbox_centroid(ul_lon: float, ul_lat: float, ur_lon: float, ur_lat: float, lr_lon: float, lr_lat: float, ll_lon: float, ll_lat: float):
+def get_geom_bbox_centroid_from_coordinates(coordinates: list[list[float, float]]):
+    from shapely.geometry import Polygon
+
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [coordinates]
+    }
+
+    polygon = Polygon(coordinates)
+    bbox = list(polygon.bounds)
+    centroid = [polygon.centroid.x, polygon.centroid.y]
+    return geometry, bbox, centroid
+
+
+def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: float, ur_lat: float, lr_lon: float, lr_lat: float, ll_lon: float, ll_lat: float):
     coordinates = [[ul_lon, ul_lat],
                    [ur_lon, ur_lat],
                    [lr_lon, lr_lat],
