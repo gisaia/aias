@@ -5,6 +5,7 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -66,6 +67,11 @@ class Driver(IngestDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         d = {}
 
+        # One metadata file can refer to multiple geoeye products
+        # We need to check that the correct metadata are taken for the item
+        inside_component_section = False
+        inside_product_image_section = False
+
         coordinates = []
         coords_length = 0
         lat = None
@@ -78,30 +84,46 @@ class Driver(IngestDriver):
                     if line.find("Number of Coordinates") >= 0:
                         coords_length = int(line.split(':')[1].strip())
                     # Get all the degrees coordinates
-                    if line.find('degrees') >= 0 and len(coordinates) < coords_length:
-                        if line.find('Latitude') >= 0:
-                            lat = float((line.split(':')[1].strip()).split(' ')[0])
-                        if line.find('Longitude') >= 0:
-                            lon = float((line.split(':')[1].strip()).split(' ')[0])
-                            if lon is not None and lat is not None:
+                    if inside_component_section:
+                        self.__get_field__(d, line, 'Product Image ID')
+                        self.__get_field__(d, line, 'Pixel Size X')
+                        self.__get_field__(d, line, 'Pixel Size Y')
+                        self.__get_field__(d, line, 'Percent Component Cloud Cover', True)
+
+                        if line.find('degrees') >= 0 and len(coordinates) < coords_length:
+                            if line.find('Latitude') >= 0:
+                                lat = float((line.split(':')[1].strip()).split(' ')[0])
+                            if line.find('Longitude') >= 0:
+                                lon = float((line.split(':')[1].strip()).split(' ')[0])
+                            if lat is not None and lon is not None:
                                 coordinates.append([lon, lat])
                                 lon = None
                                 lat = None
+                        # Stop reading the file if the last line of the product description is reached
+                        if line.find('Percent Component Cloud Cover:') >= 0:
+                            break
+                    if line.find('Component ID: ' + self.component_id) >= 0:
+                        inside_component_section = True
 
-                    self.__get_field__(d, line, 'Product Image ID')
-                    self.__get_field__(d, line, 'Pixel Size X')
-                    self.__get_field__(d, line, 'Pixel Size Y')
-                    self.__get_field__(d, line, 'Percent Component Cloud Cover', True)
+            # Loop on the metadata file to ensure taht we got the Product Image ID
+            with open(local_met_path) as f:
+                for line in f:
                     self.__get_field__(d, line, 'Sensor Type')
                     self.__get_field__(d, line, 'Processing Level')
-                    self.__get_field__(d, line, 'Sensor')
-                    self.__get_field__(d, line, 'Scan Azimuth')
-                    self.__get_field__(d, line, 'Sun Angle Azimuth')
-                    self.__get_field__(d, line, 'Sun Angle Elevation')
-                    self.__get_date_field__(d, line)
+                    if inside_product_image_section:
+                        self.__get_field__(d, line, 'Sensor')
+                        self.__get_field__(d, line, 'Scan Azimuth')
+                        self.__get_field__(d, line, 'Sun Angle Azimuth')
+                        self.__get_field__(d, line, 'Sun Angle Elevation')
+                        self.__get_date_field__(d, line)
+
+                        if line.find('Percent Cloud Cover:') >= 0:
+                            break
+                    if line.find('Product Image ID: ' + d['Product Image ID']) >= 0:
+                        inside_product_image_section = True
 
         if len(coordinates) < 4:
-            raise Exception("Couldn't find enough coordinates for a polygon")
+            raise DriverException("Couldn't find enough coordinates for a polygon")
         coordinates.append(coordinates[0])
 
         geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coordinates)

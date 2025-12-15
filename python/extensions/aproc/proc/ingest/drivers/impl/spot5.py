@@ -66,7 +66,7 @@ class Driver(IngestDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         setup_gdal()
 
-        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}
+        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
