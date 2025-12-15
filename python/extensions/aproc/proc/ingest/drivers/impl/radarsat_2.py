@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid, geotiff_to_jpg)
+    get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners, geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -104,7 +104,7 @@ class Driver(IngestDriver):
         BL = max(tiepoints, key=lambda t: (t["line"], -t["pixel"]))
         BR = max(tiepoints, key=lambda t: (t["line"], t["pixel"]))
 
-        geometry, bbox, centroid = get_geom_bbox_centroid(float(UL["lon"]), float(UL["lat"]), float(UR["lon"]), float(UR["lat"]), float(BR["lon"]), float(BR["lat"]), float(BL["lon"]), float(BL["lat"]))
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(float(UL["lon"]), float(UL["lat"]), float(UR["lon"]), float(UR["lat"]), float(BR["lon"]), float(BR["lat"]), float(BL["lon"]), float(BL["lat"]))
 
         start_time = root.find(".//rs2:zeroDopplerTimeFirstLine", ns).text
         start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")

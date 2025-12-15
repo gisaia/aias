@@ -6,9 +6,11 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
-from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
+    ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid, setup_gdal)
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates,
+    setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 RED_EDGE = "Vegetation red edge"
@@ -109,13 +111,11 @@ class Driver(IngestDriver):
                 snow_cover = p_info.text
 
             for coords in root.iter('EXT_POS_LIST'):
-                corners = coords.text.removesuffix(' ').split(' ')
-                lats = [float(c) for (i, c) in enumerate(corners) if i % 2 == 0]
-                lons = [float(c) for (i, c) in enumerate(corners) if i % 2 == 1]
-
-                geometry, bbox, centroid = get_geom_bbox_centroid(
-                    lons[0], lats[0], lons[1], lats[1], lons[2], lats[2], lons[3], lats[3]
-                )
+                coords_raw = coords.text.strip().split()
+                coords_float = list(map(float, coords_raw))
+                # WARNING IN EXT_POS_LIST order is lat lon , in geojson we need lon lat
+                points = [[coords_float[i+1], coords_float[i]] for i in range(0, len(coords_float), 2)]
+                geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(points)
 
             eo__bands: list[Band] = []
             for bands in root.iter("Spectral_Information_List"):

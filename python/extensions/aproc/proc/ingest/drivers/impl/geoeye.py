@@ -5,10 +5,11 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid)
+    get_epsg, get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -65,56 +66,67 @@ class Driver(IngestDriver):
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         d = {}
+
+        # One metadata file can refer to multiple geoeye products
+        # We need to check that the correct metadata are taken for the item
         inside_component_section = False
         inside_product_image_section = False
-        inside_coord_1 = False
-        inside_coord_2 = False
-        inside_coord_3 = False
-        inside_coord_4 = False
+
+        coordinates = []
+        coords_length = 0
+        lat = None
+        lon = None
 
         with AccessManager.make_local(self.met_path) as local_met_path:
             with open(local_met_path) as f:
-                for line_1 in f:
+                for line in f:
+                    # Get number of coordinates to avoid adding bbox to polygon
+                    if line.find("Number of Coordinates") >= 0:
+                        coords_length = int(line.split(':')[1].strip())
+                    # Get all the degrees coordinates
                     if inside_component_section:
-                        self.__set_lat_lon(d, line_1, inside_coord_1, 1)
-                        self.__set_lat_lon(d, line_1, inside_coord_2, 2)
-                        self.__set_lat_lon(d, line_1, inside_coord_3, 3)
-                        self.__set_lat_lon(d, line_1, inside_coord_4, 4)
-                        self.__get_field__(d, line_1, 'Product Image ID')
-                        self.__get_field__(d, line_1, 'Pixel Size X')
-                        self.__get_field__(d, line_1, 'Pixel Size Y')
-                        self.__get_field__(d, line_1, 'Percent Component Cloud Cover', True)
-                        if line_1.find('Coordinate: 1') >= 0:
-                            inside_coord_1 = True
-                            inside_coord_4 = False
-                        if line_1.find('Coordinate: 2') >= 0:
-                            inside_coord_2 = True
-                            inside_coord_1 = False
-                        if line_1.find('Coordinate: 3') >= 0:
-                            inside_coord_3 = True
-                            inside_coord_2 = False
-                        if line_1.find('Coordinate: 4') >= 0:
-                            inside_coord_4 = True
-                            inside_coord_3 = False
-                        if line_1.find('Percent Component Cloud Cover') >= 0:
+                        self.__get_field__(d, line, 'Product Image ID')
+                        self.__get_field__(d, line, 'Pixel Size X')
+                        self.__get_field__(d, line, 'Pixel Size Y')
+                        self.__get_field__(d, line, 'Percent Component Cloud Cover', True)
+
+                        if line.find('degrees') >= 0 and len(coordinates) < coords_length:
+                            if line.find('Latitude') >= 0:
+                                lat = float((line.split(':')[1].strip()).split(' ')[0])
+                            if line.find('Longitude') >= 0:
+                                lon = float((line.split(':')[1].strip()).split(' ')[0])
+                            if lat is not None and lon is not None:
+                                coordinates.append([lon, lat])
+                                lon = None
+                                lat = None
+                        # Stop reading the file if the last line of the product description is reached
+                        if line.find('Percent Component Cloud Cover:') >= 0:
                             break
-                    if line_1.find('Component ID: ' + self.component_id) >= 0:
+                    if line.find('Component ID: ' + self.component_id) >= 0:
                         inside_component_section = True
 
-            with open(local_met_path) as f_2:
-                for line_2 in f_2:
-                    self.__get_field__(d, line_2, 'Sensor Type')
-                    self.__get_field__(d, line_2, 'Processing Level')
+            # Loop on the metadata file to ensure taht we got the Product Image ID
+            with open(local_met_path) as f:
+                for line in f:
+                    self.__get_field__(d, line, 'Sensor Type')
+                    self.__get_field__(d, line, 'Processing Level')
                     if inside_product_image_section:
-                        self.__get_field__(d, line_2, 'Sensor')
-                        self.__get_field__(d, line_2, 'Scan Azimuth')
-                        self.__get_field__(d, line_2, 'Sun Angle Azimuth')
-                        self.__get_field__(d, line_2, 'Sun Angle Elevation')
-                        self.__get_date_field__(d, line_2)
-                    if line_2.find('Product Image ID: ' + d['Product Image ID']) >= 0:
+                        self.__get_field__(d, line, 'Sensor')
+                        self.__get_field__(d, line, 'Scan Azimuth')
+                        self.__get_field__(d, line, 'Sun Angle Azimuth')
+                        self.__get_field__(d, line, 'Sun Angle Elevation')
+                        self.__get_date_field__(d, line)
+
+                        if line.find('Percent Cloud Cover:') >= 0:
+                            break
+                    if line.find('Product Image ID: ' + d['Product Image ID']) >= 0:
                         inside_product_image_section = True
 
-        geometry, bbox, centroid = get_geom_bbox_centroid(d['lon_1'], d['lat_1'], d['lon_2'], d['lat_2'], d['lon_3'], d['lat_3'], d['lon_4'], d['lat_4'])
+        if len(coordinates) < 4:
+            raise DriverException("Couldn't find enough coordinates for a polygon")
+        coordinates.append(coordinates[0])
+
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coordinates)
         x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
         y_pixel_size = float(d['Pixel Size Y'].split(' ')[0])
         gsd = (x_pixel_size + y_pixel_size) / 2
@@ -194,16 +206,3 @@ class Driver(IngestDriver):
                 data[field] = float(line.split(':')[1].strip())
             else:
                 data[field] = line.split(':')[1].strip()
-
-    def __get_latitude__(self, data, line, coord_number):
-        if line.find('Latitude') >= 0:
-            data['lat_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
-
-    def __get_longitude__(self, data, line, coord_number):
-        if line.find('Longitude') >= 0:
-            data['lon_' + str(coord_number)] = float((line.split(':')[1].strip()).split(' ')[0])
-
-    def __set_lat_lon(self, data, line, inside_coord, coord_number):
-        if inside_coord:
-            self.__get_latitude__(data, line, coord_number)
-            self.__get_longitude__(data, line, coord_number)

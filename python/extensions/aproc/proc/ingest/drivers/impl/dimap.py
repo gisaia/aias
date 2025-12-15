@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid, setup_gdal)
+    get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -86,6 +86,18 @@ class Driver(IngestDriver):
         from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
         setup_gdal()
 
+        with AccessManager.make_local(self.dim_path) as local_dim_path:
+            tree = ET.parse(local_dim_path)
+            root = tree.getroot()
+
+            coords = []
+            # Calculate bbox
+            for vertex in root.iter('Vertex'):
+                coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
+                coords.append(coord)
+            coords.append(coords[0])
+            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
+
         # Open ROI GML file to find the real footprint of the product
         with AccessManager.make_local(self.roi_path) as local_roi_path:
             ogr_d = ogr.GetDriverByName("GML")
@@ -126,18 +138,6 @@ class Driver(IngestDriver):
             centroid_geom = component_geometry.Centroid()
             centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
             centroid = [float(centroid_geom_list[2]), float(centroid_geom_list[1])]
-
-        with AccessManager.make_local(self.dim_path) as local_dim_path:
-            tree = ET.parse(local_dim_path)
-            root = tree.getroot()
-
-            coords = []
-            # Calculate bbox
-            for vertex in root.iter('Vertex'):
-                coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
-                coords.append(coord)
-            geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
-                                                              coords[2][0], coords[2][1], coords[3][0], coords[3][1])
 
         # Open the XML dimap file with gdal to retrieve the metadata
         metadata = AccessManager.get_gdal_md(self.dim_path)

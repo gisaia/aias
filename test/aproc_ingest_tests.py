@@ -19,23 +19,24 @@ from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
                         setUpTest)
 
-DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
-WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
 AST = "ast/"
-TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
-RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
-TIF = "cog.tiff"
-JP2000 = "jpeg2000.jpg2"
-SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
-RADARSAT2 = "RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
 CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
+DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+ICEYE = "ICEYE-Scan-mode/2631255"
+IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+JP2000 = "jpeg2000.jpg2"
+RADARSAT2 = "RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
+RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
 SENTINEL1_GRDH = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
 SENTINEL1_SLC = "S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
-ICEYE = "ICEYE-Scan-mode/2631255"
+SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 SKYSAT = "skysat/"
+SPOT5 = "spot5/"
+TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
+TIF = "cog.tiff"
+WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
 
-SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   #NOSONAR
+SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
 callback_job_status = {}
 
@@ -44,7 +45,7 @@ app = FastAPI()
 
 @app.post("/subscriber/{status}/{id}")
 async def callback(status, id, request: Request):
-    r = await request.json()
+    await request.json()
     callback_job_status[id] = status
 
 

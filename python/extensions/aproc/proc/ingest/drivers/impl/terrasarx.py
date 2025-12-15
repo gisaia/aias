@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid)
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -83,7 +83,7 @@ class Driver(IngestDriver):
             lr_lon = self.__get_coord__(root, "lowerRightLongitude")
             ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
             ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
-            geometry, bbox, centroid = get_geom_bbox_centroid(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+            geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
             x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
             y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
@@ -92,8 +92,8 @@ class Driver(IngestDriver):
             for vertex in root.findall('productInfo/sceneInfo/sceneCornerCoord'):
                 coord = [float(vertex.find('lon').text), float(vertex.find('lat').text)]
                 coords.append(coord)
-            geometry, bbox, centroid = get_geom_bbox_centroid(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
-                                                              coords[1][0], coords[1][1], coords[0][0], coords[0][1])
+            geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
+                                                                           coords[1][0], coords[1][1], coords[0][0], coords[0][1])
             x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
             y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
 

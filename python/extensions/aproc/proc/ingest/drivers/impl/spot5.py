@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid, setup_gdal)
+    get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -66,18 +66,19 @@ class Driver(IngestDriver):
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         setup_gdal()
 
+        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
             coords = []
             # Get geometry, bbox, centroid
-            for vertex in root.iter('Vertex'):
+            for vertex in root.find('./Dataset_Frame', ns).iter('Vertex'):
                 coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
                 coords.append(coord)
-            geometry, bbox, centroid = get_geom_bbox_centroid(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
-                                                              coords[2][0], coords[2][1], coords[3][0], coords[3][1])
-            if root.find('./Geoposition/Geoposition_Insert/XDIM') and root.find('./Geoposition/Geoposition_Insert/YDIM'):
-                gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM').text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM').text))/2
+            coords.append(coords[0])
+            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
+            if root.find('./Geoposition/Geoposition_Insert/XDIM', ns) is not None and root.find('./Geoposition/Geoposition_Insert/YDIM', ns) is not None:
+                gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM', ns).text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM', ns).text))/2
             else:
                 gsd = None
 

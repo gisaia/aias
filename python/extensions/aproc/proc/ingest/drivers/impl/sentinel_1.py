@@ -10,7 +10,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid)
+    get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 # Level-1 Product Family Summary Table Dictionary
@@ -171,7 +171,7 @@ class Driver(IngestDriver):
 
         coords = root.find(".//safe:footPrint/gml:coordinates", ns).text
         [ul_lat, ul_lon, ur_lat, ur_lon, lr_lat, lr_lon, ll_lat, ll_lon] = ",".join(coords.split(" ")).split(",")
-        geometry, bbox, centroid = get_geom_bbox_centroid(float(ul_lon), float(ul_lat), float(ur_lon), float(ur_lat), float(lr_lon), float(lr_lat), float(ll_lon), float(ll_lat))
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(float(ul_lon), float(ul_lat), float(ur_lon), float(ur_lat), float(lr_lon), float(lr_lat), float(ll_lon), float(ll_lat))
 
         start_time = root.find(".//safe:acquisitionPeriod/safe:startTime", ns).text
         start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f")

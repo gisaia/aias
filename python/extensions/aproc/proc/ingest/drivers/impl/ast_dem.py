@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid)
+    get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -111,7 +111,7 @@ class Driver(IngestDriver):
         lr_lon = float(self.__get_corner_coord__(data, "LOWERRIGHTCORNERLONGITUDE"))
         ll_lat = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLATITUDE"))
         ll_lon = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLONGITUDE"))
-        geometry, bbox, centroid = get_geom_bbox_centroid(
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(
             ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat
         )
         time = data["INVENTORYMETADATA"]["SINGLEDATETIME"]["TIMEOFDAY"]["VALUE"]

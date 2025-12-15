@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, get_epsg_from_gdal_info, get_geom_bbox_centroid)
+    downsample_image, get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -74,7 +74,7 @@ class Driver(IngestDriver):
         [_, _, lr_lat, lr_lon] = root.find("coord_last_far").text.split(" ")
         [_, _, ll_lat, ll_lon] = root.find("coord_last_near").text.split(" ")
 
-        geometry, bbox, centroid = get_geom_bbox_centroid(float(ul_lon), float(ul_lat), float(ur_lon), float(ur_lat), float(lr_lon), float(lr_lat), float(ll_lon), float(ll_lat))
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(float(ul_lon), float(ul_lat), float(ur_lon), float(ur_lat), float(lr_lon), float(lr_lat), float(ll_lon), float(ll_lat))
 
         start_time = root.find("acquisition_start_utc").text
         start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f")
