@@ -78,25 +78,26 @@ def get_client():
 def setUpTest():
     import airs.core.product_registration as rs
     es = elasticsearch.Elasticsearch(index_endpoint_url)
-    try:
-        # Clean the index
-        es.indices.delete(index=index_collection_prefix+"_"+COLLECTION)
-    except Exception:
-        ...
-    try:
-        objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(COLLECTION, ID))
-        for object in objects["Contents"]:
-            get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
-        get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
-    except Exception as e:
-        ...
-    try:
-        objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(COLLECTION, ID_MANAGED))
-        for object in objects["Contents"]:
-            get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
-        get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(COLLECTION, ID))
-    except Exception as e:
-        ...
+    for collection in [COLLECTION, "collection1", "collection2", "collection3"]:
+        try:
+            # Clean the index
+            es.indices.delete(index=index_collection_prefix + "_" + collection)
+        except Exception:
+            ...
+        try:
+            objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID))
+            for object in objects["Contents"]:
+                get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
+            get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
+        except Exception as e:
+            ...
+        try:
+            objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID_MANAGED))
+            for object in objects["Contents"]:
+                get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
+            get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
+        except Exception as e:
+            ...
 
 
 def dir_to_list(dirname, parent={}):

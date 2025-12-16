@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
 
-from airs.core.models.stacapi import CollectionDescriptionListResponse
+from airs.core.models.stacapi import CollectionDescriptionListResponse, Link
 import airs.core.product_registration as rs
 from airs.core import exceptions
 from airs.core.models.mapper import to_json
@@ -29,7 +29,17 @@ async def init_collection(collection: str, request: Request) -> JSONResponse:
             response_model=CollectionDescriptionListResponse,
             response_model_exclude_none=True)
 async def list_collection(request: Request) -> CollectionDescriptionListResponse:
-    return rs.list_collections()
+    collections = rs.list_collections()
+    for c in collections.collections:
+        c.links = [
+            Link(
+                href=str(request.base_url) + "collections/" + c.id,
+                rel="self",
+                type="application/json",
+                title=f"Collection {c.id}"
+            )
+        ]
+    return collections
 
 
 @ROUTER.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)",
