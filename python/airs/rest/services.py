@@ -29,17 +29,7 @@ async def init_collection(collection: str, request: Request) -> JSONResponse:
             response_model=CollectionDescriptionListResponse,
             response_model_exclude_none=True)
 async def list_collection(request: Request) -> CollectionDescriptionListResponse:
-    collections = rs.list_collections()
-    for c in collections.collections:
-        c.links = [
-            Link(
-                href=str(request.base_url) + "collections/" + c.id,
-                rel="self",
-                type="application/json",
-                title=f"Collection {c.id}"
-            )
-        ]
-    return collections
+    return rs.list_collections()
 
 
 @ROUTER.post('/collections/{collection}/items', description="Create an item. item.id must be set. Asset must exist (depends on the server configuration)",
