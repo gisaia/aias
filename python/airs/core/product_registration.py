@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from typing import List
 import elasticsearch
+from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse, Link
 import pygeohash as pgh
 import pytz
 import requests
@@ -310,6 +311,18 @@ def reindex(collection: str):
     LOGGER.info("Done with reindexing collection {}".format(collection))
 
 
+def list_collections() -> CollectionDescriptionListResponse:
+    """ List all collections available
+    """
+    collections: list[CollectionDescription] = []
+    indices = __getES().indices.get(index=__get_es_index_name("*")).keys()
+    for i in indices:
+        i = __get_collection_name_from_es_index_name(i)
+        collections.append(CollectionDescription(id=i, title=f"Collection {i}", description=f"Collection {i}", links=[]))
+    return CollectionDescriptionListResponse(collections=collections, links=[
+    ], numberMatched=len(indices), numberReturned=len(indices))
+
+
 def item_exists(collection: str, item_id: str) -> bool:
     if not __getES().indices.exists(index=__get_es_index_name(collection)):
         LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
@@ -532,6 +545,13 @@ def __get_es_index_name(collection: str) -> str:
         return Configuration.settings.index.collection_prefix + "_" + collection
     else:
         return collection
+
+
+def __get_collection_name_from_es_index_name(index: str) -> str:
+    if Configuration.settings.index.collection_prefix:
+        return index.removeprefix(Configuration.settings.index.collection_prefix + "_")
+    else:
+        return index
 
 
 def __getES():

@@ -110,29 +110,30 @@ def get_jobs_by_resource_id(resourceId: str):
             response_model=LandingPage,
             response_model_exclude_none=True)
 def get_landing_page(request: Request) -> LandingPage:
-    server_root = str(request.base_url).rstrip("/")
+    here = str(request.url).rstrip("/")
+    base = str(request.base_url).rstrip("/")
 
     api_definition = Link(
-        href=server_root + "/openapi.json",
+        href=base + "/openapi.json",
         rel="service-desc",
         type="application/vnd.oai.openapi+json;version=3.0",
         title="OpenAPI service description",
     )
     conformance = Link(
-        href=server_root + "/conformace",
+        href=here + "/conformance",
         rel="http://www.opengis.net/def/rel/ogc/1.0/conformance",
         type=MimeType.JSON.value,
         title="OGC API - Processes conformance classes " +
               "implemented by this server"
     )
     processes = Link(
-        href=server_root + "/processes",
+        href=here + "/processes",
         rel="http://www.opengis.net/def/rel/ogc/1.0/processes",
         type=MimeType.JSON.value,
         title="Metadata about the processes"
     )
     jobs = Link(
-        href=server_root + "/jobs",
+        href=here + "/jobs",
         rel="http://www.opengis.net/def/rel/ogc/1.0/job-list",
         title="The endpoint for job monitoring"
     )
@@ -161,7 +162,7 @@ def get_processes_list(request: Request) -> ProcessList:
 
     for process in Processes.processes:
         processes.append(process.get_process_summary())
-        links.append(__create_process_link(process.get_process_description(), request.base_url))
+        links.append(__create_process_link(process.get_process_description(), request.url))
 
     return ProcessList(
         processes=processes,

@@ -12,8 +12,7 @@ s3:
   tier: $AIRS_S3_TIER|"Standard"
   platform: $AIRS_S3_PLATFORM
   writable_paths:
-    - /digitalearth.africa
-    - /cubes
+    - /
 
 # asset_http_endpoint_url must look like https://storage.googleapis.com/{}/{}
 # first element is the bucket, second is the path to the object
