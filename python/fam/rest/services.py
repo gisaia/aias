@@ -53,7 +53,7 @@ async def archives(path_request: PathRequest, timeout: int = 10):
     path_request.size = min(path_request.size, MAX_SIZE)
     file_path = path_request.path.removesuffix("/")
     __check_file_path__(file_path)
-    archives = await run_in_threadpool(Fam.list_archives, file_path, max_size=path_request.size, timeout_in_seconds=timeout)
+    archives = await run_in_threadpool(Fam.list_archives, file_path, max_size=path_request.size, include_drivers=path_request.include_drivers, timeout_in_seconds=timeout)
     return archives
 
 
