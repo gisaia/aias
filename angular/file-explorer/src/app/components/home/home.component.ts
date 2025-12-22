@@ -39,11 +39,11 @@ export class HomeComponent implements OnInit {
   public showTasks = true;
 
   constructor(
-    private famService: FamService,
-    private jobsService: JobService,
-    private dialog: MatDialog,
-    private toastr: ToastrService,
-    private translate: TranslateService
+    private readonly famService: FamService,
+    private readonly jobsService: JobService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly translate: TranslateService
   ) { }
 
   public ngOnInit(): void {
@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
     const dialogRef = this.dialog.open(DriversDialogComponent, { width: '600px' });
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm) {
+        if (confirm) {
           localStorage.setItem('driversActivated', confirm.drivers);
           this.toastr.success(this.translate.instant('Drivers updated'))
         }

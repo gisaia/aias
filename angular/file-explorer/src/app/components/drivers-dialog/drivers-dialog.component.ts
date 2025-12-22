@@ -15,7 +15,5 @@ import { TranslateModule } from '@ngx-translate/core';
 export class DriversDialogComponent {
   public selectedDrivers: string[] = [];
 
-  public constructor(
-    
-  ) { }
+  public constructor() { }
 }

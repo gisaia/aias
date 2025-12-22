@@ -17,9 +17,10 @@
  * under the License.
  */
 
-import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { emitErrors } from '@tools/errors';
 import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject } from 'rxjs';
@@ -36,10 +37,10 @@ export class JobService {
 
   public availableDrivers: string[] = [];
 
-  constructor(
-    private http: HttpClient,
-    private translate: TranslateService,
-    private toastr: ToastrService
+  public constructor(
+    private readonly http: HttpClient,
+    private readonly translate: TranslateService,
+    private readonly toastr: ToastrService
   ) { }
 
   public setOptions(options: any) {
@@ -53,19 +54,14 @@ export class JobService {
   public fetchAvailableDrivers() {
     return this.http.get(this.jobSettings?.url + '/processes/ingest', this.options).subscribe({
       next: (data: any) => this.availableDrivers = data?.inputs?.include_drivers?.schema?.items?.enum,
-      error: (err) => {
-        console.log(err)
-        if (err.status === 404) {
-          this.toastr.error(this.translate.instant('Unable to fetch drivers'))
-        } else if (err.status === 403) {
-          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-        } else if (err.status === 500) {
-          if (!!err.error && !!err.error.detail) {
-            this.toastr.error(err.error.detail);
-          } else {
-            this.toastr.error(this.translate.instant('Error while fetching the drivers'))
-          }
-        }
+      error: (err: HttpErrorResponse) => {
+        emitErrors(
+          this.toastr,
+          err,
+          this.translate.instant('Unable to fetch drivers'),
+          this.translate.instant('You are not allowed to access this feature'),
+          this.translate.instant('Error while fetching the drivers')
+        );
       }
     });
   }

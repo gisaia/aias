@@ -18,18 +18,19 @@
  */
 
 import { FlatTreeControl } from '@angular/cdk/tree';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { DynamicDataSource } from '@tools/DynamicDataSource';
-import { FamService } from '@services/fam/fam.service';
-import { Subject } from 'rxjs';
-import { DynamicFileNode } from '@tools/interface';
-import { JobService } from '@services/job/job.service';
 import { MatDialog } from '@angular/material/dialog';
+import { marker } from '@colsen1991/ngx-translate-extract-marker';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
+import { FamService } from '@services/fam/fam.service';
+import { JobService } from '@services/job/job.service';
+import { DynamicDataSource } from '@tools/DynamicDataSource';
+import { emitErrors } from '@tools/errors';
+import { DynamicFileNode } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
-import { marker } from '@colsen1991/ngx-translate-extract-marker';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-explorer',
@@ -54,18 +55,18 @@ export class ExplorerComponent implements OnInit {
 
   hasChild = (_: number, nodeData: DynamicFileNode) => nodeData.is_dir;
 
-  constructor(
-    private famService: FamService,
-    private jobService: JobService,
-    private dialog: MatDialog,
-    private translate: TranslateService,
-    private toastr: ToastrService
+  public constructor(
+    private readonly famService: FamService,
+    private readonly jobService: JobService,
+    private readonly dialog: MatDialog,
+    private readonly translate: TranslateService,
+    private readonly toastr: ToastrService
   ) {
     this.treeControl = new FlatTreeControl<DynamicFileNode>(this.getLevel, this.isExpandable);
     this.dataSource = new DynamicDataSource(this.treeControl, this.famService);
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.famService.dataChange.subscribe(data => {
       this.dataSource.data = data;
     });
@@ -108,17 +109,13 @@ export class ExplorerComponent implements OnInit {
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: HttpErrorResponse) => {
-              if (err.status === 404) {
-                this.toastr.error(this.translate.instant('Activation failed'))
-              } else if (err.status === 403) {
-                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-              } else if (err.status === 500) {
-                if (!!err.error && !!err.error.detail) {
-                  this.toastr.error(err.error.detail);
-                } else {
-                  this.toastr.error(this.translate.instant('Activation failed'))
-                }
-              }
+              emitErrors(
+                this.toastr,
+                err,
+                this.translate.instant('Activation failed'),
+                this.translate.instant('You are not allowed to access this feature'),
+                this.translate.instant('Activation failed')
+              );
             }
           });
         }

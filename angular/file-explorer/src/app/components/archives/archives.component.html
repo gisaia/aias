@@ -14,7 +14,7 @@
           <div mat-line class="label">
             {{archive.name}}
           </div>
-          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short')} }}</div>
+          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short') || '--'} }}</div>
           <div mat-line class="detail">{{ 'id:' | translate:{id: archive.id} }}</div>
         </div>
         <div class="actions">
