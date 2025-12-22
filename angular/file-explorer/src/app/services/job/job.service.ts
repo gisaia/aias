@@ -17,9 +17,11 @@
  * under the License.
  */
 
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
+import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable({
@@ -32,8 +34,12 @@ export class JobService {
   public refreshTasks: Subject<boolean> = new Subject();
   public refreshTasksAndArchives: Subject<boolean> = new Subject();
 
+  public availableDrivers: string[] = [];
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private translate: TranslateService,
+    private toastr: ToastrService
   ) { }
 
   public setOptions(options: any) {
@@ -44,13 +50,34 @@ export class JobService {
     this.jobSettings = settings;
   }
 
-  public ingestArchive(archive: Archive, annotations: string): Observable<any> {
+  public fetchAvailableDrivers() {
+    return this.http.get(this.jobSettings?.url + '/processes/ingest', this.options).subscribe({
+      next: (data: any) => this.availableDrivers = data?.inputs?.include_drivers?.schema?.items?.enum,
+      error: (err) => {
+        console.log(err)
+        if (err.status === 404) {
+          this.toastr.error(this.translate.instant('Unable to fetch drivers'))
+        } else if (err.status === 403) {
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+        } else if (err.status === 500) {
+          if (!!err.error && !!err.error.detail) {
+            this.toastr.error(err.error.detail);
+          } else {
+            this.toastr.error(this.translate.instant('Error while fetching the drivers'))
+          }
+        }
+      }
+    });
+  }
+
+  public ingestArchive(archive: Archive, annotations: string, drivers: string[] = []): Observable<any> {
     const payload: IngestPayload = {
       inputs: {
         url: archive.path,
         collection: this.jobSettings?.collection || '',
         catalog: this.jobSettings?.catalog || 'catalog',
-        annotations
+        annotations,
+        include_drivers: drivers
       },
       outputs: null,
       response: "raw",
@@ -59,13 +86,14 @@ export class JobService {
     return this.http.post(this.jobSettings?.url + '/processes/ingest/execution', payload, this.options);
   }
 
-  public ingestDirectory(node: DynamicFileNode, annotations: string) {
+  public ingestDirectory(node: DynamicFileNode, annotations: string, drivers: string[] = []) {
     const payload: IngestPayload = {
       inputs: {
         catalog: this.jobSettings?.catalog || 'catalog',
         collection: this.jobSettings?.collection || '',
         directory: node.path,
-        annotations
+        annotations,
+        include_drivers: drivers
       },
       outputs: null,
       response: "raw",
@@ -78,7 +106,7 @@ export class JobService {
     return this.http.get(this.jobSettings?.url + '/jobs?offset=' + page + '&limit=' + pageSize, this.options) as Observable<ProcessResult>;
   }
 
-  public cancelJob(jobId: string): Observable<Process>{
+  public cancelJob(jobId: string): Observable<Process> {
     return this.http.get(this.jobSettings.url + '/jobs/' + jobId + '/cancel', this.options) as Observable<Process>;
   }
 }

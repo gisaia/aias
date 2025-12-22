@@ -39,13 +39,17 @@
 ::ng-deep .top-menu {
   // height: $topMenuHeight;
   background-color: $primaryColor !important;
-  color: white;
-  font-weight: 400;
+  color: white !important;
+  font-weight: 400 !important;
   padding: 0 10px !important;
-  font-size: 1.5em;
-  button {
-    mat-icon {
-      color: white !important;
+  font-size: 1.5em !important;
+  .right-menu {
+    display: flex;
+    padding-right: 15px;
+    gap: 0 15px;
+    &--refresh-btn,
+    &--drivers-btn {
+      cursor: pointer;
     }
   }
 }
@@ -89,10 +93,4 @@
       height: $sectionTitleHeight;
     }
   }
-}
-
-.refresh-btn {
-  display: flex;
-  margin-right: 15px;
-  cursor: pointer;
 }

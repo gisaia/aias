@@ -17,22 +17,41 @@
  * under the License.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MatChipListboxChange } from '@angular/material/chips';
+import { JobService } from '@services/job/job.service';
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss']
 })
-export class ConfirmDialogComponent {
-
-
+export class ConfirmDialogComponent implements OnInit {
 
   public title = '';
   public message = '';
   public action = '';
-  public showAnnotations = true
+  public showAnnotations = true;
+  public availalbleDrivers = [];
+  public selectedDrivers = [];
 
-  constructor() { }
+  constructor(
+    private jobService: JobService
+  ) { }
+
+  public ngOnInit(): void {
+    const storedDrivers = localStorage.getItem('driversActivated');
+    if(storedDrivers){
+      this.selectedDrivers = storedDrivers.split(',');
+    }
+    this.availalbleDrivers = this.jobService.availableDrivers.map(driver => {
+      let selected = this.selectedDrivers.includes(driver) ?? false
+      return { name: driver, selected }
+    });
+  }
+
+  public driversSelectionChange(event: MatChipListboxChange) {
+    this.selectedDrivers = event.value.map(item => item.name);
+  }
 
 }

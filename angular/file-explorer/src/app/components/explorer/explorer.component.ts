@@ -96,13 +96,13 @@ export class ExplorerComponent implements OnInit {
   }
 
   public activate(node: DynamicFileNode) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { width: '600px' });
     dialogRef.componentInstance.title = this.translate.instant('Activate folder:', { folder: node.name });
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
-          this.jobService.ingestDirectory(node, confirm.annotations).subscribe({
+          this.jobService.ingestDirectory(node, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))

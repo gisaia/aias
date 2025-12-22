@@ -62,6 +62,7 @@ import { ExplorerComponent } from './components/explorer/explorer.component';
 import { HomeComponent } from './components/home/home.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { StartupService } from './services/startup.service';
+import { DriversDialogComponent } from '@components/drivers-dialog/drivers-dialog.component';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -75,7 +76,8 @@ export function startupServiceFactory(startupService: StartupService) {
     ExplorerComponent,
     ArchivesComponent,
     TasksComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    DriversDialogComponent
   ],
   imports: [
     BrowserModule,

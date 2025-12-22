@@ -1,0 +1,14 @@
+:host {
+  .drivers .mat-mdc-chip-option {
+    --mdc-chip-label-text-size: 12px;
+    --mdc-chip-container-shape-radius: 4px;
+    --mdc-chip-elevated-selected-container-color: rgba(76, 175, 80, 0.6);
+    --mdc-chip-with-avatar-avatar-size: 0px;
+  }
+
+  .actions {
+    // Uniformize padding with rest of elements
+    --mat-dialog-actions-alignment: end;
+    --mat-dialog-actions-padding: 24px 24px 12px;
+  }
+}

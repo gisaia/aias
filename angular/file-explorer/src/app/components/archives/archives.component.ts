@@ -42,6 +42,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input() public archivesPath: string = '';
   public archives: Archive[] | undefined = undefined;
+  public selectedDrivers = [];
 
   public constructor(
     private famService: FamService,
@@ -85,7 +86,11 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public getArchives(path: string) {
-    this.famService.getArchive(path)
+    const storedDrivers = localStorage.getItem('driversActivated');
+    if (storedDrivers) {
+      this.selectedDrivers = storedDrivers.split(',');
+    }
+    this.famService.getArchive(path, this.selectedDrivers)
       .pipe(
         mergeMap((archives) => {
           if (archives.length > 0) {
@@ -128,13 +133,13 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public activate(archive: Archive) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Activate:', {name: archive.name});
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { width: '600px' });
+    dialogRef.componentInstance.title = this.translate.instant('Activate:', { name: archive.name });
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
-          this.jobService.ingestArchive(archive, confirm.annotations).subscribe({
+          this.jobService.ingestArchive(archive, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
@@ -160,7 +165,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   public desactivate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', {name: archive.name});
+    dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', { name: archive.name });
     dialogRef.componentInstance.action = marker('Dereference');
     dialogRef.componentInstance.showAnnotations = false;
     dialogRef.afterClosed().subscribe({
