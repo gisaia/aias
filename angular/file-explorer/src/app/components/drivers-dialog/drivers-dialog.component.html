@@ -1,13 +1,7 @@
 <h2 mat-dialog-title>{{'Enable drivers' | translate}}</h2>
 <mat-dialog-content class="content">
   <div>{{'Select the drivers to enable' | translate}}</div>
-  <mat-chip-listbox class="drivers" [multiple]="true" (change)="driversSelectionChange($event)">
-    @for (driver of availalbleDrivers; track driver) {
-    <mat-chip-option [value]="driver" [selected]="driver.selected">
-      {{driver.name}}
-    </mat-chip-option>
-    }
-  </mat-chip-listbox>
+  <app-drivers-list (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
 
 </mat-dialog-content>
 

@@ -1,33 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { MatChipListboxChange } from '@angular/material/chips';
-import { JobService } from '@services/job/job.service';
+import { Component } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-drivers-dialog',
-  standalone: false,
+  standalone: true,
+  imports: [MatDialogModule, MatChipsModule, TranslateModule, MatButtonModule, DriversListComponent],
   templateUrl: './drivers-dialog.component.html',
   styleUrl: './drivers-dialog.component.scss'
 })
-export class DriversDialogComponent implements OnInit {
-  public availalbleDrivers: { name: string; selected: boolean; }[] = [];
+export class DriversDialogComponent {
   public selectedDrivers: string[] = [];
 
   public constructor(
-    private readonly jobService: JobService
+    
   ) { }
-
-  public ngOnInit(): void {
-    const storedDrivers = localStorage.getItem('driversActivated');
-    if(storedDrivers){
-      this.selectedDrivers = storedDrivers.split(',');
-    }
-    this.availalbleDrivers = this.jobService.availableDrivers.map(driver => {
-      let selected = this.selectedDrivers.includes(driver) ?? false
-      return { name: driver, selected }
-    });
-  }
-
-  public driversSelectionChange(event: MatChipListboxChange) {
-    this.selectedDrivers = event.value.map(item => item.name);
-  }
 }

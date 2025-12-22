@@ -26,13 +26,8 @@
   --mdc-dialog-supporting-text-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --mdc-dialog-supporting-text-tracking: 0;
 
-  .drivers .mat-mdc-chip-option {
-    --mdc-chip-label-text-size: 12px;
-    --mdc-chip-container-shape-radius: 4px;
-    --mdc-chip-elevated-selected-container-color: #4caf50;
-    --mdc-chip-elevated-selected-container-color: rgba(92, 184, 92, 0.6);
-    --mdc-chip-with-avatar-avatar-size: 0px;
-    --mdc-chip-container-height: 24px;
+  .drivers-list {
+    --drivers-chip-height: 24px;
   }
 
   .actions {
