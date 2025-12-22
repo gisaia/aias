@@ -31,12 +31,12 @@ export class ConfirmDialogComponent implements OnInit {
   public title = '';
   public message = '';
   public action = '';
-  public showAnnotations = true;
+  public showActivationInfos = true;
   public availalbleDrivers = [];
   public selectedDrivers = [];
 
-  constructor(
-    private jobService: JobService
+  public constructor(
+    private readonly jobService: JobService
   ) { }
 
   public ngOnInit(): void {

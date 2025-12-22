@@ -167,7 +167,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', { name: archive.name });
     dialogRef.componentInstance.action = marker('Dereference');
-    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {

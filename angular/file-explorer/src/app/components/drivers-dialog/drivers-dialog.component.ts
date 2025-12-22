@@ -13,7 +13,7 @@ export class DriversDialogComponent implements OnInit {
   public selectedDrivers: string[] = [];
 
   public constructor(
-    private jobService: JobService
+    private readonly jobService: JobService
   ) { }
 
   public ngOnInit(): void {

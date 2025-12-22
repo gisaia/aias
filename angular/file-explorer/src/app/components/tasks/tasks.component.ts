@@ -144,7 +144,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.componentInstance.title = this.translate.instant('Confirmation');
     dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?')
     dialogRef.componentInstance.action = this.translate.instant('Confirm');
-    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         this.jobService.cancelJob(jobId).subscribe({
