@@ -156,7 +156,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit=orbit_number,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tci_path))
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         if len(resolutions) > 0:
             item.properties.gsd = gsd

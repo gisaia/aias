@@ -7,7 +7,9 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_epsg
+from extensions.aproc.proc.ingest.drivers.impl.utils import (get_bbox,
+                                                             get_centroid,
+                                                             get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -42,20 +44,13 @@ class Driver(IngestDriver):
         return assets
 
     def to_item(self, url: str, assets: list[Asset]):
-        import shapely
-
         with AccessManager.make_local(self.md_path) as local_md_path:
             with open(local_md_path, 'r') as f:
                 data = json.load(f)
 
         geometry = data["geometry"]
-        centroid = [*shapely.centroid(shapely.from_geojson(json.dumps(geometry))).coords]
-
-        coordinates = geometry["coordinates"][0]
-        bbox = [min(map(lambda xy: xy[0], coordinates)),
-                min(map(lambda xy: xy[1], coordinates)),
-                max(map(lambda xy: xy[0], coordinates)),
-                max(map(lambda xy: xy[1], coordinates))]
+        centroid = get_centroid(geometry)
+        bbox = get_bbox(geometry["coordinates"][0])
 
         date = datetime.strptime(data["acquisitionDate"], "%Y-%m-%dT%H:%M:%S.%f")
         constellation = "BlackSkyGlobal"
@@ -87,7 +82,7 @@ class Driver(IngestDriver):
                 view__sun_elevation=view__sun_elevation,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         return item
 

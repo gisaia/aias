@@ -115,7 +115,7 @@ class Driver(IngestDriver):
                 sar__polarizations=polarizations,
                 proj__epsg=get_epsg_from_gdal_info(self.tif_path)
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
 
         return item

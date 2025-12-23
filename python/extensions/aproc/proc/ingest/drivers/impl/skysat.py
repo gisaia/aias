@@ -95,7 +95,7 @@ class Driver(IngestDriver):
         eo__snow_cover = properties["snow_ice_percent"]
         gsd = properties["gsd"]
 
-        sattelite = properties["satellite_id"]
+        satellite = properties["satellite_id"]
         view__azimuth = properties["satellite_azimuth"]
         view__sun_azimuth = properties["sun_azimuth"]
         view__sun_elevation = properties["sun_elevation"]
@@ -111,10 +111,10 @@ class Driver(IngestDriver):
                 eo__snow_cover=eo__snow_cover,
                 gsd=gsd,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.sr_path)),
-                instrument=sattelite,
+                instrument=satellite,
                 constellation="SkySat",
-                satellite=sattelite,
-                sensor=sattelite,
+                satellite=satellite,
+                sensor=satellite,
                 sensor_type=SensorType.OPTIC.value,
                 view__azimuth=view__azimuth,
                 view__sun_azimuth=view__sun_azimuth,
@@ -125,7 +125,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
 
         return item

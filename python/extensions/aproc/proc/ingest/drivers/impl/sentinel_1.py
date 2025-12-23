@@ -206,7 +206,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit=orbit_number,
                 proj__epsg=get_epsg_from_gdal_info(self.main_asset_path)
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:

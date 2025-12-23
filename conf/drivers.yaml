@@ -109,6 +109,14 @@ drivers:
     priority: 15
 
   -
+    name: axelspace
+    class_name: extensions.aproc.proc.ingest.drivers.impl.axelspace
+    assets_dir: /tmp/aproc/axelspace
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 16
+
+  -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
     assets_dir: /tmp/aproc/tiff

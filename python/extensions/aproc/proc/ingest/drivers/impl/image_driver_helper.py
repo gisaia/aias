@@ -75,7 +75,7 @@ class ImageDriverHelper:
 
     @staticmethod
     def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
-        preview = Asset(href=None, name= role.value, description=role.value, roles=[role.value],
+        preview = Asset(href=None, name=role.value, description=role.value, roles=[role.value],
                         type=type.value, asset_format=format.value, asset_type=ResourceType.other.value)
         preview.href = driver.get_asset_filepath(href, preview)
         return preview
@@ -148,7 +148,7 @@ class ImageDriverHelper:
                 main_asset_name=Role.data.value,
                 description=description
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         item.properties.instrument = None
         item.properties.constellation = None

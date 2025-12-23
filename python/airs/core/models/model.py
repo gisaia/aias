@@ -132,6 +132,7 @@ class ResourceType(Enum):
 class ItemFormat(Enum):
     adc3 = "adc3"
     ast_dem = "AST_DEM"
+    axelspace = "Axelspace"
     bsg = "BlackSkyGlobal"
     csk = "COSMO-SkyMed"
     digitalglobe = "DIGITALGLOBE"
