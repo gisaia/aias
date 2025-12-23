@@ -1,9 +1,12 @@
 <arlas-top-menu [showAboutButton]="false">
   <div left-menu>{{'Archive explorer' | translate}}</div>
   <div right-menu class="right-menu">
-
-    <mat-icon class="right-menu--drivers-btn" (click)="openDrivers()" [matTooltip]="'Enable drivers' | translate">storage</mat-icon>
-    <mat-icon class="right-menu--refresh-btn" (click)="refresh()" [matTooltip]="'Refresh' | translate">refresh</mat-icon>
+    <button class="right-menu--btn" mat-icon-button [disableRipple]="true" (click)="openDrivers()" [matTooltip]="'Enable drivers' | translate">
+        <mat-icon>storage</mat-icon>
+    </button>
+    <button class="right-menu--btn" mat-icon-button (click)="refresh()" [matTooltip]="'Refresh' | translate">
+        <mat-icon>refresh</mat-icon>
+    </button>
   </div>
 </arlas-top-menu>
 
