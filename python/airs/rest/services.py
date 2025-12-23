@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
 
-from airs.core.models.stacapi import CollectionDescriptionListResponse, Link
+from airs.core.models.stacapi import CollectionDescriptionListResponse
 import airs.core.product_registration as rs
 from airs.core import exceptions
 from airs.core.models.mapper import to_json, to_dict
@@ -21,8 +21,7 @@ async def init_collection(collection: str, request: Request) -> JSONResponse:
     if not collection:
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
     return JSONResponse(content={"created": rs.init_collection(collection)},
-                        status_code=status.HTTP_201_CREATED
-                        )
+                        status_code=status.HTTP_201_CREATED)
 
 
 @ROUTER.get('/collections', description="List collections.",
@@ -64,7 +63,7 @@ async def create_item(collection: str, item: Item, request: Request) -> Item:
     except exceptions.InvalidItemsException as e:
         raise NotFound(detail=__INVALID_ITEM_MSG__.format(e.items, e.reason))
 
-    
+
 @ROUTER.put('/collections/{collection}/items/{id}', description="Update an item. Asset should/must exist (depends on the server configuration)")
 async def update_item(collection: str, id: str, item: Item, request: Request) -> JSONResponse:
     """ From https://github.com/stac-api-extensions/transaction:
