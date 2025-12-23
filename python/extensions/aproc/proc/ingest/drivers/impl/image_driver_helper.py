@@ -76,7 +76,7 @@ class ImageDriverHelper:
     @staticmethod
     def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
         preview = Asset(href=None, name=role.value, description=role.value, roles=[role.value],
-                        type=type.value, asset_format=format.value, asset_type=ResourceType.other.value)
+                        type=type.value, asset_format=format.value, asset_type=ResourceType.other.value, airs__managed=True)
         preview.href = driver.get_asset_filepath(href, preview)
         return preview
 

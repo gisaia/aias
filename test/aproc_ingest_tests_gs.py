@@ -1,6 +1,6 @@
 import os
 import unittest
-from test.aproc_ingest_tests import (AST, CSK, DIMAP, ICEYE, IKONOS, JP2000,
+from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000,
                                      RADARSAT2, RAPID_EYE, SENTINEL1_GRDH,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
@@ -93,6 +93,11 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SPOT5)
         item_id = "e3753718ee48324000b50a457444d0efd0881a8589da5bce4b9f3bc8d7648873"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_geosat_cloud(self):  # Driver Geosat
+        url = os.path.join(ROOT, GEOSAT)
+        item_id = "00638c20c0f940f98e5491d9ec3a0b0257d327b64c58471e8f726adcb5d76429"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
 
 if __name__ == '__main__':

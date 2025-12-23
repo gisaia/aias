@@ -117,6 +117,14 @@ drivers:
     priority: 16
 
   -
+    name: geosat
+    class_name: extensions.aproc.proc.ingest.drivers.impl.geosat
+    assets_dir: /tmp/aproc/geosat
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 17
+
+  -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
     assets_dir: /tmp/aproc/tiff
