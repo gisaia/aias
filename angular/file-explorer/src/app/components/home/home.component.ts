@@ -23,6 +23,7 @@ import { DriversDialogComponent } from '@components/drivers-dialog/drivers-dialo
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
+import { StatusService } from '@services/status/status.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 
@@ -43,11 +44,13 @@ export class HomeComponent implements OnInit {
     private readonly jobsService: JobService,
     private readonly dialog: MatDialog,
     private readonly toastr: ToastrService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private readonly statusService: StatusService
   ) { }
 
   public ngOnInit(): void {
     this.jobsService.fetchAvailableDrivers();
+    this.statusService.fetchExistingCollections();
   }
 
   public refresh() {

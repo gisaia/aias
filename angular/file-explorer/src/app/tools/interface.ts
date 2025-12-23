@@ -79,3 +79,10 @@ export interface ProcessResult {
   total: number;
   status_list: Process[];
 }
+
+export interface Collection {
+  id: string;
+  title: string;
+  description: string;
+  links: string[];
+}

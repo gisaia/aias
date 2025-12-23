@@ -17,8 +17,12 @@
  * under the License.
  */
 
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { emitErrors } from '@tools/errors';
+import { Collection } from '@tools/interface';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -28,8 +32,12 @@ export class StatusService {
   private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
   private statusSettings: { url?: string; collection?: string; } = {};
 
+  public existingCollections: Collection[] = [];
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private readonly translate: TranslateService,
+    private readonly toastr: ToastrService
   ) { }
 
   public setOptions(options: any) {
@@ -50,5 +58,21 @@ export class StatusService {
     return this.http.delete(
       this.statusSettings?.url + '/collections/' + this.statusSettings.collection + '/items/' + archiveId,
       this.options) as Observable<any>;
+  }
+
+  public fetchExistingCollections() {
+    return this.http.get(this.statusSettings?.url + '/collections', this.options)
+      .subscribe({
+        next: (data: any) => this.existingCollections = data,
+        error: (err: HttpErrorResponse) => {
+          emitErrors(
+            this.toastr,
+            err,
+            this.translate.instant('Unable to fetch collections'),
+            this.translate.instant('You are not allowed to access this feature'),
+            this.translate.instant('Error while fetching the collections')
+          );
+        }
+      })
   }
 }
