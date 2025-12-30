@@ -122,8 +122,9 @@ class S3Storage(AbstractStorage):
 
     def pull(self, href: str, dst: str):
         import botocore.client
-
+        LOGGER.debug("Downloading from %s to %s", href, dst)
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
+        path = self.__get_href_key(href)
 
         paginator = client.get_paginator('list_objects_v2')
         for result in paginator.paginate(Bucket=self.get_configuration().bucket, Prefix=self.__get_href_key(href)):
@@ -132,10 +133,20 @@ class S3Storage(AbstractStorage):
                     # Skip the folder itself
                     if obj['Key'][-1] == '/':
                         continue
+                    if path == obj['Key']:
+                        # The href points to a file and the path is the exact location for the file, we remove the full prefix
+                        LOGGER.debug("The href points to a file")
+                        local_file_path = dst
+                    else:
+                        # The href points to a folder, we remove the href prefix only
+                        LOGGER.debug("The href points to a folder")
+                        prefix_to_remove = self.__get_href_key(href).removesuffix("/") + "/"
+                        local_file_path = os.path.join(dst, obj['Key'].removeprefix(prefix_to_remove))
+
                     # Create local directory structure
-                    local_file_path = os.path.join(dst, obj['Key'])
                     os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                     # Download the file
+                    LOGGER.debug("Downloading S3 object %s to local file %s", obj['Key'], local_file_path)
                     obj = client.get_object(Bucket=self.get_configuration().bucket, Key=obj['Key'])
                     with open(local_file_path, "wb") as f:
                         for chunk in obj['Body'].iter_chunks(50 * 1024):
