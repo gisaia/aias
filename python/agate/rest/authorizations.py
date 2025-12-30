@@ -162,6 +162,6 @@ class Authorizations:
                         except Exception as e:
                             LOGGER.exception(e)
                 else:
-                    LOGGER.debug("{} does not matches pattern {} at position 0".format(part, rule.pattern))
+                    LOGGER.debug("{} does not match pattern {} at position 0".format(part, rule.pattern))
             LOGGER.debug("{} does not match {}".format(rule.pattern, part))
         return False
