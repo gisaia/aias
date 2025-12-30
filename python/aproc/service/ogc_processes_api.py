@@ -215,7 +215,6 @@ def get_process_description(process_id: str):
              })
 def post_process_execute(process_id: str, execute: Execute, request: Request):
     LOGGER.debug("Execute process {} with inputs {}".format(process_id, execute.model_dump_json()))
-    LOGGER.debug("Request headers: {}".format(dict(request.headers.keys())))
     process = __get_process(process_id)
     try:
         if hasattr(process, "input_model"):

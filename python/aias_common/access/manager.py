@@ -127,6 +127,7 @@ class AccessManager:
             raise ValueError("Destination must be on the local filesystem")
 
         storage = AccessManager.resolve_storage(href)
+        LOGGER.debug("Pulling file from %s to %s using storage %s", href, dst, storage.storage_configuration.type)
         storage.pull(href, dst)
 
     @staticmethod

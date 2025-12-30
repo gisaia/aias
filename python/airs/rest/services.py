@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse, Response
 from airs.core.models.stacapi import CollectionDescriptionListResponse, Link
 import airs.core.product_registration as rs
 from airs.core import exceptions
-from airs.core.models.mapper import to_json
+from airs.core.models.mapper import to_json, to_dict
 from airs.core.models.model import Item
 from aias_common.rest.exception import BadRequest, Conflict, NotFound
 
@@ -89,7 +89,7 @@ async def update_item(collection: str, id: str, item: Item, request: Request) ->
     if not rs.item_exists(collection, item.id):
         raise BadRequest(detail="Item does not exist, can not update")
     try:
-        return JSONResponse(content=to_json(rs.register_item(item=item)),
+        return JSONResponse(content=to_dict(rs.register_item(item=item)),
                             status_code=status.HTTP_200_OK,
                             headers={"Location": request.base_url.path + "/" + rs.get_item_relative_path(collection, item.id)})
     except exceptions.InvalidAssetsException as e:
@@ -122,7 +122,7 @@ async def get_item(collection: str, id: str) -> JSONResponse:
     if not rs.item_exists(collection, id):
         raise NotFound(detail="Item does not exist")
     try:
-        return JSONResponse(content=to_json(rs.get_item(collection, id)), status_code=status.HTTP_200_OK)
+        return JSONResponse(content=to_dict(rs.get_item(collection, id)), status_code=status.HTTP_200_OK)
     except exceptions.InvalidAssetsException as e:
         raise NotFound(detail=__INVALID_ASSET_MSG__.format(e.assets, e.reason))
     except exceptions.InvalidItemsException as e:

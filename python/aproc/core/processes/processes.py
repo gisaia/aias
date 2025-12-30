@@ -56,26 +56,30 @@ class Processes:
             if status_info is None:
                 sleep(5)  # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
                 status_info = Processes.__retrieve_status_info__(task_id)
-            if status_info.status is None or not status_info.status.is_final():
-                status_info.status = Processes.__to_status_info_code__(new_status)
-                status_info.updated = round(datetime.now().timestamp())
-                if status_info.status.is_final():
-                    status_info.finished = round(datetime.now().timestamp())
-                    if new_status == states.SUCCESS:
-                        status_info.message = json.dumps(result, default=serialize_datetime, indent=2)
-                    else:
-                        status_info.message = str(result)
-                Processes.__save_status_info__(status_info)
-                LOGGER.debug(f"Task {task_id} updated to status {status_info.status}")
-                if status_info.status.is_final():
-                    if new_status == states.SUCCESS and subscriber.successUri:
-                        Processes.__notify(subscriber.successUri.replace("{jobID}", task_id), json.dumps(result, default=serialize_datetime, indent=2))
-                    if new_status == states.FAILURE and subscriber.failedUri:
-                        result = Processes.result(task_id)
-                        Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True, exclude_unset=True))
-                LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()  }")
-            else:
-                LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
+            if status_info :
+                if status_info.status is None or not status_info.status.is_final():
+                    status_info.status = Processes.__to_status_info_code__(new_status)
+                    status_info.updated = round(datetime.now().timestamp())
+                    if status_info.status.is_final():
+                        status_info.finished = round(datetime.now().timestamp())
+                        if new_status == states.SUCCESS:
+                            status_info.message = json.dumps(result, default=serialize_datetime, indent=2)
+                        else:
+                            status_info.message = str(result)
+                    Processes.__save_status_info__(status_info)
+                    LOGGER.debug(f"Task {task_id} updated to status {status_info.status}")
+                    if status_info.status.is_final():
+                        if new_status == states.SUCCESS and subscriber.successUri:
+                            Processes.__notify(subscriber.successUri.replace("{jobID}", task_id), json.dumps(result, default=serialize_datetime, indent=2))
+                        if new_status == states.FAILURE and subscriber.failedUri:
+                            result = Processes.result(task_id)
+                            Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True, exclude_unset=True))
+                    LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()  }")
+                else:
+                    LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
+        else:
+            LOGGER.warning(f"Status info is not found for task {task_id}. No update performed.")        
+        
 
     @staticmethod
     @task_prerun.connect
@@ -375,7 +379,6 @@ class Processes:
             if celery_result_backend_transport_options is None or celery_result_backend_transport_options.get("master_name") is None:
                 raise ConnectionError("Invalid configuration: master_name and sentinel_password must be provided")
             sentinel_kwargs = celery_result_backend_transport_options.get("sentinel_kwargs")
-            LOGGER.debug("sentinel_kwargs:{}".format(sentinel_kwargs))
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
             host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
             con = {
