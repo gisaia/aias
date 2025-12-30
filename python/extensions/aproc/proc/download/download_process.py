@@ -128,8 +128,6 @@ class AprocProcess(Process):
 
     @staticmethod
     def __get_download_location__(item: Item, send_to: str) -> tuple[str, str]:
-        if send_to is None:
-            send_to = "anonymous"
         relative_target_directory = os.path.join(send_to.split("@")[0].replace(".", "_").replace("-", "_"), item.id + "_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
         target_directory = os.path.join(DownloadConfiguration.settings.outbox_directory, relative_target_directory)
         LOGGER.info("create {} if not exist".format(target_directory))
@@ -164,7 +162,7 @@ class AprocProcess(Process):
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
-                LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                LOGGER.debug(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 mail_context["error"] = error_msg
                 Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
@@ -172,10 +170,10 @@ class AprocProcess(Process):
             driver: DownloadDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
             if driver is not None:
                 try:
-                    LOGGER.info("Download will be done by {}".format(driver.name))
+                    LOGGER.debug("Download will be done by {}".format(driver.name))
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "DOWNLOAD", "TARGET": item_id})
                     target_directory, relative_target_directory = AprocProcess.__get_download_location__(item, send_to)
-                    LOGGER.info("Download will be placed in {}".format(target_directory))
+                    LOGGER.debug("Download will be placed in {}".format(target_directory))
                     mail_context["target_directory"] = target_directory
                     mail_context = AprocProcess.__update_paths__(mail_context)
                     driver.fetch_and_transform(
@@ -191,11 +189,11 @@ class AprocProcess(Process):
                                                    AccessManager.resolve_storage("/".join([DownloadConfiguration.settings.outbox_s3.endpoint_url, DownloadConfiguration.settings.outbox_s3.bucket])))
                         if DownloadConfiguration.settings.clean_outbox_directory:
                             LOGGER.debug("clean {}".format(target_directory))
-                            shutil.rmtree(target_directory)
+                            AccessManager.clean(target_directory)
                         mail_context["target_directory"] = DownloadConfiguration.settings.outbox_s3.asset_http_endpoint_url.format(DownloadConfiguration.settings.outbox_s3.bucket, relative_target_directory)
                     Notifications.report(item, DownloadConfiguration.settings.email_subject_user, DownloadConfiguration.settings.email_content_user, to=[send_to], context=mail_context, outcome="success")
                     Notifications.report(item, DownloadConfiguration.settings.email_subject_admin, DownloadConfiguration.settings.email_content_admin, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context)
-                    LOGGER.info("Download success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "success", USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
+                    LOGGER.debug("Download success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "success", USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     download_locations.append(mail_context["target_directory"])
                 except Exception as e:
                     error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))

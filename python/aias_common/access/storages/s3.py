@@ -125,10 +125,21 @@ class S3Storage(AbstractStorage):
 
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
 
-        obj = client.get_object(Bucket=self.get_configuration().bucket, Key=self.__get_href_key(href))
-        with open(dst, "wb") as f:
-            for chunk in obj['Body'].iter_chunks(50 * 1024):
-                f.write(chunk)
+        paginator = client.get_paginator('list_objects_v2')
+        for result in paginator.paginate(Bucket=self.get_configuration().bucket, Prefix=self.__get_href_key(href)):
+            if 'Contents' in result:
+                for obj in result['Contents']:
+                    # Skip the folder itself
+                    if obj['Key'][-1] == '/':
+                        continue
+                    # Create local directory structure
+                    local_file_path = os.path.join(dst, obj['Key'])
+                    os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                    # Download the file
+                    obj = client.get_object(Bucket=self.get_configuration().bucket, Key=obj['Key'])
+                    with open(local_file_path, "wb") as f:
+                        for chunk in obj['Body'].iter_chunks(50 * 1024):
+                            f.write(chunk)
 
     def push(self, href: str, dst: str, content_type: str | None = None):
         import botocore.client

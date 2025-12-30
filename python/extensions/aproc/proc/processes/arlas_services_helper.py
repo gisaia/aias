@@ -12,10 +12,10 @@ from aproc.core.processes.process import Process
 from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       RegisterException)
 from aias_common.access.storages.s3 import S3Storage
+from aproc.core.logger import Logger
 
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
-
 
 class ARLASServicesHelper(ABC):
 
@@ -23,6 +23,7 @@ class ARLASServicesHelper(ABC):
     def get_item_from_arlas(arlas_url_search: str, collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
             url = arlas_url_search.format(collection=collection, item=item_id)
+            Process.LOGGER.debug("Get item from ARLAS with url {} and headers {}".format(url, headers))
             r = requests.get(url=url, headers={"authorization": headers.get("authorization"), "arlas-org-filter": headers.get("arlas-org-filter")})
             if r.ok:
                 result = r.json()
@@ -64,8 +65,8 @@ class ARLASServicesHelper(ABC):
     @staticmethod
     def get_user_email(authorization: str) -> tuple[str, str]:
         import jwt
-        send_to: str = "anonymous"
-        user_id: str = "anonymous"
+        send_to: str = "undefined_email"
+        user_id: str = "undefined_user"
         try:
             if authorization:
                 token_content = jwt.decode(authorization.removeprefix("Bearer "), options={"verify_signature": False})  # NOSONAR
