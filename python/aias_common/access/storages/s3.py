@@ -144,7 +144,8 @@ class S3Storage(AbstractStorage):
                         local_file_path = os.path.join(dst, obj['Key'].removeprefix(prefix_to_remove))
 
                     # Create local directory structure
-                    os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                    if os.path.dirname(local_file_path):
+                        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                     # Download the file
                     LOGGER.debug("Downloading S3 object %s to local file %s", obj['Key'], local_file_path)
                     obj = client.get_object(Bucket=self.get_configuration().bucket, Key=obj['Key'])
