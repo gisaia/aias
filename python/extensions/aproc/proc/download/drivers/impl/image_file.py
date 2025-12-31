@@ -64,7 +64,7 @@ class Driver(DownloadDriver):
             # If the projetion and the format are natives, just copy the file and the georef file
             if item.assets and item.assets.get(Role.extent.value) is not None and AccessManager.exists(item.assets.get(Role.extent.value).href):
                 geo_ext_file = item.assets.get(Role.extent.value).href
-                self.LOGGER.info("Copy {} to {}".format(geo_ext_file, target_directory))
+                self.LOGGER.debug("Copy {} to {}".format(geo_ext_file, target_directory))
                 AccessManager.pull(geo_ext_file, os.path.join(target_directory, os.path.basename(geo_ext_file)))
             self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
             AccessManager.pull(href, os.path.join(target_directory, os.path.basename(href)))
