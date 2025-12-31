@@ -53,8 +53,8 @@ async def urbac(request: Request):
                             matches = re.finditer(pattern=url_pattern, string=request_path)
                             for match in matches:
                                 if match.start() == 0:
-                                    LOGGER.debug("{} matches {}".format(request_path, url_pattern))
-                                    return Response(status_code=status.HTTP_202_ACCEPTED)
+                                    LOGGER.debug("{} matches {} with method {} in role {}".format(request_path, url_pattern, request_method, n))
+                                    return Response(status_code=status.HTTP_202_ACCEPTED, headers={Configuration.settings.urbac.jwt_header: authorization})
                             LOGGER.debug("{} does not matches {}".format(request_path, url_pattern))
                 else:
                     LOGGER.warning("unrecognized permission {}".format(p))
