@@ -57,7 +57,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ArchivesComponent } from './components/archives/archives.component';
-import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { ExplorerComponent } from './components/explorer/explorer.component';
 import { HomeComponent } from './components/home/home.component';
 import { TasksComponent } from './components/tasks/tasks.component';
@@ -74,8 +73,7 @@ export function startupServiceFactory(startupService: StartupService) {
     HomeComponent,
     ExplorerComponent,
     ArchivesComponent,
-    TasksComponent,
-    ConfirmDialogComponent
+    TasksComponent
   ],
   imports: [
     BrowserModule,

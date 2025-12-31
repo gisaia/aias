@@ -24,6 +24,7 @@ export interface IngestPayload {
     url?: string;
     directory?: string;
     annotations: string;
+    include_drivers: string[]
   },
   outputs: any,
   response: "raw",

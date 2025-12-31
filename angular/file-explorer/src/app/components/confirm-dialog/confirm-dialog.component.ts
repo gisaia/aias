@@ -17,22 +17,30 @@
  * under the License.
  */
 
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { Component } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
+  standalone: true,
+  imports: [
+    MatDialogModule, DriversListComponent, MatFormFieldModule,
+    MatButtonModule, TranslateModule, TextFieldModule, MatInputModule
+  ],
   styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
 
-
-
   public title = '';
   public message = '';
   public action = '';
-  public showAnnotations = true
-
-  constructor() { }
-
+  public showActivationInfos = true;
+  public selectedDrivers = [];
 }

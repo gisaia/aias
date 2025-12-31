@@ -17,9 +17,13 @@
  * under the License.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DriversDialogComponent } from '@components/drivers-dialog/drivers-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
+import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -27,21 +31,39 @@ import { Subject } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
   public archivesPath = '';
   public collapseEvent: Subject<boolean> = new Subject();
   public refreshTasks: Subject<boolean> = new Subject();
   public showTasks = true;
 
-
   constructor(
-    private famService: FamService,
-    private jobsService: JobService
+    private readonly famService: FamService,
+    private readonly jobsService: JobService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly translate: TranslateService
   ) { }
+
+  public ngOnInit(): void {
+    this.jobsService.fetchAvailableDrivers();
+  }
 
   public refresh() {
     this.famService.refreshArchives$.next(true);
     this.jobsService.refreshTasks.next(true);
+  }
+
+  public openDrivers() {
+    const dialogRef = this.dialog.open(DriversDialogComponent, { width: '600px' });
+    dialogRef.afterClosed().subscribe({
+      next: (confirm) => {
+        if (confirm) {
+          localStorage.setItem('driversActivated', confirm.drivers);
+          this.toastr.success(this.translate.instant('Drivers updated'))
+        }
+      }
+    });
   }
 }

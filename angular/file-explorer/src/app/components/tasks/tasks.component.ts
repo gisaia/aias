@@ -26,6 +26,7 @@ import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialo
 import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
+import { emitErrors } from '@tools/errors';
 import { Process, ProcessResult, ProcessStatus } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
@@ -61,11 +62,11 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   public unsubscribeRefreshTasks = new Subject<boolean>();
 
   public constructor(
-    private jobService: JobService,
-    private toastr: ToastrService,
-    private translate: TranslateService,
-    private famService: FamService,
-    private dialog: MatDialog
+    private readonly jobService: JobService,
+    private readonly toastr: ToastrService,
+    private readonly translate: TranslateService,
+    private readonly famService: FamService,
+    private readonly dialog: MatDialog
   ) { }
 
 
@@ -144,7 +145,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.componentInstance.title = this.translate.instant('Confirmation');
     dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?')
     dialogRef.componentInstance.action = this.translate.instant('Confirm');
-    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         this.jobService.cancelJob(jobId).subscribe({
@@ -152,17 +153,13 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
             this.jobService.refreshTasks.next(true);
           },
           error: (err: HttpErrorResponse) => {
-            if (err.status === 404) {
-              this.toastr.error(this.translate.instant('Unable to delete this job'))
-            } else if (err.status === 403) {
-              this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-            } else if (err.status === 500) {
-              if (!!err.error && !!err.error.detail) {
-                this.toastr.error(err.error.detail);
-              } else {
-                this.toastr.error(this.translate.instant('Unable to delete this job'))
-              }
-            }
+            emitErrors(
+              this.toastr,
+              err,
+              this.translate.instant('Unable to delete this job'),
+              this.translate.instant('You are not allowed to access this feature'),
+              this.translate.instant('Unable to delete this job')
+            );
           }
         })
       }

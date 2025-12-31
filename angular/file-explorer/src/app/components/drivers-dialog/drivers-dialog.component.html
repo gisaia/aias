@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{'Enable drivers' | translate}}</h2>
+<mat-dialog-content class="content">
+  <div>{{'Select the drivers to enable' | translate}}</div>
+  <app-drivers-list (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="actions">
+  <button mat-flat-button color="primary" [color]="'primary'" [mat-dialog-close]="{drivers: selectedDrivers}">
+    {{'Save' | translate}}
+  </button>
+  <button mat-stroked-button [mat-dialog-close]="false">
+    {{'Cancel' | translate}}
+  </button>
+</mat-dialog-actions>

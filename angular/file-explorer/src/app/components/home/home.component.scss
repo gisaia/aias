@@ -36,18 +36,24 @@
   }
 }
 
+:host {
+  .right-menu {
+    display: flex;
+    padding-right: 15px;
+    &--btn {
+      --mdc-icon-button-state-layer-size: 40px;
+      padding: 8px;
+    }
+  }
+}
+
 ::ng-deep .top-menu {
   // height: $topMenuHeight;
   background-color: $primaryColor !important;
-  color: white;
-  font-weight: 400;
+  color: white !important;
+  font-weight: 400 !important;
   padding: 0 10px !important;
-  font-size: 1.5em;
-  button {
-    mat-icon {
-      color: white !important;
-    }
-  }
+  font-size: 1.5em !important;
 }
 
 .content {
@@ -89,10 +95,4 @@
       height: $sectionTitleHeight;
     }
   }
-}
-
-.refresh-btn {
-  display: flex;
-  margin-right: 15px;
-  cursor: pointer;
 }

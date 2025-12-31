@@ -1,0 +1,7 @@
+<mat-chip-listbox class="drivers" [multiple]="true" (change)="driversSelectionChange($event)">
+  @for (driver of availalbleDrivers; track driver) {
+  <mat-chip-option [value]="driver" [selected]="driver.selected">
+    {{driver.name}}
+  </mat-chip-option>
+  }
+</mat-chip-listbox>

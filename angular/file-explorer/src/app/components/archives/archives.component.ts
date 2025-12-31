@@ -26,6 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
+import { emitErrors } from '@tools/errors';
 import { Archive, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
@@ -42,15 +43,16 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input() public archivesPath: string = '';
   public archives: Archive[] | undefined = undefined;
+  public selectedDrivers = [];
 
   public constructor(
-    private famService: FamService,
-    private jobService: JobService,
-    private statusService: StatusService,
-    private dialog: MatDialog,
-    private translate: TranslateService,
-    private spinner: NgxSpinnerService,
-    private toastr: ToastrService
+    private readonly famService: FamService,
+    private readonly jobService: JobService,
+    private readonly statusService: StatusService,
+    private readonly dialog: MatDialog,
+    private readonly translate: TranslateService,
+    private readonly spinner: NgxSpinnerService,
+    private readonly toastr: ToastrService
   ) { }
 
 
@@ -85,7 +87,11 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public getArchives(path: string) {
-    this.famService.getArchive(path)
+    const storedDrivers = localStorage.getItem('driversActivated');
+    if (storedDrivers) {
+      this.selectedDrivers = storedDrivers.split(',');
+    }
+    this.famService.getArchive(path, this.selectedDrivers)
       .pipe(
         mergeMap((archives) => {
           if (archives.length > 0) {
@@ -112,45 +118,37 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
       .subscribe({
         next: (data) => this.archives = data,
         error: (err: HttpErrorResponse) => {
-          if (err.status === 404) {
-            this.toastr.error(this.translate.instant('Unable to retrieve archives'))
-          } else if (err.status === 403) {
-            this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-          } else if (err.status === 500) {
-            if (!!err.error && !!err.error.detail) {
-              this.toastr.error(err.error.detail);
-            } else {
-              this.toastr.error(this.translate.instant('Unable to retrieve archives'))
-            }
-          }
+          emitErrors(
+            this.toastr,
+            err,
+            this.translate.instant('Unable to retrieve archives'),
+            this.translate.instant('You are not allowed to access this feature'),
+            this.translate.instant('Unable to retrieve archives')
+          );
         }
       })
   }
 
   public activate(archive: Archive) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Activate:', {name: archive.name});
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, { width: '600px' });
+    dialogRef.componentInstance.title = this.translate.instant('Activate:', { name: archive.name });
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
-          this.jobService.ingestArchive(archive, confirm.annotations).subscribe({
+          this.jobService.ingestArchive(archive, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'))
             },
             error: (err: HttpErrorResponse) => {
-              if (err.status === 404) {
-                this.toastr.error(this.translate.instant('Activation failed'))
-              } else if (err.status === 403) {
-                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-              } else if (err.status === 500) {
-                if (!!err.error && !!err.error.detail) {
-                  this.toastr.error(err.error.detail);
-                } else {
-                  this.toastr.error(this.translate.instant('Activation failed'))
-                }
-              }
+              emitErrors(
+                this.toastr,
+                err,
+                this.translate.instant('Activation failed'),
+                this.translate.instant('You are not allowed to access this feature'),
+                this.translate.instant('Activation failed')
+              );
             }
           });
         }
@@ -160,9 +158,9 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   public desactivate(archive: Archive) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
-    dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', {name: archive.name});
+    dialogRef.componentInstance.title = this.translate.instant('Dereferencing:', { name: archive.name });
     dialogRef.componentInstance.action = marker('Dereference');
-    dialogRef.componentInstance.showAnnotations = false;
+    dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (!!confirm.status) {
@@ -173,18 +171,13 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
               this.toastr.success(this.translate.instant('Archive dereferenced'))
             },
             error: (err: HttpErrorResponse) => {
-              if (err.status === 404) {
-                this.toastr.error(this.translate.instant('Dereferencing failed'))
-              } else if (err.status === 403) {
-                this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
-              } else if (err.status === 500) {
-                if (!!err.error && !!err.error.detail) {
-                  this.toastr.error(err.error.detail);
-                } else {
-                  this.toastr.error(this.translate.instant('Dereferencing failed'))
-                }
-
-              }
+              emitErrors(
+                this.toastr,
+                err,
+                this.translate.instant('Dereferencing failed'),
+                this.translate.instant('You are not allowed to access this feature'),
+                this.translate.instant('Dereferencing failed')
+              );
             }
           });
         }

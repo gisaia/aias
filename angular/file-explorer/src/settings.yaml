@@ -10,14 +10,14 @@ authentication:
   use_authent: true
   force_connect: true
   use_discovery: true
-  auth_mode: "openid"
+  auth_mode: "iam"
   url: "https://localhost/arlas_iam_server"
   threshold: 60000
   scope: openid
   issuer: https://girabal:9443/auth/realms/arlas
   client_id: arlas-front
-  redirect_uri: http://localhost:4200/callback
-  silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html
+  redirect_uri: https://localhost:4200/callback
+  silent_refresh_redirect_uri: https://localhost:4200/silent-refresh.html
   require_https: false
   response_type: "code"
   silent_refresh_timeout: 10000

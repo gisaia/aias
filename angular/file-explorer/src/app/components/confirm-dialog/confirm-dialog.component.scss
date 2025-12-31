@@ -25,6 +25,16 @@
 
   --mdc-dialog-supporting-text-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --mdc-dialog-supporting-text-tracking: 0;
+
+  .drivers-list {
+    --drivers-chip-height: 24px;
+  }
+
+  .actions {
+    // Uniformize padding with rest of elements
+    --mat-dialog-actions-alignment: end;
+    --mat-dialog-actions-padding: 24px 24px 12px;
+  }
 }
 
 .content {
@@ -41,15 +51,5 @@
       border: 1px solid lightgray;
       background-color: unset;
     }
-
-    &.hide {
-      display: none;
-    }
   }
-}
-
-.actions {
-  // Uniformize padding with rest of elements
-  padding-left: 24px;
-  padding-bottom: 24px;
 }

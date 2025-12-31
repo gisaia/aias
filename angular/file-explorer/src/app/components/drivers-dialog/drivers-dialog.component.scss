@@ -1,0 +1,7 @@
+:host {
+  .actions {
+    // Uniformize padding with rest of elements
+    --mat-dialog-actions-alignment: end;
+    --mat-dialog-actions-padding: 24px 24px 12px;
+  }
+}

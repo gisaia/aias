@@ -3,16 +3,23 @@
   <div>
     {{message}}
   </div>
-  <mat-form-field [class.hide]="!showAnnotations" class="annotations" appearance="fill">
+
+  <mat-form-field [class.hide]="!showActivationInfos" class="annotations" appearance="fill">
     <mat-label>{{'Annotations' | translate}}</mat-label>
     <textarea #anno matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
       cdkAutosizeMaxRows="6"></textarea>
   </mat-form-field>
+
+  @if(showActivationInfos){
+  <div class="drivers-title">{{'Enabled drivers' | translate}}</div>
+  <app-drivers-list class="drivers-list" (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
+  }
+
 </mat-dialog-content>
 
 <mat-dialog-actions class="actions">
-  <button mat-raised-button color="primary" [color]="'primary'"
-    [mat-dialog-close]="{status: true, annotations: anno?.value}">
+  <button mat-flat-button color="primary" [color]="'primary'"
+    [mat-dialog-close]="{status: true, annotations: anno?.value, drivers: selectedDrivers}">
     {{action | translate}}
   </button>
   <button mat-stroked-button [mat-dialog-close]="{status: false}">
