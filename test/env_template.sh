@@ -2,6 +2,7 @@ export PYTHONPATH=`pwd`:`pwd`/extensions:`pwd`/test
 export APROC_CONFIGURATION_FILE=`pwd`/conf/aproc.yaml
 export APROC_ENDPOINT=http://localhost:8001/arlas/aproc
 export ROOT_DIRECTORY=`pwd`/test/inputs
+export ACCESS_LOGGER_LEVEL=DEBUG
 
 # AIRS
 export AIRS_CORS_ORIGINS="*"

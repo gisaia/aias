@@ -41,14 +41,15 @@ class ImageDriverHelper:
                           description=role.value, asset_format=AssetFormat.png.value)
             asset.href = driver.get_asset_filepath(url, asset)
             driver.LOGGER.debug("Try to create the thumbnail of {} in {}".format(url, asset.href))
-
-            with AccessManager.make_local(url) as local_url:
-                image = Image.open(local_url)
+            if AccessManager.get_local_storage().is_file(url):
+                image = Image.open(url)
                 image.thumbnail([size, size])
                 image.save(asset.href, 'PNG')
                 asset.size = AccessManager.get_size(asset.href)
                 to_assets.append(asset)
                 image.close()
+            else:
+                driver.LOGGER.debug("Couldn't create the thumbnail of {}: it is not local".format(url))
         except Exception as e:
             driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
             driver.LOGGER.error(e)

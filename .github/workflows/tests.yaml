@@ -151,7 +151,7 @@ jobs:
 
   aias-tests-g3:
     if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g3 || inputs.run_all))
-    runs-on: ubuntu-latest
+    runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v4

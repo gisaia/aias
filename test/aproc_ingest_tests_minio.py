@@ -27,7 +27,7 @@ class Tests(IngestTests):
     def test_async_ingest_ast_minio(self):  # Driver AST
         url = os.path.join(ROOT, AST)
         item_id = "9de1896cad5ffaa490f2c38dbca2e19fb6db486350a6408364bccbc4d020f5b5"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_terrasarx_minio(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX)

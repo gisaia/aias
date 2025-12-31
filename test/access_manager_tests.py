@@ -1,4 +1,5 @@
 import os
+import shutil
 import pytest
 from aias_common.access.configuration import AccessManagerSettings, HttpsStorageConfiguration
 import aias_common.access.storages.s3 as s3
@@ -18,6 +19,7 @@ MINIO_HOST = "minio"
 S3_RO_DIR_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/"
 S3_RO_DIR_NO_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/ast"
 S3_RO_FILE = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+S3_RO_SMALL_DIR = "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/PROD_SPOT6_001/LIBRARY"
 S3_RO_DIR = "http://" + MINIO_HOST + ":9000/downloads/readonly/"
 S3_RW_DIR = "http://" + MINIO_HOST + ":9000/downloads/readwrite/"
 S3_RW_FILE = "http://" + MINIO_HOST + ":9000/downloads/readwrite/a_file"
@@ -25,6 +27,7 @@ S3_RW_FILE = "http://" + MINIO_HOST + ":9000/downloads/readwrite/a_file"
 GS_RO_DIR_NO_SLASH = "gs://gisaia-public/test-aias/ast"
 GS_RO_DIR_SLASH = "gs://gisaia-public/test-aias/DIMAP/"
 GS_RO_FILE = "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+GS_RO_SMALL_DIR = "gs://gisaia-public/test-aias/DIMAP/PROD_SPOT6_001/LIBRARY/"
 
 HTTPS_RO_FILE = "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md"
 
@@ -172,6 +175,8 @@ CAN_PULL = [
     GS_RO_FILE,
     S3_RO_FILE,
     HTTPS_RO_FILE,
+    #    GS_RO_SMALL_DIR, // todo fix pull of directories for gs. See issue #366
+    S3_RO_SMALL_DIR
 ]
 
 CAN_NOT_PULL = [
@@ -202,6 +207,8 @@ CAN_NOT_PUSH_ON = [
 
 @pytest.fixture(scope="class")
 def fixture_am():
+    shutil.rmtree(FS_RO_DIR_NO_SLASH, ignore_errors=True, onerror=None)
+    shutil.rmtree(FS_RW_DIR_SLASH, ignore_errors=True, onerror=None)
     os.makedirs(FS_RO_DIR_NO_SLASH, exist_ok=True)
     os.makedirs(FS_RW_DIR_SLASH, exist_ok=True)
     Path(FS_RO_FILE).touch()

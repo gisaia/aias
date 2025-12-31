@@ -24,6 +24,6 @@ class Driver(DownloadDriver):
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         href = self.get_asset_href(item)
-        file_name = get_file_name(item.id)
-
+        file_name = get_file_name(item, "archive" if raw_archive else target_format)
+        self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
         AccessManager.pull(href, os.path.join(target_directory, file_name))

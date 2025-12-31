@@ -19,7 +19,7 @@ def to_airs_item(item: Item) -> Item:
      Returns:
          item: The airs item
      """
-    dictionary = item.model_dump(exclude_unset=True, by_alias=True, exclude_none=True)
+    dictionary = item.model_dump(mode="json", exclude_unset=True, by_alias=True, exclude_none=True)
     return Item(**__replaceKeys(dictionary, ":", "__"))
 
 
@@ -32,7 +32,7 @@ def to_dict(item: Item) -> dict:
      Returns:
          dict: The dictionary. Keys contain : as namespace seperator
      """
-    dictionary = item.model_dump(exclude_unset=True, by_alias=True, exclude_none=True)
+    dictionary = item.model_dump(mode="json", exclude_unset=True, by_alias=True, exclude_none=True)
     return __replaceKeys(dictionary, "__", ":")
 
 
@@ -45,7 +45,7 @@ def to_airs_dict(item: Item) -> dict:
     Returns:
         dict: The dictionary. Keys contain __ as namespace seperator
     """
-    dictionary = item.model_dump(exclude_unset=True, by_alias=False, exclude_none=True)
+    dictionary = item.model_dump(mode="json", exclude_unset=True, by_alias=False, exclude_none=True)
     return dictionary
 
 
