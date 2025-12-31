@@ -125,11 +125,10 @@ def get_epsg(proj):
     return None
 
 
-def get_epsg_from_gdal_info(path: str):
+def get_epsg_from_gdal_info(path: str) -> int | None:
     from osgeo import gdal
-
     info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
-    return get_epsg(info["gcps"]["coordinateSystem"]["wkt"])
+    return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
 
 
 def downsample_image(image_path: str, downsampled_image_path: str, block_size: int):
