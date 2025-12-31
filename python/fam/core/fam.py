@@ -13,14 +13,15 @@ LOGGER = Logger.logger
 class Fam():
 
     @staticmethod
-    def list_archives(path: str, max_size: int = 10, timeout_in_seconds: int = 60) -> list[Archive]:
-        return Fam.__list_archives(path, size=0, max_size=max_size, timeout_in_seconds=timeout_in_seconds, start_timestamp=datetime.datetime.now().timestamp())
+    def list_archives(path: str, max_size: int = 10, include_drivers: list[str] = [], timeout_in_seconds: int = 60) -> list[Archive]:
+        return Fam.__list_archives(path, size=0, max_size=max_size, include_drivers=include_drivers, timeout_in_seconds=timeout_in_seconds, start_timestamp=datetime.datetime.now().timestamp())
 
     @staticmethod
-    def __list_archives(path: str, size: int = 0, max_size: int = 10, start_timestamp: float = 0.0, timeout_in_seconds: int = 60) -> list[Archive]:
+    def __list_archives(path: str, size: int = 0, max_size: int = 10, include_drivers: list[str] = [], start_timestamp: float = 0.0, timeout_in_seconds: int = 60) -> list[Archive]:
         if size >= max_size or os.path.basename(path).startswith("."):
             return []
-        driver: IngestDriver = DriverManager.solve("ingest", path)
+        LOGGER.debug("Listing archives in {} with include_drivers={}".format(path, include_drivers))
+        driver: IngestDriver = DriverManager.solve("ingest", path, include_drivers=include_drivers)
         if driver is not None:
             lm: float | None = AccessManager.get_last_modification_time(path)
             cd: float | None = AccessManager.get_creation_time(path)
@@ -44,7 +45,7 @@ class Fam():
                     return []
                 archives: list[Archive] = []
                 for file in AccessManager.listdir(path):
-                    sub_archives = Fam.__list_archives(file.path, size=size, max_size=max_size, start_timestamp=start_timestamp, timeout_in_seconds=timeout_in_seconds)
+                    sub_archives = Fam.__list_archives(file.path, size=size, max_size=max_size, start_timestamp=start_timestamp, include_drivers=include_drivers, timeout_in_seconds=timeout_in_seconds)
                     size = size + len(sub_archives)
                     archives = archives + sub_archives
                 return archives
