@@ -18,11 +18,12 @@ class Driver(DriverConfiguration):
 
 
 class SMPTConfiguration(BaseModel, extra='allow'):
+    enabled: bool = Field(False, title="Enabled", description="Whether SMTP is enabled or not")
     host: str = Field(title="Host", description="SMTP host")
     port: int = Field(title="Port", description="SMTP port")
     login: str = Field(title="Login", description="SMTP user login")
     password: str = Field(title="Password", description="SMTP user password")
-    from_addr: str = Field(title="From", description="Emails address of the system that sends the emails")
+    from_addr: str = Field(title="From", description="Email address of the system that sends the emails")
 
 
 class Index(BaseModel, extra=Extra.allow):
@@ -39,7 +40,7 @@ class Settings(BaseModel, extra='allow'):
     outbox_s3: S3 | None = Field(title="S3 outbox configuration", description="S3 bucket where the downloads will be placed. If configured, outbox_directory will be cleaned")
     clean_outbox_directory: bool = Field(True, title="Clean after S3 copy", description="Clean outbox directory once files copied on S3")
     notification_admin_emails: str = Field("", title="Admin's email", description="List of admin emails for receiving download notifications, comma seperated.")
-    smtp: SMPTConfiguration | None = Field(None, title="SMTP Configuration", description="Emails address of the system that sends the emails")
+    smtp: SMPTConfiguration = Field(title="SMTP Configuration", description="SMTP configuration that sends the emails")
     email_content_user: str = Field("", title="Email content", description="Content of the email to be sent to the user")
     email_content_error_download: str = Field("", title="Error email content", description="Content of the email to be sent to the user")
     email_content_admin: str = Field("", title="Admin email content", description="Content of the email to be sent to the admin")
@@ -58,7 +59,7 @@ class Settings(BaseModel, extra='allow'):
 
 
 class Configuration:
-    settings: Settings | None = Field(title="Download configuration", description="APROC Download service configuration")
+    settings: Settings = Field(title="Download configuration", description="APROC Download service configuration")
 
     @staticmethod
     def init(configuration_file: str):

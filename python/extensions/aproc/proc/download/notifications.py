@@ -78,7 +78,7 @@ class Notifications:
         if (not subject and not msg) or not to or to == "anonymous":
             return
         try:
-            if context is not None:
+            if Configuration.settings.smtp.enabled and context is not None:
                 msg = msg.format(**context)
                 subject = subject.format(**context)
             email = EmailMessage()
