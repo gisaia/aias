@@ -9,7 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
+    geotiff_to_jpg, get_epsg_from_gdal_info,
+    get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -105,7 +106,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
+                proj__epsg=get_epsg_from_gdal_info(self.tif_path),
                 instrument=instrument,
                 constellation=mission,
                 sensor=mission,
@@ -115,7 +116,7 @@ class Driver(IngestDriver):
                 view__sun_azimuth=view__sun_azimuth,
                 view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.spot5.value,
+                item_format=ItemFormat.geosat.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value

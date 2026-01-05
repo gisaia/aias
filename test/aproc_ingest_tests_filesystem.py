@@ -83,6 +83,11 @@ class Tests(IngestTests):
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
         self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
 
+    def test_async_ingest_axelspace(self):
+        url = os.path.join(ROOT, "GRUS1A_20240331202000", "GRUS1A_20240331202000_L1C_PSM_N21034203.tif")
+        item_id = "bc359afa58912763aa450db4d78c192dd18994303075922af58c6ef6d33bd448"
+        self.async_ingest(url, item_id, ["data", "metadata", "cloud", "thumbnail", "overview", "airs_item"])
+
     def test_ingest_directory(self):  # Test Folder ingestion
         self.ingest_directory(os.path.join(ROOT, DIMAP), collection=COLLECTION, catalog=CATALOG)
 

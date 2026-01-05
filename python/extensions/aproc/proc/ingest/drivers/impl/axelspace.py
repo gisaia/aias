@@ -73,15 +73,15 @@ class Driver(IngestDriver):
         transformer = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326")
         coordinates = tile_md["imageLocation"]["coordinates"][0]
         xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
-        geometry = {"type": "Polygon", "coordinates": [[[x, y] for (x, y) in zip(xx, yy)]]}
+        geometry = {"type": "Polygon", "coordinates": [[[y, x] for (x, y) in zip(xx, yy)]]}
 
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
         start_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
-        start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%:z")
+        start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
         end_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
-        end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%:z")
+        end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%z")
         eo__cloud_cover = tile_md["cloudCoverPercentage"]
         gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
 
@@ -102,7 +102,7 @@ class Driver(IngestDriver):
                 end_datetime=end_date_time,
                 eo__cloud_cover=eo__cloud_cover,
                 gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.sr_path)),
+                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
                 instrument=satellite,
                 constellation="Axelspace",
                 satellite=satellite,

@@ -138,6 +138,7 @@ class ItemFormat(Enum):
     digitalglobe = "DIGITALGLOBE"
     dimap = "DIMAP"
     geoeye = "GEOEYE"
+    geosat = "GEOSAT"
     geotiff = "GEOTIFF"
     iceye = "ICEYE"
     jpeg2000 = "JPEG2000"

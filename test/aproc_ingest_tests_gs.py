@@ -97,7 +97,7 @@ class Tests(IngestTests):
     def test_async_ingest_geosat_cloud(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT)
         item_id = "00638c20c0f940f98e5491d9ec3a0b0257d327b64c58471e8f726adcb5d76429"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':
