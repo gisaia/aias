@@ -60,7 +60,7 @@ export class FamService {
   }
 
   public getArchive(path: string, drivers: string[] = []): Observable<Archive[]> {
-    return this.http.post(this.famSettings?.url + '/archives', { path, size: this.famSettings?.archives_page_size, included_drivers: drivers }, this.options) as Observable<Archive[]>;
+    return this.http.post(this.famSettings?.url + '/archives', { path, size: this.famSettings?.archives_page_size, include_drivers: drivers }, this.options) as Observable<Archive[]>;
   }
 
   public initializeFiles(path: string) {
