@@ -178,7 +178,8 @@ class Driver(IngestDriver):
         stop_time = root.find(".//safe:acquisitionPeriod/safe:stopTime", ns).text
         stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%f")
 
-        satellite = os.path.dirname(self.md_path).split("_")[0]
+        constellation = root.find(".//safe:platform/safe:familyName", ns).text
+        satellite = constellation + root.find(".//safe:platform/safe:number", ns).text
         level = root.find(".//xfdu:contentUnit", ns).attrib["textInfo"].split(" ")[2]
         orbit_number = float(root.find(".//safe:orbitReference/safe:orbitNumber", ns).text)
         orbit_direction = root.find(".//safe:orbitReference//safe:extension/s1:orbitProperties/s1:pass", ns).text
@@ -192,10 +193,9 @@ class Driver(IngestDriver):
                 datetime=start_time,
                 start_datetime=start_time,
                 end_datetime=stop_time,
-                constellation="Sentinel 1",
+                constellation=constellation,
                 satellite=satellite,
                 instrument=satellite,
-                sensor=satellite,
                 sensor_type=SensorType.SAR,
                 item_format=ItemFormat.safe,
                 main_asset_format=AssetFormat.geotiff,
@@ -211,6 +211,12 @@ class Driver(IngestDriver):
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:
             item.properties.gsd = product_values["max_pixel_spacing"]
+
+        sensor = root.find(".//s1sarl1:mode", ns)
+        if sensor is None:
+            sensor = root.find(".//s1sarl2:mode", ns)
+        if sensor is not None:
+            item.properties.sensor = sensor.text
         return item
 
     def __check_path__(self, path: str):
