@@ -21,7 +21,7 @@ export class DriversListComponent implements OnInit {
     const storedDrivers = localStorage.getItem('driversActivated') ? localStorage.getItem('driversActivated').split(',') : [];
     this.selectedDrivers.emit(storedDrivers);
     this.availalbleDrivers = this.jobService.availableDrivers.map(driver => {
-      let selected = storedDrivers.includes(driver) ?? false
+      let selected = storedDrivers.includes(driver) ?? true
       return { name: driver, selected }
     });
   }
