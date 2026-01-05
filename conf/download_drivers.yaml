@@ -32,6 +32,7 @@ email_path_prefix_add: $APROC_EMAIL_PATH_PREFIX_ADD
 email_path_to_windows: $APROC_PATH_TO_WINDOWS
 
 smtp:
+  enabled: true
   host: $ARLAS_SMTP_HOST
   port: $ARLAS_SMTP_PORT
   login: $ARLAS_SMTP_USERNAME
