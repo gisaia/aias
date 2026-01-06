@@ -45,15 +45,19 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href, bands_list=[1, 2, 3])
-        quicklook.size = AccessManager.get_size(quicklook.href)
-        assets.append(quicklook)
+        try:
+            if AccessManager.get_local_storage().is_file(self.tif_path):
+                quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href, bands_list=[1, 2, 3])
+                quicklook.size = AccessManager.get_size(quicklook.href)
+                assets.append(quicklook)
 
-        thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(self.tif_path, 10, 10, output_path=thumbnail.href, bands_list=[1, 2, 3])
-        thumbnail.size = AccessManager.get_size(thumbnail.href)
-        assets.append(thumbnail)
+                thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(self.tif_path, 10, 10, output_path=thumbnail.href, bands_list=[1, 2, 3])
+                thumbnail.size = AccessManager.get_size(thumbnail.href)
+                assets.append(thumbnail)
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
 
         return assets
 

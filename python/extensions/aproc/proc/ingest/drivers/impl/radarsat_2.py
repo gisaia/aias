@@ -34,15 +34,19 @@ class Driver(IngestDriver):
         })
 
     def _add_preview_asset(self, assets: list[Asset], role: Role, size: int, suffix: str):
-        base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
-        AccessManager.makedir(base_path)
-        jpg_path = f"{base_path}/{suffix}.jpg"
-        geotiff_to_jpg(self.browse_path, size, size, jpg_path)
-        ImageDriverHelper.add_asset(
-            assets, jpg_path, role,
-            MimeType.JPG, AssetFormat.jpg, ResourceType.other,
-            airs__managed=True
-        )
+        try:
+            if AccessManager.get_local_storage().is_file(self.browse_path):
+                base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
+                AccessManager.makedir(base_path)
+                jpg_path = f"{base_path}/{suffix}.jpg"
+                geotiff_to_jpg(self.browse_path, size, size, jpg_path)
+                ImageDriverHelper.add_asset(
+                    assets, jpg_path, role,
+                    MimeType.JPG, AssetFormat.jpg, ResourceType.other,
+                    airs__managed=True
+                )
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
 
     # Implements drivers method
     @staticmethod

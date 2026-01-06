@@ -34,7 +34,7 @@ class Tests(IngestTests):
     def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX)
         item_id = "650cbc54a5554720fa3290473f0db93888ecae701c602539018927292277ab46"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, item_id, ["data", "metadata", "extent", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = os.path.join(ROOT, RAPID_EYE)
@@ -57,12 +57,12 @@ class Tests(IngestTests):
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)
         item_id = "eee16f1452c0ff3897d2a3b6595348bd151993aedc95104246accec3a00f05d1"
-        self.async_ingest(url, item_id, ["overview", "metadata", "data", "airs_item", *SENTINEL2_BANDS])
+        self.async_ingest(url, item_id, ["metadata", "data", "airs_item", *SENTINEL2_BANDS])
 
     def test_async_ingest_csk(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
         item_id = "5b1dbff1eaa5117872abc8f2612fb672b194a61d21c532191a13a7d5f062b12f"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False)
+        self.async_ingest(url, item_id, ["data", "airs_item"], check_epsg=False)
 
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)
@@ -82,12 +82,12 @@ class Tests(IngestTests):
     def test_async_ingest_radarsat2(self):  # Driver RADARSAT 2
         url = os.path.join(ROOT, RADARSAT2)
         item_id = "81fde97a25a2611b3806f314a73bdca6c59d655a74c0a58d6470bbe50247feab"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "Polarization HH", "metadata", "airs_item"], data_key="Polarization HH")
+        self.async_ingest(url, item_id, ["Polarization HH", "metadata", "airs_item"], data_key="Polarization HH")
 
     def test_async_ingest_skysat(self):  # Driver SKYSAT
         url = os.path.join(ROOT, SKYSAT)
         item_id = "66fc9856b9120c2d04c4ea4886368726bc0577bfb6bd79107d877005a9a46024"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "UDM2", "visual", "metadata", "airs_item"])
+        self.async_ingest(url, item_id, ["thumbnail", "data", "UDM2", "visual", "metadata", "airs_item"])
 
     def test_async_ingest_spot5(self):  # Driver SPOT5
         url = os.path.join(ROOT, SPOT5)
@@ -97,7 +97,7 @@ class Tests(IngestTests):
     def test_async_ingest_geosat_cloud(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT)
         item_id = "00638c20c0f940f98e5491d9ec3a0b0257d327b64c58471e8f726adcb5d76429"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+        self.async_ingest(url, item_id, ["thumbnail", "data", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':

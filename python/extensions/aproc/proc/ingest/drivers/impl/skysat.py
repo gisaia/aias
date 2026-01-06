@@ -63,6 +63,14 @@ class Driver(IngestDriver):
             tif_path = self.sr_path
             stretch = True
 
+        # Skip generation if tif is not local
+        try:
+            if not AccessManager.get_local_storage().is_file(tif_path):
+                return assets
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
+            return assets
+
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
         geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href,
                        bands_list=bands, stretch=stretch)

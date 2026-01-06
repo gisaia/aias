@@ -49,6 +49,13 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        try:
+            if not AccessManager.get_local_storage().is_file(self.tif_path):
+                return assets
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
+            return assets
+
         if self.quicklook_path is None:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href, bands_list=[1, 2, 3])
