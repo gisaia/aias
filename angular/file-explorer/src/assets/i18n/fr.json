@@ -18,7 +18,7 @@
 	"Toggle task panel": "Afficher/Masquer le panneau des tâches",
 	"Activate this folder": "Activer ce dossier",
 	"Select the drivers to enable": "Sélectionner les drivers à activer",
-	"Save": "Enregistrer",
+	"Ok": "Ok",
 	"Annotations": "Annotations",
 	"Enabled drivers": "Drivers activés",
 	"last update:": "mise à jour le : {{date}}",
