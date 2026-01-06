@@ -7,6 +7,7 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (geotiff_to_jpg,
@@ -66,30 +67,34 @@ class Driver(IngestDriver):
 
         with AccessManager.stream(self.md_path) as fb:
             md = json.load(fb)
-        tile_md = md["imageTileMetadata"][os.path.basename(self.tif_path)]
 
-        # Convert geometry to correct projection
-        epsg = md["productMetadata"]["spatialReferenceSystem"]["EPSGCode"]
-        transformer = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326")
-        coordinates = tile_md["imageLocation"]["coordinates"][0]
-        xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
-        geometry = {"type": "Polygon", "coordinates": [[[y, x] for (x, y) in zip(xx, yy)]]}
+        try:
+            tile_md = md["imageTileMetadata"][os.path.basename(self.tif_path)]
 
-        centroid = get_centroid(geometry)
-        bbox = get_bbox(geometry["coordinates"][0])
+            # Convert geometry to correct projection
+            epsg = md["productMetadata"]["spatialReferenceSystem"]["EPSGCode"]
+            transformer = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326")
+            coordinates = tile_md["imageLocation"]["coordinates"][0]
+            xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
+            geometry = {"type": "Polygon", "coordinates": [[[y, x] for (x, y) in zip(xx, yy)]]}
 
-        start_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
-        start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
-        end_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
-        end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%z")
-        eo__cloud_cover = tile_md["cloudCoverPercentage"]
-        gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
+            centroid = get_centroid(geometry)
+            bbox = get_bbox(geometry["coordinates"][0])
 
-        satellite = md["EOMetadata"]["satelliteName"]
-        view__sun_elevation = md["EOMetadata"]["solarElevationAngleNominal"]
-        view__sun_azimuth = md["EOMetadata"]["solarAzimuthAngleNominal"]
+            start_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
+            start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
+            end_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
+            end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+            eo__cloud_cover = tile_md["cloudCoverPercentage"]
+            gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
 
-        orbit_direction = md["EOMetadata"]["orbitDirection"]
+            satellite = md["EOMetadata"]["satelliteName"]
+            view__sun_elevation = md["EOMetadata"]["solarElevationAngleNominal"]
+            view__sun_azimuth = md["EOMetadata"]["solarAzimuthAngleNominal"]
+
+            orbit_direction = md["EOMetadata"]["orbitDirection"]
+        except KeyError as ke:
+            raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
 
         item = Item(
             id=self.get_item_id(url),

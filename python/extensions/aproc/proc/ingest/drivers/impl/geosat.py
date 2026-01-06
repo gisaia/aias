@@ -6,6 +6,7 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -68,35 +69,34 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def to_item(self, url: str, assets: list[Asset]) -> Item:
-        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
 
         coords = []
         # Calculate bbox
-        for vertex in root.find('./Dataset_Frame', ns).iter('Vertex'):
-            coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
+        for vertex in self.__find_value__(root, './Dataset_Frame').iter('Vertex'):
+            coord = [float(self.__find_value__(vertex, 'FRAME_LON').text), float(self.__find_value__(vertex, 'FRAME_LAT').text)]
             coords.append(coord)
         coords.append(coords[0])
         geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
-        mission = root.find("./Dataset_Sources/Source_Information/Scene_Source/MISSION", ns).text
-        instrument = root.find("./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT", ns).text
-        date_time = root.find("./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE", ns).text \
-            + root.find("./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME", ns).text
+        mission = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/MISSION").text
+        instrument = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT").text
+        date_time = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE").text \
+            + self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME").text
         date_time = datetime.strptime(date_time, "%Y-%m-%d%H:%M:%S")
 
-        view__incidence_angle = float(root.find("./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE", ns).text)
-        view__sun_azimuth = float(root.find("./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH", ns).text)
-        view__sun_elevation = float(root.find("./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION", ns).text)
-        gsd = float(root.find("./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", ns).text)
+        view__incidence_angle = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE").text)
+        view__sun_azimuth = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH").text)
+        view__sun_elevation = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION").text)
+        gsd = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION").text)
 
         eo__cloud_cover = None
         for param in root.iter("Quality_Parameter"):
-            code = param.find("./QUALITY_PARAMETER_CODE").text
+            code = self.__find_value__(param, "./QUALITY_PARAMETER_CODE").text
             if code == "SPACEMETRIC:CLOUDCOVER_PERCENT":
-                eo__cloud_cover = float(param.find("./QUALITY_PARAMETER_VALUE").text)
+                eo__cloud_cover = float(self.__find_value__(param, "./QUALITY_PARAMETER_VALUE").text)
 
         item = Item(
             id=self.get_item_id(url),
@@ -152,3 +152,11 @@ class Driver(IngestDriver):
             == os.path.basename(self.tif_path).split(".")[0] \
             and (self.thumbnail_path is not None
                  or self.quicklook_path is not None)
+
+    def __find_value__(self, root: ET.Element, key: str) -> ET.Element:
+        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
+
+        value = root.find(key, ns)
+        if value is None:
+            raise DriverException(f"Couldn't find {key}")
+        return value
