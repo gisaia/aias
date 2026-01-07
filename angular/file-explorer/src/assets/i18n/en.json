@@ -40,7 +40,7 @@
 	"Would you like to cancel this job ?": "Would you like to cancel this job ?",
 	"Confirm": "Confirm",
 	"Unable to delete this job": "Unable to delete this job",
-	"Drivers updated": "Drivers updated",
+	"Drivers updated": "List of drivers updated",
 	"Activate folder:": "Activate folder: {{folder}}",
 	"Activation started": "Activation started",
 	"Activation failed": "Activation failed",

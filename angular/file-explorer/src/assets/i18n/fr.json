@@ -40,7 +40,7 @@
 	"Would you like to cancel this job ?": "Voulez-vous annuler cette tâche ?",
 	"Confirm": "Confirmer",
 	"Unable to delete this job": "Impossible de supprimer ce job",
-	"Drivers updated": "Modification enregistrée",
+	"Drivers updated": "Liste des drivers mise à jour",
 	"Activate folder:": "Activer le dossier : {{folder}}",
 	"Activation started": "Activation lancée !",
 	"Activation failed": "L'activation a échoué",
