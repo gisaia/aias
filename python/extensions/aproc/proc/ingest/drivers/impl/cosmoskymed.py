@@ -69,46 +69,45 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.browse_path is not None:
-            self.__prepare_thumbnail__(url)
-            geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
+        try:
+            if self.browse_path is not None and AccessManager.get_local_storage().is_file(self.browse_path):
+                self.__prepare_thumbnail__(url)
+                geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
+                ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
-            self.__prepare_quicklook__(url)
-            geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
-        elif self.data_format == AssetFormat.h5:
-            import h5py
-            import numpy as np
-            from PIL import Image
+                self.__prepare_quicklook__(url)
+                geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
+                ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+            elif self.data_format == AssetFormat.h5 and AccessManager.get_local_storage().is_file(self.data_path):
+                import h5py
+                import numpy as np
+                from PIL import Image
 
-            self.__prepare_quicklook__(url)
+                self.__prepare_quicklook__(url)
 
-            with AccessManager.stream(self.data_path) as f:
-                with h5py.File(f) as h5f:
-                    max_height = -np.inf
-                    values = []
+                with AccessManager.stream(self.data_path) as f:
+                    with h5py.File(f) as h5f:
+                        max_height = -np.inf
+                        values = []
 
-                    # Find QLK in HDF5 file
-                    for v in h5f.values():
-                        data: np.ndarray = v['QLK'][()]
-                        max_height = max(max_height, data.shape[0])
-                        values.append(data)
+                        # Find QLK in HDF5 file
+                        for v in h5f.values():
+                            data: np.ndarray = v['QLK'][()]
+                            max_height = max(max_height, data.shape[0])
+                            values.append(data)
 
-                    for idx, data in enumerate(values):
-                        if data.shape[0] < max_height:
-                            values[idx] = np.pad(data, pad_width=(max_height - data.shape[0], 0), mode='edge')
+                        for idx, data in enumerate(values):
+                            if data.shape[0] < max_height:
+                                values[idx] = np.pad(data, pad_width=(max_height - data.shape[0], 0), mode='edge')
 
-                    img = Image.fromarray(np.concatenate(values, axis=1))
-                    img.save(self.quicklook_path)
+                        img = Image.fromarray(np.concatenate(values, axis=1))
+                        img.save(self.quicklook_path)
 
-            # Downsample quicklook for thumbnail
-            self.__prepare_thumbnail__(url)
-            downsample_image(self.quicklook_path, self.thumbnail_path, 8)
-        else:
-            return assets
-
-        # Register assets
-        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-        ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+                # Downsample quicklook for thumbnail
+                self.__prepare_thumbnail__(url)
+                downsample_image(self.quicklook_path, self.thumbnail_path, 8)
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
 
         return assets
 
@@ -172,7 +171,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit_direction=orbit_direction,
                 acq__acquisition_orbit=orbit_number
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
 
         return item

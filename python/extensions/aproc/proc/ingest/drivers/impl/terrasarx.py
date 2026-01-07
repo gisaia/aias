@@ -50,18 +50,22 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.browse_path is not None:
-            thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
-            AccessManager.makedir(thumbnail_path)
-            self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-            geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        try:
+            if self.browse_path is not None and AccessManager.get_local_storage().is_file(self.browse_path):
+                thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
+                AccessManager.makedir(thumbnail_path)
+                self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
+                geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
+                ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
-            quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
-            AccessManager.makedir(quicklook_path)
-            self.quicklook_path = quicklook_path + '/quicklook.jpg'
-            geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
-            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+                quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
+                AccessManager.makedir(quicklook_path)
+                self.quicklook_path = quicklook_path + '/quicklook.jpg'
+                geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
+                ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
+
         return assets
 
     # Implements drivers method
@@ -127,7 +131,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
 
         return item

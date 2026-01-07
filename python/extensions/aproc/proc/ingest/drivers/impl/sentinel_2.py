@@ -72,13 +72,15 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
-        AccessManager.makedir(overview_folder)
-        overview_path = overview_folder + '/overview.jpg'
-        # File is processed locally as it significantly speeds up processing time
-        with AccessManager.make_local(self.tci_path) as local_tci_path:
-            geotiff_to_jpg(local_tci_path, 10, 10, overview_path, [1, 2, 3])
-        ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        try:
+            if AccessManager.get_local_storage().is_file(self.tci_path):
+                overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
+                AccessManager.makedir(overview_folder)
+                overview_path = overview_folder + '/overview.jpg'
+                geotiff_to_jpg(self.tci_path, 10, 10, overview_path, [1, 2, 3])
+                ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        except PermissionError:
+            self.LOGGER.warn("Couldn't create assets, file is not local")
 
         return assets
 
@@ -156,7 +158,7 @@ class Driver(IngestDriver):
                 acq__acquisition_orbit=orbit_number,
                 proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tci_path))
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         if len(resolutions) > 0:
             item.properties.gsd = gsd

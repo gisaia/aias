@@ -192,7 +192,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
         # To fit the case of PNEO 30 cm with no instrument metadata
         if "INSTRUMENT" in metadata:
@@ -224,7 +224,7 @@ class Driver(IngestDriver):
                         if mask.name.endswith('.GML') and mask.name.startswith('ROI'):
                             self.roi_path = mask.path
                 # check if current file is a file
-                if AccessManager.is_file(file.path):
+                if not file.is_dir:
                     if file.name.endswith('.XML') and file.name.startswith('RPC'):
                         self.rpc_file = file.path
                     if file.name.endswith('.XML') and file.name.startswith('DIM'):

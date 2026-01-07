@@ -148,7 +148,7 @@ class Driver(IngestDriver):
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value,
             ),
-            assets=dict([(asset.name, asset) for asset in assets])
+            assets={asset.name: asset for asset in assets}
         )
 
         if eo__cloud_cover != -999000.0:

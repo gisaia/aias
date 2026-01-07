@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from typing import List
 import elasticsearch
-from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse, Link
+from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse
 import pygeohash as pgh
 import pytz
 import requests
@@ -137,7 +137,7 @@ def upload_item(item: Item):
 
 def __s3storage() -> S3Storage:
     return S3Storage(S3StorageConfiguration(
-        bucket=Configuration.settings.s3.bucket, 
+        bucket=Configuration.settings.s3.bucket,
         endpoint=Configuration.settings.s3.endpoint_url,
         readable_paths=Configuration.settings.s3.readable_paths,
         writable_paths=Configuration.settings.s3.writable_paths,
@@ -208,7 +208,7 @@ def delete_item(collection: str, item_id: str):
         raise exceptions.InvalidItemsException(
             [item_id], reason="Collection does not exist"
         )
-    r = __getES().delete(index=__get_es_index_name(collection), id=item_id)
+    __getES().delete(index=__get_es_index_name(collection), id=item_id)
     # the item is dereferenced from ES and the STAC json file is deleted, not the rest.
     LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
     __s3storage().clean(__s3storage().get_full_href(get_item_relative_path(collection, item_id)))
@@ -403,7 +403,7 @@ def __add_generated_fields(item: Item) -> Item:
     acquisition = datetime.fromtimestamp(item.properties.datetime)
     try:
         acquisition = pytz.UTC.localize(acquisition)
-    except Exception as e:
+    except Exception:
         ...  # LOGGER.error("Can not localize {}: {}".format(acquisition, e))
     item.properties.generated__day_of_week = acquisition.weekday()
     item.properties.generated__day_of_year = int(acquisition.strftime("%j"))

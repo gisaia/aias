@@ -132,11 +132,13 @@ class ResourceType(Enum):
 class ItemFormat(Enum):
     adc3 = "adc3"
     ast_dem = "AST_DEM"
+    axelspace = "Axelspace"
     bsg = "BlackSkyGlobal"
     csk = "COSMO-SkyMed"
     digitalglobe = "DIGITALGLOBE"
     dimap = "DIMAP"
     geoeye = "GEOEYE"
+    geosat = "GEOSAT"
     geotiff = "GEOTIFF"
     iceye = "ICEYE"
     jpeg2000 = "JPEG2000"
