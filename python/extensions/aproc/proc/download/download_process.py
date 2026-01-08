@@ -167,10 +167,10 @@ class AprocProcess(Process):
                 Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
             extra_params = {
-                crop_wkt: crop_wkt,
-                target_projection: target_projection,
-                target_format: target_format,
-                raw_archive: raw_archive
+                "crop_wkt": crop_wkt,
+                "target_projection": target_projection,
+                "target_format": target_format,
+                "raw_archive": raw_archive
             }
             driver: DownloadDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers, extra_params=extra_params)
             if driver is not None:
