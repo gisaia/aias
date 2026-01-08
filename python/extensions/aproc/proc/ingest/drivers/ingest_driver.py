@@ -1,6 +1,7 @@
 import hashlib
 import os
 from abc import abstractmethod
+from typing import Any
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import Asset, Item
@@ -57,9 +58,9 @@ class IngestDriver(AbstractDriver):
         return os.path.sep.join([self.get_assets_dir(url), asset.name])
 
     # Implements drivers method
-    def supports(self, url: str) -> bool:
+    def supports(self, resource: str, extra_params: dict[str, Any] = {}) -> bool:
         try:
-            result = self.__check_path__(url)
+            result = self.__check_path__(resource)
             return result
         except Exception as e:
             self.LOGGER.warn(e)

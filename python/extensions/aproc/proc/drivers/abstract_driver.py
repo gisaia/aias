@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 from aproc.core.logger import Logger
 
 
@@ -22,11 +23,11 @@ class AbstractDriver(ABC):
         ...
 
     @abstractmethod
-    def supports(self, ressource) -> bool:
+    def supports(self, resource, extra_params: dict[str, Any] = {}) -> bool:
         """Return True if the provided url points to an archive supported by this driver.
 
         Args:
-            url (str): archive's url
+            resource (str): archive's url
 
         Returns:
             bool: True if the driver supports the archive format, False otherwise

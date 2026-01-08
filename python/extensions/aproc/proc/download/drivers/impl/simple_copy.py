@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from airs.core.models.model import Item
 from aias_common.access.manager import AccessManager
@@ -17,8 +18,11 @@ class Driver(DownloadDriver):
         DownloadDriver.init(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
-        href = self.get_asset_href(item)
+    def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
+        # simple copy does not support any transformation
+        if extra_params.get("crop_wkt", "") or extra_params.get("target_projection", "") or extra_params.get("target_format", ""):
+            return False
+        href = self.get_asset_href(resource)
         return href is not None
 
     # Implements drivers method

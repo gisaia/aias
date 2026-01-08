@@ -85,7 +85,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel) -> str:
         url = InputIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).url
         driver: IngestDriver = DriverManager.solve(summary.id, url)
         if driver is not None:

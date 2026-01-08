@@ -3,6 +3,7 @@ import os
 import re
 import tarfile
 import tempfile
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -31,11 +32,14 @@ class Driver(DownloadDriver):
         Driver.configuration = ZarrConfiguration.model_validate(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
-        href = self.get_asset_href(item)
-        return item.properties.item_format \
-            and item.properties.item_format.lower() == ItemFormat.safe.value.lower() \
-            and href is not None
+    def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
+        # Supports only zarr target format for s2 items
+        if extra_params.get("target_format", "").lower() == AssetFormat.zarr.value.lower():                
+            href = self.get_asset_href(resource)
+            return resource.properties is not None and resource.properties.item_format is not None \
+                and resource.properties.item_format.lower() == ItemFormat.safe.value.lower() \
+                and href is not None
+        return False
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
@@ -43,8 +47,11 @@ class Driver(DownloadDriver):
             raise DriverException("Raw archive can't be returned for a zarr download.")
         if target_format.lower() != AssetFormat.zarr.value.lower():
             raise DriverException(f"Target format must be {AssetFormat.zarr.value}")
-        if target_projection == 'native':
-            target_projection = item.properties.proj__epsg
+        if target_projection == 'native' and item.properties:
+            if item.properties.proj__epsg:
+                target_projection = str(item.properties.proj__epsg)
+            else:
+                raise DriverException("Item has no EPSG code defined for native projection.")
 
         import rasterio
         import rioxarray

@@ -2,6 +2,7 @@ import io
 import os
 import re
 import tempfile
+from typing import Any
 import zipfile
 from time import time
 
@@ -25,8 +26,8 @@ class Driver(EnrichDriver):
         EnrichDriver.init(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
-        return item.properties.item_format and item.properties.item_format.lower() == ItemFormat.safe.value.lower()
+    def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
+        return extra_params.get("asset_type", "") == "cog" and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() == ItemFormat.safe.value.lower()
 
     # Implements drivers method
     def create_assets(self, item: Item, asset_type: str) -> list[Asset]:

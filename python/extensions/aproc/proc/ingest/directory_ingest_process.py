@@ -81,7 +81,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel) -> str:
         return InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
 
     @shared_task(bind=True, track_started=True)

@@ -41,9 +41,9 @@ LOGGER = Logger.logger
 
 class InputDownloadProcess(InputProcess):
     requests: list[dict[str, str]] = Field(default=[], title="The list of item (collection, item_id) to download")
-    crop_wkt: str = Field(default=None, title="WKT geometry for cropping the data")
-    target_projection: str = Field(default=None, title="epsg target projection")
-    target_format: str = Field(default=None, title="target format")
+    crop_wkt: str = Field(default="", title="WKT geometry for cropping the data")
+    target_projection: str = Field(default="", title="epsg target projection")
+    target_format: str = Field(default="", title="target format")
     raw_archive: bool = Field(default=True, title="raw archive")
 
 
@@ -135,7 +135,7 @@ class AprocProcess(Process):
         return (target_directory, relative_target_directory)
 
     @staticmethod
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel) -> str:
         inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
@@ -166,8 +166,13 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(None, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise RegisterException(error_msg)
-
-            driver: DownloadDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+            extra_params = {
+                crop_wkt: crop_wkt,
+                target_projection: target_projection,
+                target_format: target_format,
+                raw_archive: raw_archive
+            }
+            driver: DownloadDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers, extra_params=extra_params)
             if driver is not None:
                 try:
                     LOGGER.debug("Download will be done by {}".format(driver.name))
