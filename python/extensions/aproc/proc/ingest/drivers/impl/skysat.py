@@ -64,11 +64,7 @@ class Driver(IngestDriver):
             stretch = True
 
         # Skip generation if tif is not local
-        try:
-            if not AccessManager.get_local_storage().is_file(tif_path):
-                return assets
-        except PermissionError:
-            self.LOGGER.warn("Couldn't create assets, file is not local")
+        if not AccessManager.is_local(tif_path):
             return assets
 
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)

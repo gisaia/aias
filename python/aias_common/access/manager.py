@@ -243,6 +243,15 @@ class AccessManager:
         return storage.is_file(href)
 
     @staticmethod
+    def is_local(href: str) -> bool:
+        storage = AccessManager.get_local_storage()
+
+        try:
+            return storage.is_file(href) or storage.is_dir(href)
+        except PermissionError:
+            return False
+
+    @staticmethod
     def is_dir(href: str):
         storage = AccessManager.resolve_storage(href)
 
