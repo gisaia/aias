@@ -72,15 +72,12 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        try:
-            if AccessManager.get_local_storage().is_file(self.tci_path):
-                overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
-                AccessManager.makedir(overview_folder)
-                overview_path = overview_folder + '/overview.jpg'
-                geotiff_to_jpg(self.tci_path, 10, 10, overview_path, [1, 2, 3])
-                ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-        except PermissionError:
-            self.LOGGER.warn("Couldn't create assets, file is not local")
+        if AccessManager.is_local(self.tci_path):
+            overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
+            AccessManager.makedir(overview_folder)
+            overview_path = overview_folder + '/overview.jpg'
+            geotiff_to_jpg(self.tci_path, 10, 10, overview_path, [1, 2, 3])
+            ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
         return assets
 

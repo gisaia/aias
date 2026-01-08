@@ -49,11 +49,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        try:
-            if not AccessManager.get_local_storage().is_file(self.tif_path):
-                return assets
-        except PermissionError:
-            self.LOGGER.warn("Couldn't create assets, file is not local")
+        if not AccessManager.is_local(self.tif_path):
             return assets
 
         if self.quicklook_path is None:
