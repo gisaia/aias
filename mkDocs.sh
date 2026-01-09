@@ -41,7 +41,7 @@ pip3.10 install lazydocs
 
 export PYTHONPATH=python
 
-pip3.10 install -r python/aias_common/requirements.txt
+pip3.10 install -r python/aias_common/requirements.aias_common.txt
 lazydocs \
     aias_common.access.manager \
     aias_common.access.configuration \

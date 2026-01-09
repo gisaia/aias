@@ -15,14 +15,16 @@ RUN addgroup -g 1000 arlasgroup && \
 USER 1000
 WORKDIR /app
 
-COPY --chown=arlasuser:arlasgroup ./python/agate/requirements.txt /app/requirements.txt
+COPY ./python/requirements.aias.services.txt /app/
+RUN pip install --no-cache-dir -r requirements.aias.services.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./python/agate/requirements.agate.txt /app/
+RUN pip install --no-cache-dir -r requirements.agate.txt
 
-COPY --chown=arlasuser:arlasgroup ./python/agate /app/agate
-COPY --chown=arlasuser:arlasgroup ./python/aias_common /app/aias_common
-COPY --chown=arlasuser:arlasgroup ./conf/agate.yaml /app/conf/
-COPY --chown=arlasuser:arlasgroup ./docker/materials/scripts/agate/start.sh /app/
+COPY ./python/agate /app/agate
+COPY ./python/aias_common /app/aias_common
+COPY ./conf/agate.yaml /app/conf/
+COPY ./docker/materials/scripts/agate/start.sh /app/
 
 EXPOSE 8004
 ENTRYPOINT ["./start.sh"]
