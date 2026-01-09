@@ -45,8 +45,6 @@ class Driver(DownloadDriver):
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
         if raw_archive is True:
             raise DriverException("Raw archive can't be returned for a zarr download.")
-        if target_format.lower() != AssetFormat.zarr.value.lower():
-            raise DriverException(f"Target format must be {AssetFormat.zarr.value}")
         if target_projection == 'native' and item.properties:
             if item.properties.proj__epsg:
                 target_projection = str(item.properties.proj__epsg)
