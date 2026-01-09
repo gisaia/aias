@@ -69,7 +69,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.browse_path is not None and AccessManager.is_local(self.browse_path):
+        if self.browse_path is not None:
             self.__prepare_thumbnail__(url)
             geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
             ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
