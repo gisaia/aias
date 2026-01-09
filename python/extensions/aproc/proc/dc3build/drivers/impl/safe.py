@@ -2,6 +2,7 @@ import functools
 import json
 import os
 import re
+from typing import Any
 
 from airs.core.models import mapper
 from airs.core.models.model import (Asset, AssetFormat, ChunkingStrategy, Item,
@@ -23,7 +24,7 @@ class Driver(DC3Driver):
         DC3Driver.init(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
+    def supports(self, item: Item, extra_params: dict[str, Any] = {}) -> bool:
         return item.properties.item_format and item.properties.item_format.lower() == ItemFormat.safe.value.lower()
 
     # Implements drivers method

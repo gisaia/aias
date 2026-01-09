@@ -66,5 +66,5 @@ class Process(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel) -> str:
         ...

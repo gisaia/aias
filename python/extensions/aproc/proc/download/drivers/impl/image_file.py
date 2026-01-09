@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from pathlib import Path
+from typing import Any
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat, Role
 from aias_common.access.manager import AccessManager
@@ -18,24 +19,26 @@ class Driver(DownloadDriver):
         DownloadDriver.init(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
-        item_format = item.properties.item_format
-        href = self.get_asset_href(item)
-        return href is not None \
-            and item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value, ItemFormat.ast_dem.value,
-                                ItemFormat.csk.value, ItemFormat.digitalglobe.value, ItemFormat.geoeye.value,
-                                ItemFormat.rapideye.value, ItemFormat.umbra.value, ItemFormat.bsg.value]
+    def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
+        if resource.properties:
+            item_format = resource.properties.item_format
+            href = self.get_asset_href(resource)
+            return href is not None \
+                and item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value, ItemFormat.ast_dem.value,
+                                    ItemFormat.csk.value, ItemFormat.digitalglobe.value, ItemFormat.geoeye.value,
+                                    ItemFormat.rapideye.value, ItemFormat.umbra.value, ItemFormat.bsg.value]
+        return False
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str,
                             target_format: str, raw_archive: bool):
         href = self.get_asset_href(item)
         if raw_archive:
-            if item.properties.item_format and \
+            if item.properties and item.properties.item_format and \
                     item.properties.item_format in [ItemFormat.geotiff.value, ItemFormat.jpeg2000.value]:
                 self.LOGGER.debug("Copy {} in {}".format(href, target_directory))
                 AccessManager.pull(href, os.path.join(target_directory, os.path.basename(href)))
-                if item.assets and item.assets.get(Role.extent.value) and AccessManager.exists(
+                if item.assets and item.assets.get(Role.extent.value) and item.assets.get(Role.extent.value).href and AccessManager.exists(
                         item.assets.get(Role.extent.value).href):
                     self.LOGGER.debug("Geo file {} detected and copied".format(item.assets.get(Role.extent.value).href))
                     AccessManager.pull(item.assets.get(Role.extent.value).href, os.path.join(target_directory, os.path.basename(item.assets.get(Role.extent.value).href)))

@@ -34,16 +34,15 @@ class Driver(IngestDriver):
         })
 
     def _add_preview_asset(self, assets: list[Asset], role: Role, size: int, suffix: str):
-        if AccessManager.is_local(self.browse_path):
-            base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
-            AccessManager.makedir(base_path)
-            jpg_path = f"{base_path}/{suffix}.jpg"
-            geotiff_to_jpg(self.browse_path, size, size, jpg_path)
-            ImageDriverHelper.add_asset(
-                assets, jpg_path, role,
-                MimeType.JPG, AssetFormat.jpg, ResourceType.other,
-                airs__managed=True
-            )
+        base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
+        AccessManager.makedir(base_path)
+        jpg_path = f"{base_path}/{suffix}.jpg"
+        geotiff_to_jpg(self.browse_path, size, size, jpg_path)
+        ImageDriverHelper.add_asset(
+            assets, jpg_path, role,
+            MimeType.JPG, AssetFormat.jpg, ResourceType.other,
+            airs__managed=True
+        )
 
     # Implements drivers method
     @staticmethod

@@ -1,4 +1,5 @@
 import importlib
+from typing import Any
 
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
@@ -42,7 +43,7 @@ class DriverManager():
         return list(map(lambda p: p.name, DriverManager.drivers[process]))
 
     @staticmethod
-    def solve(process: str, resource, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> AbstractDriver:
+    def solve(process: str, resource, include_drivers: list[str] = [], exclude_drivers: list[str] = [], extra_params: dict[str, Any] = {}) -> AbstractDriver | None:
         DriverManager.__check_drivers(process)
         drivers = DriverManager.drivers.get(process, [])
         if include_drivers and len(include_drivers) > 0:
@@ -55,7 +56,7 @@ class DriverManager():
             try:
                 LOGGER.debug("Test if driver {} supports the resource".format(driver_class.name))
                 driver: AbstractDriver = driver_class()
-                if driver.supports(resource) is True:
+                if driver.supports(resource, extra_params=extra_params) is True:
                     return driver
             except Exception as e:
                 LOGGER.exception(e)

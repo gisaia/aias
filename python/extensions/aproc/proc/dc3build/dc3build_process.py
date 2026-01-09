@@ -87,12 +87,11 @@ class AprocProcess(Process):
 
     @staticmethod
     def __get_driver__(input: InputDC3BuildProcess) -> DC3Driver:
-        driver: DC3Driver = None
+        driver: DC3Driver | None = None
         if input.composition and len(input.composition) > 0 and len(input.composition[0].dc3__references) and input.composition[0].dc3__references[0]:
             reference = input.composition[0].dc3__references[0]
             item: Item = ARLASServicesHelper.get_item_from_airs(airs_endpoint=AprocConfiguration.settings.airs_endpoint, collection=reference.dc3__collection, item_id=reference.dc3__id)
             driver = DriverManager.solve(summary.id, item, include_drivers=input.include_drivers, exclude_drivers=input.exclude_drivers)
-
         if driver is None:
             error_msg = "No driver found for {}/{}".format(reference.dc3__collection, reference.dc3__id)
             LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "dc3build", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build", ARLAS_COLLECTION_KEY: reference.dc3__collection, ARLAS_ITEM_ID_KEY: reference.dc3__id})

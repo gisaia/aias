@@ -91,7 +91,7 @@ class AprocProcess(Process):
         return {}
 
     @staticmethod
-    def get_resource_id(inputs: BaseModel):
+    def get_resource_id(inputs: BaseModel) -> str:
         inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
         hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
         return hash_object.hexdigest()
@@ -108,7 +108,10 @@ class AprocProcess(Process):
                 LOGGER.error(error_msg)
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 raise DriverException(error_msg)
-            driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+            extra_params = {
+                "asset_type": asset_type
+            }
+            driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers, extra_params=extra_params)
             if driver is not None:
                 try:
                     LOGGER.debug("ingestion: 1 - enrichment will be done by {}".format(driver.name))

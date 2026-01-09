@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from typing import Any
 import xml.etree.ElementTree as ET
 
 from airs.core.models.model import AssetFormat, Item, ItemFormat
@@ -19,13 +20,15 @@ class Driver(DownloadDriver):
         DownloadDriver.init(configuration)
 
     # Implements drivers method
-    def supports(self, item: Item) -> bool:
-        item_format = item.properties.item_format
-        href = self.get_asset_href(item)
-        return href is not None \
-            and (item_format == ItemFormat.dimap.value
-                 or item_format == ItemFormat.terrasar.value
-                 or item_format == ItemFormat.spot5.value)
+    def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
+        if resource.properties:
+            item_format = resource.properties.item_format
+            href = self.get_asset_href(resource)
+            return href is not None \
+                and (item_format == ItemFormat.dimap.value
+                     or item_format == ItemFormat.terrasar.value
+                     or item_format == ItemFormat.spot5.value)
+        return False
 
     # Implements drivers method
     def fetch_and_transform(self, item: Item, target_directory: str, crop_wkt: str, target_projection: str, target_format: str, raw_archive: bool):
