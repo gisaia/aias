@@ -16,7 +16,6 @@ USER 1000
 WORKDIR /app
 
 COPY ./python/requirements.aias.services.txt /app/
-RUN pip install --no-cache-dir -r requirements.aias.services.txt
 
 COPY ./python/airs/requirements.airs.txt /app/
 RUN pip install --no-cache-dir -r requirements.airs.txt

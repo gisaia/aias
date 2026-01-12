@@ -19,10 +19,8 @@ WORKDIR /app
 RUN python -m venv --system-site-packages aproc
 
 COPY ./python/requirements.aias.services.txt /app/
-RUN aproc/bin/pip install --no-cache-dir -r requirements.aias.services.txt
 
 COPY ./python/aias_common/requirements.aias_common.txt /app/
-RUN aproc/bin/pip install --no-cache-dir -r requirements.aias_common.txt
 
 COPY ./python/aproc/requirements.aproc.txt /app/
 RUN aproc/bin/pip install --no-cache-dir -r requirements.aproc.txt
