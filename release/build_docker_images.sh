@@ -2,6 +2,7 @@
 set -o errexit
 [ -z "$1" ] && echo "Please provide the version" && exit 1;
 VERSION=$1
+export DOCKER_BUILDKIT=1
 
 build_docker (){
     IMAGE=$1

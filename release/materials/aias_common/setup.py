@@ -1,5 +1,11 @@
 import setuptools
 
+
+def get_requirements():
+    with open("python/aias_common/requirements.aias_common.txt", "r") as f:
+        return [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -13,6 +19,5 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires='>=3.10',
     package_dir={'': 'src'},
-    install_requires=['ecs_logging', 'google-cloud-storage==2.5.0', 'pydantic==2.10.6', 'requests==2.32.4',
-                      'smart_open==7.5.0', 'boto3==1.39.11', 'fastapi_utilities']
+    install_requires=get_requirements()
 )

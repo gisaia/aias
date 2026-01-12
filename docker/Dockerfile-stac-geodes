@@ -14,13 +14,15 @@ RUN addgroup -g 1000 arlasgroup && \
     adduser -D -u 1000 -G arlasgroup arlasuser
 USER 1000
 WORKDIR /app
-COPY --chown=arlasuser:arlasgroup python/requirements-stac.txt /app/requirements.txt
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY ./python/requirements.aias.services.txt /app/
 
-COPY --chown=arlasuser:arlasgroup ./python/stac /app/stac
-COPY --chown=arlasuser:arlasgroup ./python/airs /app/airs
-COPY --chown=arlasuser:arlasgroup ./python/aias_common /app/aias_common
+COPY ./python/requirements.stac.txt /app/
+RUN pip install --no-cache-dir -r requirements.stac.txt
+
+COPY ./python/stac /app/stac
+COPY ./python/airs /app/airs
+COPY ./python/aias_common /app/aias_common
 
 ENV PYTHONPATH=/app
 ENTRYPOINT ["python3.10", "-m", "stac.geodes_sync"]

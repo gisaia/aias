@@ -1,0 +1,2 @@
+prettytable==3.9.0
+-r requirements.aias.services.txt

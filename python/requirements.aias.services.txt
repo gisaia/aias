@@ -1,0 +1,16 @@
+click==8.1.6
+typer==0.9.0
+pydantic==2.10.6
+fastapi==0.121.0
+uvicorn==0.34.2
+envyaml==1.10.211231
+requests==2.32.4
+attrs==23.1.0
+ecs-logging==2.2.0
+PyJWT==2.8.0
+cryptography==42.0.4
+python-dateutil==2.8.2
+fastapi-utilities==0.3.1
+pytz==2023.3
+python-multipart==0.0.20
+memory-profiler==0.61.0

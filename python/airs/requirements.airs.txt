@@ -1,0 +1,5 @@
+pygeohash==1.2.0
+boto3==1.39.11
+aioboto3==15.1.0
+elasticsearch==8.9.0
+-r requirements.aias.services.txt
