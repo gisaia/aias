@@ -1,0 +1,80 @@
+.collection-list-field {
+  width: 100%;
+}
+
+// Sticky header for the search input
+.sticky-search-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    height: 36px;
+
+    .search-icon {
+      color: rgba(0, 0, 0, 0.54);
+      margin-right: 12px;
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      background: transparent;
+      font-family: inherit;
+    }
+
+    .clear-btn {
+      .mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+.no-results-msg {
+  padding: 16px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.54);
+  text-align: center;
+}
+
+::ng-deep .mat-mdc-select-panel {
+  padding-top: 0 !important; // Required for sticky header to touch the top
+  max-height: 350px !important;
+}
+
+.add-custom-option {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+  // Custom style for the disabled state
+  &.mat-mdc-option-disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: not-allowed;
+
+    .add-text {
+      color: rgba(0, 0, 0, 0.38);
+    }
+  }
+
+  // Active state (valid)
+  &:not(.mat-mdc-option-disabled) {
+    background-color: #f0f7ff;
+    color: #1976d2;
+  }
+
+  mat-icon {
+    margin-right: 8px !important;
+  }
+}

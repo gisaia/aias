@@ -21,7 +21,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { emitErrors } from '@tools/errors';
-import { Collection } from '@tools/interface';
+import { ARLAS_AIAS_COLLECTION, Collection } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
@@ -50,13 +50,13 @@ export class StatusService {
 
   public getResourceStatus(archiveId: string): Observable<any> {
     return this.http.get(
-      this.statusSettings?.url + '/collections/' + this.statusSettings.collection + '/items/' + archiveId,
+      this.statusSettings?.url + '/collections/' + this.getCollection() + '/items/' + archiveId,
       this.options) as Observable<any>;
   }
 
   public dereferenceArchive(archiveId: string): Observable<any> {
     return this.http.delete(
-      this.statusSettings?.url + '/collections/' + this.statusSettings.collection + '/items/' + archiveId,
+      this.statusSettings?.url + '/collections/' + this.getCollection() + '/items/' + archiveId,
       this.options) as Observable<any>;
   }
 
@@ -74,5 +74,9 @@ export class StatusService {
           );
         }
       })
+  }
+
+  private getCollection(): string {
+    return localStorage.getItem(ARLAS_AIAS_COLLECTION) ?? this.statusSettings.collection;
   }
 }

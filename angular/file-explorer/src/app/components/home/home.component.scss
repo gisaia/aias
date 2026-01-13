@@ -37,6 +37,11 @@
 }
 
 :host {
+  .left-menu {
+    display: flex;
+    gap: 0 10px;
+    align-items: center;
+  }
   .right-menu {
     display: flex;
     padding-right: 15px;
@@ -75,6 +80,22 @@
       width: 100%;
       .section-title {
         @include section-title();
+        padding: 4px 10px;
+        .catalog {
+          display: flex;
+          align-items: center;
+          gap: 0 10px;
+          font-size: 14px;
+          ::ng-deep mat-form-field {
+            height: 36px;
+            .mat-mdc-text-field-wrapper {
+              height: 36px;
+            }
+            .mat-mdc-form-field-infix {
+              padding: 8px 0;
+            }
+          }
+        }
       }
     }
     .explorer {

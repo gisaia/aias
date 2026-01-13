@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>{{'Choose the catalog to use' | translate}}</h2>
+<mat-dialog-content class="content">
+  <app-collection-list [collections]="collections" (selectedValueChange)="selectedCollection=$event"></app-collection-list>
+</mat-dialog-content>
+
+<mat-dialog-actions class="actions">
+  <button mat-flat-button color="primary" [disabled]="!selectedCollection" [color]="'primary'"
+    [mat-dialog-close]="{collection: selectedCollection}">
+    {{'Validate' | translate}}
+  </button>
+</mat-dialog-actions>

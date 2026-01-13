@@ -35,8 +35,18 @@
     --mat-dialog-actions-alignment: end;
     --mat-dialog-actions-padding: 24px 24px 12px;
   }
+
+  .catalog .mat-mdc-chip {
+    --mdc-chip-label-text-size: 12px;
+    --mdc-chip-container-shape-radius: 4px;
+    --mdc-chip-with-avatar-avatar-size: 0px;
+    --mdc-chip-container-height: 24px;
+  }
 }
 
+.title {
+  word-break: break-all;
+}
 .content {
   padding-bottom: 0;
 

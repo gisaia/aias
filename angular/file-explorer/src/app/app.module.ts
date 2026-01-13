@@ -61,6 +61,7 @@ import { ExplorerComponent } from './components/explorer/explorer.component';
 import { HomeComponent } from './components/home/home.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { StartupService } from './services/startup.service';
+import { CollectionListComponent } from '@components/collection-list/collection-list.component';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -119,7 +120,8 @@ export function startupServiceFactory(startupService: StartupService) {
         deps: [HttpClient, ArlasSettingsService, PersistenceService]
       }
     }),
-    OAuthModule.forRoot()
+    OAuthModule.forRoot(),
+    CollectionListComponent
   ],
   providers: [
     {

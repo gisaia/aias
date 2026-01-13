@@ -1,0 +1,36 @@
+<mat-form-field appearance="outline" class="collection-list-field" [subscriptSizing]="'dynamic'">
+  <mat-select #select [placeholder]="'Select a catalog' | translate" [(value)]="selectedValue"
+    (selectionChange)="onSelectionChange($event.value)" (openedChange)="onOpenedChange($event)">
+    <div class="sticky-search-header" (keydown)="$event.stopPropagation()">
+      <div class="search-wrapper">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input #searchInput class="search-input" [placeholder]="'Search or add a catalog' | translate"
+          [(ngModel)]="searchTerm" (input)="onSearchChange()" autocomplete="off" />
+        <button mat-icon-button *ngIf="searchTerm" (click)="searchTerm = ''; onSearchChange()" class="clear-btn"
+          type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+    </div>
+
+    @for (collection of filteredCollections; track collection) {
+    <mat-option [value]="collection">
+      {{ collection }}
+    </mat-option>
+    }
+
+    @if (searchTerm && !exists()) {
+    <mat-option class="add-custom-option" [disabled]="isInvalid()" (click)="!isInvalid() && addCustomValue()">
+      <mat-icon [color]="isInvalid() ? '' : 'primary'">add_circle_outline</mat-icon>
+      <span class="add-text">
+        {{'Add' | translate}} "{{ searchTerm }}"
+      </span>
+    </mat-option>
+    }
+
+    @if (filteredCollections.length === 0 && (exists() || !searchTerm)) {
+    <div class="no-results-msg">{{'No results found' | translate}}</div>
+    }
+  </mat-select>
+</mat-form-field>

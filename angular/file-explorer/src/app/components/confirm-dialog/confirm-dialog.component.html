@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{title}} </h2>
+<h2 mat-dialog-title class="title">{{title}}</h2>
 <mat-dialog-content class="content">
   <div>
     {{message}}
@@ -11,8 +11,14 @@
   </mat-form-field>
 
   @if(showActivationInfos){
-  <div class="drivers-title">{{'Enabled drivers' | translate}}</div>
+
+  <div>{{'Catalog' | translate}}</div>
+  <mat-chip-set class="catalog">
+    <mat-chip>{{currentCollection}}</mat-chip>
+  </mat-chip-set>
+  <div>{{'Enabled drivers' | translate}}</div>
   <app-drivers-list class="drivers-list" (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
+
   }
 
 </mat-dialog-content>

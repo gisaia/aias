@@ -27,7 +27,7 @@ import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
 import { emitErrors } from '@tools/errors';
-import { Archive, ProcessStatus } from '@tools/interface';
+import { Archive, ARLAS_AIAS_DRIVERS_ACTIVATED, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, zip } from 'rxjs';
@@ -87,7 +87,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public getArchives(path: string) {
-    const storedDrivers = localStorage.getItem('driversActivated');
+    const storedDrivers = localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED);
     if (storedDrivers) {
       this.selectedDrivers = storedDrivers.split(',');
     }
