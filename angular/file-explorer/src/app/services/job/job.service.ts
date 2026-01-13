@@ -21,7 +21,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { emitErrors } from '@tools/errors';
-import { Archive, ARLAS_AIAS_COLLECTION, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
+import { Archive, ARLAS_AIAS_ACTIVE_COLLECTION, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject } from 'rxjs';
 
@@ -107,6 +107,6 @@ export class JobService {
   }
 
   private getCollection(): string {
-    return localStorage.getItem(ARLAS_AIAS_COLLECTION) ?? this.jobSettings.collection;
+    return localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.jobSettings.collection;
   }
 }

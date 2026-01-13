@@ -1,10 +1,10 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatOptionModule } from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInput, MatInputModule } from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CollectionListComponent } from "@components/collection-list/collection-list.component";
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,7 +22,6 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './collection-dialog.component.scss'
 })
 export class CollectionDialogComponent {
-  @ViewChild('newCollection') newCollection: MatInput;
 
   public collections: string[] = [];
   public selectedCollection: string;

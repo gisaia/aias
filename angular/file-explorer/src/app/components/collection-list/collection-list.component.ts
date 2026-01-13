@@ -45,7 +45,7 @@ export class CollectionListComponent implements OnInit, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedValue'] && changes['selectedValue'].firstChange) {
+    if (changes['selectedValue']?.firstChange) {
       this.selectedValueChange.emit(changes['selectedValue'].currentValue);
     }
     if (changes['collections']) {

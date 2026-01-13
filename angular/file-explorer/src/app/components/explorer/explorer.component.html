@@ -13,7 +13,7 @@
       <span (click)="listArchives(node.path)" [class.folder]="node.is_dir" class="name"
         [class.active]="selectedFilePath === node.path">{{node.name}}</span>
       <span *ngIf="node.is_dir" class="material-symbols-outlined pointer activate-btn" (click)="activate(node)"
-        [matTooltip]="'Activate this folder'| translate" [matTooltipPosition]="'right'">
+        [matTooltip]="'Activate this folder in catalog'| translate:{catalog: currentCatalog}" [matTooltipPosition]="'right'">
         add_circle
       </span>
       <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'" *ngIf="node.isLoading"

@@ -26,7 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ARLAS_AIAS_COLLECTION } from '@tools/interface';
+import { ARLAS_AIAS_ACTIVE_COLLECTION } from '@tools/interface';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -49,6 +49,6 @@ export class ConfirmDialogComponent implements OnInit {
   public currentCollection = '';
 
   public ngOnInit(): void {
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_COLLECTION)
+    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION)
   }
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-export const ARLAS_AIAS_COLLECTION = 'ARLAS_AIAS_COLLECTION';
+export const ARLAS_AIAS_ACTIVE_COLLECTION = 'ARLAS_AIAS_ACTIVE_COLLECTION';
 export const ARLAS_AIAS_DRIVERS_ACTIVATED = 'driversActivated';
 
 export interface IngestPayload {

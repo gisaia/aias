@@ -21,7 +21,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { emitErrors } from '@tools/errors';
-import { ARLAS_AIAS_COLLECTION, Collection } from '@tools/interface';
+import { ARLAS_AIAS_ACTIVE_COLLECTION, Collection } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
@@ -30,12 +30,16 @@ import { Observable } from 'rxjs';
 })
 export class StatusService {
   private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
-  private statusSettings: { url?: string; collection?: string; } = {};
+  private _statusSettings: { url?: string; collection?: string; } = {};
+
+  public get statusSettings(): { url?: string; collection?: string; } {
+    return this._statusSettings;
+  }
 
   public existingCollections: Collection[] = [];
 
   constructor(
-    private http: HttpClient,
+    private readonly http: HttpClient,
     private readonly translate: TranslateService,
     private readonly toastr: ToastrService
   ) { }
@@ -45,7 +49,7 @@ export class StatusService {
   }
 
   public setSettings(settings: any) {
-    this.statusSettings = settings;
+    this._statusSettings = settings;
   }
 
   public getResourceStatus(archiveId: string): Observable<any> {
@@ -77,6 +81,6 @@ export class StatusService {
   }
 
   private getCollection(): string {
-    return localStorage.getItem(ARLAS_AIAS_COLLECTION) ?? this.statusSettings.collection;
+    return localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.statusSettings.collection;
   }
 }

@@ -19,14 +19,14 @@ export class DriversListComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    const storedDrivers = localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED) ? localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED).split(',') : [];
+    const storedDrivers = localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED)?.split(',') ?? [];
     this.selectedDrivers.emit(storedDrivers);
     this.availalbleDrivers = this.jobService.availableDrivers.map(driver => {
       let selected;
-      if( !localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED)){
-        selected = true;
-      } else {
+      if( localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED)){
         selected = storedDrivers.includes(driver);
+      } else {
+        selected = true;
       }
       
       return { name: driver, selected }

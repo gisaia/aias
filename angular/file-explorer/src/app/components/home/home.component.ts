@@ -25,7 +25,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
-import { ARLAS_AIAS_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
+import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 
@@ -56,9 +56,7 @@ export class HomeComponent implements OnInit {
     this.jobsService.fetchAvailableDrivers();
     this.statusService.fetchExistingCollections();
     this.collections = this.statusService.existingCollections.map(c => c.id);
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_COLLECTION) ?? '';
-
-    // this.collections = ["main", "catalogue", "new_collection_name_very_long"];
+    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.statusService.statusSettings.collection;
     this.addCurrentCollectionIfMissing();
     if (this.currentCollection === '') {
       this.openCatalogSelection();
@@ -66,12 +64,17 @@ export class HomeComponent implements OnInit {
   }
 
   public openCatalogSelection() {
-    const data: any = { collections: this.collections };
-    const dialogRefCollection = this.dialog.open(CollectionDialogComponent, { width: '400px', disableClose: true, data });
+    const dialogRefCollection = this.dialog.open(
+      CollectionDialogComponent,
+      {
+        width: '400px',
+        disableClose: true, data: { collections: this.collections }
+      }
+    );
     dialogRefCollection.afterClosed().subscribe({
       next: (confirm) => {
         if (confirm) {
-          localStorage.setItem(ARLAS_AIAS_COLLECTION, confirm.collection);
+          localStorage.setItem(ARLAS_AIAS_ACTIVE_COLLECTION, confirm.collection);
           this.currentCollection = confirm.collection;
           this.addCurrentCollectionIfMissing();
           this.refresh();
@@ -98,7 +101,8 @@ export class HomeComponent implements OnInit {
   }
 
   public collectionChange(event) {
-    localStorage.setItem(ARLAS_AIAS_COLLECTION, event);
+    localStorage.setItem(ARLAS_AIAS_ACTIVE_COLLECTION, event);
+    this.currentCollection = event;
     this.famService.refreshArchives$.next(true);
   }
 

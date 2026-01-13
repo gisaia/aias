@@ -12,10 +12,8 @@
 
   @if(showActivationInfos){
 
-  <div>{{'Catalog' | translate}}</div>
-  <mat-chip-set class="catalog">
-    <mat-chip>{{currentCollection}}</mat-chip>
-  </mat-chip-set>
+  <div>{{'In catalog' | translate}} <strong>{{currentCollection}}</strong></div>
+  <br />
   <div>{{'Enabled drivers' | translate}}</div>
   <app-drivers-list class="drivers-list" (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
 

@@ -21,7 +21,7 @@
     }
 
     @if (searchTerm && !exists()) {
-    <mat-option class="add-custom-option" [disabled]="isInvalid()" (click)="!isInvalid() && addCustomValue()">
+    <mat-option class="add-custom-option" [disabled]="isInvalid()" (keydown)="!isInvalid() && addCustomValue()" (click)="!isInvalid() && addCustomValue()">
       <mat-icon [color]="isInvalid() ? '' : 'primary'">add_circle_outline</mat-icon>
       <span class="add-text">
         {{'Add' | translate}} "{{ searchTerm }}"

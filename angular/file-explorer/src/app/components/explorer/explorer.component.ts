@@ -43,6 +43,7 @@ export class ExplorerComponent implements OnInit {
   @Output() public archivePath: EventEmitter<string> = new EventEmitter();
 
   @Input() public collapseAllSubject: Subject<boolean> = new Subject();
+  @Input() public currentCatalog: string;
 
   public treeControl: FlatTreeControl<DynamicFileNode>;
   public dataSource: DynamicDataSource;
