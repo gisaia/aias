@@ -49,6 +49,17 @@ class ImageDriverHelper:
         return preview
 
     @staticmethod
+    def make_local_overview_asset(driver: IngestDriver, archive_href: str, overview_href: str, type: MimeType, format: AssetFormat) -> Asset:
+        overview = ImageDriverHelper.prepare_preview_asset(driver, archive_href, Role.overview, type, format)
+        if not AccessManager.is_local(overview_href):
+            AccessManager.pull(overview_href, overview.href)
+        else:
+            overview.href = overview_href
+        overview.size = AccessManager.get_size(overview.href)
+
+        return overview
+
+    @staticmethod
     def to_item(driver: IngestDriver, item_format: ItemFormat, asset_format: AssetFormat, url: str, assets: list[Asset]) -> Item:
         import rasterio
         import rasterio.features

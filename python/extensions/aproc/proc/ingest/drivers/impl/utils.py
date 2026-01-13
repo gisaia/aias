@@ -137,8 +137,9 @@ def downsample_image(image_path: str, out_path: str, factor: int):
     """
     from PIL import Image
 
-    # TODO: should we make it local? or just ignore files that are not local?
-    with AccessManager.make_local(image_path) as local_image_path:
-        with Image.open(local_image_path) as im:
-            im_new = im.reduce(factor)
-            im_new.save(out_path)
+    if not AccessManager.is_local(image_path):
+        raise Exception(f"Image downsample can only be done on local images; {image_path} is not")
+
+    with Image.open(image_path) as im:
+        im_new = im.reduce(factor)
+        im_new.save(out_path)

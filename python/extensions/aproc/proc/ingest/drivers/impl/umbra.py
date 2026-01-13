@@ -8,6 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             geotiff_to_jpg,
                                                              get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -35,9 +36,20 @@ class Driver(IngestDriver):
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
+        if self.quicklook_path:
+            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
+        if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
         if self.quicklook_path is not None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
             downsample_image(self.quicklook_path, thumbnail.href, 4)

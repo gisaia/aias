@@ -29,15 +29,18 @@ class Driver(IngestDriver):
         assets: list[Asset] = []
         ImageDriverHelper.add_archive(assets, url)
 
-        if self.quicklook_path:
-            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.pan_tif_path, Role.pan_sharpened, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
-        # TODO: retrieve quicklook and make it local for each driver where the quicklook sometimes exists
+        # Make the quicklook local to downsample it
+        if self.quicklook_path:
+            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
