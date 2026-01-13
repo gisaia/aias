@@ -153,6 +153,7 @@ class ItemFormat(Enum):
     terrasar = "TerraSAR-X"
     theia = "THEIA"
     umbra = "UMBRA"
+    wyvern = "wyvern"
 
 
 class AssetFormat(Enum):

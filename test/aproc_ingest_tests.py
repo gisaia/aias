@@ -36,7 +36,7 @@ SPOT5 = "spot5/"
 TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
 TIF = "cog.tiff"
 WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
-
+WYVERN = "f3aa9cc0-3622-4711-a729-41e573a316f3/wyvern_dragonette-001_20250101T072826_f3aa9cc0/"
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
 callback_job_status = {}
