@@ -9,7 +9,8 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_coordinates)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -18,7 +19,6 @@ class Driver(IngestDriver):
     def __init__(self):
         super().__init__()
         self.quicklook_path = None
-        self.thumbnail_path = None
         self.tif_path = None
         self.tfw_path = None
         self.file_name = None
@@ -35,10 +35,6 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        if self.thumbnail_path is not None:
-            assets.append(Asset(href=self.thumbnail_path,
-                                roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
         if self.quicklook_path is not None:
             assets.append(Asset(href=self.quicklook_path,
                                 roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
@@ -61,6 +57,18 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tif_path, 25, 25, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
+        if self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method
@@ -188,7 +196,6 @@ class Driver(IngestDriver):
                     if not file.is_dir:
                         if file.name.endswith('.jpg'):
                             if file.name == parts_of_file_name[0] + '_' + parts_of_file_name[1] + '_rgb_' + parts_of_file_name[3] + '_ovr.jpg':
-                                self.thumbnail_path = file.path
                                 self.quicklook_path = file.path
                         if file.name.endswith('_metadata.txt'):
                             self.met_path = file.path

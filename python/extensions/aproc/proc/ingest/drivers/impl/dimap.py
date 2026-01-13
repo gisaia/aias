@@ -8,7 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -53,10 +54,10 @@ class Driver(IngestDriver):
             mime = None
             if self.image_path.lower().endswith("jp2"):
                 asset_format = AssetFormat.jpg2000.value
-                mime = "image/jp2"
+                mime = MimeType.JPEG2000
             if self.image_path.lower().endswith("tif") or self.image_path.lower().endswith("tiff"):
                 asset_format = AssetFormat.geotiff.value
-                mime = "image/tif"
+                mime = MimeType.TIFF
             assets.append(Asset(href=self.image_path, size=AccessManager.get_size(self.image_path),
                                 roles=[Role.data.value], name=Role.data.value, type=mime,
                                 description=Role.data.value, airs__managed=False, asset_format=asset_format))
@@ -78,6 +79,18 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path is None and AccessManager.is_local(self.image_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.image_path, 25, 25, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
+        if self.thumbnail_path is None and self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method
@@ -227,26 +240,26 @@ class Driver(IngestDriver):
                 if not file.is_dir:
                     if file.name.endswith('.XML') and file.name.startswith('RPC'):
                         self.rpc_file = file.path
-                    if file.name.endswith('.XML') and file.name.startswith('DIM'):
+                    elif file.name.endswith('.XML') and file.name.startswith('DIM'):
                         self.dim_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('PREVIEW'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('PREVIEW'):
                         raw_all_quick_path = file.path
 
                     # Data and georef
-                    if file.name.lower().endswith(('.jpg', 'jp2')) and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith(('.jpg', 'jp2')) and file.name.startswith('IMG_'):
                         self.image_path = file.path
-                    if file.name.lower().endswith('.tfw') and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith('.tfw') and file.name.startswith('IMG_'):
                         self.georef_path = file.path
-                    if file.name.lower().endswith('.j2w') and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith('.j2w') and file.name.startswith('IMG_'):
                         self.georef_path = file.path
-                    if file.name.lower().endswith(('.tiff', '.tif')) and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith(('.tiff', '.tif')) and file.name.startswith('IMG_'):
                         self.image_path = file.path
 
-                    if file.name.endswith('.JPG') and file.name.startswith('ICON'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('ICON'):
                         raw_all_thumb_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('CAT_QL'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('CAT_QL'):
                         cat_all_quick_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('CAT_TB'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('CAT_TB'):
                         cat_all_thumb_path = file.path
             if cat_all_thumb_path is not None:
                 self.thumbnail_path = cat_all_thumb_path
@@ -256,7 +269,7 @@ class Driver(IngestDriver):
                 self.quicklook_path = cat_all_quick_path
             else:
                 self.quicklook_path = raw_all_quick_path
-            return self.roi_path is not None and self.dim_path is not None
+            return self.roi_path is not None and self.dim_path is not None and self.image_path is not None
         return False
 
     @staticmethod

@@ -8,12 +8,12 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners, geotiff_to_jpg)
+    downsample_image, geotiff_to_jpg, get_epsg_from_gdal_info,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
@@ -24,7 +24,6 @@ class Driver(IngestDriver):
         self.tif_VV_path = None
         self.polarizations = []
         self.browse_path = None
-        self.url = None
 
     def _add_polarization(self, name: str, path: str):
         self.polarizations.append({
@@ -33,22 +32,10 @@ class Driver(IngestDriver):
             'name': f'Polarization {name}'
         })
 
-    def _add_preview_asset(self, assets: list[Asset], role: Role, size: int, suffix: str):
-        base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
-        AccessManager.makedir(base_path)
-        jpg_path = f"{base_path}/{suffix}.jpg"
-        geotiff_to_jpg(self.browse_path, size, size, jpg_path)
-        ImageDriverHelper.add_asset(
-            assets, jpg_path, role,
-            MimeType.JPG, AssetFormat.jpg, ResourceType.other,
-            airs__managed=True
-        )
-
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -61,22 +48,35 @@ class Driver(IngestDriver):
                                 description=pol['name'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
+
+        if self.browse_path:
+            ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        self.url = url
-        if self.browse_path:
-            self._add_preview_asset(
-                assets, Role.thumbnail, 50, "thumbnail"
-            )
-            self._add_preview_asset(
-                assets, Role.overview, 100, "quicklook"
-            )
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        image_path = None
+        quicklook_pct = 100
+        if self.browse_path:
+            image_path = self.browse_path
+        elif AccessManager.is_local(self.polarizations[0]['path']):
+            image_path = self.polarizations[0]['path']
+            quicklook_pct = 25
+
+        if image_path:
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(image_path, quicklook_pct, quicklook_pct, output_path=quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method
@@ -136,7 +136,7 @@ class Driver(IngestDriver):
                 sensor_type=SensorType.SAR,
                 item_format=ItemFormat.radarsat2,
                 main_asset_format=AssetFormat.geotiff,
-                main_asset_name=Role.data.value,
+                main_asset_name=self.polarizations[0]['name'],
                 observation_type=ObservationType.radar,
                 processing__level=product_level,
                 gsd=gsd,

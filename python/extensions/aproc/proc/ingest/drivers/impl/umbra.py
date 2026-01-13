@@ -7,7 +7,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import get_epsg
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -16,7 +17,7 @@ class Driver(IngestDriver):
         super().__init__()
         self.tif_path = None
         self.md_path = None
-        self.thumbnail_path = None
+        self.quicklook_path = None
 
     @staticmethod
     def init(configuration: dict):
@@ -26,18 +27,22 @@ class Driver(IngestDriver):
         assets: list[Asset] = []
         ImageDriverHelper.add_archive(assets, url)
 
-        if self.thumbnail_path:
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
+        if self.quicklook_path:
+            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
 
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
-        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
+        if self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     def to_item(self, url: str, assets: list[Asset]):
@@ -122,6 +127,6 @@ class Driver(IngestDriver):
                     if f.path.endswith("_METADATA.json"):
                         self.md_path = f.path
                     if f.path.endswith("-thumbnail.png"):
-                        self.thumbnail_path = f.path
+                        self.quicklook_path = f.path
             return self.tif_path is not None and self.md_path is not None
         return False

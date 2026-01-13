@@ -29,31 +29,6 @@ class ImageDriverHelper:
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
-    # TODO: replace by geotiff_to_jpg ?
-    @staticmethod
-    def add_overview_if_you_can(driver: IngestDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
-        driver.LOGGER.debug("Try to create the thumbnail of {}".format(url))
-        try:
-            from PIL import Image
-            Image.MAX_IMAGE_PIXELS = 2000000000
-            asset = Asset(href=None,
-                          roles=[role.value], name=role.value, type=MimeType.PNG.value,
-                          description=role.value, asset_format=AssetFormat.png.value)
-            asset.href = driver.get_asset_filepath(url, asset)
-            driver.LOGGER.debug("Try to create the thumbnail of {} in {}".format(url, asset.href))
-            if AccessManager.get_local_storage().is_file(url):
-                image = Image.open(url)
-                image.thumbnail([size, size])
-                image.save(asset.href, 'PNG')
-                asset.size = AccessManager.get_size(asset.href)
-                to_assets.append(asset)
-                image.close()
-            else:
-                driver.LOGGER.debug("Couldn't create the thumbnail of {}: it is not local".format(url))
-        except Exception as e:
-            driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
-            driver.LOGGER.error(e)
-
     @staticmethod
     def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False):
         assets.append(Asset(href=href, size=AccessManager.get_size(href),
@@ -66,18 +41,11 @@ class ImageDriverHelper:
                             type=MimeType.DIRECTORY.value, description=Role.archive.value, airs__managed=False))
 
     @staticmethod
-    def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    @staticmethod
-    def transform_assets(driver: IngestDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    @staticmethod
     def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
         preview = Asset(href=None, name=role.value, description=role.value, roles=[role.value],
                         type=type.value, asset_format=format.value, asset_type=ResourceType.other.value, airs__managed=True)
-        preview.href = driver.get_asset_filepath(href, preview)
+        preview.href = driver.get_asset_filepath(href, preview) + '.' + format.value.lower()
+
         return preview
 
     @staticmethod

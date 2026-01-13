@@ -54,6 +54,10 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        return assets
+
+    # Implements drivers method
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.visual_tif_path:
             bands = [1, 2, 3]
             tif_path = self.visual_tif_path
@@ -68,8 +72,7 @@ class Driver(IngestDriver):
             return assets
 
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href,
-                       bands_list=bands, stretch=stretch)
+        geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href, bands_list=bands, stretch=stretch)
         quicklook.size = AccessManager.get_size(quicklook.href)
         assets.append(quicklook)
 
@@ -78,10 +81,6 @@ class Driver(IngestDriver):
             downsample_image(quicklook.href, thumbnail.href, 4)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
-        return assets
-
-    # Implements drivers method
-    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method

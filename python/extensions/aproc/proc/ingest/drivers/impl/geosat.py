@@ -10,7 +10,7 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg_from_gdal_info,
+    downsample_image, geotiff_to_jpg, get_epsg_from_gdal_info,
     get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -49,6 +49,10 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        return assets
+
+    # Implements drivers method
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if not AccessManager.is_local(self.tif_path):
             return assets
 
@@ -56,18 +60,15 @@ class Driver(IngestDriver):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href, bands_list=[1, 2, 3])
             quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
             assets.append(quicklook)
 
-        if self.thumbnail_path is None:
-            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, 10, 10, output_path=thumbnail.href, bands_list=[1, 2, 3])
+        if self.thumbnail_path is None and self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 
-        return assets
-
-    # Implements drivers method
-    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method

@@ -44,13 +44,13 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets: list[Asset] = []
         ImageDriverHelper.add_archive(assets, url)
 
+        # It is put as a thumbnail as the resolution is low
         ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.thumbnail,
                                     MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
@@ -72,17 +72,16 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if AccessManager.is_local(self.tci_path):
-            overview_folder = self.output_folder + '/sentinel2/' + self.get_item_id(url) + '/overview'
-            AccessManager.makedir(overview_folder)
-            overview_path = overview_folder + '/overview.jpg'
-            geotiff_to_jpg(self.tci_path, 10, 10, overview_path, [1, 2, 3])
-            ImageDriverHelper.add_asset(assets, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
 
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if AccessManager.is_local(self.tci_path):
+            overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tci_path, 10, 10, overview.href, [1, 2, 3])
+            overview.size = AccessManager.get_size(overview.href)
+            assets.append(overview)
         return assets
 
     # Implements drivers method
@@ -183,7 +182,7 @@ class Driver(IngestDriver):
                                                 self.tci_path = band.path
                                             elif band.name.endswith('.jp2'):
                                                 self.band_paths.append(band.path)
-            return self.quicklook_path and self.md_path and self.tci_path and len(self.band_paths) > 0
+            return self.quicklook_path is not None and self.md_path is not None and self.tci_path is not None and len(self.band_paths) > 0
         return False
 
     @staticmethod

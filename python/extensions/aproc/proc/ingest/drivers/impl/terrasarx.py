@@ -9,18 +9,15 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder = None
 
     def __init__(self):
         super().__init__()
         self.browse_path = None
-        self.quicklook_path = None
-        self.thumbnail_path = None
         self.tif_path = None
         self.tfw_path = None
         self.met_path = None
@@ -29,7 +26,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -42,6 +38,7 @@ class Driver(IngestDriver):
         assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+        ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         if self.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=AccessManager.get_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
@@ -50,22 +47,19 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
-        AccessManager.makedir(thumbnail_path)
-        self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-        geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
-        ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-
-        quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
-        AccessManager.makedir(quicklook_path)
-        self.quicklook_path = quicklook_path + '/quicklook.jpg'
-        geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
-        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+        geotiff_to_jpg(self.browse_path, 100, 100, quicklook.href)
+        quicklook.size = AccessManager.get_size(quicklook.href)
+        assets.append(quicklook)
+
+        thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+        downsample_image(quicklook.href, thumbnail.href, 4)
+        thumbnail.size = AccessManager.get_size(thumbnail.href)
+        assets.append(thumbnail)
         return assets
 
     # Implements drivers method

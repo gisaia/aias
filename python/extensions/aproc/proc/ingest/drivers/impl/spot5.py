@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
+    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -60,6 +60,18 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
+        if self.thumbnail_path is None and self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method

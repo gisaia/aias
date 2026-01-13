@@ -1,4 +1,3 @@
-import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -9,12 +8,12 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
+    downsample_image, get_epsg_from_gdal_info,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
@@ -27,7 +26,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -48,19 +46,15 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.thumbnail_path is None:
-            thumbnail_folder = os.path.join(Driver.output_folder, self.get_item_id(url), 'thumbnail')
-            AccessManager.makedir(thumbnail_folder)
-            self.thumbnail_path = os.path.join(thumbnail_folder, "thumbnail.png")
-
-            downsample_image(self.quicklook_path, self.thumbnail_path, 8)
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail,
-                                        MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
-
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.thumbnail_path is None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 10)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method

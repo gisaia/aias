@@ -7,7 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (get_bbox,
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image, get_bbox,
                                                              get_centroid,
                                                              get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -19,7 +19,7 @@ class Driver(IngestDriver):
         self.tif_path = None
         self.pan_tif_path = None
         self.md_path = None
-        self.thumbnail_path = None
+        self.quicklook_path = None
 
     @staticmethod
     def init(configuration: dict):
@@ -29,18 +29,23 @@ class Driver(IngestDriver):
         assets: list[Asset] = []
         ImageDriverHelper.add_archive(assets, url)
 
-        if self.thumbnail_path:
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
+        if self.quicklook_path:
+            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.pan_tif_path, Role.pan_sharpened, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]):
-        ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
+        # TODO: retrieve quicklook and make it local for each driver where the quicklook sometimes exists
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
+        if self.quicklook_path:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     def to_item(self, url: str, assets: list[Asset]):
@@ -93,11 +98,11 @@ class Driver(IngestDriver):
                 if not f.is_dir:
                     if f.path.lower().endswith("ortho.tif"):
                         self.tif_path = f.path
-                    if f.path.lower().endswith("ortho-pan.tif"):
+                    elif f.path.lower().endswith("ortho-pan.tif"):
                         self.pan_tif_path = f.path
-                    if f.path.endswith("_metadata.json"):
+                    elif f.path.endswith("_metadata.json"):
                         self.md_path = f.path
-                    if f.path.endswith("_browse.png"):
-                        self.thumbnail_path = f.path
+                    elif f.path.endswith("_browse.png"):
+                        self.quicklook_path = f.path
             return self.tif_path is not None and self.pan_tif_path is not None and self.md_path is not None
         return False

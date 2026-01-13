@@ -14,8 +14,7 @@ class IngestDriver(AbstractDriver):
 
     def __init__(self):
         super().__init__()
-        self.thumbnail_size = 256
-        self.overview_size = 1024
+        # TODO: define const for the downsample factors, the percent for the geotiff_to_jpg, ...
 
     # Implements drivers method
     @staticmethod

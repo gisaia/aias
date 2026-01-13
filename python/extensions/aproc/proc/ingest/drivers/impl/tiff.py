@@ -1,7 +1,10 @@
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, MimeType, Role
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, Role)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -37,6 +40,16 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if AccessManager.is_local(url):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(url, 25, 25, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method

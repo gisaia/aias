@@ -9,7 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_corners, setup_gdal)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_corners, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -17,8 +18,7 @@ class Driver(IngestDriver):
 
     def __init__(self):
         super().__init__()
-        self.quicklook_path = None
-        self.thumbnail_path = None
+        self.browse_path = None
         self.xml_path = None
         self.tif_path = None
         self.tfw_path = None
@@ -47,14 +47,20 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        # If not None, then no thumbnail & quicklook ?
-        if self.quicklook_path is None:
-            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets)
-            ImageDriverHelper.add_overview_if_you_can(self, self.tif_path, Role.overview, self.overview_size, assets)
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.browse_path:
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.browse_path, 100, 100, output_path=quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, 4)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
     # Implements drivers method
@@ -130,8 +136,7 @@ class Driver(IngestDriver):
             for file in AccessManager.listdir(path):
                 if not file.is_dir:
                     if file.name.endswith("_browse.tif"):
-                        self.quicklook_path = file.path
-                        self.thumbnail_path = file.path
+                        self.browse_path = file.path
                     if file.name.endswith(".tif") and file.name.find("browse") < 0 and file.name.find("_udm") < 0:
                         self.tif_path = file.path
                         tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"

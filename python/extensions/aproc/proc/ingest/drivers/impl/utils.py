@@ -94,7 +94,7 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
     if bands_list is None:
         bands_list = [1]
         if dataset.RasterCount == 3:
-            bands_list = [3, 2, 1]
+            bands_list = [1, 2, 3]
 
     scale_params = None
     if stretch:
@@ -131,16 +131,14 @@ def get_epsg_from_gdal_info(path: str) -> int | None:
     return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
 
 
-def downsample_image(image_path: str, downsampled_image_path: str, block_size: int):
+def downsample_image(image_path: str, out_path: str, factor: int):
     """
-    Downsamples an image by the given block_size factor
+    Downsamples an image by the given factor
     """
-    import numpy as np
     from PIL import Image
-    from skimage.measure import block_reduce
 
-    image = Image.open(image_path)
-    image_data = np.asarray(image)
-    reduced_image = block_reduce(image_data, block_size=block_size, func=np.average)
-
-    Image.fromarray(np.asarray(reduced_image, image_data.dtype), image.mode).save(downsampled_image_path)
+    # TODO: should we make it local? or just ignore files that are not local?
+    with AccessManager.make_local(image_path) as local_image_path:
+        with Image.open(local_image_path) as im:
+            im_new = im.reduce(factor)
+            im_new.save(out_path)

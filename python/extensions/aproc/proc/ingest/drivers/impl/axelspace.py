@@ -10,7 +10,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (geotiff_to_jpg,
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image, geotiff_to_jpg,
                                                              get_bbox,
                                                              get_centroid,
                                                              get_epsg)
@@ -45,6 +45,10 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        return assets
+
+    # Implements drivers method
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if AccessManager.is_local(self.tif_path):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tif_path, 25, 25, output_path=quicklook.href, bands_list=[1, 2, 3])
@@ -52,14 +56,10 @@ class Driver(IngestDriver):
             assets.append(quicklook)
 
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, 10, 10, output_path=thumbnail.href, bands_list=[1, 2, 3])
+            downsample_image(quicklook.href, thumbnail.href, 4)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 
-        return assets
-
-    # Implements drivers method
-    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
     # Implements drivers method
