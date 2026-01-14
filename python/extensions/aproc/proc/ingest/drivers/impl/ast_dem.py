@@ -41,46 +41,11 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        assets.append(
-            Asset(
-                href=self.tif_path,
-                size=AccessManager.get_size(self.tif_path),
-                roles=[Role.data.value],
-                name=Role.data.value,
-                type=MimeType.TIFF.value,
-                description=Role.data.value,
-                airs__managed=False,
-                asset_format=AssetFormat.geotiff.value,
-                asset_type=ResourceType.gridded.value,
-            )
-        )
-        assets.append(
-            Asset(
-                href=self.met_path,
-                size=AccessManager.get_size(self.met_path),
-                roles=[Role.metadata.value],
-                name=Role.metadata.value,
-                type=MimeType.PVL.value,
-                description=Role.metadata.value,
-                airs__managed=False,
-                asset_format=AssetFormat.pvl.value,
-                asset_type=ResourceType.other.value,
-            )
-        )
+        ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+        ImageDriverHelper.add_asset(assets, self.met_path, Role.metadata, MimeType.PVL, AssetFormat.pvl, ResourceType.other)
+
         if self.tfw_path:
-            assets.append(
-                Asset(
-                    href=self.tfw_path,
-                    size=AccessManager.get_size(self.tfw_path),
-                    roles=[Role.extent.value],
-                    name=Role.extent.value,
-                    type=MimeType.TEXT.value,
-                    description=Role.metadata.value,
-                    airs__managed=False,
-                    asset_format=AssetFormat.tfw.value,
-                    asset_type=ResourceType.other.value,
-                )
-            )
+            ImageDriverHelper.add_asset(assets, self.tfw_path, Role.extent, MimeType.TEXT, AssetFormat.tfw, ResourceType.other)
         return assets
 
     # Implements drivers method
