@@ -11,10 +11,19 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
 
 
 class IngestDriver(AbstractDriver):
+    # Factor to apply when downsampling an overview
+    THUMBNAIL_DOWNSAMPLE_FACTOR = 4
+    # Factor to apply when downsampling a large overview
+    THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE = 8
+    # When generating an overview from a browse, keep the whole image
+    OVERVIEW_FROM_BROWSE_PCT = 100
+    # When generating an overview from a tiff, reduce the tiff resolution
+    OVERVIEW_FROM_TIFF_PCT = 25
+    # When generating an overview from a large tiff, reduce the tiff resolution
+    OVERVIEW_FROM_LARGE_TIFF_PCT = 10
 
     def __init__(self):
         super().__init__()
-        # TODO: define const for the downsample factors, the percent for the geotiff_to_jpg, ...
 
     # Implements drivers method
     @staticmethod

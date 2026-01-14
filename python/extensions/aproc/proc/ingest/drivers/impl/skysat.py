@@ -72,13 +72,13 @@ class Driver(IngestDriver):
             return assets
 
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href, bands_list=bands, stretch=stretch)
+        geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
         quicklook.size = AccessManager.get_size(quicklook.href)
         assets.append(quicklook)
 
         if self.thumbnail_path is None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, 4)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets

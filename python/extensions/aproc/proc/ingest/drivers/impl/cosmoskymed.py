@@ -76,12 +76,12 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.browse_path is not None:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.browse_path, 50, 50, quicklook.href)
+            geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href)
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, 4)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         elif self.data_format == AssetFormat.h5 and AccessManager.is_local(self.data_path):
@@ -113,7 +113,7 @@ class Driver(IngestDriver):
 
             # Downsample quicklook for thumbnail
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, 8)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 

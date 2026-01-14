@@ -60,12 +60,12 @@ class Driver(IngestDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         image_path = None
-        quicklook_pct = 100
+        quicklook_pct = Driver.OVERVIEW_FROM_BROWSE_PCT
         if self.browse_path:
             image_path = self.browse_path
         elif AccessManager.is_local(self.polarizations[0]['path']):
             image_path = self.polarizations[0]['path']
-            quicklook_pct = 25
+            quicklook_pct = Driver.OVERVIEW_FROM_TIFF_PCT
 
         if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
@@ -74,7 +74,7 @@ class Driver(IngestDriver):
             assets.append(quicklook)
 
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, 4)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets

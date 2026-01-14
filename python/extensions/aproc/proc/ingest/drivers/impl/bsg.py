@@ -46,7 +46,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]):
         if self.quicklook_path:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(self.quicklook_path, thumbnail.href, 4)
+            downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets
