@@ -3,11 +3,12 @@ from datetime import datetime
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
-                                    MimeType, Properties, ResourceType, Role,
-                                    SensorType)
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image, get_bbox,
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             get_bbox,
                                                              get_centroid,
                                                              get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -51,47 +52,53 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def to_item(self, url: str, assets: list[Asset]):
-        with AccessManager.make_local(self.md_path) as local_md_path:
-            with open(local_md_path, 'r') as f:
-                data = json.load(f)
+    def load_metadata(self, url: str) -> object:
+        with AccessManager.stream(self.md_path) as fb:
+            md = json.load(fb)
 
-        geometry = data["geometry"]
+        return md
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        date = datetime.strptime(data["acquisitionDate"], "%Y-%m-%dT%H:%M:%S.%f")
-        constellation = "BlackSkyGlobal"
-        sensor = data["sensorName"]
-        gsd = data["gsd"]
-
-        view__off_nadir = data["offNadirAngle"]
-        view__sun_azimuth = data["sunAzimuth"]
-        view__sun_elevation = data["sunElevation"]
+        date = datetime.strptime(metadata["acquisitionDate"], "%Y-%m-%dT%H:%M:%S.%f")
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=[centroid[0][0], centroid[0][1]],
             properties=Properties(
                 datetime=date,
-                constellation=constellation,
-                satellite=constellation,
-                instrument=constellation,
-                sensor=sensor,
-                sensor_type=SensorType.OPTIC,
-                gsd=gsd,
+                constellation="BlackSkyGlobal",
+                sensor_type=SensorType.OPTIC.value,
+                item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.bsg.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
-                view__off_nadir=view__off_nadir,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                observation_type=ObservationType.optic,
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.satellite = item.properties.constellation
+        item.properties.gsd = metadata["gsd"]
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.instrument = item.properties.constellation
+        item.properties.sensor = metadata["sensorName"]
+
+        item.properties.view__off_nadir = metadata["offNadirAngle"]
+        item.properties.view__sun_azimuth = metadata["sunAzimuth"]
+        item.properties.view__sun_elevation = metadata["sunElevation"]
+
         return item
 
     def __check_path__(self, path: str):

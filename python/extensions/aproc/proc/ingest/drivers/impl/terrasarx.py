@@ -62,12 +62,14 @@ class Driver(IngestDriver):
         assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.met_path) as local_met_path:
             tree = ET.parse(local_met_path)
             root = tree.getroot()
-        # Some data dont have this balise in xml metadata
+
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
         if root.find("productSpecific/geocodedImageInfo") is not None:
             ul_lat = self.__get_coord__(root, "upperLeftLatitude")
             ul_lon = self.__get_coord__(root, "upperLeftLongitude")
@@ -78,8 +80,6 @@ class Driver(IngestDriver):
             ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
             ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
             geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
-            x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
-            y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
             coords = []
             # order lower left; lower right: upper left ; upper right
@@ -88,33 +88,17 @@ class Driver(IngestDriver):
                 coords.append(coord)
             geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
                                                                            coords[1][0], coords[1][1], coords[0][0], coords[0][1])
-            x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
-            y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
 
-        gsd = (x_pixel_size + y_pixel_size) / 2
-        processing__level = root.find("setup/orderInfo/orderType").text
         constellation = root.find("productInfo/missionInfo/mission").text
-        instrument = root.find("productInfo/missionInfo/mission").text
-        sensor = root.find("productInfo/missionInfo/mission").text
-        sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
-        view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
         date_time = int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=instrument,
                 constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.terrasar.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -123,6 +107,30 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Some data dont have this tag in xml metadata
+        if root.find("productSpecific/geocodedImageInfo") is not None:
+            x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
+            y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
+        else:
+
+            x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
+            y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
+        item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
+
+        item.properties.processing__level = root.find("setup/orderInfo/orderType").text
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = root.find("productInfo/missionInfo/mission").text
+        item.properties.sensor = root.find("productInfo/missionInfo/mission").text
+        item.properties.sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
+        item.properties.view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
 
         return item
 

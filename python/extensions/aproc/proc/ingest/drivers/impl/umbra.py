@@ -57,11 +57,14 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def to_item(self, url: str, assets: list[Asset]):
-        with AccessManager.make_local(self.md_path) as local_md_path:
-            with open(local_md_path, 'r') as f:
-                data = json.load(f)
-                data_take = data["collects"][0]
+    def load_metadata(self, url: str) -> object:
+        with AccessManager.stream(self.md_path) as fb:
+            metadata = json.loads(fb)
+
+        return metadata
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        data_take = metadata["collects"][0]
 
         geometry = data_take["footprintPolygonLla"]
         centroid = data_take["sceneCenterPointLla"]["coordinates"][:2]
@@ -71,30 +74,12 @@ class Driver(IngestDriver):
                 min(map(lambda xy: xy[1], coordinates)),
                 max(map(lambda xy: xy[0], coordinates)),
                 max(map(lambda xy: xy[1], coordinates))]
-        # Remove altitude
-        for idx, coords in enumerate(coordinates):
-            coordinates[idx] = coords[:2]
 
         start_datetime = datetime.strptime(data_take["startAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S")
         end_datetime = datetime.strptime(data_take["endAtUTC"].split("+")[0], "%Y-%m-%dT%H:%M:%S.%f")
         constellation = "UMBRA"
-        satellite = data["umbraSatelliteName"]
-        sensor_mode = data["imagingMode"]
-        gsd = data["baseIpr"]
-        view__incidence_angle = data_take["angleIncidenceDegrees"]
-        view__azimuth = data_take["angleAzimuthDegrees"]
-        acq__acquisition_orbit_direction = data_take["satelliteTrack"]
-        acq__acquisition_type = data["orderType"]
-        acq__request_id = data_take["taskId"]
-        sar__frequency_band = data_take["radarBand"]
-        sar__center_frequency = data_take["radarCenterFrequencyHz"]
-        sar__polarizations = data_take["polarizations"].upper()
-        sar__resolution_range = data_take["maxGroundResolution"]["rangeMeters"]
-        sar__resolution_azimuth = data_take["maxGroundResolution"]["azimuthMeters"]
-        sar__observation_direction = data_take["observationDirection"]
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -103,30 +88,43 @@ class Driver(IngestDriver):
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
                 constellation=constellation,
-                satellite=satellite,
-                instrument=constellation,
-                sensor=constellation,
                 sensor_type=SensorType.SAR,
-                sensor_mode=sensor_mode,
-                gsd=gsd,
                 item_format=ItemFormat.umbra.value,
                 main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                view__incidence_angle=view__incidence_angle,
-                view__azimuth=view__azimuth,
-                acq__acquisition_orbit_direction=acq__acquisition_orbit_direction,
-                acq__acquisition_type=acq__acquisition_type,
-                acq__request_id=acq__request_id,
-                sar__frequency_band=sar__frequency_band,
-                sar__center_frequency=sar__center_frequency,
-                sar__polarizations=sar__polarizations,
-                sar__resolution_range=sar__resolution_range,
-                sar__resolution_azimuth=sar__resolution_azimuth,
-                sar__observation_direction=sar__observation_direction,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
+                main_asset_name=Role.data.value
             ),
             assets={asset.name: asset for asset in assets}
         )
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.satellite = metadata["umbraSatelliteName"]
+        item.properties.gsd = metadata["baseIpr"]
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        data_take = metadata["collects"][0]
+
+        item.properties.instrument = item.properties.constellation
+        item.properties.sensor = item.properties.constellation
+        item.properties.sensor_mode = metadata["imagingMode"]
+
+        item.properties.view__incidence_angle = data_take["angleIncidenceDegrees"]
+        item.properties.view__azimuth = data_take["angleAzimuthDegrees"]
+
+        item.properties.acq__acquisition_orbit_direction = data_take["satelliteTrack"]
+        item.properties.acq__acquisition_type = metadata["orderType"]
+        item.properties.acq__request_id = data_take["taskId"]
+
+        item.properties.sar__frequency_band = data_take["radarBand"]
+        item.properties.sar__center_frequency = data_take["radarCenterFrequencyHz"]
+        item.properties.sar__polarizations = data_take["polarizations"].upper()
+        item.properties.sar__resolution_range = data_take["maxGroundResolution"]["rangeMeters"]
+        item.properties.sar__resolution_azimuth = data_take["maxGroundResolution"]["azimuthMeters"]
+        item.properties.sar__observation_direction = data_take["observationDirection"]
+
         return item
 
     def __check_path__(self, path: str):

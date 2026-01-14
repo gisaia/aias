@@ -83,45 +83,26 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.stream(self.md_path) as fb:
-            md = json.load(fb)
+            metadata = json.load(fb)
+        return metadata
 
-        geometry = md["geometry"]
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        properties = md["properties"]
-        date_time = datetime.strptime(properties["acquired"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        eo__cloud_cover = properties["cloud_cover"]
-        eo__snow_cover = properties["snow_ice_percent"]
-        gsd = properties["gsd"]
-
-        satellite = properties["satellite_id"]
-        view__azimuth = properties["satellite_azimuth"]
-        view__sun_azimuth = properties["sun_azimuth"]
-        view__sun_elevation = properties["sun_elevation"]
+        date_time = datetime.strptime(metadata["properties"]["acquired"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                eo__snow_cover=eo__snow_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.sr_path)),
-                instrument=satellite,
                 constellation="SkySat",
-                satellite=satellite,
-                sensor=satellite,
                 sensor_type=SensorType.OPTIC.value,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.skysat.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -130,6 +111,27 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.sr_path))
+        item.properties.gsd = metadata["properties"]["gsd"]
+
+        item.properties.satellite = metadata["properties"]["satellite_id"]
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        item.properties.eo__cloud_cover = metadata["properties"]["cloud_cover"]
+        item.properties.eo__snow_cover = metadata["properties"]["snow_ice_percent"]
+
+        item.properties.view__azimuth = metadata["properties"]["satellite_azimuth"]
+        item.properties.view__sun_azimuth = metadata["properties"]["sun_azimuth"]
+        item.properties.view__sun_elevation = metadata["properties"]["sun_elevation"]
 
         return item
 

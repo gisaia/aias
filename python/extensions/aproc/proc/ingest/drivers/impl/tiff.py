@@ -20,18 +20,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        assets = ImageDriverHelper.identify_assets(self, "image/tiff", url)
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.GEOTIFF.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.geotiff.value
-            )
-        )
+        assets = ImageDriverHelper.identify_assets(self, MimeType.TIFF, AssetFormat.geotiff, url)
         return assets
 
     # Implements drivers method
@@ -52,13 +41,17 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        return ImageDriverHelper.to_item(self, ItemFormat.geotiff, AssetFormat.geotiff, url, assets)
+    def load_metadata(self, url: str) -> object:
+        return ImageDriverHelper.load_metadata(self, url)
 
-    @staticmethod
-    def get_main_asset_format(root):
-        return AssetFormat.geotiff.value
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        return ImageDriverHelper.build_core_item(self, url, ItemFormat.geotiff, AssetFormat.geotiff, assets, metadata)
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        return item
 
     def __check_path__(self, path: str):
         return path.lower().endswith((".tif", ".tiff")) and AccessManager.is_file(path)

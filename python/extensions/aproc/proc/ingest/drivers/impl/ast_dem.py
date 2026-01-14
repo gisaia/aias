@@ -8,7 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -100,47 +101,70 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         import pvl
 
         with AccessManager.make_local(self.met_path) as local_met_path:
             data = pvl.load(local_met_path)
 
-        ul_lat = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLATITUDE"))
-        ul_lon = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLONGITUDE"))
-        ur_lat = float(self.__get_corner_coord__(data, "UPPERRIGHTCORNERLATITUDE"))
-        ur_lon = float(self.__get_corner_coord__(data, "UPPERRIGHTCORNERLONGITUDE"))
-        lr_lat = float(self.__get_corner_coord__(data, "LOWERRIGHTCORNERLATITUDE"))
-        lr_lon = float(self.__get_corner_coord__(data, "LOWERRIGHTCORNERLONGITUDE"))
-        ll_lat = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLATITUDE"))
-        ll_lon = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLONGITUDE"))
+        return data
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        ul_lat = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLATITUDE"))
+        ul_lon = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLONGITUDE"))
+        ur_lat = float(self.__get_corner_coord__(metadata, "UPPERRIGHTCORNERLATITUDE"))
+        ur_lon = float(self.__get_corner_coord__(metadata, "UPPERRIGHTCORNERLONGITUDE"))
+        lr_lat = float(self.__get_corner_coord__(metadata, "LOWERRIGHTCORNERLATITUDE"))
+        lr_lon = float(self.__get_corner_coord__(metadata, "LOWERRIGHTCORNERLONGITUDE"))
+        ll_lat = float(self.__get_corner_coord__(metadata, "LOWERLEFTCORNERLATITUDE"))
+        ll_lon = float(self.__get_corner_coord__(metadata, "LOWERLEFTCORNERLONGITUDE"))
         geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(
             ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat
         )
-        time = data["INVENTORYMETADATA"]["SINGLEDATETIME"]["TIMEOFDAY"]["VALUE"]
-        date = data["INVENTORYMETADATA"]["SINGLEDATETIME"]["CALENDARDATE"]["VALUE"]
+
+        time = metadata["INVENTORYMETADATA"]["SINGLEDATETIME"]["TIMEOFDAY"]["VALUE"]
+        date = metadata["INVENTORYMETADATA"]["SINGLEDATETIME"]["CALENDARDATE"]["VALUE"]
         date_time = int(
             datetime.strptime(
                 (date + " " + time).rstrip("Z").rstrip("0"), "%Y-%m-%d %H:%M:%S.%f"
             ).timestamp()
         )
-        processing__level = (
-            data["INVENTORYMETADATA"]
+
+        constellation = (
+            metadata["INVENTORYMETADATA"]
+            .get("PLATFORMINSTRUMENTSENSOR", {})
+            .get("PLATFORMSHORTNAME", {})
+            .get("VALUE", None)
+        )
+
+        item = Item(
+            geometry=geometry,
+            bbox=bbox,
+            centroid=centroid,
+            properties=Properties(
+                datetime=date_time,
+                constellation=constellation,
+                item_type=ResourceType.gridded.value,
+                item_format=ItemFormat.ast_dem.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.dem.value,
+            ),
+            assets={asset.name: asset for asset in assets}
+        )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.processing__level = (
+            metadata["INVENTORYMETADATA"]
             .get("COLLECTIONDESCRIPTIONCLASS", {})
             .get("SHORTNAME", {})
             .get("VALUE", None)
         )
-        eo__cloud_cover = (
-            data["INVENTORYMETADATA"]
-            .get("CLOUDCOVERAGE", {})
-            .get("SCENECLOUDCOVERAGE", {})
-            .get("VALUE", None)
-        )
-        if eo__cloud_cover:
-            eo__cloud_cover = float(eo__cloud_cover)
+
         gsd_row = (
-            data["INVENTORYMETADATA"]
+            metadata["INVENTORYMETADATA"]
             .get("SWATHSTRUCTUREINFO", {})
             .get("CROSSTRACKPIXELRESOLUTION", {})
             .get("VALUE", None)
@@ -148,7 +172,7 @@ class Driver(IngestDriver):
         if gsd_row:
             gsd_row = float(gsd_row)
         gsd_col = (
-            data["INVENTORYMETADATA"]
+            metadata["INVENTORYMETADATA"]
             .get("SWATHSTRUCTUREINFO", {})
             .get("ALONGTRACKPIXELRESOLUTION", {})
             .get("VALUE", None)
@@ -158,65 +182,49 @@ class Driver(IngestDriver):
         gsd = None
         if gsd_col and gsd_row:
             gsd = (gsd_col + gsd_row) / 2
-        constellation = (
-            data["INVENTORYMETADATA"]
-            .get("PLATFORMINSTRUMENTSENSOR", {})
-            .get("PLATFORMSHORTNAME", {})
+        item.properties.gsd = gsd
+
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        eo__cloud_cover = (
+            metadata["INVENTORYMETADATA"]
+            .get("CLOUDCOVERAGE", {})
+            .get("SCENECLOUDCOVERAGE", {})
             .get("VALUE", None)
         )
-        instrument = (
-            data["INVENTORYMETADATA"]
+        if eo__cloud_cover:
+            item.properties.eo__cloud_cover = float(eo__cloud_cover)
+        item.properties.instrument = (
+            metadata["INVENTORYMETADATA"]
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("INSTRUMENTSHORTNAME", {})
             .get("VALUE", None)
         )
-        sensor = (
-            data["INVENTORYMETADATA"]
+        item.properties.sensor = (
+            metadata["INVENTORYMETADATA"]
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("PLATFORMSHORTNAME", {})
             .get("VALUE", None)
         )
         view__sun_azimuth = (
-            data["INVENTORYMETADATA"]
+            metadata["INVENTORYMETADATA"]
             .get("PRODUCTSPECIFICMETADATA", {})
             .get("SOLAR_AZIMUTH_ANGLE", {})
             .get("VALUE", None)
         )
         if view__sun_azimuth:
-            view__sun_azimuth = float(view__sun_azimuth)
+            item.properties.view__sun_azimuth = float(view__sun_azimuth)
         view__sun_elevation = (
-            data["INVENTORYMETADATA"]
+            metadata["INVENTORYMETADATA"]
             .get("PRODUCTSPECIFICMETADATA", {})
             .get("SOLAR_ELEVATION_ANGLE", {})
             .get("VALUE", None)
         )
         if view__sun_elevation:
-            view__sun_elevation = float(view__sun_elevation)
-
-        item = Item(
-            id=self.get_item_id(url),
-            geometry=geometry,
-            bbox=bbox,
-            centroid=centroid,
-            properties=Properties(
-                datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=instrument,
-                constellation=constellation,
-                sensor=sensor,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.ast_dem.value,
-                main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.dem.value,
-            ),
-            assets={asset.name: asset for asset in assets}
-        )
+            item.properties.view__sun_elevation = float(view__sun_elevation)
 
         return item
 

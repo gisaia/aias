@@ -95,23 +95,25 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import ogr, osr
-        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
-        setup_gdal()
-
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
 
-            coords = []
-            # Calculate bbox
-            for vertex in root.iter('Vertex'):
-                coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
-                coords.append(coord)
-            coords.append(coords[0])
-            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
+        from osgeo import ogr, osr
+        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
+        setup_gdal()
+
+        coords = []
+        # Calculate bbox
+        for vertex in root.iter('Vertex'):
+            coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
+            coords.append(coord)
+        coords.append(coords[0])
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
         # Open ROI GML file to find the real footprint of the product
         with AccessManager.make_local(self.roi_path) as local_roi_path:
@@ -172,35 +174,19 @@ class Driver(IngestDriver):
             for lgv in root.iter('Located_Geometric_Values'):
                 if lgv.find('LOCATION_TYPE').text == "Center":
                     date_time = int(datetime.strptime(lgv.find('TIME').text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
-        # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
-        cloud_cover = None
-        if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
-            cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
-        else:
-            for cloud in root.iter('Dataset_Content'):
-                if cloud.find("CLOUD_COVERAGE") is not None:
-                    cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
 
-        # We calculate the GSD as the mean of  GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
-        if metadata.get("GSD_ACROSS_TRACK") and metadata.get("GSD_ALONG_TRACK"):
-            gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
-        else:
-            gsd = None
+        if "MISSION" in metadata:
+            constellation = metadata["MISSION"]
+        elif "DATASET_PRODUCER_NAME" in metadata:
+            constellation = metadata["DATASET_PRODUCER_NAME"]
+
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=metadata.get("PROCESSING_LEVEL"),
-                eo__cloud_cover=cloud_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
-                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
-                view__azimuth=metadata.get("AZIMUTH_ANGLE"),
-                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
-                view__sun_elevation=metadata.get("SUN_ELEVATION"),
+                constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
                 main_asset_format=self.get_main_asset_format(root),
@@ -209,15 +195,43 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Open the XML dimap file with gdal to retrieve the metadata
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        # We calculate the GSD as the mean of GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
+        if metadata.get("GSD_ACROSS_TRACK") and metadata.get("GSD_ALONG_TRACK"):
+            item.properties.gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
+
+        item.properties.processing__level = root.get("PROCESSING_LEVEL")
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Open the XML dimap file with gdal to retrieve the metadata
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
+        if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
+            item.properties.eo__cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
+        else:
+            for cloud in root.iter('Dataset_Content'):
+                if cloud.find("CLOUD_COVERAGE") is not None:
+                    item.properties.eo__cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
+
+        item.properties.sensor = item.properties.constellation
+        item.properties.view__azimuth = root.get("AZIMUTH_ANGLE")
+        item.properties.view__incidence_angle = root.get("INCIDENCE_ANGLE")
+        item.properties.view__sun_azimuth = root.get("SUN_AZIMUTH")
+        item.properties.view__sun_elevation = root.get("SUN_ELEVATION")
+
         # To fit the case of PNEO 30 cm with no instrument metadata
         if "INSTRUMENT" in metadata:
             item.properties.instrument = metadata["INSTRUMENT"]
-        if "MISSION" in metadata:
-            item.properties.constellation = metadata["MISSION"]
-            item.properties.sensor = metadata["MISSION"]
-        elif "DATASET_PRODUCER_NAME" in metadata:
-            item.properties.constellation = metadata["DATASET_PRODUCER_NAME"]
-            item.properties.sensor = metadata["DATASET_PRODUCER_NAME"]
         if "MISSION_INDEX" in metadata:
             item.properties.sensor_type = metadata["MISSION_INDEX"]
 

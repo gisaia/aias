@@ -72,9 +72,9 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        d = {}
+    def load_metadata(self, url: str) -> object:
+        # The metadata file is a txt, so we build a dictionary that wll be easy to read
+        metadata = {}
 
         # One metadata file can refer to multiple geoeye products
         # We need to check that the correct metadata are taken for the item
@@ -94,10 +94,10 @@ class Driver(IngestDriver):
                         coords_length = int(line.split(':')[1].strip())
                     # Get all the degrees coordinates
                     if inside_component_section:
-                        self.__get_field__(d, line, 'Product Image ID')
-                        self.__get_field__(d, line, 'Pixel Size X')
-                        self.__get_field__(d, line, 'Pixel Size Y')
-                        self.__get_field__(d, line, 'Percent Component Cloud Cover', True)
+                        self.__get_field__(metadata, line, 'Product Image ID')
+                        self.__get_field__(metadata, line, 'Pixel Size X')
+                        self.__get_field__(metadata, line, 'Pixel Size Y')
+                        self.__get_field__(metadata, line, 'Percent Component Cloud Cover', True)
 
                         if line.find('degrees') >= 0 and len(coordinates) < coords_length:
                             if line.find('Latitude') >= 0:
@@ -117,57 +117,40 @@ class Driver(IngestDriver):
             # Loop on the metadata file to ensure taht we got the Product Image ID
             with open(local_met_path) as f:
                 for line in f:
-                    self.__get_field__(d, line, 'Sensor Type')
-                    self.__get_field__(d, line, 'Processing Level')
+                    self.__get_field__(metadata, line, 'Sensor Type')
+                    self.__get_field__(metadata, line, 'Processing Level')
                     if inside_product_image_section:
-                        self.__get_field__(d, line, 'Sensor')
-                        self.__get_field__(d, line, 'Scan Azimuth')
-                        self.__get_field__(d, line, 'Sun Angle Azimuth')
-                        self.__get_field__(d, line, 'Sun Angle Elevation')
-                        self.__get_date_field__(d, line)
+                        self.__get_field__(metadata, line, 'Sensor')
+                        self.__get_field__(metadata, line, 'Scan Azimuth')
+                        self.__get_field__(metadata, line, 'Sun Angle Azimuth')
+                        self.__get_field__(metadata, line, 'Sun Angle Elevation')
+                        self.__get_date_field__(metadata, line)
 
                         if line.find('Percent Cloud Cover:') >= 0:
                             break
-                    if line.find('Product Image ID: ' + d['Product Image ID']) >= 0:
+                    if line.find('Product Image ID: ' + metadata['Product Image ID']) >= 0:
                         inside_product_image_section = True
 
         if len(coordinates) < 4:
             raise DriverException("Couldn't find enough coordinates for a polygon")
         coordinates.append(coordinates[0])
 
-        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coordinates)
-        x_pixel_size = float(d['Pixel Size X'].split(' ')[0])
-        y_pixel_size = float(d['Pixel Size Y'].split(' ')[0])
-        gsd = (x_pixel_size + y_pixel_size) / 2
-        eo__cloud_cover = d['Percent Component Cloud Cover']
-        processing__level = d['Processing Level']
-        constellation = d['Sensor']
-        instrument = d['Sensor']
-        sensor = d['Sensor']
-        sensor_type = d['Sensor Type']
-        date_time = int(datetime.strptime(d['Acquisition Date/Time'], "%Y-%m-%d %H:%M %Z").timestamp())
-        view__azimuth = float(d['Scan Azimuth'].split(' ')[0])
-        view__sun_azimuth = float(d['Sun Angle Azimuth'].split(' ')[0])
-        view__sun_elevation = float(d['Sun Angle Elevation'].split(' ')[0])
+        metadata['coordinates'] = coordinates
+
+        return metadata
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(metadata['coordinates'])
+        date_time = int(datetime.strptime(metadata['Acquisition Date/Time'], "%Y-%m-%d %H:%M %Z").timestamp())
+        constellation = metadata['Sensor']
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                eo__cloud_cover=eo__cloud_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=instrument,
                 constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geoeye.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -176,6 +159,29 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        x_pixel_size = float(metadata['Pixel Size X'].split(' ')[0])
+        y_pixel_size = float(metadata['Pixel Size Y'].split(' ')[0])
+        item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
+
+        item.properties.processing__level = metadata['Processing Level']
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.eo__cloud_cover = metadata['Percent Component Cloud Cover']
+
+        item.properties.instrument = item.properties.constellation
+        item.properties.sensor = item.properties.constellation
+        item.properties.sensor_type = metadata['Sensor Type']
+
+        item.properties.view__azimuth = float(metadata['Scan Azimuth'].split(' ')[0])
+        item.properties.view__sun_azimuth = float(metadata['Sun Angle Azimuth'].split(' ')[0])
+        item.properties.view__sun_elevation = float(metadata['Sun Angle Elevation'].split(' ')[0])
 
         return item
 
@@ -203,12 +209,12 @@ class Driver(IngestDriver):
                 return self.met_path is not None and self.tif_path is not None
         return False
 
-    def __get_date_field__(self, data, line):
+    def __get_date_field__(self, data: dict, line: str):
         field = 'Acquisition Date/Time'
         if line.find(field) >= 0:
             data[field] = line.split(':')[1].strip() + ':' + line.split(':')[2].strip()
 
-    def __get_field__(self, data, line, field, is_float=False):
+    def __get_field__(self, data: dict, line: str, field: str, is_float=False):
         if line.find(field) >= 0:
             if is_float:
                 data[field] = float(line.split(':')[1].strip())

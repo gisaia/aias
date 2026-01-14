@@ -73,12 +73,14 @@ class Driver(IngestDriver):
 
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
 
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
         coords = []
         # Calculate bbox
         for vertex in self.__find_value__(root, './Dataset_Frame').iter('Vertex'):
@@ -87,40 +89,20 @@ class Driver(IngestDriver):
         coords.append(coords[0])
         geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
-        mission = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/MISSION").text
-        instrument = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT").text
         date_time = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE").text \
             + self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME").text
         date_time = datetime.strptime(date_time, "%Y-%m-%d%H:%M:%S")
 
-        view__incidence_angle = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE").text)
-        view__sun_azimuth = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH").text)
-        view__sun_elevation = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION").text)
-        gsd = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION").text)
-
-        eo__cloud_cover = None
-        for param in root.iter("Quality_Parameter"):
-            code = self.__find_value__(param, "./QUALITY_PARAMETER_CODE").text
-            if code == "SPACEMETRIC:CLOUDCOVER_PERCENT":
-                eo__cloud_cover = float(self.__find_value__(param, "./QUALITY_PARAMETER_VALUE").text)
+        constellation = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/MISSION").text
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                gsd=gsd,
-                proj__epsg=get_epsg_from_gdal_info(self.tif_path),
-                instrument=instrument,
-                constellation=mission,
-                sensor=mission,
+                constellation=constellation,
                 sensor_type=SensorType.OPTIC.value,
-                eo__cloud_cover=eo__cloud_cover,
-                view__incidence_angle=view__incidence_angle,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geosat.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -129,6 +111,27 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
+        item.properties.gsd = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION").text)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT").text
+        item.properties.sensor = item.properties.constellation
+
+        item.properties.view__incidence_angle = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE").text)
+        item.properties.view__sun_azimuth = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH").text)
+        item.properties.view__sun_elevation = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION").text)
+
+        for param in root.iter("Quality_Parameter"):
+            code = self.__find_value__(param, "./QUALITY_PARAMETER_CODE").text
+            if code == "SPACEMETRIC:CLOUDCOVER_PERCENT":
+                item.properties.eo__cloud_cover = float(self.__find_value__(param, "./QUALITY_PARAMETER_VALUE").text)
 
         return item
 

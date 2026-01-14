@@ -61,12 +61,14 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
 
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
         [_, _, ul_lat, ul_lon] = root.find("coord_first_near").text.split(" ")
         [_, _, ur_lat, ur_lon] = root.find("coord_first_far").text.split(" ")
         [_, _, lr_lat, lr_lon] = root.find("coord_last_far").text.split(" ")
@@ -79,17 +81,7 @@ class Driver(IngestDriver):
         stop_time = root.find("acquisition_end_utc").text
         stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%f")
 
-        satellite = root.find("satellite_name").text
-        level = root.find("product_level").text
-        range_spacing = float(root.find("range_spacing").text)
-        azimuth_spacing = float(root.find("azimuth_spacing").text)
-        gsd = (range_spacing + azimuth_spacing) / 2
-        orbit_direction = root.find("orbit_direction").text
-        orbit_number = root.find("orbit_absolute_number").text
-        polarizations = [root.find("polarization").text.upper()]
-
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -98,23 +90,37 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation="ICEYE",
-                satellite=satellite,
-                instrument=satellite,
-                sensor=satellite,
                 sensor_type=SensorType.SAR,
                 item_format=ItemFormat.iceye,
+                item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.radar,
-                processing__level=level,
-                gsd=gsd,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number,
-                sar__polarizations=polarizations,
-                proj__epsg=get_epsg_from_gdal_info(self.tif_path)
+                observation_type=ObservationType.radar
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.satellite = root.find("satellite_name").text
+        item.properties.processing__level = root.find("product_level").text
+
+        range_spacing = float(root.find("range_spacing").text)
+        azimuth_spacing = float(root.find("azimuth_spacing").text)
+        item.properties.gsd = (range_spacing + azimuth_spacing) / 2
+
+        item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        item.properties.acq__acquisition_orbit_direction = root.find("orbit_direction").text
+        item.properties.acq__acquisition_orbit = root.find("orbit_absolute_number").text
+        item.properties.sar__polarizations = [root.find("polarization").text.upper()]
 
         return item
 

@@ -9,11 +9,13 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
+    ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
 
     def __init__(self):
         super().__init__()
@@ -75,48 +77,37 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        setup_gdal()
-
-        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
-            coords = []
-            # Get geometry, bbox, centroid
-            for vertex in root.find('./Dataset_Frame', ns).iter('Vertex'):
-                coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
-                coords.append(coord)
-            coords.append(coords[0])
-            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
-            if root.find('./Geoposition/Geoposition_Insert/XDIM', ns) is not None and root.find('./Geoposition/Geoposition_Insert/YDIM', ns) is not None:
-                gsd = (float(root.find('./Geoposition/Geoposition_Insert/XDIM', ns).text) + float(root.find('./Geoposition/Geoposition_Insert/YDIM', ns).text))/2
-            else:
-                gsd = None
+
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
+        coords = []
+        # Get geometry, bbox, centroid
+        for vertex in root.find('./Dataset_Frame', Driver.ns).iter('Vertex'):
+            coord = [float(vertex.find('FRAME_LON').text), float(vertex.find('FRAME_LAT').text)]
+            coords.append(coord)
+        coords.append(coords[0])
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
         metadata = AccessManager.get_gdal_md(self.dim_path)
         # We retrieve the time
         date = metadata["IMAGING_DATE"]
         time = metadata["IMAGING_TIME"]
         date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
+
+        constellation = metadata["MISSION"]
+
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=metadata.get("PROCESSING_LEVEL"),
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
-                instrument=metadata.get("INSTRUMENT"),
-                constellation=metadata.get("MISSION"),
-                sensor=metadata.get("MISSION"),
-                sensor_type=metadata.get("MISSION_INDEX"),
-                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
-                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
-                view__sun_elevation=metadata.get("SUN_ELEVATION"),
+                constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.spot5.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -125,6 +116,32 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        gsd_x = root.find('./Geoposition/Geoposition_Insert/XDIM', Driver.ns)
+        gsd_y = root.find('./Geoposition/Geoposition_Insert/YDIM', Driver.ns)
+        if gsd_x is not None and gsd_y is not None:
+            item.properties.gsd = (float(gsd_x.text) + float(gsd_y.text))/2
+
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
+        item.properties.processing__level = metadata["PROCESSING_LEVEL"]
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        item.properties.instrument = metadata["INSTRUMENT"]
+        item.properties.sensor = item.properties.constellation
+        item.properties.sensor_type = metadata["MISSION_INDEX"]
+
+        item.properties.view__incidence_angle = metadata["INCIDENCE_ANGLE"]
+        item.properties.view__sun_azimuth = metadata["SUN_AZIMUTH"]
+        item.properties.view__sun_elevation = metadata["SUN_ELEVATION"]
 
         return item
 

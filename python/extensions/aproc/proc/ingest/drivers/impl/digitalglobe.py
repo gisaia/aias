@@ -78,22 +78,25 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import ogr
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.xml_path) as local_xml_path:
             tree = ET.parse(local_xml_path)
             root = tree.getroot()
 
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: ET.Element) -> Item:
+        from osgeo import ogr
+
         # Calculate bbox
-        ul_lat = float(root.find("./TIL/TILE/ULLAT").text)
-        ul_lon = float(root.find("./TIL/TILE/ULLON").text)
-        ur_lat = float(root.find("./TIL/TILE/URLAT").text)
-        ur_lon = float(root.find("./TIL/TILE/URLON").text)
-        lr_lat = float(root.find("./TIL/TILE/LRLAT").text)
-        lr_lon = float(root.find("./TIL/TILE/LRLON").text)
-        ll_lat = float(root.find("./TIL/TILE/LLLAT").text)
-        ll_lon = float(root.find("./TIL/TILE/LLLON").text)
+        ul_lat = float(metadata.find("./TIL/TILE/ULLAT").text)
+        ul_lon = float(metadata.find("./TIL/TILE/ULLON").text)
+        ur_lat = float(metadata.find("./TIL/TILE/URLAT").text)
+        ur_lon = float(metadata.find("./TIL/TILE/URLON").text)
+        lr_lat = float(metadata.find("./TIL/TILE/LRLAT").text)
+        lr_lon = float(metadata.find("./TIL/TILE/LRLON").text)
+        ll_lat = float(metadata.find("./TIL/TILE/LLLAT").text)
+        ll_lon = float(metadata.find("./TIL/TILE/LLLON").text)
         geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
 
         # Overwrite geometry and centroid if GIS_FILE is present with order shape file
@@ -116,41 +119,18 @@ class Driver(IngestDriver):
                     centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
                     break
 
-        date_time_str = root.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
+        date_time_str = metadata.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
-        gsd = float(root.find("./IMD/IMAGE/MEANCOLLECTEDGSD").text)
-        processing__level = root.find("./IMD/PRODUCTLEVEL").text
-        eo__cloud_cover = float(root.find("./IMD/IMAGE/CLOUDCOVER").text) * 1000
-        constellation = root.find("./IMD/IMAGE/SATID").text
-        if root.find("./IMD/IMAGE/SATAZ") is not None:
-            view__azimuth = float(root.find("./IMD/IMAGE/SATAZ").text)
-        else:
-            view__azimuth = float(root.find("./IMD/IMAGE/MEANSATAZ").text)
-        if root.find("./IMD/IMAGE/SUNAZ") is not None:
-            view__sun_azimuth = float(root.find("./IMD/IMAGE/SUNAZ").text)
-        else:
-            view__sun_azimuth = float(root.find("./IMD/IMAGE/MEANSUNAZ").text)
-        if root.find("./IMD/IMAGE/SUNEL") is not None:
-            view__sun_elevation = float(root.find("./IMD/IMAGE/SUNEL").text)
-        else:
-            view__sun_elevation = float(root.find("./IMD/IMAGE/MEANSUNEL").text)
+
+        constellation = metadata.find("./IMD/IMAGE/SATID").text
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=constellation,
                 constellation=constellation,
-                sensor=constellation,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.digitalglobe.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -160,6 +140,35 @@ class Driver(IngestDriver):
             assets={asset.name: asset for asset in assets}
         )
 
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.processing__level = metadata.find("./IMD/PRODUCTLEVEL").text
+        item.properties.gsd = float(metadata.find("./IMD/IMAGE/MEANCOLLECTEDGSD").text)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
+        item.properties.instrument = item.properties.constellation
+        item.properties.sensor = item.properties.constellation
+
+        if metadata.find("./IMD/IMAGE/SATAZ") is not None:
+            item.properties.view__azimuth = float(metadata.find("./IMD/IMAGE/SATAZ").text)
+        else:
+            item.properties.view__azimuth = float(metadata.find("./IMD/IMAGE/MEANSATAZ").text)
+
+        if metadata.find("./IMD/IMAGE/SUNAZ") is not None:
+            item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/SUNAZ").text)
+        else:
+            item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/MEANSUNAZ").text)
+
+        if metadata.find("./IMD/IMAGE/SUNEL") is not None:
+            item.properties.view__sun_elevation = float(metadata.find("./IMD/IMAGE/SUNEL").text)
+        else:
+            item.properties.view__sun_elevation = float(metadata.find("./IMD/IMAGE/MEANSUNEL").text)
+
+        eo__cloud_cover = float(metadata.find("./IMD/IMAGE/CLOUDCOVER").text) * 1000
         if eo__cloud_cover != -999000.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
 

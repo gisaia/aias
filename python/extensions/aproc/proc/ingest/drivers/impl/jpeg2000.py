@@ -20,18 +20,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        assets = ImageDriverHelper.identify_assets(self, MimeType.JPEG2000, url)
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.JPEG2000.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.jpg2000.value
-            )
-        )
+        assets = ImageDriverHelper.identify_assets(self, MimeType.JPEG2000, AssetFormat.jpg2000, url)
         return assets
 
     # Implements drivers method
@@ -52,14 +41,17 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        item = ImageDriverHelper.to_item(self, ItemFormat.jpeg2000, AssetFormat.jpg2000, url, assets)
+    def load_metadata(self, url: str) -> object:
+        return ImageDriverHelper.load_metadata(self, url)
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        return ImageDriverHelper.build_core_item(self, url, ItemFormat.jpeg2000, AssetFormat.jpg2000, assets, metadata)
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
         return item
 
-    @staticmethod
-    def get_main_asset_format(root):
-        return AssetFormat.jpg2000.value
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        return item
 
     def __check_path__(self, path: str):
         return path.lower().endswith((".jp2", ".j2k", ".jpf", ".jpm", ".jpg2", ".j2c", ".jpc", ".jpx")) \

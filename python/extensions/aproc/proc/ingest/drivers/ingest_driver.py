@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Any
 
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import Asset, Item
+from airs.core.models.model import Asset, Item, Role
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
@@ -106,7 +106,7 @@ class IngestDriver(AbstractDriver):
             assets (list[Asset]): list of assets to be fetched
 
         Returns:
-            list[Asset]: list of fetched assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
+            list[Asset]: list of fetched assets. Assets must have a valid name, href and roles.
         """
         ...
 
@@ -119,20 +119,143 @@ class IngestDriver(AbstractDriver):
             assets (list[Asset]): list of assets to be transformed
 
         Returns:
-            list[Asset]: list of transformed assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
+            list[Asset]: list of transformed assets. Assets must have a valid name, href and roles.
         """
         ...
 
-    @abstractmethod
     def to_item(self, url: str, assets: list[Asset]) -> Item:
         """Analyse an archive assets to create an item
 
         Args:
             url (str): archive's url
-            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles. Assets href must be existing local files.
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
 
         Returns:
             Item: the item. An item must have a valid id and valid assets.
+        """
+        metadata = self.load_metadata(url)
+
+        try:
+            item = self.build_core_item(url, assets, metadata)
+            item.id = self.get_item_id(url)
+        except Exception as e:
+            raise DriverException(e)
+
+        if item.geometry is None:
+            raise DriverException(f"No geometry was found for {url}")
+        elif item.bbox is None:
+            raise DriverException(f"No bbox was found for {url}")
+        elif item.centroid is None:
+            raise DriverException(f"No centroid was found for {url}")
+        elif item.properties.datetime is None:
+            raise DriverException(f"No datetime was found for {url}")
+        elif item.properties.constellation is None:
+            raise DriverException(f"No constellation was found for {url}")
+        elif item.properties.item_type is None:
+            raise DriverException(f"No item_type was found for {url}")
+        elif item.properties.item_format is None:
+            raise DriverException(f"No item_format was found for {url}")
+        elif item.properties.main_asset_format is None:
+            raise DriverException(f"No main_asset_format was found for {url}")
+        elif item.properties.main_asset_name is None:
+            raise DriverException(f"No main_asset_name was found for {url}")
+        elif item.assets.get(item.properties.main_asset_name) is None:
+            raise DriverException(f"No {item.properties.main_asset_name} asset was found for {url}")
+        elif item.properties.observation_type is None:
+            raise DriverException(f"No observation_type was found for {url}")
+        elif item.assets.get(Role.archive.value) is None:
+            raise DriverException(f"No archive asset was found for {url}")
+
+        # Check that there is at least one asset with data asset
+        roles = [a.roles for a in item.assets.values()]
+        unique_roles = set()
+        for role in roles:
+            for r in role:
+                unique_roles.add(r)
+
+        if Role.data.value not in unique_roles:
+            raise DriverException(f"No asset has the data role for {url}")
+
+        try:
+            item = self.add_major_metadata(url, item, metadata)
+        except Exception as e:
+            self.LOGGER.warn(f"Failed to retrieve additional information: {e}")
+
+        try:
+            item = self.add_minor_metadata(url, item, metadata)
+        except Exception:
+            ...
+
+        return item
+
+    @abstractmethod
+    def load_metadata(self, url: str) -> object:
+        """Load the archive's metadata to prepare the item creation
+
+        Args:
+            url (str): archive's url
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+
+        Returns:
+            Object: A structure containing the metadata (diictionary, parsed xml, ...)
+        """
+        ...
+
+    @abstractmethod
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        """Create an item containing all the mandatory metadata:
+            - id
+            - geometry
+            - centroid
+            - bbox
+            - datetime
+            - constellation
+            - item_type
+            - item_format
+            - main_asset_format
+            - main_asset_name
+            - observation_type
+            - assets
+
+        Args:
+            url (str): archive's url
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+            metadata (object): metadata describing the item
+
+        Returns:
+            Item: the item
+        """
+        ...
+
+    @abstractmethod
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        """Add to the item major metadata:
+            - satellite
+            - resolution
+            - processing level
+            - projection
+
+        Args:
+            url (str): archive's url
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+            metadata (object): metadata describing the item
+
+        Returns:
+            Item: the item
+        """
+        ...
+
+    @abstractmethod
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        """Add to the item the rest of the metadata
+
+        Args:
+            url (str): archive's url
+            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+            metadata (object): metadata describing the item
+
+        Returns:
+            Item: the item
         """
         ...
 

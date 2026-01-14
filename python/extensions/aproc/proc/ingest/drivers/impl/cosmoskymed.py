@@ -1,7 +1,7 @@
 import os
-from typing import Literal
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from typing import Literal
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -10,7 +10,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -119,64 +120,59 @@ class Driver(IngestDriver):
 
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         from osgeo import gdal
 
         options = gdal.InfoOptions(format="json")
         info = AccessManager.get_gdal_info(self.data_path, options)
-        metadata = info["metadata"][""]
 
-        geometry, bbox, centroid = self.__get_geometries__(info)
+        return info["metadata"]
 
-        try:
-            near_incidence_angle = float(metadata["MBI_Near_Incidence_Angle"])
-            far_incidence_angle = float(metadata["MBI_Far_Incidence_Angle"])
-            view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
-        except Exception:
-            near_incidence_angle = None
-            far_incidence_angle = None
-            view__incidence_angle = None
-
-        gsd = float(metadata["Ground_Range_Geometric_Resolution"])
-        instrument = metadata["Satellite_ID"]
-        sensor = instrument
-
-        date_time = int(datetime.strptime(metadata["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-
-        orbit_direction = metadata["Orbit_Direction"]
-        orbit_number = metadata["Orbit_Number"]
-
-        with AccessManager.make_local(self.h5met_path) as local_h5met_path:
-            h5_tree = ET.parse(local_h5met_path)
-            h5_root = h5_tree.getroot()
-        processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        geometry, bbox, centroid = self.__get_geometries__(metadata)
+        date_time = int(datetime.strptime(metadata[""]["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=self.__get_proj__(metadata, centroid),
-                instrument=instrument,
                 constellation="COSMO-SkyMed",
-                sensor=sensor,
                 sensor_type=SensorType.SAR,
-                view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,
                 main_asset_format=self.data_format.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.gsd = float(metadata[""]["Ground_Range_Geometric_Resolution"])
+        item.properties.proj__epsg = self.__get_proj__(metadata[""], item.centroid)
+        item.properties.satellite = metadata[""]["Satellite_ID"]
+
+        with AccessManager.make_local(self.h5met_path) as local_h5met_path:
+            h5_tree = ET.parse(local_h5met_path)
+            h5_root = h5_tree.getroot()
+        item.properties.processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        near_incidence_angle = float(metadata[""]["MBI_Near_Incidence_Angle"])
+        far_incidence_angle = float(metadata[""]["MBI_Far_Incidence_Angle"])
+        item.properties.view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
+
+        item.properties.acq__acquisition_orbit_direction = metadata[""]["Orbit_Direction"]
+        item.properties.acq__acquisition_orbit = metadata[""]["Orbit_Number"]
 
         return item
 
@@ -254,7 +250,7 @@ class Driver(IngestDriver):
                 return None
 
     def __get_geometries__(self, gdal_info_json: object):
-        metadata = gdal_info_json["metadata"][""]
+        metadata = gdal_info_json[""]
         try:
             ul_lat = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
             ul_lon = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
@@ -269,7 +265,7 @@ class Driver(IngestDriver):
             # Some have their measures split up in multiple scenes
 
             # 2 datasets per scene, with each a name and description
-            last_scene = int(len(gdal_info_json["metadata"]["SUBDATASETS"]) / 4)
+            last_scene = int(len(gdal_info_json["SUBDATASETS"]) / 4)
 
             # Top left and bottom left of first scene
             ul_lat = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])

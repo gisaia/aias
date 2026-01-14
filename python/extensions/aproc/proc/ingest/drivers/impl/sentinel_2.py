@@ -9,8 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates,
-    setup_gdal)
+    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 RED_EDGE = "Vegetation red edge"
@@ -83,50 +82,29 @@ class Driver(IngestDriver):
             assets.append(overview)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        setup_gdal()
-        resolutions: list[float] = []
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
 
-            for p_info in root.iter('Product_Info'):
-                start_time = Driver.__get_property(p_info, 'PRODUCT_START_TIME')
-                start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-                stop_time = Driver.__get_property(p_info, 'PRODUCT_STOP_TIME')
-                stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-                level = Driver.__get_property(p_info, 'PROCESSING_LEVEL')
-                secondary_id = Driver.__get_property(p_info, "PRODUCT_URI")
-                satellite = Driver.__get_property(p_info, 'Datatake/SPACECRAFT_NAME')
-                orbit_direction = Driver.__get_property(p_info, 'Datatake/SENSING_ORBIT_DIRECTION')
-                orbit_number = Driver.__get_property(p_info, "Datatake/SENSING_ORBIT_NUMBER")
+        return root
 
-            for p_info in root.iter('Cloud_Coverage_Assessment'):
-                cloud_cover = p_info.text
-            for p_info in root.iter('Snow_Coverage_Assessment'):
-                snow_cover = p_info.text
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
+        for coords in root.iter('EXT_POS_LIST'):
+            coords_raw = coords.text.strip().split()
+            coords_float = list(map(float, coords_raw))
+            # WARNING IN EXT_POS_LIST order is lat lon , in geojson we need lon lat
+            points = [[coords_float[i+1], coords_float[i]] for i in range(0, len(coords_float), 2)]
+            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(points)
 
-            for coords in root.iter('EXT_POS_LIST'):
-                coords_raw = coords.text.strip().split()
-                coords_float = list(map(float, coords_raw))
-                # WARNING IN EXT_POS_LIST order is lat lon , in geojson we need lon lat
-                points = [[coords_float[i+1], coords_float[i]] for i in range(0, len(coords_float), 2)]
-                geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(points)
+        for p_info in root.iter('Product_Info'):
+            start_time = Driver.__get_property(p_info, 'PRODUCT_START_TIME')
+            start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+            stop_time = Driver.__get_property(p_info, 'PRODUCT_STOP_TIME')
+            stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%fZ")
 
-            eo__bands: list[Band] = []
-            for bands in root.iter("Spectral_Information_List"):
-                for band in bands.iter('Spectral_Information'):
-                    band_id = band.get('bandId')
-                    resolutions.append(Driver.__get_property(band, 'RESOLUTION'))
-                    eo__bands.append(Band(
-                        asset=band.get('physicalBand'),
-                        name=band.get('physicalBand'),
-                        eo__common_name=BANDS_NAME.get(band_id, ''),
-                        eo__center_wavelength=Driver.__get_property(band, 'Wavelength/CENTRAL')
-                    ))
-        if len(resolutions) > 0:
-            gsd = min(resolutions)
+            secondary_id = Driver.__get_property(p_info, "PRODUCT_URI")
+
         item = Item(
             id=self.get_item_id(url),
             geometry=geometry,
@@ -137,26 +115,56 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation="Sentinel 2",
-                instrument=satellite,
-                sensor=satellite,
-                satellite=satellite,
                 sensor_type=SensorType.OPTIC,
                 secondary_id=secondary_id,
                 item_format=ItemFormat.safe,
+                item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.jpg2000,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.optic.value,
-                eo__cloud_cover=cloud_cover,
-                eo__snow_cover=snow_cover,
-                processing__level=level,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tci_path))
+                observation_type=ObservationType.optic.value
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        for p_info in root.iter('Product_Info'):
+            item.properties.processing__level = Driver.__get_property(p_info, 'PROCESSING_LEVEL')
+            item.properties.satellite = Driver.__get_property(p_info, 'Datatake/SPACECRAFT_NAME')
+
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tci_path))
+
+        resolutions: list[float] = []
+        item.properties.eo__bands: list[Band] = []
+        for bands in root.iter("Spectral_Information_List"):
+            for band in bands.iter('Spectral_Information'):
+                band_id = band.get('bandId')
+                resolutions.append(Driver.__get_property(band, 'RESOLUTION'))
+                item.properties.eo__bands.append(Band(
+                    asset=band.get('physicalBand'),
+                    name=band.get('physicalBand'),
+                    eo__common_name=BANDS_NAME.get(band_id, ''),
+                    eo__center_wavelength=Driver.__get_property(band, 'Wavelength/CENTRAL')
+                ))
+
         if len(resolutions) > 0:
-            item.properties.gsd = gsd
+            item.properties.gsd = min(resolutions)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        for p_info in root.iter('Product_Info'):
+            item.properties.acq__acquisition_orbit_direction = Driver.__get_property(p_info, 'Datatake/SENSING_ORBIT_DIRECTION')
+            item.properties.acq__acquisition_orbit = Driver.__get_property(p_info, "Datatake/SENSING_ORBIT_NUMBER")
+
+        for p_info in root.iter('Cloud_Coverage_Assessment'):
+            item.properties.eo__cloud_cover = p_info.text
+        for p_info in root.iter('Snow_Coverage_Assessment'):
+            item.properties.eo__snow_cover = p_info.text
 
         return item
 

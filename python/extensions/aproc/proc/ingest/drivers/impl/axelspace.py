@@ -10,7 +10,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image, geotiff_to_jpg,
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             geotiff_to_jpg,
                                                              get_bbox,
                                                              get_centroid,
                                                              get_epsg)
@@ -33,7 +34,17 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        ImageDriverHelper.add_archive(assets, url)
+        assets.append(
+            Asset(
+                href=url,
+                roles=[Role.archive.value],
+                name=Role.archive.value,
+                type=MimeType.TIFF.value,
+                description=Role.archive.value,
+                airs__managed=False,
+                asset_format=AssetFormat.geotiff.value
+            )
+        )
 
         ImageDriverHelper.add_asset(assets, self.tif_path, Role.data,
                                     MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
@@ -56,25 +67,26 @@ class Driver(IngestDriver):
             assets.append(quicklook)
 
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR
-                             )
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from pyproj import Transformer
-
+    def load_metadata(self, url: str) -> object:
         with AccessManager.stream(self.md_path) as fb:
             md = json.load(fb)
 
+        return md
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        from pyproj import Transformer
+
         try:
-            tile_md = md["imageTileMetadata"][os.path.basename(self.tif_path)]
+            tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
 
             # Convert geometry to correct projection
-            epsg = md["productMetadata"]["spatialReferenceSystem"]["EPSGCode"]
+            epsg = metadata["productMetadata"]["spatialReferenceSystem"]["EPSGCode"]
             transformer = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326")
             coordinates = tile_md["imageLocation"]["coordinates"][0]
             xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
@@ -83,23 +95,15 @@ class Driver(IngestDriver):
             centroid = get_centroid(geometry)
             bbox = get_bbox(geometry["coordinates"][0])
 
-            start_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
+            start_date_time = metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
             start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
-            end_date_time = md["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
+            end_date_time = metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
             end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%z")
-            eo__cloud_cover = tile_md["cloudCoverPercentage"]
-            gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
 
-            satellite = md["EOMetadata"]["satelliteName"]
-            view__sun_elevation = md["EOMetadata"]["solarElevationAngleNominal"]
-            view__sun_azimuth = md["EOMetadata"]["solarAzimuthAngleNominal"]
-
-            orbit_direction = md["EOMetadata"]["orbitDirection"]
         except KeyError as ke:
             raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -107,17 +111,8 @@ class Driver(IngestDriver):
                 datetime=start_date_time,
                 start_datetime=start_date_time,
                 end_datetime=end_date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=satellite,
                 constellation="Axelspace",
-                satellite=satellite,
-                sensor=satellite,
                 sensor_type=SensorType.OPTIC.value,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
-                acq__acquisition_orbit_direction=orbit_direction,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.axelspace.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -126,6 +121,32 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        try:
+            tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
+
+            item.properties.gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
+
+            item.properties.satellite = metadata["EOMetadata"]["satelliteName"]
+            item.properties.instrument = item.properties.satellite
+            item.properties.sensor = item.properties.satellite
+            item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        except KeyError as ke:
+            raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
+        item.properties.eo__cloud_cover = tile_md["cloudCoverPercentage"]
+
+        item.properties.view__sun_elevation = metadata["EOMetadata"]["solarElevationAngleNominal"]
+        item.properties.view__sun_azimuth = metadata["EOMetadata"]["solarAzimuthAngleNominal"]
+
+        item.properties.acq__acquisition_orbit_direction = metadata["EOMetadata"]["orbitDirection"]
 
         return item
 

@@ -104,6 +104,18 @@ def get_product_values(filename):
 
 
 class Driver(IngestDriver):
+    ns = {
+        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "gml": "http://www.opengis.net/gml",
+        "xfdu": "urn:ccsds:schema:xfdu:1",
+        "safe": "http://www.esa.int/safe/sentinel-1.0",
+        "s1": "http://www.esa.int/safe/sentinel-1.0/sentinel-1",
+        "s1sar": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar",
+        "s1sarl1": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar/level-1",
+        "s1sarl2": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar/level-2",
+        "gx": "http://www.google.com/kml/ext/2.2"
+    }
+
     def __init__(self):
         super().__init__()
         self.file_name = None
@@ -133,7 +145,7 @@ class Driver(IngestDriver):
         for measurement in self.measurements:
             # Polarization of the measure is used as name
             polarization = os.path.basename(measurement).split('-')[3]
-            name = ' '.join(os.path.basename(measurement).split('-')[1:4])
+            name = self.__get_measurement_name__(measurement)
 
             # According to copernicus website, could end in .cog.tiff
             assets.append(Asset(href=measurement, size=AccessManager.get_size(measurement), roles=[Role.data.value],
@@ -151,41 +163,26 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        ns = {
-            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-            "gml": "http://www.opengis.net/gml",
-            "xfdu": "urn:ccsds:schema:xfdu:1",
-            "safe": "http://www.esa.int/safe/sentinel-1.0",
-            "s1": "http://www.esa.int/safe/sentinel-1.0/sentinel-1",
-            "s1sar": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar",
-            "s1sarl1": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar/level-1",
-            "s1sarl2": "http://www.esa.int/safe/sentinel-1.0/sentinel-1/sar/level-2",
-            "gx": "http://www.google.com/kml/ext/2.2"
-        }
-
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
 
-        coords = root.find(".//safe:footPrint/gml:coordinates", ns).text
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
+        coords = root.find(".//safe:footPrint/gml:coordinates", Driver.ns).text
         [ul_lat, ul_lon, ur_lat, ur_lon, lr_lat, lr_lon, ll_lat, ll_lon] = ",".join(coords.split(" ")).split(",")
         geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(float(ul_lon), float(ul_lat), float(ur_lon), float(ur_lat), float(lr_lon), float(lr_lat), float(ll_lon), float(ll_lat))
 
-        start_time = root.find(".//safe:acquisitionPeriod/safe:startTime", ns).text
+        start_time = root.find(".//safe:acquisitionPeriod/safe:startTime", Driver.ns).text
         start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f")
-        stop_time = root.find(".//safe:acquisitionPeriod/safe:stopTime", ns).text
+        stop_time = root.find(".//safe:acquisitionPeriod/safe:stopTime", Driver.ns).text
         stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%f")
 
-        constellation = root.find(".//safe:platform/safe:familyName", ns).text
-        satellite = constellation + root.find(".//safe:platform/safe:number", ns).text
-        level = root.find(".//xfdu:contentUnit", ns).attrib["textInfo"].split(" ")[2]
-        orbit_number = float(root.find(".//safe:orbitReference/safe:orbitNumber", ns).text)
-        orbit_direction = root.find(".//safe:orbitReference//safe:extension/s1:orbitProperties/s1:pass", ns).text
+        constellation = root.find(".//safe:platform/safe:familyName", Driver.ns).text
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -194,29 +191,40 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation=constellation,
-                satellite=satellite,
-                instrument=satellite,
                 sensor_type=SensorType.SAR,
                 item_format=ItemFormat.safe,
+                item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.radar,
-                processing__level=level,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number,
-                proj__epsg=get_epsg_from_gdal_info(self.main_asset_path)
+                main_asset_name=self.__get_measurement_name__(self.measurements[0]),
+                observation_type=ObservationType.radar
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.satellite = item.properties.constellation + root.find(".//safe:platform/safe:number", Driver.ns).text
+        item.properties.processing__level = root.find(".//xfdu:contentUnit", Driver.ns).attrib["textInfo"].split(" ")[2]
+        item.properties.proj__epsg = get_epsg_from_gdal_info(self.main_asset_path)
+
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:
             item.properties.gsd = product_values["max_pixel_spacing"]
 
-        sensor = root.find(".//s1sarl1:mode", ns)
+        sensor = root.find(".//s1sarl1:mode", Driver.ns)
         if sensor is None:
-            sensor = root.find(".//s1sarl2:mode", ns)
+            sensor = root.find(".//s1sarl2:mode", Driver.ns)
         if sensor is not None:
             item.properties.sensor = sensor.text
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.acq__acquisition_orbit_direction = root.find(".//safe:orbitReference//safe:extension/s1:orbitProperties/s1:pass", Driver.ns).text
+        item.properties.acq__acquisition_orbit = float(root.find(".//safe:orbitReference/safe:orbitNumber", Driver.ns).text)
+
         return item
 
     def __check_path__(self, path: str):
@@ -253,3 +261,6 @@ class Driver(IngestDriver):
                 and len(self.measurements) > 0
 
         return False
+
+    def __get_measurement_name__(self, measurement: str):
+        return '_'.join(os.path.basename(measurement).split('-')[1:4])
