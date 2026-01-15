@@ -101,7 +101,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_wyvern(self):  # Driver Wyvern
         url = os.path.join(ROOT, WYVERN)
-        item_id = "5aeac6e747bd5eab1e5df4ae452fd47221038a63eb5920fc02ddc1cb6ae61e5d"
+        item_id = "88fb893c13a1f41a41b53db1e96a89649772f74542caeb090e0e09e7a6974cdf"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 

@@ -11,7 +11,6 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
@@ -25,7 +24,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -49,14 +47,18 @@ class Driver(IngestDriver):
             """
             bands = []
             for b in bands_raw:
+                name = b.get('name', None)
+                common_name = b.get('common_name', None)
+                if not (name or common_name):
+                    continue
                 kwargs = dict(
-                    name=b['name'],
-                    eo__common_name=b['common_name'],
-                    eo__center_wavelength=b['center_wavelength'],
-                    eo__full_width_half_max=b['full_width_half_max'],
+                    name=name,
+                    eo__common_name=common_name,
+                    eo__center_wavelength=b.get('center_wavelength', None),
+                    eo__full_width_half_max=b.get('full_width_half_max', None)
                 )
                 if include_solar:
-                    kwargs['eo__solar_illumination'] = b['solar_illumination']
+                    kwargs['eo__solar_illumination'] = b.get('solar_illumination', None)
                 bands.append(Band(**kwargs))
             return bands
 
@@ -66,7 +68,10 @@ class Driver(IngestDriver):
             Raises DriverException if a key is missing.
             """
             try:
-                return make_bands(md['assets'][asset_name]['eo:bands'], include_solar)
+                md_assets = md.get('assets', {})
+                asset = md_assets.get(asset_name, {})
+                bands = asset.get('eo:bands', [])
+                return make_bands(bands, include_solar)
             except KeyError as ke:
                 raise DriverException(f"Invalid metadata file {self.md_path}: missing key {ke.args[0]}")
 
@@ -113,83 +118,126 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.stream(self.md_path) as fb:
             md = json.load(fb)
-        try:
-            geometry = md["geometry"]
-            bbox = md["bbox"]
+        return md
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
+        id = metadata.get("id", None)
+        geometry = metadata.get("geometry", None)
+        bbox = metadata.get("bbox", None)
+        if bbox and len(bbox) >= 4:
             centroid_lon = (bbox[0] + bbox[2]) / 2
             centroid_lat = (bbox[1] + bbox[3]) / 2
-            properties =  md["properties"]
-            processing__level = properties["processing:level"]
-            processing__facility = properties["processing:facility"]
-            processing__version = properties["processing:version"]
-            license = properties["license"]
-            start_datetime = datetime.strptime(properties["start_datetime"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            end_datetime = datetime.strptime(properties["end_datetime"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            instrument = properties["instruments"][0]
-            platform= properties["platform"]
-            created =  int(datetime.strptime(properties["created"], "%Y-%m-%dT%H:%M:%SZ").timestamp())
-            updated =  int(datetime.strptime(properties["updated"],"%Y-%m-%dT%H:%M:%SZ").timestamp())
-            constellation = properties["constellation"]
-            view__off_nadir = properties["view:off_nadir"]
-            view__incidence_angle = properties["view:incidence_angle"]
-            view__azimuth = properties["view:azimuth"]
-            view__sun_azimuth = properties["view:sun_azimuth"]
-            view__sun_elevation = properties["view:sun_elevation"]
-            gsd = properties["gsd"]
-            proj__epsg = properties["proj:epsg"]
-            proj__shape = properties["proj:shape"]
-            eo__cloud_cover = properties["eo:cloud_cover"]
-            sensor_mode= properties["sensor_mode"]
-            product_type = properties["product_type"]
-            date_time = datetime.strptime(properties["datetime"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        except KeyError as ke:
-            raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
+            centroid = [centroid_lon, centroid_lat]
+        else:
+            centroid = None
 
+        properties = metadata.get("properties", {})
+        start_datetime_str = properties.get("start_datetime", None)
+        start_datetime = (
+            datetime.strptime(start_datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            if start_datetime_str
+            else None
+        )
+        end_datetime_str = properties.get("end_datetime", None)
+        end_datetime = (
+            datetime.strptime(end_datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            if end_datetime_str
+            else None
+        )
+        constellation = properties.get("constellation", None)
+        date_time_str = properties.get("datetime", None)
+        date_time = (
+            datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            if date_time_str
+            else None
+        )
         item = Item(
             id=self.get_item_id(url),
-            license=license,
             geometry=geometry,
             bbox=bbox,
-            centroid=[centroid_lon,centroid_lat],
+            centroid=centroid,
             properties=Properties(
                 datetime=date_time,
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
-                created=created,
-                updated=updated,
                 constellation=constellation,
-                platform=platform,
-                satellite=platform,
-                instrument=instrument,
-                sensor=platform,
                 sensor_type=SensorType.OPTIC,
-                sensor_mode=sensor_mode,
+                secondary_id=id,
                 item_format=ItemFormat.wyvern,
                 item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.optic,
-                processing__level=processing__level,
-                processing__facility = processing__facility,
-                processing__version = processing__version,
-                gsd=gsd,
-                proj__epsg=proj__epsg,
-                proj__shape=proj__shape,
-                view__off_nadir = view__off_nadir,
-                view__incidence_angle = view__incidence_angle,
-                view__azimuth = view__azimuth,
-                view__sun_azimuth = view__sun_azimuth,
-                view__sun_elevation = view__sun_elevation,
-                product_type=product_type,
-                eo__cloud_cover=eo__cloud_cover
+                observation_type=ObservationType.optic
             ),
             assets={asset.name: asset for asset in assets}
         )
 
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        properties = metadata.get("properties", {})
+
+        processing__level = properties.get("processing:level", None)
+        gsd = properties.get("gsd", None)
+        proj__epsg = properties.get("proj:epsg", None)
+        satellite = properties.get("platform", None)
+        item.properties.gsd=gsd
+        item.properties.processing__level=processing__level
+        item.properties.proj__epsg=proj__epsg
+        item.properties.satellite=satellite
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        properties = metadata.get("properties", {})
+
+        processing__facility = properties.get("processing:facility", None)
+        processing__version = properties.get("processing:version", None)
+        license = properties.get("license", None)
+        instruments = properties.get("instruments", [])
+        instrument = instruments[0] if instruments else None
+        platform = properties.get("platform", None)
+        created_str = properties.get("created", None)
+        created = (
+            int(datetime.strptime(created_str, "%Y-%m-%dT%H:%M:%SZ").timestamp())
+            if created_str
+            else None
+        )
+        updated_str = properties.get("updated", None)
+        updated = (
+            int(datetime.strptime(updated_str, "%Y-%m-%dT%H:%M:%SZ").timestamp())
+            if updated_str
+            else None
+        )
+        view__off_nadir = properties.get("view:off_nadir", None)
+        view__incidence_angle = properties.get("view:incidence_angle", None)
+        view__azimuth = properties.get("view:azimuth", None)
+        view__sun_azimuth = properties.get("view:sun_azimuth", None)
+        view__sun_elevation = properties.get("view:sun_elevation", None)
+        proj__shape = properties.get("proj:shape", None)
+        eo__cloud_cover = properties.get("eo:cloud_cover", None)
+        sensor_mode = properties.get("sensor_mode", None)
+        product_type = properties.get("product_type", None)
+
+        item.properties.processing__facility = processing__facility
+        item.properties.processing__version = processing__version
+        item.properties.license = license
+        item.properties.instrument = instrument
+        item.properties.platform= platform
+        item.properties.created =  created
+        item.properties.updated =  updated
+        item.properties.view__off_nadir = view__off_nadir
+        item.properties.view__incidence_angle = view__incidence_angle
+        item.properties.view__azimuth = view__azimuth
+        item.properties.view__sun_azimuth = view__sun_azimuth
+        item.properties.view__sun_elevation = view__sun_elevation
+        item.properties.proj__shape = proj__shape
+        item.properties.eo__cloud_cover = eo__cloud_cover
+        item.properties.sensor_mode= sensor_mode
+        item.properties.sensor = platform
+        item.properties.product_type = product_type
         return item
 
     def __check_path__(self, path: str):
