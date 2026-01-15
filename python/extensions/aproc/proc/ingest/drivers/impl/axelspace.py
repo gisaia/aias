@@ -73,13 +73,13 @@ class Driver(IngestDriver):
 
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
             md = json.load(fb)
 
         return md
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         from pyproj import Transformer
 
         try:
@@ -124,29 +124,32 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         try:
+            # Is necessarily a dictionary as the core item was built using it
             tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
 
-            item.properties.gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
+            if tile_md.get("rowGSD", None) and tile_md.get("columnGSD", None):
+                item.properties.gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
 
-            item.properties.satellite = metadata["EOMetadata"]["satelliteName"]
+            item.properties.satellite = metadata.get("EOMetadata", {}).get("satelliteName", None)
             item.properties.instrument = item.properties.satellite
             item.properties.sensor = item.properties.satellite
-            item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         except KeyError as ke:
             raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
 
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
-        item.properties.eo__cloud_cover = tile_md["cloudCoverPercentage"]
+        item.properties.eo__cloud_cover = tile_md.get("cloudCoverPercentage", None)
 
-        item.properties.view__sun_elevation = metadata["EOMetadata"]["solarElevationAngleNominal"]
-        item.properties.view__sun_azimuth = metadata["EOMetadata"]["solarAzimuthAngleNominal"]
+        item.properties.view__sun_elevation = metadata.get("EOMetadata", {}).get("solarElevationAngleNominal", None)
+        item.properties.view__sun_azimuth = metadata.get("EOMetadata", {}).get("solarAzimuthAngleNominal", None)
 
-        item.properties.acq__acquisition_orbit_direction = metadata["EOMetadata"]["orbitDirection"]
+        item.properties.acq__acquisition_orbit_direction = metadata.get("EOMetadata", {}).get("orbitDirection", None)
 
         return item
 

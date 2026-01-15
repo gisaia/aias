@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -113,24 +113,24 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         # Some data dont have this tag in xml metadata
         if root.find("productSpecific/geocodedImageInfo") is not None:
-            x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
-            y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
+            x_pixel_size = find_or_none(root, "productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting", lambda x: float(x))
+            y_pixel_size = find_or_none(root, "productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing", lambda x: float(x))
         else:
 
-            x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
-            y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
+            x_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/columnSpacing", lambda x: float(x))
+            y_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/rowSpacing", lambda x: float(x))
         item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
 
-        item.properties.processing__level = root.find("setup/orderInfo/orderType").text
+        item.properties.processing__level = find_or_none(root, "setup/orderInfo/orderType")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.instrument = root.find("productInfo/missionInfo/mission").text
-        item.properties.sensor = root.find("productInfo/missionInfo/mission").text
-        item.properties.sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
-        item.properties.view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
+        item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
+        item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
+        item.properties.sensor_type = find_or_none(root, "productInfo/acquisitionInfo/sensor")
+        item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
 
         return item
 

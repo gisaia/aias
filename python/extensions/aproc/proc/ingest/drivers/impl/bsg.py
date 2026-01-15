@@ -7,7 +7,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image, geotiff_to_jpg,
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             geotiff_to_jpg,
                                                              get_bbox,
                                                              get_centroid,
                                                              get_epsg)
@@ -59,13 +60,13 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
             md = json.load(fb)
 
         return md
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
@@ -91,20 +92,20 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.satellite = item.properties.constellation
-        item.properties.gsd = metadata["gsd"]
+        item.properties.gsd = metadata.get("gsd", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.instrument = item.properties.constellation
-        item.properties.sensor = metadata["sensorName"]
+        item.properties.sensor = metadata.get("sensorName", None)
 
-        item.properties.view__off_nadir = metadata["offNadirAngle"]
-        item.properties.view__sun_azimuth = metadata["sunAzimuth"]
-        item.properties.view__sun_elevation = metadata["sunElevation"]
+        item.properties.view__off_nadir = metadata.get("offNadirAngle", None)
+        item.properties.view__sun_azimuth = metadata.get("sunAzimuth", None)
+        item.properties.view__sun_elevation = metadata.get("sunElevation", None)
 
         return item
 

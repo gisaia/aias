@@ -72,8 +72,8 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def load_metadata(self, url: str) -> object:
-        # The metadata file is a txt, so we build a dictionary that wll be easy to read
+    def load_metadata(self, url: str) -> dict:
+        # The metadata file is a txt, so we build a dictionary that will be easy to read
         metadata = {}
 
         # One metadata file can refer to multiple geoeye products
@@ -162,26 +162,30 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
-        x_pixel_size = float(metadata['Pixel Size X'].split(' ')[0])
-        y_pixel_size = float(metadata['Pixel Size Y'].split(' ')[0])
-        item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        if 'Pixel Size X' in metadata and 'Pixel Size Y' in metadata:
+            x_pixel_size = float(metadata['Pixel Size X'].split(' ')[0])
+            y_pixel_size = float(metadata['Pixel Size Y'].split(' ')[0])
+            item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
 
-        item.properties.processing__level = metadata['Processing Level']
+        item.properties.processing__level = metadata.get("Processing Level", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
-        item.properties.eo__cloud_cover = metadata['Percent Component Cloud Cover']
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.eo__cloud_cover = metadata.get("Percent Component Cloud Cover", None)
 
         item.properties.instrument = item.properties.constellation
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_type = metadata['Sensor Type']
+        item.properties.sensor_type = metadata.get("Sensor Type", None)
 
-        item.properties.view__azimuth = float(metadata['Scan Azimuth'].split(' ')[0])
-        item.properties.view__sun_azimuth = float(metadata['Sun Angle Azimuth'].split(' ')[0])
-        item.properties.view__sun_elevation = float(metadata['Sun Angle Elevation'].split(' ')[0])
+        if 'Scan Azimuth' in metadata:
+            item.properties.view__azimuth = float(metadata['Scan Azimuth'].split(' ')[0])
+        if 'Sun Angle Azimuth' in metadata:
+            item.properties.view__sun_azimuth = float(metadata['Sun Angle Azimuth'].split(' ')[0])
+        if 'Sun Angle Elevation' in metadata:
+            item.properties.view__sun_elevation = float(metadata['Sun Angle Elevation'].split(' ')[0])
 
         return item
 

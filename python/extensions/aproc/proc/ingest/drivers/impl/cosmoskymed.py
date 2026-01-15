@@ -120,7 +120,7 @@ class Driver(IngestDriver):
 
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         from osgeo import gdal
 
         options = gdal.InfoOptions(format="json")
@@ -128,7 +128,7 @@ class Driver(IngestDriver):
 
         return info["metadata"]
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         geometry, bbox, centroid = self.__get_geometries__(metadata)
         date_time = int(datetime.strptime(metadata[""]["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
 
@@ -151,28 +151,36 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
-        item.properties.gsd = float(metadata[""]["Ground_Range_Geometric_Resolution"])
-        item.properties.proj__epsg = self.__get_proj__(metadata[""], item.centroid)
-        item.properties.satellite = metadata[""]["Satellite_ID"]
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        gsd = metadata.get("", {}).get("Ground_Range_Geometric_Resolution", None)
+        if gsd is not None:
+            item.properties.gsd = float(gsd)
+
+        item.properties.satellite = metadata.get("", {}).get("Satellite_ID", None)
 
         with AccessManager.make_local(self.h5met_path) as local_h5met_path:
             h5_tree = ET.parse(local_h5met_path)
             h5_root = h5_tree.getroot()
-        item.properties.processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
+
+        processing__level = h5_root.find("ProcessingInfo/ProcessingLevel")
+        if processing__level:
+            item.properties.processing__level = processing__level.text
+
+        item.properties.proj__epsg = self.__get_proj__(metadata.get(""), item.centroid)
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
-        near_incidence_angle = float(metadata[""]["MBI_Near_Incidence_Angle"])
-        far_incidence_angle = float(metadata[""]["MBI_Far_Incidence_Angle"])
-        item.properties.view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
+        near_incidence_angle = metadata.get("", {}).get("MBI_Near_Incidence_Angle", None)
+        far_incidence_angle = metadata.get("", {}).get("MBI_Far_Incidence_Angle", None)
+        if near_incidence_angle and far_incidence_angle:
+            item.properties.view__incidence_angle = (float(near_incidence_angle) + float(far_incidence_angle)) / 2
 
-        item.properties.acq__acquisition_orbit_direction = metadata[""]["Orbit_Direction"]
-        item.properties.acq__acquisition_orbit = metadata[""]["Orbit_Number"]
+        item.properties.acq__acquisition_orbit_direction = metadata.get("", {}).get("Orbit_Direction", None)
+        item.properties.acq__acquisition_orbit = metadata.get("", {}).get("Orbit_Number", None)
 
         return item
 

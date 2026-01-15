@@ -10,12 +10,13 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
     get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
+    ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
 
     def __init__(self):
         super().__init__()
@@ -116,22 +117,21 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
-        item.properties.gsd = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION").text)
-
+        item.properties.gsd = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", lambda x: float(x), Driver.ns)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.instrument = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT").text
+        item.properties.instrument = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/INSTRUMENT", ns=Driver.ns)
         item.properties.sensor = item.properties.constellation
 
-        item.properties.view__incidence_angle = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE").text)
-        item.properties.view__sun_azimuth = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH").text)
-        item.properties.view__sun_elevation = float(self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION").text)
+        item.properties.view__incidence_angle = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/INCIDENCE_ANGLE", lambda x: float(x), Driver.ns)
+        item.properties.view__sun_azimuth = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_AZIMUTH", lambda x: float(x), Driver.ns)
+        item.properties.view__sun_elevation = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/SUN_ELEVATION", lambda x: float(x), Driver.ns)
 
         for param in root.iter("Quality_Parameter"):
             code = self.__find_value__(param, "./QUALITY_PARAMETER_CODE").text
             if code == "SPACEMETRIC:CLOUDCOVER_PERCENT":
-                item.properties.eo__cloud_cover = float(self.__find_value__(param, "./QUALITY_PARAMETER_VALUE").text)
+                item.properties.eo__cloud_cover = find_or_none(param, "./QUALITY_PARAMETER_VALUE", lambda x: float(x))
 
         return item
 
@@ -163,9 +163,7 @@ class Driver(IngestDriver):
                  or self.quicklook_path is not None)
 
     def __find_value__(self, root: ET.Element, key: str) -> ET.Element:
-        ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
-
-        value = root.find(key, ns)
+        value = root.find(key, Driver.ns)
         if value is None:
             raise DriverException(f"Couldn't find {key}")
         return value

@@ -66,7 +66,7 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         import pvl
 
         with AccessManager.make_local(self.met_path) as local_met_path:
@@ -74,7 +74,7 @@ class Driver(IngestDriver):
 
         return data
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         ul_lat = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLATITUDE"))
         ul_lon = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLONGITUDE"))
         ur_lat = float(self.__get_corner_coord__(metadata, "UPPERRIGHTCORNERLATITUDE"))
@@ -99,8 +99,7 @@ class Driver(IngestDriver):
             metadata["INVENTORYMETADATA"]
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("PLATFORMSHORTNAME", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
 
         item = Item(
             geometry=geometry,
@@ -120,28 +119,25 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.processing__level = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("COLLECTIONDESCRIPTIONCLASS", {})
             .get("SHORTNAME", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
 
         gsd_row = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("SWATHSTRUCTUREINFO", {})
             .get("CROSSTRACKPIXELRESOLUTION", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
         if gsd_row:
             gsd_row = float(gsd_row)
         gsd_col = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("SWATHSTRUCTUREINFO", {})
             .get("ALONGTRACKPIXELRESOLUTION", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
         if gsd_col:
             gsd_col = float(gsd_col)
         gsd = None
@@ -153,41 +149,41 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         eo__cloud_cover = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("CLOUDCOVERAGE", {})
             .get("SCENECLOUDCOVERAGE", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
         if eo__cloud_cover:
             item.properties.eo__cloud_cover = float(eo__cloud_cover)
+
         item.properties.instrument = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("INSTRUMENTSHORTNAME", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
+
         item.properties.sensor = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("PLATFORMSHORTNAME", {})
             .get("VALUE", None)
         )
+
         view__sun_azimuth = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("PRODUCTSPECIFICMETADATA", {})
             .get("SOLAR_AZIMUTH_ANGLE", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
         if view__sun_azimuth:
             item.properties.view__sun_azimuth = float(view__sun_azimuth)
+
         view__sun_elevation = (
-            metadata["INVENTORYMETADATA"]
+            metadata.get("INVENTORYMETADATA", {})
             .get("PRODUCTSPECIFICMETADATA", {})
             .get("SOLAR_ELEVATION_ANGLE", {})
-            .get("VALUE", None)
-        )
+            .get("VALUE", None))
         if view__sun_elevation:
             item.properties.view__sun_elevation = float(view__sun_elevation)
 
@@ -208,7 +204,7 @@ class Driver(IngestDriver):
                     return self.tif_path is not None and self.met_path is not None
         return False
 
-    def __get_corner_coord__(self, data, corner):
+    def __get_corner_coord__(self, data, corner: str):
         if data["INVENTORYMETADATA"]["SPATIALDOMAINCONTAINER"][
             "HORIZONTALSPATIALDOMAINCONTAINER"
         ].get("BOUNDINGBOX"):

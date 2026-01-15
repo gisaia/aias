@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -203,10 +203,10 @@ class Driver(IngestDriver):
         metadata = AccessManager.get_gdal_md(self.dim_path)
 
         # We calculate the GSD as the mean of GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
-        if metadata.get("GSD_ACROSS_TRACK") and metadata.get("GSD_ALONG_TRACK"):
+        if "GSD_ACROSS_TRACK" in metadata and "GSD_ALONG_TRACK" in metadata:
             item.properties.gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
 
-        item.properties.processing__level = root.get("PROCESSING_LEVEL")
+        item.properties.processing__level = find_or_none(root, "PROCESSING_LEVEL")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
 
         return item
@@ -220,20 +220,17 @@ class Driver(IngestDriver):
             item.properties.eo__cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
         else:
             for cloud in root.iter('Dataset_Content'):
-                if cloud.find("CLOUD_COVERAGE") is not None:
-                    item.properties.eo__cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
+                item.properties.eo__cloud_cover = find_or_none(cloud, "CLOUD_COVERAGE", lambda x: float(x))
 
         item.properties.sensor = item.properties.constellation
-        item.properties.view__azimuth = root.get("AZIMUTH_ANGLE")
-        item.properties.view__incidence_angle = root.get("INCIDENCE_ANGLE")
-        item.properties.view__sun_azimuth = root.get("SUN_AZIMUTH")
-        item.properties.view__sun_elevation = root.get("SUN_ELEVATION")
+        item.properties.view__azimuth = find_or_none(root, "AZIMUTH_ANGLE")
+        item.properties.view__incidence_angle = find_or_none(root, "INCIDENCE_ANGLE")
+        item.properties.view__sun_azimuth = find_or_none(root, "SUN_AZIMUTH")
+        item.properties.view__sun_elevation = find_or_none(root, "SUN_ELEVATION")
 
         # To fit the case of PNEO 30 cm with no instrument metadata
-        if "INSTRUMENT" in metadata:
-            item.properties.instrument = metadata["INSTRUMENT"]
-        if "MISSION_INDEX" in metadata:
-            item.properties.sensor_type = metadata["MISSION_INDEX"]
+        item.properties.instrument = metadata.get("INSTRUMENT", None)
+        item.properties.sensor_type = metadata.get("MISSION_INDEX", None)
 
         return item
 

@@ -175,7 +175,7 @@ CAN_PULL = [
     GS_RO_FILE,
     S3_RO_FILE,
     HTTPS_RO_FILE,
-    GS_RO_SMALL_DIR,
+    #    GS_RO_SMALL_DIR, // todo fix pull of directories for gs. See issue #366
     S3_RO_SMALL_DIR
 ]
 

@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -110,23 +110,24 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
-        item.properties.processing__level = root.find("gml:metaDataProperty/re:EarthObservationMetaData/eop:productType", Driver.ns).text
+        item.properties.processing__level = find_or_none(root, "gml:metaDataProperty/re:EarthObservationMetaData/eop:productType", ns=Driver.ns)
 
-        gsd_col = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd", Driver.ns).text)
-        gsd_row = float(root.find("gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", Driver.ns).text)
-        item.properties.gsd = (gsd_col + gsd_row) / 2
+        gsd_col = find_or_none(root, "gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd", lambda x: float(x), ns=Driver.ns)
+        gsd_row = find_or_none(root, "gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", lambda x: float(x), ns=Driver.ns)
+        if gsd_col is not None and gsd_row is not None:
+            item.properties.gsd = (gsd_col + gsd_row) / 2
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.view__incidence_angle = float(root.find("gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/eop:incidenceAngle", Driver.ns).text)
-        item.properties.view__sun_azimuth = float(root.find("gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationAzimuthAngle", Driver.ns).text)
-        item.properties.view__sun_elevation = float(root.find("gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationElevationAngle", Driver.ns).text)
-        item.properties.view__azimuth = float(root.find("gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/re:azimuthAngle", Driver.ns).text)
-        item.properties.sensor_type = root.find("gml:using/eop:EarthObservationEquipment/eop:sensor/re:Sensor/eop:sensorType", Driver.ns).text
-        item.properties.sensor = root.find("gml:using/eop:EarthObservationEquipment/eop:platform/eop:Platform/eop:shortName", Driver.ns).text
-        item.properties.instrument = root.find("gml:using/eop:EarthObservationEquipment/eop:instrument/eop:Instrument/eop:shortName", Driver.ns).text
-        item.properties.eo__cloud_cover = float(root.find("gml:resultOf/re:EarthObservationResult/opt:cloudCoverPercentage", Driver.ns).text)
+        item.properties.view__incidence_angle = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/eop:incidenceAngle", lambda x: float(x), ns=Driver.ns)
+        item.properties.view__sun_azimuth = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationAzimuthAngle", lambda x: float(x), ns=Driver.ns)
+        item.properties.view__sun_elevation = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationElevationAngle", lambda x: float(x), ns=Driver.ns)
+        item.properties.view__azimuth = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/re:azimuthAngle", lambda x: float(x), ns=Driver.ns)
+        item.properties.sensor_type = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:sensor/re:Sensor/eop:sensorType", ns=Driver.ns)
+        item.properties.sensor = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:platform/eop:Platform/eop:shortName", ns=Driver.ns)
+        item.properties.instrument = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:instrument/eop:Instrument/eop:shortName", ns=Driver.ns)
+        item.properties.eo__cloud_cover = find_or_none(root, "gml:resultOf/re:EarthObservationResult/opt:cloudCoverPercentage", lambda x: float(x), ns=Driver.ns)
 
         return item
 

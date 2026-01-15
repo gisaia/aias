@@ -10,7 +10,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
+    find_or_none, get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 # Level-1 Product Family Summary Table Dictionary
@@ -204,26 +204,34 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.satellite = item.properties.constellation + root.find(".//safe:platform/safe:number", Driver.ns).text
-        item.properties.processing__level = root.find(".//xfdu:contentUnit", Driver.ns).attrib["textInfo"].split(" ")[2]
+        satellite_number = find_or_none(root, ".//safe:platform/safe:number", ns=Driver.ns)
+        if satellite_number:
+            item.properties.satellite = item.properties.constellation + satellite_number
+
+        processing__level = root.find(".//xfdu:contentUnit", Driver.ns)
+        if processing__level:
+            textInfo = processing__level.attrib.get("textInfo", None)
+            if textInfo:
+                item.properties.processing__level = textInfo.split(" ")[2]
+
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.main_asset_path)
 
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:
             item.properties.gsd = product_values["max_pixel_spacing"]
 
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.acq__acquisition_orbit_direction = find_or_none(root, ".//safe:orbitReference//safe:extension/s1:orbitProperties/s1:pass", ns=Driver.ns)
+        item.properties.acq__acquisition_orbit = find_or_none(root, ".//safe:orbitReference/safe:orbitNumber", lambda x: float(x), ns=Driver.ns)
+
         sensor = root.find(".//s1sarl1:mode", Driver.ns)
         if sensor is None:
             sensor = root.find(".//s1sarl2:mode", Driver.ns)
         if sensor is not None:
             item.properties.sensor = sensor.text
-
-        return item
-
-    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.instrument = item.properties.satellite
-        item.properties.acq__acquisition_orbit_direction = root.find(".//safe:orbitReference//safe:extension/s1:orbitProperties/s1:pass", Driver.ns).text
-        item.properties.acq__acquisition_orbit = float(root.find(".//safe:orbitReference/safe:orbitNumber", Driver.ns).text)
 
         return item
 

@@ -83,12 +83,12 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
             metadata = json.load(fb)
         return metadata
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
@@ -114,24 +114,24 @@ class Driver(IngestDriver):
 
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.sr_path))
-        item.properties.gsd = metadata["properties"]["gsd"]
+        item.properties.gsd = metadata.get("properties", {}).get("gsd", None)
 
-        item.properties.satellite = metadata["properties"]["satellite_id"]
+        item.properties.satellite = metadata.get("properties", {}).get("satellite_id", None)
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
-        item.properties.eo__cloud_cover = metadata["properties"]["cloud_cover"]
-        item.properties.eo__snow_cover = metadata["properties"]["snow_ice_percent"]
+        item.properties.eo__cloud_cover = metadata.get("properties", {}).get("cloud_cover", None)
+        item.properties.eo__snow_cover = metadata.get("properties", {}).get("snow_ice_percent", None)
 
-        item.properties.view__azimuth = metadata["properties"]["satellite_azimuth"]
-        item.properties.view__sun_azimuth = metadata["properties"]["sun_azimuth"]
-        item.properties.view__sun_elevation = metadata["properties"]["sun_elevation"]
+        item.properties.view__azimuth = metadata.get("properties", {}).get("satellite_azimuth", None)
+        item.properties.view__sun_azimuth = metadata.get("properties", {}).get("sun_azimuth", None)
+        item.properties.view__sun_elevation = metadata.get("properties", {}).get("sun_elevation", None)
 
         return item
 

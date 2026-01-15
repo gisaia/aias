@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -139,22 +139,22 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.satellite = item.properties.constellation
-        item.properties.processing__level = root.find(".//rs2:productType", Driver.ns).text
+        item.properties.processing__level = find_or_none(root, ".//rs2:productType", ns=Driver.ns)
 
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.polarizations[0]['path'])
 
-        pixel_spacing = root.find(".//rs2:sampledPixelSpacing", Driver.ns).text
-        line_spacing = root.find(".//rs2:sampledLineSpacing", Driver.ns).text
-        item.properties.gsd = max(float(pixel_spacing), float(line_spacing))
+        pixel_spacing = find_or_none(root, ".//rs2:sampledPixelSpacing", ns=Driver.ns)
+        line_spacing = find_or_none(root, ".//rs2:sampledLineSpacing", ns=Driver.ns)
+        if pixel_spacing and line_spacing:
+            item.properties.gsd = max(float(pixel_spacing), float(line_spacing))
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.acq__acquisition_orbit_direction = root.find(".//rs2:passDirection", Driver.ns).text
-        orbit_data_file = root.find(".//rs2:orbitDataFile", Driver.ns).text
-        item.properties.acq__acquisition_orbit = orbit_data_file.split('_')[0]
+        item.properties.acq__acquisition_orbit_direction = find_or_none(root, ".//rs2:passDirection", ns=Driver.ns)
+        item.properties.acq__acquisition_orbit = find_or_none(root, ".//rs2:orbitDataFile", lambda x: x.split('_')[0], ns=Driver.ns)
 
-        item.properties.sar__polarizations = map(lambda x: x['polarization'], self.polarizations)
+        item.properties.sar__polarizations = [x['polarization'] for x in self.polarizations]
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 

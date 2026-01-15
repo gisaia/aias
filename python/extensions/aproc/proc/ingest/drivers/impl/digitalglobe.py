@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_corners, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -143,9 +143,9 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
+        item.properties.processing__level = find_or_none(metadata, "./IMD/PRODUCTLEVEL")
+        item.properties.gsd = find_or_none(metadata, "./IMD/IMAGE/MEANCOLLECTEDGSD", lambda x: float(x))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
-        item.properties.processing__level = metadata.find("./IMD/PRODUCTLEVEL").text
-        item.properties.gsd = float(metadata.find("./IMD/IMAGE/MEANCOLLECTEDGSD").text)
 
         return item
 
@@ -155,20 +155,20 @@ class Driver(IngestDriver):
 
         if metadata.find("./IMD/IMAGE/SATAZ") is not None:
             item.properties.view__azimuth = float(metadata.find("./IMD/IMAGE/SATAZ").text)
-        else:
+        elif metadata.find("./IMD/IMAGE/MEANSATAZ") is not None:
             item.properties.view__azimuth = float(metadata.find("./IMD/IMAGE/MEANSATAZ").text)
 
         if metadata.find("./IMD/IMAGE/SUNAZ") is not None:
             item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/SUNAZ").text)
-        else:
+        elif metadata.find("./IMD/IMAGE/SUNAZ") is not None:
             item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/MEANSUNAZ").text)
 
         if metadata.find("./IMD/IMAGE/SUNEL") is not None:
             item.properties.view__sun_elevation = float(metadata.find("./IMD/IMAGE/SUNEL").text)
-        else:
+        elif metadata.find("./IMD/IMAGE/MEANSUNEL") is not None:
             item.properties.view__sun_elevation = float(metadata.find("./IMD/IMAGE/MEANSUNEL").text)
 
-        eo__cloud_cover = float(metadata.find("./IMD/IMAGE/CLOUDCOVER").text) * 1000
+        eo__cloud_cover = find_or_none(metadata, "./IMD/IMAGE/CLOUDCOVER", lambda x: float(x) * 1000)
         if eo__cloud_cover != -999000.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
 

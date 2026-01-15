@@ -128,20 +128,20 @@ class Driver(IngestDriver):
             item.properties.gsd = (float(gsd_x.text) + float(gsd_y.text))/2
 
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
-        item.properties.processing__level = metadata["PROCESSING_LEVEL"]
+        item.properties.processing__level = metadata.get("PROCESSING_LEVEL", None)
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         metadata = AccessManager.get_gdal_md(self.dim_path)
 
-        item.properties.instrument = metadata["INSTRUMENT"]
+        item.properties.instrument = metadata.get("INSTRUMENT", None)
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_type = metadata["MISSION_INDEX"]
+        item.properties.sensor_type = metadata.get("MISSION_INDEX", None)
 
-        item.properties.view__incidence_angle = metadata["INCIDENCE_ANGLE"]
-        item.properties.view__sun_azimuth = metadata["SUN_AZIMUTH"]
-        item.properties.view__sun_elevation = metadata["SUN_ELEVATION"]
+        item.properties.view__incidence_angle = metadata.get("INCIDENCE_ANGLE", None)
+        item.properties.view__sun_azimuth = metadata.get("SUN_AZIMUTH", None)
+        item.properties.view__sun_elevation = metadata.get("SUN_ELEVATION", None)
 
         return item
 

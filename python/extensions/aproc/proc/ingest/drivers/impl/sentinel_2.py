@@ -9,7 +9,7 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
+    find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 RED_EDGE = "Vegetation red edge"
@@ -98,12 +98,12 @@ class Driver(IngestDriver):
             geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(points)
 
         for p_info in root.iter('Product_Info'):
-            start_time = Driver.__get_property(p_info, 'PRODUCT_START_TIME')
+            start_time = find_or_none(p_info, 'PRODUCT_START_TIME')
             start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-            stop_time = Driver.__get_property(p_info, 'PRODUCT_STOP_TIME')
+            stop_time = find_or_none(p_info, 'PRODUCT_STOP_TIME')
             stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%fZ")
 
-            secondary_id = Driver.__get_property(p_info, "PRODUCT_URI")
+            secondary_id = find_or_none(p_info, "PRODUCT_URI")
 
         item = Item(
             id=self.get_item_id(url),
@@ -130,8 +130,8 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         for p_info in root.iter('Product_Info'):
-            item.properties.processing__level = Driver.__get_property(p_info, 'PROCESSING_LEVEL')
-            item.properties.satellite = Driver.__get_property(p_info, 'Datatake/SPACECRAFT_NAME')
+            item.properties.processing__level = find_or_none(p_info, 'PROCESSING_LEVEL')
+            item.properties.satellite = find_or_none(p_info, 'Datatake/SPACECRAFT_NAME')
 
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tci_path))
 
@@ -139,13 +139,13 @@ class Driver(IngestDriver):
         item.properties.eo__bands: list[Band] = []
         for bands in root.iter("Spectral_Information_List"):
             for band in bands.iter('Spectral_Information'):
-                band_id = band.get('bandId')
-                resolutions.append(Driver.__get_property(band, 'RESOLUTION'))
+                band_id = band.get('bandId', None)
+                resolutions.append(find_or_none(band, 'RESOLUTION'))
                 item.properties.eo__bands.append(Band(
-                    asset=band.get('physicalBand'),
-                    name=band.get('physicalBand'),
+                    asset=band.get('physicalBand', None),
+                    name=band.get('physicalBand', None),
                     eo__common_name=BANDS_NAME.get(band_id, ''),
-                    eo__center_wavelength=Driver.__get_property(band, 'Wavelength/CENTRAL')
+                    eo__center_wavelength=find_or_none(band, 'Wavelength/CENTRAL')
                 ))
 
         if len(resolutions) > 0:
@@ -158,8 +158,8 @@ class Driver(IngestDriver):
         item.properties.sensor = item.properties.satellite
 
         for p_info in root.iter('Product_Info'):
-            item.properties.acq__acquisition_orbit_direction = Driver.__get_property(p_info, 'Datatake/SENSING_ORBIT_DIRECTION')
-            item.properties.acq__acquisition_orbit = Driver.__get_property(p_info, "Datatake/SENSING_ORBIT_NUMBER")
+            item.properties.acq__acquisition_orbit_direction = find_or_none(p_info, 'Datatake/SENSING_ORBIT_DIRECTION')
+            item.properties.acq__acquisition_orbit = find_or_none(p_info, "Datatake/SENSING_ORBIT_NUMBER")
 
         for p_info in root.iter('Cloud_Coverage_Assessment'):
             item.properties.eo__cloud_cover = p_info.text
@@ -191,10 +191,3 @@ class Driver(IngestDriver):
                                                 self.band_paths.append(band.path)
             return self.quicklook_path is not None and self.md_path is not None and self.tci_path is not None and len(self.band_paths) > 0
         return False
-
-    @staticmethod
-    def __get_property(n: ET.Element, key: str):
-        element = n.find(key)
-        if element is not None:
-            return element.text
-        return None

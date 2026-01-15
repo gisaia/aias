@@ -1,5 +1,8 @@
 import hashlib
 import os
+import xml.etree.ElementTree as ET
+from typing import Callable
+
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
 
@@ -121,14 +124,16 @@ def get_epsg(proj):
         proj = osr.SpatialReference(wkt=proj)
         return int(proj.GetAttrValue('AUTHORITY', 1))
     except Exception:
-        ...
-    return None
+        return None
 
 
 def get_epsg_from_gdal_info(path: str) -> int | None:
-    from osgeo import gdal
-    info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
-    return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
+    try:
+        from osgeo import gdal
+        info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
+        return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
+    except Exception:
+        return None
 
 
 def downsample_image(image_path: str, out_path: str, factor: int):
@@ -138,8 +143,22 @@ def downsample_image(image_path: str, out_path: str, factor: int):
     from PIL import Image
 
     if not AccessManager.is_local(image_path):
-        raise Exception(f"Image downsample can only be done on local images; {image_path} is not")
+        raise PermissionError(f"Image downsample can only be done on local images; {image_path} is not")
 
     with Image.open(image_path) as im:
         im_new = im.reduce(factor)
         im_new.save(out_path)
+
+
+def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[str, str] = None):
+    """
+    Tries to find the key in the given element. If found, returns its text value, optionally processed
+    """
+    value = root.find(key, ns)
+    if value is not None:
+
+        if process is not None:
+            return process(value.text)
+        return value.text
+
+    return None

@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, get_epsg_from_gdal_info,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -103,12 +103,13 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.satellite = root.find("satellite_name").text
-        item.properties.processing__level = root.find("product_level").text
+        item.properties.satellite = find_or_none(root, "satellite_name")
+        item.properties.processing__level = find_or_none(root, "product_level")
 
-        range_spacing = float(root.find("range_spacing").text)
-        azimuth_spacing = float(root.find("azimuth_spacing").text)
-        item.properties.gsd = (range_spacing + azimuth_spacing) / 2
+        range_spacing = find_or_none(root, "range_spacing", lambda x: float(x))
+        azimuth_spacing = find_or_none(root, "azimuth_spacing", lambda x: float(x))
+        if range_spacing and azimuth_spacing:
+            item.properties.gsd = (range_spacing + azimuth_spacing) / 2
 
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
 
@@ -118,9 +119,9 @@ class Driver(IngestDriver):
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
-        item.properties.acq__acquisition_orbit_direction = root.find("orbit_direction").text
-        item.properties.acq__acquisition_orbit = root.find("orbit_absolute_number").text
-        item.properties.sar__polarizations = [root.find("polarization").text.upper()]
+        item.properties.acq__acquisition_orbit_direction = find_or_none(root, "orbit_direction")
+        item.properties.acq__acquisition_orbit = find_or_none(root, "orbit_absolute_number")
+        item.properties.sar__polarizations = find_or_none(root, "polarization", lambda x: [x.upper()])
 
         return item
 

@@ -141,6 +141,30 @@ class IngestDriver(AbstractDriver):
         except Exception as e:
             raise DriverException(e)
 
+        self.validate_item(url, item)
+
+        try:
+            item = self.add_major_metadata(url, item, metadata)
+        except Exception as e:
+            self.LOGGER.warn(f"Failed to retrieve additional information: {e}")
+
+        self.log_if_missing(url, item)
+
+        try:
+            item = self.add_minor_metadata(url, item, metadata)
+        except Exception:
+            ...
+
+        return item
+
+    def validate_item(self, url: str, item: Item):
+        """
+        Validate that the created item contains all the mandatory properties
+
+        Args:
+            url (str): archive's url
+            item (Item): the item
+        """
         if item.geometry is None:
             raise DriverException(f"No geometry was found for {url}")
         elif item.bbox is None:
@@ -176,17 +200,26 @@ class IngestDriver(AbstractDriver):
         if Role.data.value not in unique_roles:
             raise DriverException(f"No asset has the data role for {url}")
 
-        try:
-            item = self.add_major_metadata(url, item, metadata)
-        except Exception as e:
-            self.LOGGER.warn(f"Failed to retrieve additional information: {e}")
+    def log_if_missing(self, url: str, item: Item):
+        """
+        Checks if some of the item properties are missing. If they are, log a warning
 
-        try:
-            item = self.add_minor_metadata(url, item, metadata)
-        except Exception:
-            ...
-
-        return item
+        Args:
+            url (str): archive's url
+            item (Item): the item
+        """
+        if item.properties.satellite is None:
+            self.LOGGER.warn(f"No satellite was found for {url}")
+        if item.properties.gsd is None:
+            self.LOGGER.warn(f"No resolution was found for {url}")
+        if item.properties.processing__level is None:
+            self.LOGGER.warn(f"No processing level was found for {url}")
+        if item.properties.proj__epsg is None:
+            self.LOGGER.warn(f"No projection was found for {url}")
+        if item.assets.get(Role.thumbnail.value) is None:
+            self.LOGGER.warn(f"No thumbnail was found for {url}")
+        if item.assets.get(Role.overview.value) is None:
+            self.LOGGER.warn(f"No overview was found for {url}")
 
     @abstractmethod
     def load_metadata(self, url: str) -> object:
@@ -237,7 +270,7 @@ class IngestDriver(AbstractDriver):
 
         Args:
             url (str): archive's url
-            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+            item (Item): the item
             metadata (object): metadata describing the item
 
         Returns:
@@ -251,7 +284,7 @@ class IngestDriver(AbstractDriver):
 
         Args:
             url (str): archive's url
-            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
+            item (Item): the item
             metadata (object): metadata describing the item
 
         Returns:

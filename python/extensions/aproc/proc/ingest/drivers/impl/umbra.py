@@ -57,13 +57,13 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         return assets
 
-    def load_metadata(self, url: str) -> object:
+    def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
             metadata = json.loads(fb)
 
         return metadata
 
-    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         data_take = metadata["collects"][0]
 
         geometry = data_take["footprintPolygonLla"]
@@ -97,33 +97,36 @@ class Driver(IngestDriver):
         )
         return item
 
-    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
-        item.properties.satellite = metadata["umbraSatelliteName"]
-        item.properties.gsd = metadata["baseIpr"]
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.satellite = metadata.get("umbraSatelliteName", None)
+        item.properties.gsd = metadata.get("baseIpr", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 
         return item
 
-    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
-        data_take = metadata["collects"][0]
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        # Used in build_core_item so it is a dictionary
+        data_take: dict = metadata["collects"][0]
 
         item.properties.instrument = item.properties.constellation
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_mode = metadata["imagingMode"]
+        item.properties.sensor_mode = metadata.get("imagingMode", None)
 
-        item.properties.view__incidence_angle = data_take["angleIncidenceDegrees"]
-        item.properties.view__azimuth = data_take["angleAzimuthDegrees"]
+        item.properties.view__incidence_angle = data_take.get("angleIncidenceDegrees", None)
+        item.properties.view__azimuth = data_take.get("angleAzimuthDegrees", None)
 
-        item.properties.acq__acquisition_orbit_direction = data_take["satelliteTrack"]
-        item.properties.acq__acquisition_type = metadata["orderType"]
-        item.properties.acq__request_id = data_take["taskId"]
+        item.properties.acq__acquisition_orbit_direction = data_take.get("satelliteTrack", None)
+        item.properties.acq__acquisition_type = metadata.get("orderType", None)
+        item.properties.acq__request_id = data_take.get("taskId", None)
 
-        item.properties.sar__frequency_band = data_take["radarBand"]
-        item.properties.sar__center_frequency = data_take["radarCenterFrequencyHz"]
-        item.properties.sar__polarizations = data_take["polarizations"].upper()
-        item.properties.sar__resolution_range = data_take["maxGroundResolution"]["rangeMeters"]
-        item.properties.sar__resolution_azimuth = data_take["maxGroundResolution"]["azimuthMeters"]
-        item.properties.sar__observation_direction = data_take["observationDirection"]
+        item.properties.sar__frequency_band = data_take.get("radarBand", None)
+        item.properties.sar__center_frequency = data_take.get("radarCenterFrequencyHz", None)
+        polarization = data_take.get("polarizations", None)
+        if polarization:
+            item.properties.sar__polarizations = polarization.upper()
+        item.properties.sar__resolution_range = data_take.get("maxGroundResolution", {}).get("rangeMeters", None)
+        item.properties.sar__resolution_azimuth = data_take.get("maxGroundResolution", {}).get("azimuthMeters", None)
+        item.properties.sar__observation_direction = data_take.get("observationDirection", None)
 
         return item
 
