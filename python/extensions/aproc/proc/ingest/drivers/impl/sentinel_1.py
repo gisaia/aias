@@ -210,9 +210,9 @@ class Driver(IngestDriver):
 
         processing__level = root.find(".//xfdu:contentUnit", Driver.ns)
         if processing__level:
-            textInfo = processing__level.attrib.get("textInfo", None)
-            if textInfo:
-                item.properties.processing__level = textInfo.split(" ")[2]
+            text_info = processing__level.attrib.get("textInfo", None)
+            if text_info:
+                item.properties.processing__level = text_info.split(" ")[2]
 
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.main_asset_path)
 

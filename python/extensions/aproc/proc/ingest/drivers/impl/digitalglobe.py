@@ -160,7 +160,7 @@ class Driver(IngestDriver):
 
         if metadata.find("./IMD/IMAGE/SUNAZ") is not None:
             item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/SUNAZ").text)
-        elif metadata.find("./IMD/IMAGE/SUNAZ") is not None:
+        elif metadata.find("./IMD/IMAGE/MEANSUNAZ") is not None:
             item.properties.view__sun_azimuth = float(metadata.find("./IMD/IMAGE/MEANSUNAZ").text)
 
         if metadata.find("./IMD/IMAGE/SUNEL") is not None:
