@@ -59,12 +59,12 @@ class Tests(unittest.TestCase):
         # UPLOAD ASSET
         with open(ASSET_PATH, 'rb') as file:
             file = {'file': (ASSET, file, "image/tiff")}
-            requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID, "assets", ASSET), files=file)
+            requests.post(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID, "assets", ASSET]), files=file)
         with open(ITEM_PATH, 'r') as file:
             data = file.read()
-            r = requests.post(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items"), data=data, headers={"Content-Type": "application/json"})
+            r = requests.post(url="/".join([AIRS_URL, "collections", COLLECTION, "items"]), data=data, headers={"Content-Type": "application/json"})
             self.assertTrue(r.ok, msg=r.content)
-        r = requests.get(url=os.path.join(AIRS_URL, "collections", COLLECTION, "items", ID))
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID]))
         self.assertTrue(r.ok, msg=r.content)
         sleep(3)
         return mapper.item_from_json(r.content)

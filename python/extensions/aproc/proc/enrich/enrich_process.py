@@ -158,7 +158,7 @@ class AprocProcess(Process):
     @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):
         try:
-            r = requests.get(url=os.path.join(AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id))
+            r = requests.get(url="/".join([AprocConfiguration.settings.airs_endpoint, "collections", collection, "items", item_id]))
             if r.ok:
                 return mapper.item_from_json(r.content)
             else:
