@@ -1,5 +1,8 @@
 import hashlib
 import os
+import xml.etree.ElementTree as ET
+from typing import Callable
+
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
 
@@ -94,7 +97,7 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
     if bands_list is None:
         bands_list = [1]
         if dataset.RasterCount == 3:
-            bands_list = [3, 2, 1]
+            bands_list = [1, 2, 3]
 
     scale_params = None
     if stretch:
@@ -121,26 +124,41 @@ def get_epsg(proj):
         proj = osr.SpatialReference(wkt=proj)
         return int(proj.GetAttrValue('AUTHORITY', 1))
     except Exception:
-        ...
-    return None
+        return None
 
 
 def get_epsg_from_gdal_info(path: str) -> int | None:
-    from osgeo import gdal
-    info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
-    return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
+    try:
+        from osgeo import gdal
+        info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))
+        return get_epsg(info.get("gcps", {}).get("coordinateSystem", {}).get("wkt", None))
+    except Exception:
+        return None
 
 
-def downsample_image(image_path: str, downsampled_image_path: str, block_size: int):
+def downsample_image(image_path: str, out_path: str, factor: int):
     """
-    Downsamples an image by the given block_size factor
+    Downsamples an image by the given factor
     """
-    import numpy as np
     from PIL import Image
-    from skimage.measure import block_reduce
 
-    image = Image.open(image_path)
-    image_data = np.asarray(image)
-    reduced_image = block_reduce(image_data, block_size=block_size, func=np.average)
+    if not AccessManager.is_local(image_path):
+        raise PermissionError(f"Image downsample can only be done on local images; {image_path} is not")
 
-    Image.fromarray(np.asarray(reduced_image, image_data.dtype), image.mode).save(downsampled_image_path)
+    with Image.open(image_path) as im:
+        im_new = im.reduce(factor)
+        im_new.save(out_path)
+
+
+def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[str, str] = None):
+    """
+    Tries to find the key in the given element. If found, returns its text value, optionally processed
+    """
+    value = root.find(key, ns)
+    if value is not None:
+
+        if process is not None:
+            return process(value.text)
+        return value.text
+
+    return None

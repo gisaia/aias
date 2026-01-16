@@ -1,7 +1,10 @@
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, MimeType, Role
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, Role)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -17,18 +20,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
-        assets = ImageDriverHelper.identify_assets(self, "image/tiff", url)
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.GEOTIFF.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.geotiff.value
-            )
-        )
+        assets = ImageDriverHelper.identify_assets(self, MimeType.TIFF, AssetFormat.geotiff, url)
         return assets
 
     # Implements drivers method
@@ -37,15 +29,29 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if AccessManager.is_local(url):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(url, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        return ImageDriverHelper.to_item(self, ItemFormat.geotiff, AssetFormat.geotiff, url, assets)
+    def load_metadata(self, url: str) -> object:
+        return ImageDriverHelper.load_metadata(self, url)
 
-    @staticmethod
-    def get_main_asset_format(root):
-        return AssetFormat.geotiff.value
+    def build_core_item(self, url: str, assets: list[Asset], metadata: object) -> Item:
+        return ImageDriverHelper.build_core_item(self, url, ItemFormat.geotiff, AssetFormat.geotiff, assets, metadata)
+
+    def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        return item
 
     def __check_path__(self, path: str):
         return path.lower().endswith((".tif", ".tiff")) and AccessManager.is_file(path)

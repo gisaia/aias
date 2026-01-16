@@ -4,18 +4,23 @@ import os
 import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
-                                    MimeType, Properties, ResourceType, Role)
+                                    MimeType, ObservationType, Properties, ResourceType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class ImageDriverHelper:
     @staticmethod
-    def identify_assets(driver: IngestDriver, format: str, url: str) -> list[Asset]:
+    def identify_assets(driver: IngestDriver, type: MimeType, format: AssetFormat, url: str) -> list[Asset]:
         assets = []
+        assets.append(Asset(href=url, size=AccessManager.get_size(url),
+                      roles=[Role.data.value], name=Role.data.value, type=type.value,
+                      description=Role.data.value, airs__managed=False, asset_format=format.value, asset_type=ResourceType.gridded.value))
+
         assets.append(Asset(href=url,
-                      roles=[Role.data.value], name=Role.data.value, type=format,
-                      description=Role.data.value, airs__managed=False))
+                            roles=[Role.archive.value], name=Role.archive.value, type=type.value,
+                            description=Role.archive.value, airs__managed=False, asset_format=format.value))
+
         tfw_path = os.path.splitext(url)[0] + ".tfw"
         if AccessManager.exists(tfw_path):
             assets.append(Asset(href=tfw_path, size=AccessManager.get_size(tfw_path),
@@ -29,31 +34,6 @@ class ImageDriverHelper:
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.j2w.value, asset_type=ResourceType.other.value))
         return assets
 
-    # TODO: replace by geotiff_to_jpg ?
-    @staticmethod
-    def add_overview_if_you_can(driver: IngestDriver, url: str, role: Role, size: int, to_assets: list[Asset]) -> Asset:
-        driver.LOGGER.debug("Try to create the thumbnail of {}".format(url))
-        try:
-            from PIL import Image
-            Image.MAX_IMAGE_PIXELS = 2000000000
-            asset = Asset(href=None,
-                          roles=[role.value], name=role.value, type=MimeType.PNG.value,
-                          description=role.value, asset_format=AssetFormat.png.value)
-            asset.href = driver.get_asset_filepath(url, asset)
-            driver.LOGGER.debug("Try to create the thumbnail of {} in {}".format(url, asset.href))
-            if AccessManager.get_local_storage().is_file(url):
-                image = Image.open(url)
-                image.thumbnail([size, size])
-                image.save(asset.href, 'PNG')
-                asset.size = AccessManager.get_size(asset.href)
-                to_assets.append(asset)
-                image.close()
-            else:
-                driver.LOGGER.debug("Couldn't create the thumbnail of {}: it is not local".format(url))
-        except Exception as e:
-            driver.LOGGER.warn("Couldn't create the thumbnail of {}".format(url))
-            driver.LOGGER.error(e)
-
     @staticmethod
     def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False):
         assets.append(Asset(href=href, size=AccessManager.get_size(href),
@@ -66,30 +46,27 @@ class ImageDriverHelper:
                             type=MimeType.DIRECTORY.value, description=Role.archive.value, airs__managed=False))
 
     @staticmethod
-    def fetch_assets(driver: IngestDriver, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    @staticmethod
-    def transform_assets(driver: IngestDriver, format: str, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    @staticmethod
     def prepare_preview_asset(driver: IngestDriver, href: str, role: Role, type: MimeType, format: AssetFormat):
         preview = Asset(href=None, name=role.value, description=role.value, roles=[role.value],
                         type=type.value, asset_format=format.value, asset_type=ResourceType.other.value, airs__managed=True)
-        preview.href = driver.get_asset_filepath(href, preview)
+        preview.href = driver.get_asset_filepath(href, preview) + '.' + format.value.lower()
+
         return preview
 
     @staticmethod
-    def to_item(driver: IngestDriver, item_format: ItemFormat, asset_format: AssetFormat, url: str, assets: list[Asset]) -> Item:
-        import rasterio
-        import rasterio.features
-        import rasterio.warp
-        from osgeo import gdal
-        from shapely import centroid, geometry, ops, to_geojson
+    def make_local_overview_asset(driver: IngestDriver, archive_href: str, overview_href: str, type: MimeType, format: AssetFormat) -> Asset:
+        overview = ImageDriverHelper.prepare_preview_asset(driver, archive_href, Role.overview, type, format)
+        if not AccessManager.is_local(overview_href):
+            AccessManager.pull(overview_href, overview.href)
+        else:
+            overview.href = overview_href
+        overview.size = AccessManager.get_size(overview.href)
 
-        geoms = []
-        bands = []
+        return overview
+
+    @staticmethod
+    def load_metadata(driver: IngestDriver, url: str) -> object:
+        from osgeo import gdal
 
         gdal_options = gdal.InfoOptions(format='json')
         try:
@@ -97,11 +74,23 @@ class ImageDriverHelper:
         except Exception as e:
             raise DriverException("Can not read image metadata from {}: {}".format(url, e))
 
-        metadata_keys = list(gdal_info.get("metadata", {}))
+        return gdal_info
+
+    @staticmethod
+    def build_core_item(driver: IngestDriver, url: str, item_format: ItemFormat, asset_format: AssetFormat, assets: list[Asset], metadata: object) -> Item:
+        import rasterio
+        import rasterio.features
+        import rasterio.warp
+        from shapely import centroid, geometry, ops, to_geojson
+
+        bands = []
+        geoms = []
+
+        metadata_keys = list(metadata.get("metadata", {}))
         if metadata_keys:
-            description = gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("title", "Image file")
+            description = metadata.get("metadata", {}).get(metadata_keys[0], {}).get("title", "Image file")
             try:
-                creation_time = dateutil.parser.parse(gdal_info.get("metadata", {}).get(metadata_keys[0], {}).get("creation_time", ""))
+                creation_time = dateutil.parser.parse(metadata.get("metadata", {}).get(metadata_keys[0], {}).get("creation_time", ""))
             except dateutil.parser.ParserError:
                 creation_time = None
         else:
@@ -117,8 +106,8 @@ class ImageDriverHelper:
                 mask = dataset.dataset_mask()
                 # Extract feature shapes and values from the array.
                 try:
-                    crs = dataset.crs
-                    for geom, val in rasterio.features.shapes(
+                    proj__epsg = dataset.crs.to_epsg()
+                    for geom, _ in rasterio.features.shapes(
                             mask, transform=dataset.transform):
                         geom = rasterio.warp.transform_geom(
                             dataset.crs, 'EPSG:4326', geom, precision=6)
@@ -131,34 +120,27 @@ class ImageDriverHelper:
                 bbox = [a, b, c, d]
                 c = centroid(geom)
 
-        asset_size = AccessManager.get_size(url)
-        date_time = AccessManager.get_creation_time(url)
-
         item = Item(
-            id=driver.get_item_id(url),
             geometry=json.loads(to_geojson(geom)),
             bbox=bbox,
             centroid=[c.x, c.y],
             properties=Properties(
-                datetime=creation_time.timestamp() if creation_time else date_time,
-                proj__epsg=crs.to_epsg(),
+                proj__epsg=proj__epsg,
+                constellation="Unknown",
                 item_type=ResourceType.gridded.value,
                 item_format=item_format.value,
-                main_asset_format=driver.get_main_asset_format(url),
+                main_asset_format=asset_format,
                 main_asset_name=Role.data.value,
-                description=description
+                observation_type=ObservationType.other,
+                description=description,
+                eo__bands=bands
             ),
             assets={asset.name: asset for asset in assets}
         )
-        item.properties.instrument = None
-        item.properties.constellation = None
-        item.properties.sensor = None
-        image_asset: Asset = item.assets.get(Role.data.value)
-        image_asset.size = asset_size
-        image_asset.airs__managed = False
 
-        image_asset.asset_format = asset_format.value
-        image_asset.asset_type = ResourceType.gridded.value
-        item.properties.eo__bands = bands
+        if creation_time:
+            item.properties.datetime = creation_time.timestamp()
+        else:
+            item.properties.datetime = AccessManager.get_creation_time(url)
 
         return item

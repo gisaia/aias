@@ -54,6 +54,10 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        return assets
+
+    # Implements drivers method
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.visual_tif_path:
             bands = [1, 2, 3]
             tif_path = self.visual_tif_path
@@ -68,61 +72,37 @@ class Driver(IngestDriver):
             return assets
 
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(tif_path, 10, 10, output_path=quicklook.href,
-                       bands_list=bands, stretch=stretch)
+        geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
         quicklook.size = AccessManager.get_size(quicklook.href)
         assets.append(quicklook)
 
         if self.thumbnail_path is None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, 4)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
-            md = json.load(fb)
+            metadata = json.load(fb)
+        return metadata
 
-        geometry = md["geometry"]
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
+        geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        properties = md["properties"]
-        date_time = datetime.strptime(properties["acquired"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        eo__cloud_cover = properties["cloud_cover"]
-        eo__snow_cover = properties["snow_ice_percent"]
-        gsd = properties["gsd"]
-
-        satellite = properties["satellite_id"]
-        view__azimuth = properties["satellite_azimuth"]
-        view__sun_azimuth = properties["sun_azimuth"]
-        view__sun_elevation = properties["sun_elevation"]
+        date_time = datetime.strptime(metadata["properties"]["acquired"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                eo__snow_cover=eo__snow_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.sr_path)),
-                instrument=satellite,
                 constellation="SkySat",
-                satellite=satellite,
-                sensor=satellite,
                 sensor_type=SensorType.OPTIC.value,
-                view__azimuth=view__azimuth,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.skysat.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -131,6 +111,27 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.sr_path))
+        item.properties.gsd = metadata.get("properties", {}).get("gsd", None)
+
+        item.properties.satellite = metadata.get("properties", {}).get("satellite_id", None)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        item.properties.eo__cloud_cover = metadata.get("properties", {}).get("cloud_cover", None)
+        item.properties.eo__snow_cover = metadata.get("properties", {}).get("snow_ice_percent", None)
+
+        item.properties.view__azimuth = metadata.get("properties", {}).get("satellite_azimuth", None)
+        item.properties.view__sun_azimuth = metadata.get("properties", {}).get("sun_azimuth", None)
+        item.properties.view__sun_elevation = metadata.get("properties", {}).get("sun_elevation", None)
 
         return item
 

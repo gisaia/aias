@@ -8,12 +8,13 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners, geotiff_to_jpg)
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
+    ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
 
     def __init__(self):
         super().__init__()
@@ -24,7 +25,6 @@ class Driver(IngestDriver):
         self.tif_VV_path = None
         self.polarizations = []
         self.browse_path = None
-        self.url = None
 
     def _add_polarization(self, name: str, path: str):
         self.polarizations.append({
@@ -33,22 +33,10 @@ class Driver(IngestDriver):
             'name': f'Polarization {name}'
         })
 
-    def _add_preview_asset(self, assets: list[Asset], role: Role, size: int, suffix: str):
-        base_path = f"{Driver.output_folder}/{self.get_item_id(self.url)}/{suffix}"
-        AccessManager.makedir(base_path)
-        jpg_path = f"{base_path}/{suffix}.jpg"
-        geotiff_to_jpg(self.browse_path, size, size, jpg_path)
-        ImageDriverHelper.add_asset(
-            assets, jpg_path, role,
-            MimeType.JPG, AssetFormat.jpg, ResourceType.other,
-            airs__managed=True
-        )
-
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -61,37 +49,52 @@ class Driver(IngestDriver):
                                 description=pol['name'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
+
+        if self.browse_path:
+            ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        self.url = url
-        if self.browse_path:
-            self._add_preview_asset(
-                assets, Role.thumbnail, 50, "thumbnail"
-            )
-            self._add_preview_asset(
-                assets, Role.overview, 100, "quicklook"
-            )
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        image_path = None
+        quicklook_pct = Driver.OVERVIEW_FROM_BROWSE_PCT
+        if self.browse_path:
+            image_path = self.browse_path
+        elif AccessManager.is_local(self.polarizations[0]['path']):
+            image_path = self.polarizations[0]['path']
+            quicklook_pct = Driver.OVERVIEW_FROM_TIFF_PCT
+
+        if image_path:
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(image_path, quicklook_pct, quicklook_pct, output_path=quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.md_path) as local_md_path:
             tree = ET.parse(local_md_path)
             root = tree.getroot()
+
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
         tiepoints = []
         # Loop on tie points
-        for tp in root.findall(".//rs2:imageTiePoint", ns):
-            line = float(tp.find("rs2:imageCoordinate/rs2:line", ns).text)
-            pixel = float(tp.find("rs2:imageCoordinate/rs2:pixel", ns).text)
-            lat = float(tp.find("rs2:geodeticCoordinate/rs2:latitude", ns).text)
-            lon = float(tp.find("rs2:geodeticCoordinate/rs2:longitude", ns).text)
+        for tp in root.findall(".//rs2:imageTiePoint", Driver.ns):
+            line = float(tp.find("rs2:imageCoordinate/rs2:line", Driver.ns).text)
+            pixel = float(tp.find("rs2:imageCoordinate/rs2:pixel", Driver.ns).text)
+            lat = float(tp.find("rs2:geodeticCoordinate/rs2:latitude", Driver.ns).text)
+            lon = float(tp.find("rs2:geodeticCoordinate/rs2:longitude", Driver.ns).text)
             tiepoints.append({
                 "line": line,
                 "pixel": pixel,
@@ -106,22 +109,14 @@ class Driver(IngestDriver):
 
         geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(float(UL["lon"]), float(UL["lat"]), float(UR["lon"]), float(UR["lat"]), float(BR["lon"]), float(BR["lat"]), float(BL["lon"]), float(BL["lat"]))
 
-        start_time = root.find(".//rs2:zeroDopplerTimeFirstLine", ns).text
+        start_time = root.find(".//rs2:zeroDopplerTimeFirstLine", Driver.ns).text
         start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        stop_time = root.find(".//rs2:zeroDopplerTimeLastLine", ns).text
+        stop_time = root.find(".//rs2:zeroDopplerTimeLastLine", Driver.ns).text
         stop_time = datetime.strptime(stop_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        satellite = root.find(".//rs2:satellite", ns).text
-        product_level = root.find(".//rs2:productType", ns).text
-        orbit_direction = root.find(".//rs2:passDirection", ns).text
 
-        pixel_spacing = root.find(".//rs2:sampledPixelSpacing", ns).text
-        line_spacing = root.find(".//rs2:sampledLineSpacing", ns).text
-        gsd = max(float(pixel_spacing), float(line_spacing))
+        constellation = root.find(".//rs2:satellite", Driver.ns).text
 
-        orbit_data_file = root.find(".//rs2:orbitDataFile", ns).text
-        orbit_number = orbit_data_file.split('_')[0]
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
@@ -129,24 +124,40 @@ class Driver(IngestDriver):
                 datetime=start_time,
                 start_datetime=start_time,
                 end_datetime=stop_time,
-                constellation=satellite,
-                satellite=satellite,
-                instrument=satellite,
-                sensor=satellite,
+                constellation=constellation,
                 sensor_type=SensorType.SAR,
+                item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.radarsat2,
                 main_asset_format=AssetFormat.geotiff,
-                main_asset_name=Role.data.value,
-                observation_type=ObservationType.radar,
-                processing__level=product_level,
-                gsd=gsd,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number,
-                sar__polarizations=map(lambda x: x['polarization'], self.polarizations),
-                proj__epsg=get_epsg_from_gdal_info(self.polarizations[0]['path'])
+                main_asset_name=self.polarizations[0]['name'],
+                observation_type=ObservationType.radar
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.satellite = item.properties.constellation
+        item.properties.processing__level = find_or_none(root, ".//rs2:productType", ns=Driver.ns)
+
+        item.properties.proj__epsg = get_epsg_from_gdal_info(self.polarizations[0]['path'])
+
+        pixel_spacing = find_or_none(root, ".//rs2:sampledPixelSpacing", ns=Driver.ns)
+        line_spacing = find_or_none(root, ".//rs2:sampledLineSpacing", ns=Driver.ns)
+        if pixel_spacing and line_spacing:
+            item.properties.gsd = max(float(pixel_spacing), float(line_spacing))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.acq__acquisition_orbit_direction = find_or_none(root, ".//rs2:passDirection", ns=Driver.ns)
+        item.properties.acq__acquisition_orbit = find_or_none(root, ".//rs2:orbitDataFile", lambda x: x.split('_')[0], ns=Driver.ns)
+
+        item.properties.sar__polarizations = [x['polarization'] for x in self.polarizations]
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
         return item
 
     def __check_path__(self, path: str):

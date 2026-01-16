@@ -8,7 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_coordinates, setup_gdal)
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -37,10 +38,7 @@ class Driver(IngestDriver):
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
                                 description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
-        if self.quicklook_path is not None:
-            assets.append(Asset(href=self.quicklook_path,
-                                roles=[Role.overview.value], name=Role.overview.value, type=MimeType.JPG.value,
-                                description=Role.overview.value, size=AccessManager.get_size(self.quicklook_path), asset_format=AssetFormat.jpg.value))
+
         assets.append(Asset(href=self.dim_path, size=AccessManager.get_size(self.dim_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value))
@@ -53,10 +51,10 @@ class Driver(IngestDriver):
             mime = None
             if self.image_path.lower().endswith("jp2"):
                 asset_format = AssetFormat.jpg2000.value
-                mime = "image/jp2"
+                mime = MimeType.JPEG2000
             if self.image_path.lower().endswith("tif") or self.image_path.lower().endswith("tiff"):
                 asset_format = AssetFormat.geotiff.value
-                mime = "image/tif"
+                mime = MimeType.TIFF
             assets.append(Asset(href=self.image_path, size=AccessManager.get_size(self.image_path),
                                 roles=[Role.data.value], name=Role.data.value, type=mime,
                                 description=Role.data.value, airs__managed=False, asset_format=asset_format))
@@ -74,29 +72,48 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path:
+            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path is None and AccessManager.is_local(self.image_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.image_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
+
+        if self.thumbnail_path is None and self.quicklook_path is not None:
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
-        from osgeo import ogr, osr
-        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
-        setup_gdal()
-
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.dim_path) as local_dim_path:
             tree = ET.parse(local_dim_path)
             root = tree.getroot()
 
-            coords = []
-            # Calculate bbox
-            for vertex in root.iter('Vertex'):
-                coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
-                coords.append(coord)
-            coords.append(coords[0])
-            geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
+        from osgeo import ogr, osr
+        from osgeo.osr import OAMS_TRADITIONAL_GIS_ORDER
+        setup_gdal()
+
+        coords = []
+        # Calculate bbox
+        for vertex in root.iter('Vertex'):
+            coord = [float(vertex.find('LON').text), float(vertex.find('LAT').text)]
+            coords.append(coord)
+        coords.append(coords[0])
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
         # Open ROI GML file to find the real footprint of the product
         with AccessManager.make_local(self.roi_path) as local_roi_path:
@@ -157,35 +174,19 @@ class Driver(IngestDriver):
             for lgv in root.iter('Located_Geometric_Values'):
                 if lgv.find('LOCATION_TYPE').text == "Center":
                     date_time = int(datetime.strptime(lgv.find('TIME').text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
-        # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
-        cloud_cover = None
-        if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
-            cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
-        else:
-            for cloud in root.iter('Dataset_Content'):
-                if cloud.find("CLOUD_COVERAGE") is not None:
-                    cloud_cover = float(cloud.find("CLOUD_COVERAGE").text)
 
-        # We calculate the GSD as the mean of  GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
-        if metadata.get("GSD_ACROSS_TRACK") and metadata.get("GSD_ALONG_TRACK"):
-            gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
-        else:
-            gsd = None
+        if "MISSION" in metadata:
+            constellation = metadata["MISSION"]
+        elif "DATASET_PRODUCER_NAME" in metadata:
+            constellation = metadata["DATASET_PRODUCER_NAME"]
+
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=metadata.get("PROCESSING_LEVEL"),
-                eo__cloud_cover=cloud_cover,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.dim_path)),
-                view__incidence_angle=metadata.get("INCIDENCE_ANGLE"),
-                view__azimuth=metadata.get("AZIMUTH_ANGLE"),
-                view__sun_azimuth=metadata.get("SUN_AZIMUTH"),
-                view__sun_elevation=metadata.get("SUN_ELEVATION"),
+                constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
                 main_asset_format=self.get_main_asset_format(root),
@@ -194,17 +195,42 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Open the XML dimap file with gdal to retrieve the metadata
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        # We calculate the GSD as the mean of GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
+        if "GSD_ACROSS_TRACK" in metadata and "GSD_ALONG_TRACK" in metadata:
+            item.properties.gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
+
+        item.properties.processing__level = find_or_none(root, "PROCESSING_LEVEL")
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Open the XML dimap file with gdal to retrieve the metadata
+        metadata = AccessManager.get_gdal_md(self.dim_path)
+
+        # We set the cloud_cover to None to cover the case of SPOT 7 and Pleaide 50cm wich dont have cloud cover info
+        if "CLOUDCOVER_CLOUD_NOTATION" in metadata:
+            item.properties.eo__cloud_cover = float(metadata["CLOUDCOVER_CLOUD_NOTATION"])
+        else:
+            for cloud in root.iter('Dataset_Content'):
+                item.properties.eo__cloud_cover = find_or_none(cloud, "CLOUD_COVERAGE", lambda x: float(x))
+
+        item.properties.sensor = item.properties.constellation
+        item.properties.view__azimuth = find_or_none(root, "AZIMUTH_ANGLE")
+        item.properties.view__incidence_angle = find_or_none(root, "INCIDENCE_ANGLE")
+        item.properties.view__sun_azimuth = find_or_none(root, "SUN_AZIMUTH")
+        item.properties.view__sun_elevation = find_or_none(root, "SUN_ELEVATION")
+
         # To fit the case of PNEO 30 cm with no instrument metadata
-        if "INSTRUMENT" in metadata:
-            item.properties.instrument = metadata["INSTRUMENT"]
-        if "MISSION" in metadata:
-            item.properties.constellation = metadata["MISSION"]
-            item.properties.sensor = metadata["MISSION"]
-        elif "DATASET_PRODUCER_NAME" in metadata:
-            item.properties.constellation = metadata["DATASET_PRODUCER_NAME"]
-            item.properties.sensor = metadata["DATASET_PRODUCER_NAME"]
-        if "MISSION_INDEX" in metadata:
-            item.properties.sensor_type = metadata["MISSION_INDEX"]
+        item.properties.instrument = metadata.get("INSTRUMENT", None)
+        item.properties.sensor_type = metadata.get("MISSION_INDEX", None)
 
         return item
 
@@ -227,26 +253,26 @@ class Driver(IngestDriver):
                 if not file.is_dir:
                     if file.name.endswith('.XML') and file.name.startswith('RPC'):
                         self.rpc_file = file.path
-                    if file.name.endswith('.XML') and file.name.startswith('DIM'):
+                    elif file.name.endswith('.XML') and file.name.startswith('DIM'):
                         self.dim_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('PREVIEW'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('PREVIEW'):
                         raw_all_quick_path = file.path
 
                     # Data and georef
-                    if file.name.lower().endswith(('.jpg', 'jp2')) and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith(('.jpg', 'jp2')) and file.name.startswith('IMG_'):
                         self.image_path = file.path
-                    if file.name.lower().endswith('.tfw') and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith('.tfw') and file.name.startswith('IMG_'):
                         self.georef_path = file.path
-                    if file.name.lower().endswith('.j2w') and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith('.j2w') and file.name.startswith('IMG_'):
                         self.georef_path = file.path
-                    if file.name.lower().endswith(('.tiff', '.tif')) and file.name.startswith('IMG_'):
+                    elif file.name.lower().endswith(('.tiff', '.tif')) and file.name.startswith('IMG_'):
                         self.image_path = file.path
 
-                    if file.name.endswith('.JPG') and file.name.startswith('ICON'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('ICON'):
                         raw_all_thumb_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('CAT_QL'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('CAT_QL'):
                         cat_all_quick_path = file.path
-                    if file.name.endswith('.JPG') and file.name.startswith('CAT_TB'):
+                    elif file.name.endswith('.JPG') and file.name.startswith('CAT_TB'):
                         cat_all_thumb_path = file.path
             if cat_all_thumb_path is not None:
                 self.thumbnail_path = cat_all_thumb_path
@@ -256,7 +282,7 @@ class Driver(IngestDriver):
                 self.quicklook_path = cat_all_quick_path
             else:
                 self.quicklook_path = raw_all_quick_path
-            return self.roi_path is not None and self.dim_path is not None
+            return self.roi_path is not None and self.dim_path is not None and self.image_path is not None
         return False
 
     @staticmethod

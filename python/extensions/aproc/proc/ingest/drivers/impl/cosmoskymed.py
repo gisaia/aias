@@ -1,7 +1,7 @@
 import os
-from typing import Literal
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from typing import Literal
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -10,12 +10,12 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder: str | None = None  # todo: this should use self.get_asset_filepath instead
 
     def __init__(self):
         super().__init__()
@@ -35,7 +35,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -65,24 +64,33 @@ class Driver(IngestDriver):
             assets.append(Asset(href=self.h5pdf_path, size=AccessManager.get_size(self.h5pdf_path),
                                 roles=[Role.metadata.value], name=Role.metadata.value + "_pdf", type=MimeType.PDF.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.pdf.value, asset_type=ResourceType.other.value))
+        if self.browse_path:
+            ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.browse_path is not None:
-            self.__prepare_thumbnail__(url)
-            geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
-            ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+        return assets
 
-            self.__prepare_quicklook__(url)
-            geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
-            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
+    # Implements drivers method
+    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.browse_path is not None:
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         elif self.data_format == AssetFormat.h5 and AccessManager.is_local(self.data_path):
             import h5py
             import numpy as np
             from PIL import Image
 
-            self.__prepare_quicklook__(url)
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
 
             with AccessManager.stream(self.data_path) as f:
                 with h5py.File(f) as h5f:
@@ -100,76 +108,79 @@ class Driver(IngestDriver):
                             values[idx] = np.pad(data, pad_width=(max_height - data.shape[0], 0), mode='edge')
 
                     img = Image.fromarray(np.concatenate(values, axis=1))
-                    img.save(self.quicklook_path)
+                    img.save(quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
 
             # Downsample quicklook for thumbnail
-            self.__prepare_thumbnail__(url)
-            downsample_image(self.quicklook_path, self.thumbnail_path, 8)
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
 
         return assets
 
-    # Implements drivers method
-    def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        return assets
-
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> dict:
         from osgeo import gdal
 
         options = gdal.InfoOptions(format="json")
         info = AccessManager.get_gdal_info(self.data_path, options)
-        metadata = info["metadata"][""]
 
-        geometry, bbox, centroid = self.__get_geometries__(info)
+        return info["metadata"]
 
-        try:
-            near_incidence_angle = float(metadata["MBI_Near_Incidence_Angle"])
-            far_incidence_angle = float(metadata["MBI_Far_Incidence_Angle"])
-            view__incidence_angle = (near_incidence_angle + far_incidence_angle) / 2
-        except Exception:
-            near_incidence_angle = None
-            far_incidence_angle = None
-            view__incidence_angle = None
-
-        gsd = float(metadata["Ground_Range_Geometric_Resolution"])
-        instrument = metadata["Satellite_ID"]
-        sensor = instrument
-
-        date_time = int(datetime.strptime(metadata["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
-
-        orbit_direction = metadata["Orbit_Direction"]
-        orbit_number = metadata["Orbit_Number"]
-
-        with AccessManager.make_local(self.h5met_path) as local_h5met_path:
-            h5_tree = ET.parse(local_h5met_path)
-            h5_root = h5_tree.getroot()
-        processing__level = h5_root.find("ProcessingInfo/ProcessingLevel").text
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
+        geometry, bbox, centroid = self.__get_geometries__(metadata)
+        date_time = int(datetime.strptime(metadata[""]["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=self.__get_proj__(metadata, centroid),
-                instrument=instrument,
                 constellation="COSMO-SkyMed",
-                sensor=sensor,
                 sensor_type=SensorType.SAR,
-                view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,
                 main_asset_format=self.data_format.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value,
-                acq__acquisition_orbit_direction=orbit_direction,
-                acq__acquisition_orbit=orbit_number
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        gsd = metadata.get("", {}).get("Ground_Range_Geometric_Resolution", None)
+        if gsd is not None:
+            item.properties.gsd = float(gsd)
+
+        item.properties.satellite = metadata.get("", {}).get("Satellite_ID", None)
+
+        with AccessManager.make_local(self.h5met_path) as local_h5met_path:
+            h5_tree = ET.parse(local_h5met_path)
+            h5_root = h5_tree.getroot()
+
+        processing__level = h5_root.find("ProcessingInfo/ProcessingLevel")
+        if processing__level:
+            item.properties.processing__level = processing__level.text
+
+        item.properties.proj__epsg = self.__get_proj__(metadata.get(""), item.centroid)
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
+
+        near_incidence_angle = metadata.get("", {}).get("MBI_Near_Incidence_Angle", None)
+        far_incidence_angle = metadata.get("", {}).get("MBI_Far_Incidence_Angle", None)
+        if near_incidence_angle and far_incidence_angle:
+            item.properties.view__incidence_angle = (float(near_incidence_angle) + float(far_incidence_angle)) / 2
+
+        item.properties.acq__acquisition_orbit_direction = metadata.get("", {}).get("Orbit_Direction", None)
+        item.properties.acq__acquisition_orbit = metadata.get("", {}).get("Orbit_Number", None)
 
         return item
 
@@ -247,7 +258,7 @@ class Driver(IngestDriver):
                 return None
 
     def __get_geometries__(self, gdal_info_json: object):
-        metadata = gdal_info_json["metadata"][""]
+        metadata = gdal_info_json[""]
         try:
             ul_lat = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
             ul_lon = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
@@ -262,7 +273,7 @@ class Driver(IngestDriver):
             # Some have their measures split up in multiple scenes
 
             # 2 datasets per scene, with each a name and description
-            last_scene = int(len(gdal_info_json["metadata"]["SUBDATASETS"]) / 4)
+            last_scene = int(len(gdal_info_json["SUBDATASETS"]) / 4)
 
             # Top left and bottom left of first scene
             ul_lat = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
@@ -276,13 +287,3 @@ class Driver(IngestDriver):
             lr_lon = float(metadata[f"S0{last_scene}_SBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[1])
 
         return get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
-
-    def __prepare_quicklook__(self, url: str):
-        quicklook_path = Driver.output_folder + '/' + self.get_item_id(url) + '/quicklook'
-        AccessManager.makedir(quicklook_path)
-        self.quicklook_path = quicklook_path + '/quicklook.jpg'
-
-    def __prepare_thumbnail__(self, url: str):
-        thumbnail_path = Driver.output_folder + '/' + self.get_item_id(url) + '/thumbnail'
-        AccessManager.makedir(thumbnail_path)
-        self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'

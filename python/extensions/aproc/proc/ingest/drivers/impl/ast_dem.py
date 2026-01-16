@@ -8,7 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, geotiff_to_jpg, get_epsg,
+    get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -40,171 +41,73 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        assets.append(
-            Asset(
-                href=self.tif_path,
-                size=AccessManager.get_size(self.tif_path),
-                roles=[Role.data.value],
-                name=Role.data.value,
-                type=MimeType.TIFF.value,
-                description=Role.data.value,
-                airs__managed=False,
-                asset_format=AssetFormat.geotiff.value,
-                asset_type=ResourceType.gridded.value,
-            )
-        )
-        assets.append(
-            Asset(
-                href=self.met_path,
-                size=AccessManager.get_size(self.met_path),
-                roles=[Role.metadata.value],
-                name=Role.metadata.value,
-                type=MimeType.PVL.value,
-                description=Role.metadata.value,
-                airs__managed=False,
-                asset_format=AssetFormat.pvl.value,
-                asset_type=ResourceType.other.value,
-            )
-        )
+        ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+        ImageDriverHelper.add_asset(assets, self.met_path, Role.metadata, MimeType.PVL, AssetFormat.pvl, ResourceType.other)
+
         if self.tfw_path:
-            assets.append(
-                Asset(
-                    href=self.tfw_path,
-                    size=AccessManager.get_size(self.tfw_path),
-                    roles=[Role.extent.value],
-                    name=Role.extent.value,
-                    type=MimeType.TEXT.value,
-                    description=Role.metadata.value,
-                    airs__managed=False,
-                    asset_format=AssetFormat.tfw.value,
-                    asset_type=ResourceType.other.value,
-                )
-            )
+            ImageDriverHelper.add_asset(assets, self.tfw_path, Role.extent, MimeType.TEXT, AssetFormat.tfw, ResourceType.other)
         return assets
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        ImageDriverHelper.add_overview_if_you_can(
-            self, self.tif_path, Role.thumbnail, self.thumbnail_size, assets
-        )
-        ImageDriverHelper.add_overview_if_you_can(
-            self, self.tif_path, Role.overview, self.overview_size, assets
-        )
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if AccessManager.is_local(self.tif_path):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> dict:
         import pvl
 
         with AccessManager.make_local(self.met_path) as local_met_path:
             data = pvl.load(local_met_path)
 
-        ul_lat = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLATITUDE"))
-        ul_lon = float(self.__get_corner_coord__(data, "UPPERLEFTCORNERLONGITUDE"))
-        ur_lat = float(self.__get_corner_coord__(data, "UPPERRIGHTCORNERLATITUDE"))
-        ur_lon = float(self.__get_corner_coord__(data, "UPPERRIGHTCORNERLONGITUDE"))
-        lr_lat = float(self.__get_corner_coord__(data, "LOWERRIGHTCORNERLATITUDE"))
-        lr_lon = float(self.__get_corner_coord__(data, "LOWERRIGHTCORNERLONGITUDE"))
-        ll_lat = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLATITUDE"))
-        ll_lon = float(self.__get_corner_coord__(data, "LOWERLEFTCORNERLONGITUDE"))
+        return data
+
+    def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
+        ul_lat = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLATITUDE"))
+        ul_lon = float(self.__get_corner_coord__(metadata, "UPPERLEFTCORNERLONGITUDE"))
+        ur_lat = float(self.__get_corner_coord__(metadata, "UPPERRIGHTCORNERLATITUDE"))
+        ur_lon = float(self.__get_corner_coord__(metadata, "UPPERRIGHTCORNERLONGITUDE"))
+        lr_lat = float(self.__get_corner_coord__(metadata, "LOWERRIGHTCORNERLATITUDE"))
+        lr_lon = float(self.__get_corner_coord__(metadata, "LOWERRIGHTCORNERLONGITUDE"))
+        ll_lat = float(self.__get_corner_coord__(metadata, "LOWERLEFTCORNERLATITUDE"))
+        ll_lon = float(self.__get_corner_coord__(metadata, "LOWERLEFTCORNERLONGITUDE"))
         geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(
             ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat
         )
-        time = data["INVENTORYMETADATA"]["SINGLEDATETIME"]["TIMEOFDAY"]["VALUE"]
-        date = data["INVENTORYMETADATA"]["SINGLEDATETIME"]["CALENDARDATE"]["VALUE"]
+
+        time = metadata["INVENTORYMETADATA"]["SINGLEDATETIME"]["TIMEOFDAY"]["VALUE"]
+        date = metadata["INVENTORYMETADATA"]["SINGLEDATETIME"]["CALENDARDATE"]["VALUE"]
         date_time = int(
             datetime.strptime(
                 (date + " " + time).rstrip("Z").rstrip("0"), "%Y-%m-%d %H:%M:%S.%f"
             ).timestamp()
         )
-        processing__level = (
-            data["INVENTORYMETADATA"]
-            .get("COLLECTIONDESCRIPTIONCLASS", {})
-            .get("SHORTNAME", {})
-            .get("VALUE", None)
-        )
-        eo__cloud_cover = (
-            data["INVENTORYMETADATA"]
-            .get("CLOUDCOVERAGE", {})
-            .get("SCENECLOUDCOVERAGE", {})
-            .get("VALUE", None)
-        )
-        if eo__cloud_cover:
-            eo__cloud_cover = float(eo__cloud_cover)
-        gsd_row = (
-            data["INVENTORYMETADATA"]
-            .get("SWATHSTRUCTUREINFO", {})
-            .get("CROSSTRACKPIXELRESOLUTION", {})
-            .get("VALUE", None)
-        )
-        if gsd_row:
-            gsd_row = float(gsd_row)
-        gsd_col = (
-            data["INVENTORYMETADATA"]
-            .get("SWATHSTRUCTUREINFO", {})
-            .get("ALONGTRACKPIXELRESOLUTION", {})
-            .get("VALUE", None)
-        )
-        if gsd_col:
-            gsd_col = float(gsd_col)
-        gsd = None
-        if gsd_col and gsd_row:
-            gsd = (gsd_col + gsd_row) / 2
+
         constellation = (
-            data["INVENTORYMETADATA"]
+            metadata["INVENTORYMETADATA"]
             .get("PLATFORMINSTRUMENTSENSOR", {})
             .get("PLATFORMSHORTNAME", {})
-            .get("VALUE", None)
-        )
-        instrument = (
-            data["INVENTORYMETADATA"]
-            .get("PLATFORMINSTRUMENTSENSOR", {})
-            .get("INSTRUMENTSHORTNAME", {})
-            .get("VALUE", None)
-        )
-        sensor = (
-            data["INVENTORYMETADATA"]
-            .get("PLATFORMINSTRUMENTSENSOR", {})
-            .get("PLATFORMSHORTNAME", {})
-            .get("VALUE", None)
-        )
-        view__sun_azimuth = (
-            data["INVENTORYMETADATA"]
-            .get("PRODUCTSPECIFICMETADATA", {})
-            .get("SOLAR_AZIMUTH_ANGLE", {})
-            .get("VALUE", None)
-        )
-        if view__sun_azimuth:
-            view__sun_azimuth = float(view__sun_azimuth)
-        view__sun_elevation = (
-            data["INVENTORYMETADATA"]
-            .get("PRODUCTSPECIFICMETADATA", {})
-            .get("SOLAR_ELEVATION_ANGLE", {})
-            .get("VALUE", None)
-        )
-        if view__sun_elevation:
-            view__sun_elevation = float(view__sun_elevation)
+            .get("VALUE", None))
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                eo__cloud_cover=eo__cloud_cover,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=instrument,
                 constellation=constellation,
-                sensor=sensor,
-                view__sun_azimuth=view__sun_azimuth,
-                view__sun_elevation=view__sun_elevation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.ast_dem.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -213,6 +116,76 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.processing__level = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("COLLECTIONDESCRIPTIONCLASS", {})
+            .get("SHORTNAME", {})
+            .get("VALUE", None))
+
+        gsd_row = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("SWATHSTRUCTUREINFO", {})
+            .get("CROSSTRACKPIXELRESOLUTION", {})
+            .get("VALUE", None))
+        if gsd_row:
+            gsd_row = float(gsd_row)
+        gsd_col = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("SWATHSTRUCTUREINFO", {})
+            .get("ALONGTRACKPIXELRESOLUTION", {})
+            .get("VALUE", None))
+        if gsd_col:
+            gsd_col = float(gsd_col)
+        gsd = None
+        if gsd_col and gsd_row:
+            gsd = (gsd_col + gsd_row) / 2
+        item.properties.gsd = gsd
+
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        eo__cloud_cover = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("CLOUDCOVERAGE", {})
+            .get("SCENECLOUDCOVERAGE", {})
+            .get("VALUE", None))
+        if eo__cloud_cover:
+            item.properties.eo__cloud_cover = float(eo__cloud_cover)
+
+        item.properties.instrument = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("PLATFORMINSTRUMENTSENSOR", {})
+            .get("INSTRUMENTSHORTNAME", {})
+            .get("VALUE", None))
+
+        item.properties.sensor = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("PLATFORMINSTRUMENTSENSOR", {})
+            .get("PLATFORMSHORTNAME", {})
+            .get("VALUE", None)
+        )
+
+        view__sun_azimuth = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("PRODUCTSPECIFICMETADATA", {})
+            .get("SOLAR_AZIMUTH_ANGLE", {})
+            .get("VALUE", None))
+        if view__sun_azimuth:
+            item.properties.view__sun_azimuth = float(view__sun_azimuth)
+
+        view__sun_elevation = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("PRODUCTSPECIFICMETADATA", {})
+            .get("SOLAR_ELEVATION_ANGLE", {})
+            .get("VALUE", None))
+        if view__sun_elevation:
+            item.properties.view__sun_elevation = float(view__sun_elevation)
 
         return item
 
@@ -231,7 +204,7 @@ class Driver(IngestDriver):
                     return self.tif_path is not None and self.met_path is not None
         return False
 
-    def __get_corner_coord__(self, data, corner):
+    def __get_corner_coord__(self, data, corner: str):
         if data["INVENTORYMETADATA"]["SPATIALDOMAINCONTAINER"][
             "HORIZONTALSPATIALDOMAINCONTAINER"
         ].get("BOUNDINGBOX"):

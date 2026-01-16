@@ -9,18 +9,15 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    output_folder = None
 
     def __init__(self):
         super().__init__()
         self.browse_path = None
-        self.quicklook_path = None
-        self.thumbnail_path = None
         self.tif_path = None
         self.tfw_path = None
         self.met_path = None
@@ -29,7 +26,6 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.output_folder = configuration['tmp_directory']  # todo: this should use self.get_asset_filepath instead
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -42,6 +38,7 @@ class Driver(IngestDriver):
         assets.append(Asset(href=self.tif_path, size=AccessManager.get_size(self.tif_path),
                             roles=[Role.data.value], name=Role.data.value, type=MimeType.TIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+        ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         if self.tfw_path:
             assets.append(Asset(href=self.tfw_path, size=AccessManager.get_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
@@ -50,30 +47,29 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        thumbnail_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/thumbnail'
-        AccessManager.makedir(thumbnail_path)
-        self.thumbnail_path = thumbnail_path + '/thumbnail.jpg'
-        geotiff_to_jpg(self.browse_path, 10, 10, self.thumbnail_path)
-        ImageDriverHelper.add_asset(assets, self.thumbnail_path, Role.thumbnail, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-
-        quicklook_path = self.output_folder + '/terrasarx/' + self.get_item_id(url) + '/quicklook'
-        AccessManager.makedir(quicklook_path)
-        self.quicklook_path = quicklook_path + '/quicklook.jpg'
-        geotiff_to_jpg(self.browse_path, 50, 50, self.quicklook_path)
-        ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
-
         return assets
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+        geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_BROWSE_PCT, Driver.OVERVIEW_FROM_BROWSE_PCT, quicklook.href)
+        quicklook.size = AccessManager.get_size(quicklook.href)
+        assets.append(quicklook)
+
+        thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+        downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+        thumbnail.size = AccessManager.get_size(thumbnail.href)
+        assets.append(thumbnail)
         return assets
 
-    # Implements drivers method
-    def to_item(self, url: str, assets: list[Asset]) -> Item:
+    def load_metadata(self, url: str) -> object:
         with AccessManager.make_local(self.met_path) as local_met_path:
             tree = ET.parse(local_met_path)
             root = tree.getroot()
-        # Some data dont have this balise in xml metadata
+
+        return root
+
+    def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
         if root.find("productSpecific/geocodedImageInfo") is not None:
             ul_lat = self.__get_coord__(root, "upperLeftLatitude")
             ul_lon = self.__get_coord__(root, "upperLeftLongitude")
@@ -84,8 +80,6 @@ class Driver(IngestDriver):
             ll_lat = self.__get_coord__(root, "lowerLeftLatitude")
             ll_lon = self.__get_coord__(root, "lowerLeftLongitude")
             geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
-            x_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting").text)
-            y_pixel_size = float(root.find("productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing").text)
         else:
             coords = []
             # order lower left; lower right: upper left ; upper right
@@ -94,33 +88,17 @@ class Driver(IngestDriver):
                 coords.append(coord)
             geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(coords[2][0], coords[2][1], coords[3][0], coords[3][1],
                                                                            coords[1][0], coords[1][1], coords[0][0], coords[0][1])
-            x_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/columnSpacing").text)
-            y_pixel_size = float(root.find("productInfo/imageDataInfo/imageRaster/rowSpacing").text)
 
-        gsd = (x_pixel_size + y_pixel_size) / 2
-        processing__level = root.find("setup/orderInfo/orderType").text
         constellation = root.find("productInfo/missionInfo/mission").text
-        instrument = root.find("productInfo/missionInfo/mission").text
-        sensor = root.find("productInfo/missionInfo/mission").text
-        sensor_type = root.find("productInfo/acquisitionInfo/sensor").text
-        view__incidence_angle = float(root.find("productInfo/sceneInfo/sceneCenterCoord/incidenceAngle").text)
         date_time = int(datetime.strptime(root.find("productInfo/sceneInfo/start/timeUTC").text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
         item = Item(
-            id=self.get_item_id(url),
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                processing__level=processing__level,
-                gsd=gsd,
-                proj__epsg=get_epsg(AccessManager.get_gdal_proj(self.tif_path)),
-                instrument=instrument,
                 constellation=constellation,
-                sensor=sensor,
-                sensor_type=sensor_type,
-                view__incidence_angle=view__incidence_angle,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.terrasar.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -129,6 +107,30 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
+
+        return item
+
+    def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        # Some data dont have this tag in xml metadata
+        if root.find("productSpecific/geocodedImageInfo") is not None:
+            x_pixel_size = find_or_none(root, "productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/easting", lambda x: float(x))
+            y_pixel_size = find_or_none(root, "productSpecific/geocodedImageInfo/geoParameter/pixelSpacing/northing", lambda x: float(x))
+        else:
+
+            x_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/columnSpacing", lambda x: float(x))
+            y_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/rowSpacing", lambda x: float(x))
+        item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
+
+        item.properties.processing__level = find_or_none(root, "setup/orderInfo/orderType")
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+
+        return item
+
+    def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
+        item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
+        item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
+        item.properties.sensor_type = find_or_none(root, "productInfo/acquisitionInfo/sensor")
+        item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
 
         return item
 

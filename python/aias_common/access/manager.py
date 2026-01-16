@@ -314,7 +314,7 @@ class AccessManager:
         return storage.get_gdal_src(href)
 
     @staticmethod
-    def get_gdal_md(href: str):
+    def get_gdal_md(href: str) -> dict:
         """
         Returns the metadata of an archive through GDAL without pulling the file
         """
