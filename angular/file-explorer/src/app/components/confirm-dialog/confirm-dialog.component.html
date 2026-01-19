@@ -12,7 +12,7 @@
 
   @if(showActivationInfos){
 
-  <div>{{'In catalog' | translate}} <strong>{{currentCollection}}</strong></div>
+  <div>{{'In collection' | translate}} <strong>{{currentCollection}}</strong></div>
   <br />
   <div>{{'Enabled drivers' | translate}}</div>
   <app-drivers-list class="drivers-list" (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>

@@ -35,12 +35,12 @@
           </span>
 
           <span class="material-symbols-outlined no-pointer not-activated" *ngIf="!archive.status"
-            [matTooltip]="'Not activated in catalog' | translate:{catalog: currentCatalog}">
+            [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection}">
             unpublished
           </span>
 
           <span class="material-symbols-outlined pointer" *ngIf="!archive.status" (keydown)="activate(archive)" (click)="activate(archive)"
-            [matTooltip]="'Activate this file in catalog' | translate:{catalog: currentCatalog}">
+            [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
             add_circle
           </span>
           <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"

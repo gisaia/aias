@@ -1,10 +1,10 @@
 <mat-form-field appearance="outline" class="collection-list-field" [subscriptSizing]="'dynamic'">
-  <mat-select #select [placeholder]="'Select a catalog' | translate" [(value)]="selectedValue"
+  <mat-select #select [placeholder]="'Select a collection' | translate" [(value)]="selectedValue"
     (selectionChange)="onSelectionChange($event.value)" (openedChange)="onOpenedChange($event)">
     <div class="sticky-search-header" (keydown)="$event.stopPropagation()">
       <div class="search-wrapper">
         <mat-icon class="search-icon">search</mat-icon>
-        <input #searchInput class="search-input" [placeholder]="'Search or add a catalog' | translate"
+        <input #searchInput class="search-input" [placeholder]="'Search or add a collection' | translate"
           [(ngModel)]="searchTerm" (input)="onSearchChange()" autocomplete="off" />
         <button mat-icon-button *ngIf="searchTerm" (click)="searchTerm = ''; onSearchChange()" class="clear-btn"
           type="button">

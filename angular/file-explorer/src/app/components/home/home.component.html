@@ -24,20 +24,20 @@
         </span>
       </div>
       @if(currentCollection !== ''){
-      <app-explorer [collapseAllSubject]="collapseEvent" [currentCatalog]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
+      <app-explorer [collapseAllSubject]="collapseEvent" [currentCollection]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
       }
     </div>
     <div class="archives">
       <div class="section-title">
         <div>{{'Archives' | translate}}</div>
         <div class="catalog">
-          <div>{{'In catalog' | translate}}:</div>
+          <div>{{'In collection' | translate}}:</div>
           <app-collection-list [collections]="collections" [selectedValue]="currentCollection"
             (selectedValueChange)="collectionChange($event)"></app-collection-list>
         </div>
       </div>
       @if(currentCollection !== ''){
-      <app-archives [archivesPath]="archivesPath" [currentCatalog]="currentCollection"></app-archives>
+      <app-archives [archivesPath]="archivesPath" [currentCollection]="currentCollection"></app-archives>
       }
     </div>
   </div>

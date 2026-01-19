@@ -42,7 +42,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   protected onDestroy = new Subject<void>();
 
   @Input() public archivesPath: string = '';
-  @Input() public currentCatalog: string;
+  @Input() public currentCollection: string;
   public archives: Archive[] | undefined = undefined;
   public selectedDrivers = [];
 
