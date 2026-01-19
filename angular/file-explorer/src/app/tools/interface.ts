@@ -17,6 +17,9 @@
  * under the License.
  */
 
+export const ARLAS_AIAS_ACTIVE_COLLECTION = 'ARLAS_AIAS_ACTIVE_COLLECTION';
+export const ARLAS_AIAS_DRIVERS_ACTIVATED = 'driversActivated';
+
 export interface IngestPayload {
   inputs: {
     collection: string;
@@ -78,4 +81,11 @@ export interface Process {
 export interface ProcessResult {
   total: number;
   status_list: Process[];
+}
+
+export interface Collection {
+  id: string;
+  title: string;
+  description: string;
+  links: string[];
 }

@@ -21,7 +21,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { emitErrors } from '@tools/errors';
-import { Archive, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
+import { Archive, ARLAS_AIAS_ACTIVE_COLLECTION, DynamicFileNode, IngestPayload, Process, ProcessResult } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject } from 'rxjs';
 
@@ -70,7 +70,7 @@ export class JobService {
     const payload: IngestPayload = {
       inputs: {
         url: archive.path,
-        collection: this.jobSettings?.collection || '',
+        collection: this.getCollection(),
         catalog: this.jobSettings?.catalog || 'catalog',
         annotations,
         include_drivers: drivers
@@ -86,7 +86,7 @@ export class JobService {
     const payload: IngestPayload = {
       inputs: {
         catalog: this.jobSettings?.catalog || 'catalog',
-        collection: this.jobSettings?.collection || '',
+        collection: this.getCollection(),
         directory: node.path,
         annotations,
         include_drivers: drivers
@@ -104,5 +104,9 @@ export class JobService {
 
   public cancelJob(jobId: string): Observable<Process> {
     return this.http.get(this.jobSettings.url + '/jobs/' + jobId + '/cancel', this.options) as Observable<Process>;
+  }
+
+  private getCollection(): string {
+    return localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.jobSettings.collection;
   }
 }

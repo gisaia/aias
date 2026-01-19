@@ -1,11 +1,14 @@
 <arlas-top-menu [showAboutButton]="false">
-  <div left-menu>{{'Archive explorer' | translate}}</div>
+  <div left-menu class="left-menu">
+    {{'Archive explorer' | translate}}
+  </div>
   <div right-menu class="right-menu">
-    <button class="right-menu--btn" mat-icon-button [disableRipple]="true" (click)="openDrivers()" [matTooltip]="'Enable drivers' | translate">
-        <mat-icon>extension</mat-icon>
+    <button class="right-menu--btn" mat-icon-button [disableRipple]="true" (click)="openDrivers()"
+      [matTooltip]="'Enable drivers' | translate">
+      <mat-icon>extension</mat-icon>
     </button>
     <button class="right-menu--btn" mat-icon-button (click)="refresh()" [matTooltip]="'Refresh' | translate">
-        <mat-icon>refresh</mat-icon>
+      <mat-icon>refresh</mat-icon>
     </button>
   </div>
 </arlas-top-menu>
@@ -20,11 +23,22 @@
           collapse_all
         </span>
       </div>
-      <app-explorer [collapseAllSubject]="collapseEvent" (archivePath)="archivesPath = $event"></app-explorer>
+      @if(currentCollection !== ''){
+      <app-explorer [collapseAllSubject]="collapseEvent" [currentCollection]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
+      }
     </div>
     <div class="archives">
-      <div class="section-title">{{'Archives' | translate}}</div>
-      <app-archives [archivesPath]="archivesPath"></app-archives>
+      <div class="section-title">
+        <div>{{'Archives' | translate}}</div>
+        <div class="catalog">
+          <div>{{'In collection' | translate}}:</div>
+          <app-collection-list [collections]="collections" [selectedValue]="currentCollection"
+            (selectedValueChange)="collectionChange($event)"></app-collection-list>
+        </div>
+      </div>
+      @if(currentCollection !== ''){
+      <app-archives [archivesPath]="archivesPath" [currentCollection]="currentCollection"></app-archives>
+      }
     </div>
   </div>
   <div class="jobs" [class.reduce]="!showTasks">
@@ -35,6 +49,8 @@
         expand_more
       </span>
     </div>
+    @if(currentCollection !== ''){
     <app-tasks *ngIf="showTasks"></app-tasks>
+    }
   </div>
 </div>

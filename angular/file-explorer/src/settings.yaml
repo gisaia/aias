@@ -8,40 +8,43 @@
 
 authentication:
   use_authent: true
+  auth_mode: openid
   force_connect: true
   use_discovery: true
-  auth_mode: "iam"
-  url: "https://localhost/arlas_iam_server"
   threshold: 60000
-  scope: openid
+  url: https://girabal/arlas_iam_server
   issuer: https://girabal:9443/auth/realms/arlas
   client_id: arlas-front
   redirect_uri: https://localhost:4200/callback
-  silent_refresh_redirect_uri: https://localhost:4200/silent-refresh.html
-  require_https: false
-  response_type: "code"
-  silent_refresh_timeout: 10000
-  timeout_factor: 0.75
-  session_checks_enabled: false
-  clear_hash_after_login: true
-  disable_at_hash_check: false
-  show_debug_information: true
+  silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html
+  scope: profile
+  token_endpoint: NOT_CONFIGURED
+  userinfo_endpoint: NOT_CONFIGURED
+  jwks_endpoint: NOT_CONFIGURED
   login_url: NOT_CONFIGURED
-  logout_url: https://localhost:9443/auth/realms/arlas/protocol/openid-connect/logout
-  storage: sessionstorage
-  custom_query_params: [{ "audience": "http://arlas.io/api/server" }]
-  sign_up_enabled: true
-
+  logout_url: NOT_CONFIGURED
+  show_debug_information: false
+  require_https: false
+  response_type: code
+  silent_refresh_timeout: 1000
+  timeout_factor: 0.75
+  session_checks_enabled: true
+  clear_hash_after_login: true
+  storage: memorystorage
+  disable_at_hash_check: true
+  dummy_client_secret: NOT_CONFIGURED
+  custom_query_params: []
+  sign_up_enabled: false
 file_manager:
-  url: https://localhost/fam
+  url: https://localhost:4200/fam
   default_path: ""
   collection: "catalogue"
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://localhost/aproc
+  url: https://localhost:4200/aproc
   collection: "catalogue"
   catalog: "catalogue"
 status:
-  url: https://localhost/airs
+  url: https://localhost:4200/airs
   collection: "catalogue"

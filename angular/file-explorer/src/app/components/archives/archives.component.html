@@ -14,7 +14,8 @@
           <div mat-line class="label">
             {{archive.name}}
           </div>
-          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short') || '--'} }}</div>
+          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date |
+            date:'short') || '--'} }}</div>
           <div mat-line class="detail">{{ 'id:' | translate:{id: archive.id} }}</div>
         </div>
         <div class="actions">
@@ -33,17 +34,17 @@
             check_circle
           </span>
 
-          <span class="material-symbols-outlined no-pointer not-activated"
-            *ngIf="!archive.status" [matTooltip]="'Not activated' | translate">
+          <span class="material-symbols-outlined no-pointer not-activated" *ngIf="!archive.status"
+            [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection}">
             unpublished
           </span>
 
-          <span class="material-symbols-outlined pointer" *ngIf="!archive.status"
-            (click)="activate(archive)" [matTooltip]="'Activate this file'| translate">
+          <span class="material-symbols-outlined pointer" *ngIf="!archive.status" (keydown)="activate(archive)" (click)="activate(archive)"
+            [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
             add_circle
           </span>
           <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
-            (click)="activate(archive)" [matTooltip]="'Re-activate'| translate">
+            (keydown)="activate(archive)" (click)="activate(archive)" [matTooltip]="'Re-activate'| translate">
             add_circle
           </span>
         </div>
@@ -59,7 +60,7 @@
     {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath}}
   </div>
   <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" [name]="'archives'" size="default" color="#fff" type="line-scale"
-      [fullScreen]="false">
-      <p style="color: white"> {{'Loading archives...' | translate}} </p>
-    </ngx-spinner>
+    [fullScreen]="false">
+    <p style="color: white"> {{'Loading archives...' | translate}} </p>
+  </ngx-spinner>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit, output } from '@angular/core';
 import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
 import { JobService } from '@services/job/job.service';
+import { ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
 
 @Component({
   selector: 'app-drivers-list',
@@ -18,10 +19,16 @@ export class DriversListComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    const storedDrivers = localStorage.getItem('driversActivated') ? localStorage.getItem('driversActivated').split(',') : [];
+    const storedDrivers = localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED)?.split(',') ?? [];
     this.selectedDrivers.emit(storedDrivers);
     this.availalbleDrivers = this.jobService.availableDrivers.map(driver => {
-      let selected = storedDrivers.includes(driver) ?? true
+      let selected;
+      if( localStorage.getItem(ARLAS_AIAS_DRIVERS_ACTIVATED)){
+        selected = storedDrivers.includes(driver);
+      } else {
+        selected = true;
+      }
+      
       return { name: driver, selected }
     });
   }

@@ -18,29 +18,37 @@
  */
 
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from "@angular/material/chips";
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ARLAS_AIAS_ACTIVE_COLLECTION } from '@tools/interface';
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
+  styleUrls: ['./confirm-dialog.component.scss'],
   standalone: true,
   imports: [
     MatDialogModule, DriversListComponent, MatFormFieldModule,
-    MatButtonModule, TranslateModule, TextFieldModule, MatInputModule
-  ],
-  styleUrls: ['./confirm-dialog.component.scss']
+    MatButtonModule, TranslateModule, TextFieldModule, MatInputModule,
+    MatChipsModule
+  ]
 })
-export class ConfirmDialogComponent {
+export class ConfirmDialogComponent implements OnInit {
 
   public title = '';
   public message = '';
   public action = '';
   public showActivationInfos = true;
   public selectedDrivers = [];
+  public currentCollection = '';
+
+  public ngOnInit(): void {
+    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION)
+  }
 }
