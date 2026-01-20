@@ -122,7 +122,7 @@ class Driver(IngestDriver):
         date_time_str = metadata.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
-        satellite = metadata.find("./IMD/IMAGE/SATID").text
+        constellation = metadata.find("./IMD/IMAGE/SATID").text
 
         item = Item(
             geometry=geometry,
@@ -130,8 +130,7 @@ class Driver(IngestDriver):
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                constellation=satellite,
-                satellite=satellite,
+                constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.digitalglobe.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -147,6 +146,7 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(metadata, "./IMD/PRODUCTLEVEL")
         item.properties.gsd = find_or_none(metadata, "./IMD/IMAGE/MEANCOLLECTEDGSD", lambda x: float(x))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.satellite = metadata.find_or_none("./IMD/IMAGE/SATID")
 
         return item
 
