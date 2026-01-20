@@ -48,13 +48,18 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]):
         if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href)
+            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=True)
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
 
         if self.quicklook_path is not None:
-            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            thumbnail_type = MimeType.JPG
+            thumbanil_format = AssetFormat.jpg
+            if self.quicklook_path.endswith(".png"):
+                thumbnail_type = MimeType.PNG
+                thumbanil_format = AssetFormat.png
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, thumbnail_type, thumbanil_format)
             downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
@@ -76,7 +81,7 @@ class Driver(IngestDriver):
         item = Item(
             geometry=geometry,
             bbox=bbox,
-            centroid=[centroid[0][0], centroid[0][1]],
+            centroid=[centroid[0], centroid[1]],
             properties=Properties(
                 datetime=date,
                 constellation="BlackSkyGlobal",
