@@ -43,7 +43,7 @@ class ARLASServicesHelper(ABC):
     @staticmethod
     def get_item_from_airs(airs_endpoint: str, collection: str, item_id: str) -> Item:
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", collection, "items", item_id))
+            r = requests.get(url="/".join([airs_endpoint, "collections", collection, "items", item_id]))
             if r.ok:
                 return mapper.item_from_json(r.content)
             else:
@@ -54,7 +54,7 @@ class ARLASServicesHelper(ABC):
     @staticmethod
     def asset_in_airs(airs_endpoint: str, collection: str, item_id: str, asset_name: str) -> bool:
         try:
-            r = requests.head(url=os.path.join(airs_endpoint, "collections", collection, "items", item_id, "assets", asset_name))
+            r = requests.head(url="/".join([airs_endpoint, "collections", collection, "items", item_id, "assets", asset_name]))
             if r.ok:
                 return True
             else:
@@ -132,7 +132,7 @@ class ARLASServicesHelper(ABC):
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:
         item_already_exists = False
         try:
-            r = requests.get(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), headers=JSON_HEADER)
+            r = requests.get(url="/".join([airs_endpoint, "collections", item.collection, "items", item.id]), headers=JSON_HEADER)
             if r.ok:
                 Process.LOGGER.debug("Item {}/{} already exists: triggers update".format(item.collection, item.id))
                 item_already_exists = True
@@ -145,10 +145,10 @@ class ARLASServicesHelper(ABC):
         try:
             if item_already_exists:
                 Process.LOGGER.debug("update item {}/{} ...".format(item.collection, item.id))
-                r = requests.put(url=os.path.join(airs_endpoint, "collections", item.collection, "items", item.id), data=mapper.to_json(item), headers=JSON_HEADER)
+                r = requests.put(url="/".join([airs_endpoint, "collections", item.collection, "items", item.id]), data=mapper.to_json(item), headers=JSON_HEADER)
             else:
                 Process.LOGGER.debug("Insert item {}/{} ...".format(item.collection, item.id))
-                r = requests.post(url=os.path.join(airs_endpoint, "collections", item.collection, "items"), data=mapper.to_json(item), headers=JSON_HEADER)
+                r = requests.post(url="/".join([airs_endpoint, "collections", item.collection, "items"]), data=mapper.to_json(item), headers=JSON_HEADER)
             if r.ok:
                 Process.LOGGER.debug("upsert done for item {}/{} ...".format(item.collection, item.id))
                 return mapper.item_from_json(r.content)
