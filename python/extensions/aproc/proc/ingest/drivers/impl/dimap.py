@@ -205,10 +205,10 @@ class Driver(IngestDriver):
         # We calculate the GSD as the mean of GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
         if "GSD_ACROSS_TRACK" in metadata and "GSD_ALONG_TRACK" in metadata:
             item.properties.gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
-
+        
         item.properties.processing__level = find_or_none(root, "PROCESSING_LEVEL")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
-
+        item.properties.secondary_id = root.find("Dataset_Identification/DATASET_NAME").text
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:

@@ -120,7 +120,7 @@ class Driver(IngestDriver):
             x_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/columnSpacing", lambda x: float(x))
             y_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/rowSpacing", lambda x: float(x))
         item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
-
+        item.properties.secondary_id = find_or_none(root, "productComponents/annotation/file/location/filename")
         item.properties.processing__level = find_or_none(root, "setup/orderInfo/orderType")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 

@@ -132,7 +132,7 @@ class Driver(IngestDriver):
         for p_info in root.iter('Product_Info'):
             item.properties.processing__level = find_or_none(p_info, 'PROCESSING_LEVEL')
             item.properties.satellite = find_or_none(p_info, 'Datatake/SPACECRAFT_NAME')
-
+            item.properties.secondary_id = find_or_none(p_info, "PRODUCT_URI")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tci_path))
 
         resolutions: list[float] = []

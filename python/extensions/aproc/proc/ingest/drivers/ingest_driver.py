@@ -208,6 +208,8 @@ class IngestDriver(AbstractDriver):
             url (str): archive's url
             item (Item): the item
         """
+        if item.properties.secondary_id is None:
+            self.LOGGER.warn(f"No ID was found for {url}")
         if item.properties.satellite is None:
             self.LOGGER.warn(f"No satellite was found for {url}")
         if item.properties.gsd is None:

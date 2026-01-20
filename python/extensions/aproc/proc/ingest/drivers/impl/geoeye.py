@@ -168,6 +168,7 @@ class Driver(IngestDriver):
             y_pixel_size = float(metadata['Pixel Size Y'].split(' ')[0])
             item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
 
+        item.properties.secondary_id = self.tif_path.removesuffix(".tif")   # If merging files in one product: metadata.get("Product Order Number", None)
         item.properties.processing__level = metadata.get("Processing Level", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
 

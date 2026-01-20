@@ -129,7 +129,7 @@ class Driver(IngestDriver):
 
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
         item.properties.processing__level = metadata.get("PROCESSING_LEVEL", None)
-
+        item.properties.secondary_id = root.find('./Dataset_Sources/Source_Information/SOURCE_ID', Driver.ns).text
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:

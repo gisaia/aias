@@ -35,7 +35,6 @@ class AbstractStorage(ABC):
             href = args[index]
             if self.is_path_authorized(href, action):
                 return fct(*args, **kwargs)
-            LOGGER.error("{} on {} is not permitted on {}".format(action.value, self.to_string(), href))
             raise PermissionError("{} access on {} is not permitted on {}".format(action.value, href, self.to_string()))
         return wrapper
 

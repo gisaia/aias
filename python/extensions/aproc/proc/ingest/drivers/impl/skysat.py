@@ -117,7 +117,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.sr_path))
         item.properties.gsd = metadata.get("properties", {}).get("gsd", None)
-
+        item.properties.secondary_id = metadata.get("id", None)
         item.properties.satellite = metadata.get("properties", {}).get("satellite_id", None)
 
         return item

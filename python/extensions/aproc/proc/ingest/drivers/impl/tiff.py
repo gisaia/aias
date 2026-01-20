@@ -6,6 +6,7 @@ from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
                                                              geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+import os
 
 
 class Driver(IngestDriver):
@@ -48,6 +49,7 @@ class Driver(IngestDriver):
         return ImageDriverHelper.build_core_item(self, url, ItemFormat.geotiff, AssetFormat.geotiff, assets, metadata)
 
     def add_major_metadata(self, url: str, item: Item, metadata: object) -> Item:
+        item.properties.secondary_id = os.path.basename(url)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: object) -> Item:

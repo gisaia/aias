@@ -147,7 +147,7 @@ class Driver(IngestDriver):
         item.properties.gsd = find_or_none(metadata, "./IMD/IMAGE/MEANCOLLECTEDGSD", lambda x: float(x))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         item.properties.satellite = find_or_none(metadata, "./IMD/IMAGE/SATID")
-
+        item.properties.secondary_id = find_or_none(metadata, "./IMD/PRODUCTORDERID")
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:

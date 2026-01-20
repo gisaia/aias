@@ -120,6 +120,12 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
+        item.properties.secondary_id = (
+            metadata.get("INVENTORYMETADATA", {})
+            .get("ECSDATAGRANULE", {})
+            .get("LOCALGRANULEID", {})
+            .get("VALUE", None))
+
         item.properties.processing__level = (
             metadata.get("INVENTORYMETADATA", {})
             .get("COLLECTIONDESCRIPTIONCLASS", {})

@@ -205,6 +205,7 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         satellite_number = find_or_none(root, ".//safe:platform/safe:number", ns=Driver.ns)
+        item.properties.secondary_id = self.main_asset_path.removesuffix(".tiff")
         if satellite_number:
             item.properties.satellite = item.properties.constellation + satellite_number
 

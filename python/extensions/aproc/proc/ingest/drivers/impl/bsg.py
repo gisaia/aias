@@ -96,6 +96,7 @@ class Driver(IngestDriver):
         item.properties.satellite = item.properties.constellation
         item.properties.gsd = metadata.get("gsd", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.secondary_id = metadata.get("id", None)
 
         return item
 
