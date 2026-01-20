@@ -146,6 +146,7 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(metadata, "./IMD/PRODUCTLEVEL")
         item.properties.gsd = find_or_none(metadata, "./IMD/IMAGE/MEANCOLLECTEDGSD", lambda x: float(x))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.satellite = find_or_none(metadata, "./IMD/IMAGE/SATID")
 
         return item
 
