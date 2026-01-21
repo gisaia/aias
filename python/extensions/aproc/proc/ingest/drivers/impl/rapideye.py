@@ -111,6 +111,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         item.properties.processing__level = find_or_none(root, "gml:metaDataProperty/re:EarthObservationMetaData/eop:productType", ns=Driver.ns)
+        item.properties.secondary_id = find_or_none(root, "gml:metaDataProperty/re:EarthObservationMetaData/eop:identifier", ns=Driver.ns)
 
         gsd_col = find_or_none(root, "gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:columnGsd", lambda x: float(x), ns=Driver.ns)
         gsd_row = find_or_none(root, "gml:resultOf/re:EarthObservationResult/eop:product/re:ProductInformation/re:rowGsd", lambda x: float(x), ns=Driver.ns)

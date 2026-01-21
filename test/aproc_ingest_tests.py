@@ -150,6 +150,7 @@ class IngestTests(unittest.TestCase):
             self.assertTrue(item.assets.get(Role.overview.value).airs__managed, f"overview asset should be managed for {id}")
         self.assertIsNotNone(item.properties.datetime, asset)
         if archive:
+            self.assertIsNotNone(item.properties.secondary_id)
             self.assertIsNotNone(item.properties.constellation)
             self.assertIsNotNone(item.properties.instrument)
             self.assertIsNotNone(item.properties.sensor)

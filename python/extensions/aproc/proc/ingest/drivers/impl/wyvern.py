@@ -188,6 +188,7 @@ class Driver(IngestDriver):
         item.properties.processing__level=processing__level
         item.properties.proj__epsg=proj__epsg
         item.properties.satellite=satellite
+        item.properties.secondary_id = metadata.get("id", None)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:

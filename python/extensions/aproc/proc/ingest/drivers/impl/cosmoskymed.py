@@ -155,8 +155,8 @@ class Driver(IngestDriver):
         gsd = metadata.get("", {}).get("Ground_Range_Geometric_Resolution", None)
         if gsd is not None:
             item.properties.gsd = float(gsd)
-
         item.properties.satellite = metadata.get("", {}).get("Satellite_ID", None)
+        item.properties.secondary_id = metadata.get("", {}).get("Product_Filename", None)
 
         with AccessManager.make_local(self.h5met_path) as local_h5met_path:
             h5_tree = ET.parse(local_h5met_path)

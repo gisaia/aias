@@ -140,6 +140,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.satellite = item.properties.constellation
         item.properties.processing__level = find_or_none(root, ".//rs2:productType", ns=Driver.ns)
+        item.properties.secondary_id = find_or_none(root, ".//rs2:productId", ns=Driver.ns)
 
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.polarizations[0]['path'])
 

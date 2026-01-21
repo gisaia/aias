@@ -118,6 +118,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
         item.properties.gsd = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", lambda x: float(x), Driver.ns)
+        item.properties.secondary_id = self.tif_path.removesuffix(".tif")
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:

@@ -105,7 +105,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.satellite = find_or_none(root, "satellite_name")
         item.properties.processing__level = find_or_none(root, "product_level")
-
+        item.properties.secondary_id = find_or_none(root, "product_name")
         range_spacing = find_or_none(root, "range_spacing", lambda x: float(x))
         azimuth_spacing = find_or_none(root, "azimuth_spacing", lambda x: float(x))
         if range_spacing and azimuth_spacing:

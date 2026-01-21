@@ -132,6 +132,7 @@ class Driver(IngestDriver):
             if tile_md.get("rowGSD", None) and tile_md.get("columnGSD", None):
                 item.properties.gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
 
+            item.properties.secondary_id = self.tif_path.removesuffix(".tif")
             item.properties.satellite = metadata.get("EOMetadata", {}).get("satelliteName", None)
             item.properties.instrument = item.properties.satellite
             item.properties.sensor = item.properties.satellite
