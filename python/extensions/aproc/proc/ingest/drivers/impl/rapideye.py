@@ -47,6 +47,9 @@ class Driver(IngestDriver):
             assets.append(Asset(href=self.tfw_path, size=AccessManager.get_size(self.tfw_path),
                                 roles=[Role.extent.value], name=Role.extent.value, type=MimeType.TEXT.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.tfw.value, asset_type=ResourceType.other.value))
+
+        if self.browse_path:
+            ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         return assets
 
     # Implements drivers method

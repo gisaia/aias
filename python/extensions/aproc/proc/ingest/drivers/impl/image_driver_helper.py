@@ -4,7 +4,8 @@ import os
 import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
-                                    MimeType, ObservationType, Properties, ResourceType, Role)
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -81,7 +82,7 @@ class ImageDriverHelper:
         import rasterio
         import rasterio.features
         import rasterio.warp
-        from shapely import centroid, geometry, ops, to_geojson
+        from shapely import centroid, geometry, is_valid, ops, to_geojson
 
         bands = []
         geoms = []
@@ -104,14 +105,20 @@ class ImageDriverHelper:
                 # GET THE GEO EXTENT
                 # Read the dataset's valid data mask as a ndarray.
                 mask = dataset.dataset_mask()
+                nodata = dataset.nodata
                 # Extract feature shapes and values from the array.
                 try:
                     proj__epsg = dataset.crs.to_epsg()
-                    for geom, _ in rasterio.features.shapes(
+                    for geom, value in rasterio.features.shapes(
                             mask, transform=dataset.transform):
-                        geom = rasterio.warp.transform_geom(
-                            dataset.crs, 'EPSG:4326', geom, precision=6)
-                        geoms.append(geometry.shape(geom))
+                        # Only consider the valid geometries that don't represent the nodata
+                        if value != nodata:
+                            geom = rasterio.warp.transform_geom(
+                                dataset.crs, 'EPSG:4326', geom, precision=6)
+                            shapely_geom = geometry.shape(geom)
+
+                            if is_valid(shapely_geom):
+                                geoms.append(shapely_geom)
                 except rasterio.errors.CRSError as e:
                     # It is mandatory to get a crs to get the geometry of the extent
                     raise DriverException("Invalid CRS for {}: {}".format(url, e))
