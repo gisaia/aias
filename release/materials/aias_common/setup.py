@@ -2,7 +2,7 @@ import setuptools
 
 
 def get_requirements():
-    with open("python/aias_common/requirements.aias_common.txt", "r") as f:
+    with open("requirements.aias_common.txt", "r") as f:
         return [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 
