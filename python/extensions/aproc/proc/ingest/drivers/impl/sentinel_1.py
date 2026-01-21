@@ -210,7 +210,7 @@ class Driver(IngestDriver):
             item.properties.satellite = item.properties.constellation + satellite_number
 
         processing__level = root.find(".//xfdu:contentUnit", Driver.ns)
-        if processing__level:
+        if processing__level is not None:
             text_info = processing__level.attrib.get("textInfo", None)
             if text_info:
                 item.properties.processing__level = text_info.split(" ")[2]
