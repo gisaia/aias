@@ -161,9 +161,8 @@ class Driver(IngestDriver):
         with AccessManager.make_local(self.h5met_path) as local_h5met_path:
             h5_tree = ET.parse(local_h5met_path)
             h5_root = h5_tree.getroot()
-
         processing__level = h5_root.find("ProcessingInfo/ProcessingLevel")
-        if processing__level:
+        if processing__level is not None and processing__level.text:
             item.properties.processing__level = processing__level.text
 
         item.properties.proj__epsg = self.__get_proj__(metadata.get(""), item.centroid)
