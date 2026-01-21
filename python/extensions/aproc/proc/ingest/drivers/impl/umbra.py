@@ -3,8 +3,8 @@ from datetime import datetime
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
-                                    MimeType, Properties, ResourceType, Role,
-                                    SensorType)
+                                    MimeType, ObservationType, Properties,
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
@@ -51,7 +51,12 @@ class Driver(IngestDriver):
             assets.append(quicklook)
 
         if self.quicklook_path is not None:
-            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            thumbnail_type = MimeType.JPG
+            thumbanil_format = AssetFormat.jpg
+            if self.quicklook_path.endswith(".png"):
+                thumbnail_type = MimeType.PNG
+                thumbanil_format = AssetFormat.png
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, thumbnail_type, thumbanil_format)
             downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
@@ -59,7 +64,7 @@ class Driver(IngestDriver):
 
     def load_metadata(self, url: str) -> dict:
         with AccessManager.stream(self.md_path) as fb:
-            metadata = json.loads(fb)
+            metadata = json.load(fb)
 
         return metadata
 
@@ -70,6 +75,9 @@ class Driver(IngestDriver):
         centroid = data_take["sceneCenterPointLla"]["coordinates"][:2]
 
         coordinates = geometry["coordinates"][0]
+        # Remove altitude
+        for idx, coords in enumerate(coordinates):
+            coordinates[idx] = coords[:2]
         bbox = [min(map(lambda xy: xy[0], coordinates)),
                 min(map(lambda xy: xy[1], coordinates)),
                 max(map(lambda xy: xy[0], coordinates)),
@@ -88,17 +96,19 @@ class Driver(IngestDriver):
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
                 constellation=constellation,
-                sensor_type=SensorType.SAR,
+                sensor_type=SensorType.SAR.value,
                 item_format=ItemFormat.umbra.value,
+                item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value
+                main_asset_name=Role.data.value,
+                observation_type=ObservationType.radar.value
             ),
             assets={asset.name: asset for asset in assets}
         )
         return item
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        item.properties.secondary_id = metadata.get("collects", [{}])[0].get("id", None)
+        item.properties.secondary_id = metadata["collects"][0].get("id", None)
         item.properties.satellite = metadata.get("umbraSatelliteName", None)
         item.properties.gsd = metadata.get("baseIpr", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
