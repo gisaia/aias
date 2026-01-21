@@ -45,6 +45,7 @@ mkdir -p target/aias_common/src/
 cp -r python/aias_common target/aias_common/src/
 cp -r release/materials/aias_common/* target/aias_common/
 sed -i.bak 's/aias_version/\"'$1'\"/' target/aias_common/setup.py
+cp python/aias_common/requirements.aias_common.txt target/aias_common/
 
 cd target/aias_common
 
