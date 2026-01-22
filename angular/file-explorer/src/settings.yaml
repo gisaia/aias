@@ -12,8 +12,8 @@ authentication:
   force_connect: true
   use_discovery: true
   threshold: 60000
-  url: https://girabal/arlas_iam_server
-  issuer: https://girabal:9443/auth/realms/arlas
+  url: https://localhost/arlas_iam_server
+  issuer: https://localhost:9443/auth/realms/arlas
   client_id: arlas-front
   redirect_uri: https://localhost:4200/callback
   silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html

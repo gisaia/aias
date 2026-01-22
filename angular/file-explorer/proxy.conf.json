@@ -1,14 +1,14 @@
 {
   "/airs/**": {
-    "target": "https://girabal",
+    "target": "https://localhost",
     "secure": false
   },
   "/fam/**": {
-    "target": "https://girabal",
+    "target": "https://localhost",
     "secure": false
   },
   "/aproc/**": {
-    "target": "https://girabal",
+    "target": "https://localhost",
     "secure": false
   }
 }
