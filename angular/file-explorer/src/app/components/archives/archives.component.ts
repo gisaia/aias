@@ -35,7 +35,8 @@ import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, 
 @Component({
   selector: 'app-archives',
   templateUrl: './archives.component.html',
-  styleUrls: ['./archives.component.scss']
+  styleUrls: ['./archives.component.scss'],
+  standalone: false
 })
 export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 

@@ -1,10 +1,10 @@
 :host {
   .drivers .mat-mdc-chip-option {
-    --mdc-chip-label-text-size: 12px;
-    --mdc-chip-container-shape-radius: 4px;
-    --mdc-chip-elevated-selected-container-color: rgba(76, 175, 80, 0.6);
-    --mdc-chip-with-avatar-avatar-size: 0px;
+    --mat-chip-label-text-size: 12px;
+    --mat-chip-container-shape-radius: 4px;
+    --mat-chip-elevated-selected-container-color: rgba(76, 175, 80, 0.6);
+    --mat-chip-with-avatar-avatar-size: 0px;
     --final-chip-container-height: var(--drivers-chip-height, 32px);
-    --mdc-chip-container-height: var(--final-chip-container-height);
+    --mat-chip-container-height: var(--final-chip-container-height);
   }
 }

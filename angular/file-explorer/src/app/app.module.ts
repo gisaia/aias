@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule, forwardRef } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -43,6 +43,8 @@ import { MatTreeModule } from '@angular/material/tree';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { CollectionListComponent } from '@components/collection-list/collection-list.component';
+import { CopyIdComponent } from '@components/copy-id/copy-id.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ArlasTranslateLoader } from '@tools/customLoader';
 import { OAuthModule } from 'angular-oauth2-oidc';
@@ -52,6 +54,7 @@ import {
   LoginModule, PersistenceService, auhtentServiceFactory, configUpdaterFactory, getOptionsFactory,
   iamServiceFactory
 } from 'arlas-wui-toolkit';
+import { ClipboardModule } from 'ngx-clipboard';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
@@ -61,9 +64,6 @@ import { ExplorerComponent } from './components/explorer/explorer.component';
 import { HomeComponent } from './components/home/home.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { StartupService } from './services/startup.service';
-import { CollectionListComponent } from '@components/collection-list/collection-list.component';
-import { ClipboardModule } from 'ngx-clipboard';
-import { CopyIdComponent } from '@components/copy-id/copy-id.component';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -110,7 +110,6 @@ export function startupServiceFactory(startupService: StartupService) {
     ReactiveFormsModule,
     LoginModule,
     RouterModule,
-    HttpClientModule,
     ToastrModule.forRoot({
       disableTimeOut: true,
       positionClass: 'toast-bottom-right',
@@ -166,6 +165,7 @@ export function startupServiceFactory(startupService: StartupService) {
       provide: CONFIG_UPDATER,
       useValue: configUpdaterFactory
     },
+    provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [AppComponent]
 })

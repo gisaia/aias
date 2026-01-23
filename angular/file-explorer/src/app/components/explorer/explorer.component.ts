@@ -35,7 +35,8 @@ import { Subject } from 'rxjs';
 @Component({
   selector: 'app-explorer',
   templateUrl: './explorer.component.html',
-  styleUrls: ['./explorer.component.scss']
+  styleUrls: ['./explorer.component.scss'],
+  standalone: false
 })
 export class ExplorerComponent implements OnInit {
 

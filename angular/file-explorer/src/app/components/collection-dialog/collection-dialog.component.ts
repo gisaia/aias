@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatSelectModule, MatOptionModule, MatButtonModule,
     MatIconModule, MatInputModule,
     CollectionListComponent
-],
+  ],
   templateUrl: './collection-dialog.component.html',
   styleUrl: './collection-dialog.component.scss'
 })
