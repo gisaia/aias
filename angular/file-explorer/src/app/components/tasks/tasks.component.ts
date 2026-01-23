@@ -46,7 +46,7 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(MatPaginator) public paginator!: MatPaginator;
+  @ViewChild(MatPaginator) public paginator: MatPaginator;
   public allTasksEnded = output<boolean>();
 
   public tasks: Process[] = [];
@@ -80,7 +80,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.jobService.refreshTasks.subscribe({
       next: refresh => {
-        if (!!refresh) {
+        if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
           this.paginator.firstPage();
@@ -93,7 +93,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.jobService.refreshTasksAndArchives.subscribe({
       next: refresh => {
-        if (!!refresh) {
+        if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
           this.paginator.firstPage();
@@ -108,7 +108,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    this.paginator.page.subscribe({
+    this.paginator?.page.subscribe({
       next: (pe: PageEvent) => {
         this.pageIndex = pe.pageIndex;
         this.pageSize = pe.pageSize;
@@ -118,7 +118,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    if (!!this.refreshSub) {
+    if (this.refreshSub) {
       this.refreshSub.unsubscribe();
     }
   }

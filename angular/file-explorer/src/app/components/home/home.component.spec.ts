@@ -1,5 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
+import { provideToastr } from 'ngx-toastr';
 import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
@@ -8,7 +10,15 @@ describe('HomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HomeComponent ]
+      declarations: [ HomeComponent ],
+      imports: [
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
+      ],
+      providers: [
+        provideHttpClient(),
+        provideToastr()
+      ]
     })
     .compileComponents();
 
