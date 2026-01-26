@@ -8,8 +8,6 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     ResourceType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from aproc.core.logger import Logger
-LOGGER = Logger.logger
 
 
 class ImageDriverHelper:
