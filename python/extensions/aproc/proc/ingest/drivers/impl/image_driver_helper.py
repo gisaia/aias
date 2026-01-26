@@ -8,6 +8,8 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     ResourceType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from aproc.core.logger import Logger
+LOGGER = Logger.logger
 
 
 class ImageDriverHelper:
@@ -100,6 +102,7 @@ class ImageDriverHelper:
 
         with rasterio.Env(**AccessManager.get_rasterio_session(url)):
             with rasterio.open(url) as dataset:
+                nodata_geoms = []
                 for v in zip(dataset.indexes, dataset.descriptions):
                     bands.append(Band(name="Band " + str(v[0]), eo__common_name="Band " + str(v[0]), description=v[1] if v[1] else "Band " + str(v[0])))
                 # GET THE GEO EXTENT
@@ -111,17 +114,23 @@ class ImageDriverHelper:
                     proj__epsg = dataset.crs.to_epsg()
                     for geom, value in rasterio.features.shapes(
                             mask, transform=dataset.transform):
-                        # Only consider the valid geometries that don't represent the nodata
-                        if value != nodata:
-                            geom = rasterio.warp.transform_geom(
-                                dataset.crs, 'EPSG:4326', geom, precision=6)
-                            shapely_geom = geometry.shape(geom)
+                        geom = rasterio.warp.transform_geom(
+                            dataset.crs, 'EPSG:4326', geom, precision=6)
+                        shapely_geom = geometry.shape(geom)
 
-                            if is_valid(shapely_geom):
+                        if is_valid(shapely_geom):
+                            # Only consider the valid geometries that don't represent the nodata
+                            if value != nodata:
                                 geoms.append(shapely_geom)
+                            else:
+                            # fallback if no geometry found
+                                nodata_geoms.append(shapely_geom)
+
                 except rasterio.errors.CRSError as e:
                     # It is mandatory to get a crs to get the geometry of the extent
                     raise DriverException("Invalid CRS for {}: {}".format(url, e))
+                if len(geoms) == 0 and len(nodata_geoms) > 0:
+                    geoms = nodata_geoms
                 geom = ops.unary_union(geoms)
                 a, b, c, d = geom.bounds
                 bbox = [a, b, c, d]
