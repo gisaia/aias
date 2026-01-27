@@ -1,7 +1,7 @@
 import os
 import unittest
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000,
-                                     RADARSAT2, RAPID_EYE, SENTINEL1_GRDH, WYVERN,
+                                     RADARSAT2, RAPID_EYE, SENTINEL1_GRDH, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
@@ -104,6 +104,10 @@ class Tests(IngestTests):
         item_id = "88fb893c13a1f41a41b53db1e96a89649772f74542caeb090e0e09e7a6974cdf"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
+    def test_async_ingest_landsat9(self):  # Driver Wyvern
+        url = os.path.join(ROOT, LANDSAT9)
+        item_id = "e98375f9ff06517aa0682215f4894561dd1a82c6d8a95b4e809e66f2158d6d25"
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 if __name__ == '__main__':
     unittest.main()
