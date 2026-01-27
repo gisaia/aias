@@ -107,8 +107,6 @@ class Driver(IngestDriver):
         return md
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
-        id = metadata.get("id", None)
-        geometry = metadata.get("geometry", None)
         bbox = metadata.get("bbox", None)
         if bbox and len(bbox) >= 4:
             centroid_lon = (bbox[0] + bbox[2]) / 2
@@ -116,9 +114,7 @@ class Driver(IngestDriver):
             centroid = [centroid_lon, centroid_lat]
         else:
             centroid = None
-
         properties = metadata.get("properties", {})
-
         date_time_str = properties.get("datetime", None)
         date_time = (
             datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -127,17 +123,14 @@ class Driver(IngestDriver):
         )
         item = Item(
             id=self.get_item_id(url),
-            geometry=geometry,
+            geometry=metadata.get("geometry", None),
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                #TODO no start and end time for landsat
-                #start_datetime=start_datetime,
-                #end_datetime=end_datetime,
                 constellation='LANDSAT',
                 sensor_type=SensorType.OPTIC,
-                secondary_id=id,
+                secondary_id=metadata.get("id", None),
                 item_format=ItemFormat.landsat,
                 item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff,
@@ -151,33 +144,25 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         properties = metadata.get("properties", {})
-
-        processing__level = properties.get("landsat:correction", None)
-        proj__epsg = properties.get("proj:epsg", None)
-        satellite = properties.get("platform", None)
         if self.gsd is not None:
             item.properties.gsd = self.gsd
-        item.properties.processing__level = processing__level
-        item.properties.proj__epsg = proj__epsg
-        item.properties.satellite = satellite
+        item.properties.processing__level = properties.get("landsat:correction", None)
+        item.properties.proj__epsg = properties.get("proj:epsg", None)
+        item.properties.satellite = properties.get("platform", None)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         properties = metadata.get("properties", {})
         instruments = properties.get("instruments", [])
         platform = properties.get("platform", None)
-        view__off_nadir = properties.get("view:off_nadir", None)
-        view__sun_azimuth = properties.get("view:sun_azimuth", None)
-        view__sun_elevation = properties.get("view:sun_elevation", None)
-        proj__shape = properties.get("proj:shape", None)
-        eo__cloud_cover = properties.get("eo:cloud_cover", None)
-        item.properties.instrument = instruments
+        if len(instruments) > 0:
+            item.properties.instrument = instruments[0]
         item.properties.platform = platform
-        item.properties.view__off_nadir = view__off_nadir
-        item.properties.view__sun_azimuth = view__sun_azimuth
-        item.properties.view__sun_elevation = view__sun_elevation
-        item.properties.proj__shape = proj__shape
-        item.properties.eo__cloud_cover = eo__cloud_cover
+        item.properties.view__off_nadir = properties.get("view:off_nadir", None)
+        item.properties.view__sun_azimuth = properties.get("view:sun_azimuth", None)
+        item.properties.view__sun_elevation = properties.get("view:sun_elevation", None)
+        item.properties.proj__shape = properties.get("proj:shape", None)
+        item.properties.eo__cloud_cover = properties.get("eo:cloud_cover", None)
         item.properties.sensor = platform
         return item
 

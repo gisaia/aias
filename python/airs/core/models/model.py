@@ -142,6 +142,7 @@ class ItemFormat(Enum):
     geotiff = "GEOTIFF"
     iceye = "ICEYE"
     jpeg2000 = "JPEG2000"
+    landsat = "landsat"
     other = "OTHER"
     radarsat2 = "RADARSAT-2",
     rapideye = "RAPIDEYE"
@@ -154,7 +155,6 @@ class ItemFormat(Enum):
     theia = "THEIA"
     umbra = "UMBRA"
     wyvern = "wyvern"
-    landsat = "landsat"
 
 
 class AssetFormat(Enum):

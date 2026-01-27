@@ -104,10 +104,10 @@ class Tests(IngestTests):
         item_id = "88fb893c13a1f41a41b53db1e96a89649772f74542caeb090e0e09e7a6974cdf"
         self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
-    def test_async_ingest_landsat9(self):  # Driver Wyvern
+    def test_async_ingest_landsat9(self):  # Driver Landsat for landsat9 product
         url = os.path.join(ROOT, LANDSAT9)
         item_id = "e98375f9ff06517aa0682215f4894561dd1a82c6d8a95b4e809e66f2158d6d25"
-        self.async_ingest(url, item_id, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+        self.async_ingest(url, item_id, ["thumbnail", "overview", "pan", "metadata", "airs_item"],data_key="pan")
 
 if __name__ == '__main__':
     unittest.main()
