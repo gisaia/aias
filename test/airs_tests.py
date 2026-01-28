@@ -55,6 +55,7 @@ class Tests(unittest.TestCase):
         # ITEM FOUND
         r = requests.get(url="/".join([AIRS_URL, "collections", collection, "items", ID_MANAGED]))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))
+        self.assertTrue(type(r.json().get("properties").get("datetime")), int) # check datetime is int (not str)
 
     def test_update_item(self):
         # ADD ITEM
@@ -64,7 +65,7 @@ class Tests(unittest.TestCase):
         with open(ITEM_PATH_MANAGED, 'r') as file:
             data = file.read()
             r = requests.put(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]), data=data, headers={"Content-Type": "application/json"})
-            self.assertTrue(r.ok, str(r.status_code)+str(r.content))
+            self.assertTrue(r.ok, str(r.status_code) + str(r.content))
 
         # ITEM FOUND
         r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))

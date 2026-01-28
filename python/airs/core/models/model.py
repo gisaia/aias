@@ -1,8 +1,9 @@
 from datetime import datetime as Datetime
 from enum import Enum
 from typing import Annotated, Any, Dict, List, Literal
+from datetime import datetime
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, ConfigDict, Extra, Field
 
 EXPRESSION_DESCRIPTION = "The expression to create the desired band. " + \
     "Can be a band of the data prefaced by its alias (ie 'S2.B05', " + \
@@ -13,6 +14,19 @@ MAX_DESCRIPTION = "A maximum value to clip the band values."
 RGB_DESCRIPTION = "Which RGB channel the band is used for the preview. " + \
     "Value can be 'RED', 'GREEN' or 'BLUE'."
 CMAP_DESCRIPTION = "The matplotlib color map to use for the preview."
+
+
+def encodedate(v):
+    if isinstance(v, datetime):
+        return int(v.timestamp())
+    elif isinstance(v, int):
+        return v
+    raise TypeError("Type not serializable ({} is of type {})".format(v, type(v)))
+
+
+json_encoders = {
+    datetime: encodedate
+}
 
 
 class ColorMap(str, Enum):
@@ -311,6 +325,7 @@ class ItemGroup(BaseModel):
     dc3__references: list[ItemReference] = Field(title="[ARLAS, extension dc3] The rasters of this group.", min_length=1)
     dc3__datetime: Datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
     dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
+    model_config = ConfigDict(json_encoders=json_encoders)
 
 
 class Band(BaseModel, extra=Extra.allow):
@@ -489,6 +504,7 @@ class Properties(BaseModel, extra=Extra.allow):
     generated__geohash3: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first three characters.")
     generated__geohash4: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first four characters.")
     generated__geohash5: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first five characters.")
+    model_config = ConfigDict(json_encoders=json_encoders)
 
 
 class Item(BaseModel, extra=Extra.allow):
