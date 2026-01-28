@@ -1,9 +1,10 @@
+from datetime import datetime
 import os
 
 import typer
 import uvicorn
 from fastapi import FastAPI
-
+from airs.core.models.model import json_encoders
 from airs.core.settings import Configuration
 from airs.rest.services import ROUTER
 from aias_common.rest.exception_handler import EXCEPTION_HANDLERS
@@ -27,6 +28,7 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
         port: int = typer.Argument(default=AIRS_PORT, help="port")):
     Configuration.init(configuration_file=configuration_file)
     api = FastAPI(version=AIAS_VERSION, title='ARLAS Item Product Registration Service',
+                  json_encoders=json_encoders,
                   description='ARLAS Item Registration Service API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=AIRS_CORS_ORIGINS.split(","),
                                          allow_methods=AIRS_CORS_ORIGINS.split(","),

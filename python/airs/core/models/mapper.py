@@ -1,14 +1,9 @@
 import json
-import datetime
 
-from airs.core.models.model import Item
+from airs.core.models.model import Item, encodedate
 
 
-def serialize_datetime(obj):
-    if isinstance(obj, datetime.datetime):
-        return int(obj.timestamp())
-    raise TypeError("Type not serializable")
-
+serialize_datetime=encodedate
 
 def to_airs_item(item: Item) -> Item:
     """ Takes an item and makes sure to map the namespace fields to AIRS Item. Keys can contain : as namespace seperator
@@ -58,7 +53,7 @@ def to_airs_json(item: Item) -> str:
     Returns:
         str: the json. Keys contain __ as namespace seperator
     """
-    return json.dumps(to_airs_dict(item), indent=2, default=serialize_datetime)
+    return json.dumps(to_airs_dict(item), indent=2, default=encodedate)
 
 
 def to_json(item: Item) -> str:
@@ -70,7 +65,7 @@ def to_json(item: Item) -> str:
     Returns:
         str: the json. Keys contain : as namespace seperator
     """
-    return json.dumps(to_dict(item), indent=2, default=serialize_datetime)
+    return json.dumps(to_dict(item), indent=2, default=encodedate)
 
 
 def item_from_json_file(jsonfile) -> Item:
