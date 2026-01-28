@@ -32,6 +32,8 @@ BANDS_NAME = {
 
 class Driver(IngestDriver):
 
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -43,6 +45,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -75,11 +78,25 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if AccessManager.is_local(self.tci_path):
+        if AccessManager.is_local(self.tci_path) and Driver.configuration.get('build_overview_when_local', True):
+            Driver.LOGGER.debug(f"Building overview for local TCI {self.tci_path}")
             overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3])
             overview.size = AccessManager.get_size(overview.href)
             assets.append(overview)
+        elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            Driver.LOGGER.debug(f"Building overview for remote TCI {self.tci_path}")
+            overview_folder = self.assets_dir + '/sentinel2/' + self.get_item_id(url) + '/overview'
+            AccessManager.makedir(overview_folder)
+            overview_path = overview_folder + '/overview.jpg'
+            # File is processed locally as it significantly speeds up processing time
+            with AccessManager.make_local(self.tci_path) as local_tci_path:
+                overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3])
+                overview.size = AccessManager.get_size(overview.href)
+                assets.append(overview)
+        else:
+            Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.tci_path))
         return assets
 
     def load_metadata(self, url: str) -> object:

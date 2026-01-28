@@ -21,6 +21,8 @@ def encodedate(v):
         return int(v.timestamp())
     elif isinstance(v, int):
         return v
+    elif isinstance(v, float):
+        return int(v)
     raise TypeError("Type not serializable ({} is of type {})".format(v, type(v)))
 
 
