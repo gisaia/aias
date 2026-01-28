@@ -142,6 +142,7 @@ class ItemFormat(Enum):
     geotiff = "GEOTIFF"
     iceye = "ICEYE"
     jpeg2000 = "JPEG2000"
+    landsat = "landsat"
     other = "OTHER"
     radarsat2 = "RADARSAT-2",
     rapideye = "RAPIDEYE"
