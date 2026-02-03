@@ -163,6 +163,7 @@ class ItemFormat(Enum):
     radarsat2 = "RADARSAT-2",
     rapideye = "RAPIDEYE"
     safe = "SAFE"
+    satellogic = "SATELLOGIC"
     shape = "SHAPE"
     skysat = "SKYSAT"
     spot5 = "SPOT5"
