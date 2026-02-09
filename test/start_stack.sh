@@ -11,6 +11,6 @@ rm -rf ./outbox
 mkdir outbox
 
 # Start  minio
-docker compose -f docker-compose.yaml up minio --wait  || true
+docker compose -f docker-compose.yaml up minio createbuckets --wait  || true
 
-docker compose -f docker-compose.yaml up --build --wait
+docker compose -f docker-compose.yaml -f docker-compose-tests.yaml up --build --wait
