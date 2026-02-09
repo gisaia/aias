@@ -11,6 +11,9 @@ rm -rf ./outbox
 mkdir outbox
 
 # Start  minio
+docker compose -f docker-compose.yaml up minio --wait  || true
+sleep 5
 docker compose -f docker-compose.yaml up minio createbuckets --wait  || true
-
-docker compose -f docker-compose.yaml -f docker-compose-tests.yaml up --build --wait
+sleep 5
+docker compose -f docker-compose.yaml -f docker-compose-tests.yaml up --build --wait airs-server elasticsearch  minio
+sleep 5
