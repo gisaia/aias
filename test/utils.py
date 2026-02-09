@@ -10,9 +10,10 @@ s3_access_key = os.getenv("AIRS_S3_SECRET_ACCESS_KEY","airssecret")
 s3_region = os.getenv("AIRS_S3_REGION","None")
 s3_bucket = os.getenv("AIRS_S3_BUCKET","airstest")
 
-index_endpoint_url = "http://localhost:9200"
-s3_endpoint_url = "http://localhost:9000"
-AIRS_URL = "http://localhost:8000/arlas/airs"
+index_endpoint_url = "http://elasticsearch:9200"
+s3_endpoint_url = "http://minio:9000"
+AIRS_URL = "http://airs-server:8000/arlas/airs"
+
 FAM_URL = "http://localhost:8005/arlas/fam"
 ARLAS_URL = "http://localhost:9999"
 APROC_ENDPOINT = os.getenv("APROC_ENDPOINT", "http://localhost:8001/arlas/aproc")
