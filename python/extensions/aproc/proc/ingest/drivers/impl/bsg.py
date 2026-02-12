@@ -102,7 +102,7 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.satellite = item.properties.constellation
-        item.properties.gsd = metadata.get("gsd", None)
+        item.properties.gsd = metadata.get("gsd", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("gsd", None))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         item.properties.secondary_id = metadata.get("id", None)
         item.properties.processing__level= metadata.get("processingLevel", None)
