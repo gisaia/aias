@@ -122,14 +122,14 @@ class Driver(IngestDriver):
         self.__init__()
         if AccessManager.is_dir(path):
             for f in AccessManager.listdir(path):
-                if not f.is_dir:
-                    if f.name.lower().startswith("bsg-") and f.path.lower().endswith(".tif") and not f.path.lower().endswith("pan.tif"):
+                if not f.is_dir and f.name.lower().startswith("bsg-"):
+                    if f.path.lower().endswith(".tif") and not f.path.lower().endswith("pan.tif"):
                         self.tif_path = f.path
-                    elif f.name.lower().startswith("bsg-") and f.path.lower().endswith("pan.tif"):
+                    elif f.path.lower().endswith("pan.tif"):
                         self.pan_tif_path = f.path
-                    elif f.name.lower().startswith("bsg-") and f.path.endswith(".json"):
+                    elif f.path.endswith(".json"):
                         self.md_path = f.path
-                    elif f.name.lower().startswith("bsg-") and f.path.endswith("browse.png"):
+                    elif f.path.endswith("browse.png"):
                         self.quicklook_path = f.path
             return self.tif_path is not None and self.pan_tif_path is not None and self.md_path is not None
         return False
