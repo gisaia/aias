@@ -9,6 +9,7 @@ test/inputs/DIMAP
 test/inputs/theia
 test/inputs/many
 test/inputs/SPOT5-2.5M
+test/inputs/proprietary
 out/
 airs.egg-info/
 .env
