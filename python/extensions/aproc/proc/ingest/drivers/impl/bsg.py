@@ -13,6 +13,7 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
                                                              get_centroid,
                                                              get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from dateutil import parser
 
 
 class Driver(IngestDriver):
@@ -72,12 +73,14 @@ class Driver(IngestDriver):
         return md
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
-        geometry = metadata["geometry"]
+        if metadata.get("geometry", None) is None and metadata.get("sensors", {}).get("rgb"):
+            geometry = metadata["sensors"]["rgb"]["geometry"]            
+        else:
+            geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        date = datetime.strptime(metadata["acquisitionDate"], "%Y-%m-%dT%H:%M:%S.%f")
-
+        date = parser.parse(metadata["acquisitionDate"])
         item = Item(
             geometry=geometry,
             bbox=bbox,
@@ -99,10 +102,10 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         item.properties.satellite = item.properties.constellation
-        item.properties.gsd = metadata.get("gsd", None)
+        item.properties.gsd = metadata.get("gsd", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("gsd", None))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         item.properties.secondary_id = metadata.get("id", None)
-
+        item.properties.processing__level= metadata.get("processingLevel", None)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
@@ -112,21 +115,21 @@ class Driver(IngestDriver):
         item.properties.view__off_nadir = metadata.get("offNadirAngle", None)
         item.properties.view__sun_azimuth = metadata.get("sunAzimuth", None)
         item.properties.view__sun_elevation = metadata.get("sunElevation", None)
-
+        item.properties.eo__cloud_cover= metadata.get("cloudCoverPercent", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("cloudCoverPercent", None))
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
         if AccessManager.is_dir(path):
             for f in AccessManager.listdir(path):
-                if not f.is_dir:
-                    if f.path.lower().endswith("ortho.tif"):
+                if not f.is_dir and f.name.lower().startswith("bsg-"):
+                    if f.path.lower().endswith(".tif") and not f.path.lower().endswith("pan.tif"):
                         self.tif_path = f.path
-                    elif f.path.lower().endswith("ortho-pan.tif"):
+                    elif f.path.lower().endswith("pan.tif"):
                         self.pan_tif_path = f.path
-                    elif f.path.endswith("_metadata.json"):
+                    elif f.path.endswith(".json"):
                         self.md_path = f.path
-                    elif f.path.endswith("_browse.png"):
+                    elif f.path.endswith("browse.png"):
                         self.quicklook_path = f.path
             return self.tif_path is not None and self.pan_tif_path is not None and self.md_path is not None
         return False

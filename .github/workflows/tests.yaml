@@ -136,6 +136,9 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack
       run: test/start_stack.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh arlas-server
+      if: always()
     - name: Run g2 tests
       run: test/tests_g2.sh
     - name: Logs dockers aproc-service
