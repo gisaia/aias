@@ -4,13 +4,14 @@
     {{message}}
   </div>
 
-  <mat-form-field [class.hide]="!showActivationInfos" class="annotations" appearance="fill">
+  @if(showActivationInfos){
+  <mat-form-field class="annotations" appearance="fill">
     <mat-label>{{'Annotations' | translate}}</mat-label>
-    <textarea #anno matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
+    <textarea matInput #anno (input)="onAnnoChange(anno.value)" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
       cdkAutosizeMaxRows="6"></textarea>
   </mat-form-field>
 
-  @if(showActivationInfos){
+
 
   <div>{{'In collection' | translate}} <strong>{{currentCollection}}</strong></div>
   <br />
@@ -23,7 +24,7 @@
 
 <mat-dialog-actions class="actions">
   <button mat-flat-button color="primary" [color]="'primary'"
-    [mat-dialog-close]="{status: true, annotations: anno?.value, drivers: selectedDrivers}">
+    [mat-dialog-close]="{status: true, annotations: annotation, drivers: selectedDrivers}">
     {{action | translate}}
   </button>
   <button mat-stroked-button [mat-dialog-close]="{status: false}">

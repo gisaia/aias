@@ -23,7 +23,9 @@
   font-display: auto;
   font-style: normal;
   font-weight: 300;
-  src: local("Material Icons"), local("MaterialIcons-Regular"),
+  src:
+    local("Material Icons"),
+    local("MaterialIcons-Regular"),
     url("./assets/fonts/material-icons.woff2") format("woff2");
 }
 
@@ -85,6 +87,10 @@
   &.x-large {
     font-size: 72px;
   }
+}
+
+.aias-tooltip {
+  font-size: 14px;
 }
 
 html,

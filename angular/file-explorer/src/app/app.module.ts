@@ -38,7 +38,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -62,6 +62,8 @@ import { HomeComponent } from './components/home/home.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { StartupService } from './services/startup.service';
 import { CollectionListComponent } from '@components/collection-list/collection-list.component';
+import { ClipboardModule } from 'ngx-clipboard';
+import { CopyIdComponent } from '@components/copy-id/copy-id.component';
 
 export function startupServiceFactory(startupService: StartupService) {
   const init = () => startupService.init();
@@ -74,7 +76,8 @@ export function startupServiceFactory(startupService: StartupService) {
     HomeComponent,
     ExplorerComponent,
     ArchivesComponent,
-    TasksComponent
+    TasksComponent,
+    CopyIdComponent
   ],
   imports: [
     BrowserModule,
@@ -102,6 +105,7 @@ export function startupServiceFactory(startupService: StartupService) {
     MatTooltipModule,
     MatTreeModule,
     NgxSpinnerModule,
+    ClipboardModule,
     FormsModule,
     ReactiveFormsModule,
     LoginModule,
@@ -141,6 +145,13 @@ export function startupServiceFactory(startupService: StartupService) {
       useFactory: iamServiceFactory,
       deps: [ArlasIamService],
       multi: true
+    },
+    {
+      provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+      useValue: {
+        disableTooltipInteractivity: true,
+        tooltipClass: 'aias-tooltip'
+      },
     },
     forwardRef(() => ArlasConfigurationDescriptor),
     forwardRef(() => ArlasCollaborativesearchService),

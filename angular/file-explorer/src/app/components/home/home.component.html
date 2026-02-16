@@ -50,7 +50,7 @@
       </span>
     </div>
     @if(currentCollection !== ''){
-    <app-tasks *ngIf="showTasks"></app-tasks>
+    <app-tasks *ngIf="showTasks" (allTasksEnded)="allTasksEnded()"></app-tasks>
     }
   </div>
 </div>

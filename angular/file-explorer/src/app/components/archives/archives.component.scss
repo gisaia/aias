@@ -60,10 +60,30 @@
             font-size: 12px;
 
             overflow-wrap: anywhere;
-            display: inline-block;
             white-space: pre-wrap;
+            display: flex;
+            align-items: center;
+            gap: 0 10px;
+
+            &.detail-id {
+              height: 21px;
+              .copy {
+                display: none;
+              }
+            }
           }
         }
+
+        &:hover {
+          .info {
+            .detail-id {
+              .copy {
+                display: block;
+              }
+            }
+          }
+        }
+
         .actions {
           display: flex;
           justify-content: space-between;

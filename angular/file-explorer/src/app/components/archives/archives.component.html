@@ -16,7 +16,12 @@
           </div>
           <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date |
             date:'short') || '--'} }}</div>
-          <div mat-line class="detail">{{ 'id:' | translate:{id: archive.id} }}</div>
+          <div mat-line class="detail detail-id">
+            <span>{{ 'id:' | translate:{id: archive.id} }}</span>
+            <span class="copy">
+              <app-copy-id [idToCopy]="archive.id"></app-copy-id>
+            </span>
+          </div>
         </div>
         <div class="actions">
           <mat-chip-listbox [selectable]="false">
@@ -39,7 +44,8 @@
             unpublished
           </span>
 
-          <span class="material-symbols-outlined pointer" *ngIf="!archive.status" (keydown)="activate(archive)" (click)="activate(archive)"
+          <span class="material-symbols-outlined pointer" *ngIf="!archive.status" (keydown)="activate(archive)"
+            (click)="activate(archive)"
             [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
             add_circle
           </span>

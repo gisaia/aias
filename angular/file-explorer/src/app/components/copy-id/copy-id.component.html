@@ -1,0 +1,7 @@
+<button class="copy-btn" [class.copied]="isCopied" ngxClipboard (cbOnSuccess)="copied()" [cbContent]="idToCopy()">
+  @if (isCopied) {
+  <mat-icon [matTooltip]="'Copied!' | translate">check_circle_outline</mat-icon>
+  } @else {
+  <mat-icon [matTooltip]="'Copy id' | translate">content_copy</mat-icon>
+  }
+</button>
