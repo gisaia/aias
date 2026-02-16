@@ -114,7 +114,10 @@ export class HomeComponent implements OnInit {
     this.collections = [...newCollections];
   }
   
-  public allTasksEnded(){
+  /**
+   * Refresh archives view
+   */
+  public refreshArchives(){
     this.famService.refreshArchives$.next(true);
   }
 }

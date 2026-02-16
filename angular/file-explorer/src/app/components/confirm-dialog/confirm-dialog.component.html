@@ -7,7 +7,7 @@
   @if(showActivationInfos){
   <mat-form-field class="annotations" appearance="fill">
     <mat-label>{{'Annotations' | translate}}</mat-label>
-    <textarea matInput #anno (input)="onAnnoChange(anno.value)" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
+    <textarea matInput #anno (input)="onAnnotationChange(anno.value)" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
       cdkAutosizeMaxRows="6"></textarea>
   </mat-form-field>
 

@@ -150,7 +150,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm.status) {
+        if (confirm?.status) {
           this.jobService.cancelJob(jobId).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);

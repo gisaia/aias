@@ -53,7 +53,7 @@ export class ConfirmDialogComponent implements OnInit {
     this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION)
   }
 
-  public onAnnoChange(text: string) {
+  public onAnnotationChange(text: string) {
     this.annotation = text;
   }
 }
