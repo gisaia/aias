@@ -34,6 +34,7 @@
     "arlas-wui-toolkit": "~27.0.1",
     "ngx-spinner": "^17.0.0",
     "ngx-toastr": "^19.0.0",
+    "ngx-clipboard": "^16.0.0",
     "patch-package": "^6.4.7",
     "tslib": "^2.3.0"
   },

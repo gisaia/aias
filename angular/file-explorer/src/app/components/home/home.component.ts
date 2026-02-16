@@ -113,4 +113,11 @@ export class HomeComponent implements OnInit {
     }
     this.collections = [...newCollections];
   }
+  
+  /**
+   * Refresh archives view
+   */
+  public refreshArchives(){
+    this.famService.refreshArchives$.next(true);
+  }
 }

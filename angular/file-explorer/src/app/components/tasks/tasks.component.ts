@@ -19,7 +19,7 @@
 
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
@@ -46,6 +46,7 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
+  public allTasksEnded = output<boolean>();
 
   public tasks: Process[] = [];
   public displayedColumns: string[] = ['type', 'status', 'created', 'started', 'finished'];
@@ -126,8 +127,9 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (pr: ProcessResult) => {
         this.tasks = pr.status_list;
         this.totalProcess = pr.total;
-        if (this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed).length === 0) {
+        if (this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed && t.status !== ProcessStatus.dismissed).length === 0) {
           this.unsubscribeRefreshTasks.next(true);
+          this.allTasksEnded.emit(true);
         }
       },
       error: (err: Response) => {
@@ -148,20 +150,22 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        this.jobService.cancelJob(jobId).subscribe({
-          next: (p: Process) => {
-            this.jobService.refreshTasks.next(true);
-          },
-          error: (err: HttpErrorResponse) => {
-            emitErrors(
-              this.toastr,
-              err,
-              this.translate.instant('Unable to delete this job'),
-              this.translate.instant('You are not allowed to access this feature'),
-              this.translate.instant('Unable to delete this job')
-            );
-          }
-        })
+        if (confirm?.status) {
+          this.jobService.cancelJob(jobId).subscribe({
+            next: () => {
+              this.jobService.refreshTasks.next(true);
+            },
+            error: (err: HttpErrorResponse) => {
+              emitErrors(
+                this.toastr,
+                err,
+                this.translate.instant('Unable to delete this job'),
+                this.translate.instant('You are not allowed to access this feature'),
+                this.translate.instant('Unable to delete this job')
+              );
+            }
+          });
+        }
       }
     });
   }

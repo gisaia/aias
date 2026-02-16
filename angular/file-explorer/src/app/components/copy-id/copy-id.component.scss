@@ -1,0 +1,20 @@
+@import "styles/colors.scss";
+
+.copy-btn {
+  border: none;
+  color: $hintColor;
+  padding: 2px 5px;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 10px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.copied {
+    color: $successColor;
+  }
+}
