@@ -126,7 +126,7 @@ class ARLASServicesHelper(ABC):
                     Process.LOGGER.error(msg)
                     raise ConnectionException(msg)
         else:
-            Process.LOGGER.info("{} not managed".format(asset.name))
+            Process.LOGGER.debug("{} not managed".format(asset.name))
 
     @staticmethod
     def insert_or_update_item(item: Item, airs_endpoint) -> Item:

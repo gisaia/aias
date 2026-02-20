@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
