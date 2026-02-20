@@ -89,7 +89,7 @@ class Driver(IngestDriver):
         coords.append(coords[0])
         geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
-        start_time_str = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/START_TIME")
+        start_time_str = root.find("./Dataset_Sources/Source_Information/Scene_Source/START_TIME", Driver.ns)
         if start_time_str is not None:
             date_time = parser.parse(start_time_str.text)
             start_time = date_time
@@ -97,7 +97,7 @@ class Driver(IngestDriver):
             date_time_str = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE").text + self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME").text
             date_time = datetime.strptime(date_time_str, "%Y-%m-%d%H:%M:%S")
 
-        stop_time_str = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/STOP_TIME")
+        stop_time_str = root.find("./Dataset_Sources/Source_Information/Scene_Source/STOP_TIME", Driver.ns)
         if stop_time_str is not None:
             stop_time = parser.parse(stop_time_str.text)
 
@@ -108,7 +108,7 @@ class Driver(IngestDriver):
         else:
             satellite = constellation
         source_id = root.find("./Dataset_Sources/Source_Information/SOURCE_ID", Driver.ns)
-        if source_id:
+        if source_id is not None:
             source_id = source_id.text
 
         item = Item(
