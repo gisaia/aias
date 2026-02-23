@@ -1,6 +1,5 @@
 import json
-from datetime import datetime
-
+import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -93,8 +92,7 @@ class Driver(IngestDriver):
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        date_time = datetime.strptime(metadata["properties"]["acquired"], "%Y-%m-%dT%H:%M:%S.%fZ")
-
+        date_time = dateutil.parser.parse(metadata["properties"]["acquired"])
         item = Item(
             geometry=geometry,
             bbox=bbox,
