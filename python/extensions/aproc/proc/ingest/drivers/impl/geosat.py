@@ -1,3 +1,4 @@
+from importlib import metadata
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -13,6 +14,7 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
     get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from dateutil import parser
 
 
 class Driver(IngestDriver):
@@ -56,10 +58,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if not AccessManager.is_local(self.tif_path):
-            return assets
-
-        if self.quicklook_path is None:
+        if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3])
             quicklook.size = AccessManager.get_size(quicklook.href)
@@ -90,11 +89,27 @@ class Driver(IngestDriver):
         coords.append(coords[0])
         geometry, bbox, centroid = get_geom_bbox_centroid_from_coordinates(coords)
 
-        date_time = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE").text \
-            + self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME").text
-        date_time = datetime.strptime(date_time, "%Y-%m-%d%H:%M:%S")
+        start_time_str = root.find("./Dataset_Sources/Source_Information/Scene_Source/START_TIME", Driver.ns)
+        if start_time_str is not None:
+            date_time = parser.parse(start_time_str.text)
+            start_time = date_time
+        else:
+            date_time_str = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_DATE").text + self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/IMAGING_TIME").text
+            date_time = datetime.strptime(date_time_str, "%Y-%m-%d%H:%M:%S")
+
+        stop_time_str = root.find("./Dataset_Sources/Source_Information/Scene_Source/STOP_TIME", Driver.ns)
+        if stop_time_str is not None:
+            stop_time = parser.parse(stop_time_str.text)
 
         constellation = self.__find_value__(root, "./Dataset_Sources/Source_Information/Scene_Source/MISSION").text
+        mission_index = root.find("./Dataset_Sources/Source_Information/Scene_Source/MISSION_INDEX", Driver.ns)
+        if mission_index is not None:
+            satellite = constellation + " " + mission_index.text
+        else:
+            satellite = constellation
+        source_id = root.find("./Dataset_Sources/Source_Information/SOURCE_ID", Driver.ns)
+        if source_id is not None:
+            source_id = source_id.text
 
         item = Item(
             geometry=geometry,
@@ -103,6 +118,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=satellite,
                 sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geosat.value,
@@ -112,12 +128,18 @@ class Driver(IngestDriver):
             ),
             assets={asset.name: asset for asset in assets}
         )
-
+        if start_time_str:
+            item.properties.start_datetime = start_time
+        if stop_time_str:
+            item.properties.end_datetime = stop_time
+        if source_id:
+            item.properties.secondary_id = source_id
         return item
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
         item.properties.gsd = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", lambda x: float(x), Driver.ns)
+        item.properties.processing__level = find_or_none(root, "./Production/PRODUCT_TYPE", Driver.ns)
         item.properties.secondary_id = self.tif_path.removesuffix(".tif")
         return item
 

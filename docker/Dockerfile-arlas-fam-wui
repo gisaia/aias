@@ -19,7 +19,7 @@ RUN npm run build
 
 ### STAGE 2: Setup ###
 
-FROM nginx:1.29-alpine3.22-slim
+FROM nginx:1.29-alpine3.23-slim
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
