@@ -28,7 +28,7 @@ As mentioned, the process is "driver" based. Each data source must have a compli
 - transform the assets
 - create an AIRS Item
 
-A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/extensions/aproc/proc/ingest/drivers/ingest_driver.py){:target="_blank"}.
+A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/python/extensions/aproc/proc/ingest/drivers/ingest_driver.py){:target="_blank"}.
 
 !!! warning
     The name of the class within the module __must be__ `Driver`.
