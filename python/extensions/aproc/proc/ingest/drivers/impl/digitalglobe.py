@@ -169,8 +169,8 @@ class Driver(IngestDriver):
         elif metadata.find("./IMD/IMAGE/MEANSUNEL") is not None:
             item.properties.view__sun_elevation = float(metadata.find("./IMD/IMAGE/MEANSUNEL").text)
 
-        eo__cloud_cover = find_or_none(metadata, "./IMD/IMAGE/CLOUDCOVER", lambda x: float(x) * 1000)
-        if eo__cloud_cover != -999000.0:
+        eo__cloud_cover = find_or_none(metadata, "./IMD/IMAGE/CLOUDCOVER", lambda x: float(x) * 100)
+        if eo__cloud_cover != -99900.0:
             item.properties.eo__cloud_cover = eo__cloud_cover
 
         return item
