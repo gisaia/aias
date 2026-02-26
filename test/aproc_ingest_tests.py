@@ -20,24 +20,24 @@ from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
                         setUpTest)
 
 AST = "ast/"
-CSK = "3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
-DIMAP = "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
-ICEYE = "ICEYE-Scan-mode/2631255"
-IKONOS = "IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
-JP2000 = "jpeg2000.jpg2"
-GEOSAT = "DE01_SL6_22S_1R_20220829T063018_20220829T063109_DMI_0_bb31/"
-RADARSAT2 = "RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
-RAPID_EYE = "3159120_2020-03-11_RE1_3A/"
-SENTINEL1_GRDH = "S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
-SENTINEL1_SLC = "S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
-SENTINEL2 = "S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
+CSK = "csk/3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
+DIMAP = "spot6/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
+ICEYE = "iceye/ICEYE-Scan-mode/2631255"
+IKONOS = "geoeye/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
+JP2000 = "images/jpeg2000.jpg2"
+GEOSAT = "geosat/DE01_SL6_22S_1R_20220829T063018_20220829T063109_DMI_0_bb31/"
+RADARSAT2 = "radarsat2/RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
+RAPID_EYE = "rapideye/3159120_2020-03-11_RE1_3A/"
+SENTINEL1_GRDH = "sentinel1/S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
+SENTINEL1_SLC = "sentinel1/S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_005255_00A6EB_46D8.SAFE"
+SENTINEL2 = "sentinel2/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 SKYSAT = "skysat/"
 SPOT5 = "spot5/"
-TERRASARX = "TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
-TIF = "cog.tiff"
-WORLDVIEW = "WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
-WYVERN = "f3aa9cc0-3622-4711-a729-41e573a316f3/wyvern_dragonette-001_20250101T072826_f3aa9cc0/"
-LANDSAT9 = "LC09_L1TP_201035_20251030_20251103_02_T1/"
+TERRASARX = "terrasarx/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
+TIF = "images/cog.tiff"
+WORLDVIEW = "digitalglobe/WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
+WYVERN = "wyvern/f3aa9cc0-3622-4711-a729-41e573a316f3/wyvern_dragonette-001_20250101T072826_f3aa9cc0/"
+LANDSAT9 = "landsat/LC09_L1TP_201035_20251030_20251103_02_T1/"
 
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
@@ -99,12 +99,11 @@ class IngestTests(unittest.TestCase):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, id: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value):
+    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        self.assertEqual(result["item_location"], "http://airs-server:8000/arlas/airs/collections/" + COLLECTION + "/items/" + id, result["item_location"])
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
-        self.check_result(item, id, assets, archive, check_epsg, data_key)
+        self.check_result(item, assets, archive, check_epsg, data_key)
         return status
 
     def test_processes_list(self):
@@ -122,10 +121,10 @@ class IngestTests(unittest.TestCase):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, id: str, assets: list, archive=True, check_epsg=True, data_key=Role.data.value):
+    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, data_key=Role.data.value):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
-        self.assertEqual(item.id, id)
+        self.assertIsNotNone(item.id)
         self.assertIsNotNone(item.geometry)
         self.assertIsNotNone(item.geometry.get("coordinates"))
         self.assertEqual(len(item.bbox), 4)

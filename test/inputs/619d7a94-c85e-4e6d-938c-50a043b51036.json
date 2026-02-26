@@ -45,7 +45,7 @@
     },
     "assets": {
       "data": {
-        "href": "gs://gisaia-public/test-aias/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
+        "href": "gs://gisaia-public/test-aias/images/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
         "type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "title": "classification",
         "eo:bands": [
@@ -64,7 +64,7 @@
         "airs__managed": false
       },
       "archive": {
-        "href": "gs://gisaia-public/test-aias/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
+        "href": "gs://gisaia-public/test-aias/images/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
         "type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "title": "classification",
         "eo:bands": [
