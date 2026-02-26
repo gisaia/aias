@@ -87,25 +87,44 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: ET.Element) -> Item:
         from osgeo import ogr
-
-        # Calculate bbox
-        ul_lat = float(metadata.find("./TIL/TILE/ULLAT").text)
-        ul_lon = float(metadata.find("./TIL/TILE/ULLON").text)
-        ur_lat = float(metadata.find("./TIL/TILE/URLAT").text)
-        ur_lon = float(metadata.find("./TIL/TILE/URLON").text)
-        lr_lat = float(metadata.find("./TIL/TILE/LRLAT").text)
-        lr_lon = float(metadata.find("./TIL/TILE/LRLON").text)
-        ll_lat = float(metadata.find("./TIL/TILE/LLLAT").text)
-        ll_lon = float(metadata.find("./TIL/TILE/LLLON").text)
-        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
-
+        # Calculate bbox for all tiles
+        tiles = metadata.findall("./TIL/TILE")
+        all_lats = []
+        all_lons = []
+        for tile in tiles:
+            all_lats.extend([
+                float(tile.find("ULLAT").text),
+                float(tile.find("URLAT").text),
+                float(tile.find("LRLAT").text),
+                float(tile.find("LLLAT").text),
+            ])
+            all_lons.extend([
+                float(tile.find("ULLON").text),
+                float(tile.find("URLON").text),
+                float(tile.find("LRLON").text),
+                float(tile.find("LLLON").text),
+            ])
+        min_lat = min(all_lats)
+        max_lat = max(all_lats)
+        min_lon = min(all_lons)
+        max_lon = max(all_lons)
+        # Global Corner
+        ul_lon, ul_lat = min_lon, max_lat
+        ur_lon, ur_lat = max_lon, max_lat
+        lr_lon, lr_lat = max_lon, min_lat
+        ll_lon, ll_lat = min_lon, min_lat
+        geometry, bbox, centroid = get_geom_bbox_centroid_from_corners(
+            ul_lon, ul_lat,
+            ur_lon, ur_lat,
+            lr_lon, lr_lat,
+            ll_lon, ll_lat
+        )
         # Overwrite geometry and centroid if GIS_FILE is present with order shape file
         d = AccessManager.dirname(url)
-        if AccessManager.is_dir(os.path.join(d, "GIS_FILE")):
+        if AccessManager.is_dir(os.path.join(d, "GIS_FILES")):
             for file in AccessManager.listdir(os.path.join(d, "GIS_FILES")):
                 if file.name.endswith("_ORDER_SHAPE.shp"):
                     setup_gdal()
-
                     with AccessManager.make_local(os.path.join(d, "GIS_FILES", file.name)) as order_shape_file:
                         ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
                         component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
