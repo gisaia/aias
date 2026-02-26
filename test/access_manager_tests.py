@@ -16,18 +16,18 @@ MINIO_HOST = "minio"
 # FILES AND DIR VARIABLES
 ###########################
 
-S3_RO_DIR_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/"
+S3_RO_DIR_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/spot6/"
 S3_RO_DIR_NO_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/ast"
 S3_RO_FILE = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
-S3_RO_SMALL_DIR = "https://storage.googleapis.com/gisaia-public/test-aias/DIMAP/PROD_SPOT6_001/LIBRARY"
+S3_RO_SMALL_DIR = "https://storage.googleapis.com/gisaia-public/test-aias/spot6/PROD_SPOT6_001/LIBRARY"
 S3_RO_DIR = "http://" + MINIO_HOST + ":9000/downloads/readonly/"
 S3_RW_DIR = "http://" + MINIO_HOST + ":9000/downloads/readwrite/"
 S3_RW_FILE = "http://" + MINIO_HOST + ":9000/downloads/readwrite/a_file"
 
 GS_RO_DIR_NO_SLASH = "gs://gisaia-public/test-aias/ast"
-GS_RO_DIR_SLASH = "gs://gisaia-public/test-aias/DIMAP/"
+GS_RO_DIR_SLASH = "gs://gisaia-public/test-aias/spot6/"
 GS_RO_FILE = "gs://gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
-GS_RO_SMALL_DIR = "gs://gisaia-public/test-aias/DIMAP/PROD_SPOT6_001/LIBRARY/"
+GS_RO_SMALL_DIR = "gs://gisaia-public/test-aias/spot6/PROD_SPOT6_001/LIBRARY/"
 
 HTTPS_RO_FILE = "https://raw.githubusercontent.com/gisaia/ARLAS-Exploration-stack/adbfe2df1699df1fecc161fdb4464fcd07ad6235/docs/docs/version.md"
 
@@ -38,7 +38,7 @@ FS_RO_FILE = "/tmp/readonly/file"
 FS_RW_FILE = "/tmp/readwrite/file"
 
 GDAL_FILES = [
-    "https://storage.googleapis.com/gisaia-public/test-aias/jpeg2000.jpg2", "gs://gisaia-public/test-aias/jpeg2000.jpg2"
+    "https://storage.googleapis.com/gisaia-public/test-aias/images/jpeg2000.jpg2", "gs://gisaia-public/test-aias/images/jpeg2000.jpg2"
 ]
 
 
@@ -101,7 +101,7 @@ CAN_NOT_READ = [
 
     HTTPS_RO_FILE.replace("ARLAS-Exploration-stack", "ARLAS-Exploration-stack-something"),
 
-    S3_RO_DIR_SLASH.replace("DIMAP", "DIMAP-something"),
+    S3_RO_DIR_SLASH.replace("spot6", "spot6-something"),
     S3_RO_DIR_NO_SLASH + "something",
     p.dirname(S3_RO_DIR_NO_SLASH),
     p.dirname(p.dirname(S3_RO_DIR_NO_SLASH)),
@@ -222,10 +222,10 @@ def fixture_am():
     manager.AccessManager.init(AccessManagerSettings(
         storages=[
             s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]),
-            s3.S3StorageConfiguration(bucket="gisaia-public", endpoint="https://storage.googleapis.com", readable_paths=["/test-aias/ast", "test-aias/DIMAP"]),
+            s3.S3StorageConfiguration(bucket="gisaia-public", endpoint="https://storage.googleapis.com", readable_paths=["/test-aias/ast", "test-aias/spot6"]),
             fs.FileStorageConfiguration(readable_paths=["/tmp/readonly"], writable_paths=["/tmp/readwrite"]),
             HttpsStorageConfiguration(domain="raw.githubusercontent.com", readable_paths=["/gisaia/ARLAS-Exploration-stack"], writable_paths=[]),
-            gs.GoogleStorageConfiguration(bucket="gisaia-public", readable_paths=["/test-aias/ast", "test-aias/DIMAP"])
+            gs.GoogleStorageConfiguration(bucket="gisaia-public", readable_paths=["/test-aias/ast", "test-aias/spot6"])
         ],
         tmp_dir="/tmp/readwrite"
     ))
