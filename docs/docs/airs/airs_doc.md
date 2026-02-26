@@ -56,7 +56,7 @@ See [here](https://hub.docker.com/r/gisaia/airs/tags){:target="_blank"} for the 
 ```shell
 curl -X POST \
     "${ARLAS_ENDPOINT}/airs/collections/digitalearth.africa/items/077cb463-1f68-5532-aa8b-8df0b510231a/assets/classification?content_type=image/tiff" \
-    -F file=@test/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif
+    -F file=@test/inputs/images/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif
 ```
 Result:
 ```json

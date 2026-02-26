@@ -45,7 +45,7 @@
     },
     "assets": {
       "data": {
-        "href": "http://minio:9000/archives/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
+        "href": "http://minio:9000/archives/inputs/images/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
         "type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "title": "classification",
         "eo:bands": [
@@ -64,7 +64,7 @@
         "airs__managed": false
       },
       "archive": {
-        "href": "http://minio:9000/archives/inputs/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
+        "href": "http://minio:9000/archives/inputs/images/ESA_WorldCover_10m_2021_v200_N15E000_Map.tif",
         "type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "title": "classification",
         "eo:bands": [

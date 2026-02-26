@@ -28,20 +28,21 @@ class Tests(unittest.TestCase):
     def test_directory(self):
         r = requests.get(url="/".join([Tests.URL, "root"]))
         root: File = File(**r.json())
-        r = requests.post(url="/".join([Tests.URL, "files"]), data=PathRequest(path="/".join([root.path, "DIMAP"])).model_dump_json(), headers={"Content-Type": "application/json"})
+        r = requests.post(url="/".join([Tests.URL, "files"]), data=PathRequest(path="/".join([root.path, "images"])).model_dump_json(), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
     def test_archive(self):
         r = requests.get(url="/".join([Tests.URL, "root"]))
         root: File = File(**r.json())
-        r = requests.post(url="/".join([Tests.URL, "archives"]), data=PathRequest(path="/".join([root.path, "DIMAP"])).model_dump_json(), headers={"Content-Type": "application/json"})
+        r = requests.post(url="/".join([Tests.URL, "archives"]), data=PathRequest(path="/".join([root.path, "images"])).model_dump_json(), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         archive = Archive(**(json.loads(r.content)[0]))
-        self.assertEqual(archive.name, "IMG_SPOT6_MS_001_A")
-        self.assertEqual(archive.path, os.path.join(root.path, "DIMAP/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"))
-        self.assertTrue(archive.is_dir)
-        self.assertIn(archive.id, ["148ddaaa431bdd2ff06b823df1e3725d462f668bd95188603bfff443ff055c71", "a75c9fc5a9fee985be7bd967ef713a20df65e7163f660bf6607436845fb48f4b", "9c74339d7d73e441e61d1b61b660d92713a163f3c212bf7dca261e4bc1e03601"])
-        self.assertEqual(archive.driver_name, "dimap")
+        print(archive)
+        self.assertTrue(archive.path.startswith("/inputs/images/") or archive.path.startswith("http://minio:9000/archives/inputs/images/") or archive.path.startswith("gs://gisaia-public/test-aias/images/"))
+        self.assertFalse(archive.is_dir)
+        self.assertEqual(archive.driver_name, "tiff")
+        self.assertGreater(archive.last_modification_date.timestamp(), 0)
+        self.assertGreater(archive.creation_date.timestamp(), 0)
 
 if __name__ == '__main__':
     unittest.main()

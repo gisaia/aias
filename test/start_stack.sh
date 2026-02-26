@@ -20,12 +20,6 @@ fi
 
 # Set env variable
 . ./test/env.sh
-# Copy heavy data for test from gcp bucket
-if [ -d "${ROOT_DIRECTORY}/DIMAP" ]; then
-    echo "${ROOT_DIRECTORY}/DIMAP exists, files are not downloaded."
-else
-    gsutil -m cp -r "gs://gisaia-public/DIMAP" $ROOT_DIRECTORY
-fi
 curl https://raw.githubusercontent.com/gisaia/ARLAS-server/refs/heads/master/arlas-commons/src/main/resources/roles.yaml -o conf/roles.yaml
 rm -rf ./outbox
 mkdir outbox
