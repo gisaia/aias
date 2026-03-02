@@ -139,6 +139,13 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 19
 
+  - name: satellogic
+    class_name: extensions.aproc.proc.ingest.drivers.impl.satellogic
+    assets_dir: /tmp/aproc/satellogic
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+    priority: 20
+
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
