@@ -10,6 +10,8 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
+from extensions.aproc.proc.ingest.drivers.impl.utils import (
+    downsample_image, geotiff_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 
@@ -143,12 +145,47 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        # Satellogic preview PNGs have large black borders that cause the
-        # quicklook to appear "too small" when positioned on the map using
-        # the item bbox. Crop the overview (derived from the preview) before upload.
-        for asset in assets:
-            if asset.name == Role.overview.value:
-                self._crop_black_borders(url, asset)
+        has_overview = any(a.name == Role.overview.value for a in assets)
+        has_thumbnail = any(a.name == Role.thumbnail.value for a in assets)
+
+        if has_overview:
+            # Satellogic preview PNGs have large black borders that cause the
+            # quicklook to appear "too small" when positioned on the map using
+            # the item bbox. Crop the overview before upload.
+            for asset in assets:
+                if asset.name == Role.overview.value:
+                    self._crop_black_borders(url, asset)
+        elif AccessManager.is_local(self.toa_path):
+            # Fallback: generate overview from TOA data if no preview PNG
+            tif_path = self.visual_path if self.visual_path else self.toa_path
+            bands = [1, 2, 3] if self.visual_path else [3, 2, 1]
+            quicklook = ImageDriverHelper.prepare_preview_asset(
+                self, url, Role.overview, MimeType.JPG, AssetFormat.jpg
+            )
+            geotiff_to_jpg(
+                tif_path,
+                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
+                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
+                output_path=quicklook.href,
+                bands_list=bands,
+                stretch=not self.visual_path
+            )
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
+            has_overview = True
+
+        if not has_thumbnail and has_overview:
+            # Generate thumbnail by downsampling the overview
+            overview_href = next(
+                a.href for a in assets if a.name == Role.overview.value
+            )
+            thumbnail = ImageDriverHelper.prepare_preview_asset(
+                self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg
+            )
+            downsample_image(overview_href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            thumbnail.size = AccessManager.get_size(thumbnail.href)
+            assets.append(thumbnail)
+
         return assets
 
     def _crop_black_borders(self, url: str, asset: Asset):
@@ -217,17 +254,17 @@ class Driver(IngestDriver):
         else:
             centroid = None
 
-        # Parse datetime from properties
+        # Parse datetime fields from properties
         properties = metadata.get("properties", {})
         datetime_str = properties.get("datetime")
         if datetime_str:
-            # Handle both formats: with and without microseconds
-            try:
-                date_time = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-            except ValueError:
-                date_time = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%SZ")
+            date_time = self._parse_datetime(datetime_str)
         else:
             raise DriverException(f"Missing required 'datetime' in STAC metadata for {url}")
+
+        # Extract eo:bands for properties-level band info
+        md = self._get_cached_metadata()
+        eo_bands = self._extract_bands(md)
 
         item = Item(
             geometry=geometry,
@@ -241,18 +278,30 @@ class Driver(IngestDriver):
                 item_format=ItemFormat.satellogic.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.optic.value
+                observation_type=ObservationType.optic.value,
+                eo__bands=eo_bands if eo_bands else None,
             ),
             assets={asset.name: asset for asset in assets}
         )
 
         return item
 
+    @staticmethod
+    def _parse_datetime(dt_str: str) -> datetime:
+        """Parse ISO 8601 datetime string, with or without microseconds."""
+        try:
+            return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
+
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         properties = metadata.get("properties", {})
 
         # GSD from properties.gsd
         item.properties.gsd = properties.get("gsd")
+
+        # Platform from properties.platform
+        item.properties.platform = properties.get("platform")
 
         # Satellite from properties.satl:sat_id
         item.properties.satellite = properties.get("satl:sat_id")
@@ -262,6 +311,9 @@ class Driver(IngestDriver):
 
         # Processing level from properties.satl:product_name
         item.properties.processing__level = properties.get("satl:product_name")
+
+        # License
+        item.properties.license = properties.get("license")
 
         # Secondary ID from STAC id
         item.properties.secondary_id = metadata.get("id")
