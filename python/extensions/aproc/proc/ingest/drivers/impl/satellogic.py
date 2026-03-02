@@ -2,6 +2,8 @@ import json
 import os
 from datetime import datetime
 
+from PIL import Image as PILImage
+
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -141,9 +143,57 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        # Use existing preview/thumbnail from product, no generation needed
-        # (same pattern as Wyvern/Landsat drivers)
+        # Satellogic preview PNGs have large black borders that cause the
+        # quicklook to appear "too small" when positioned on the map using
+        # the item bbox. Crop the overview (derived from the preview) before upload.
+        for asset in assets:
+            if asset.name == Role.overview.value:
+                self._crop_black_borders(url, asset)
         return assets
+
+    def _crop_black_borders(self, url: str, asset: Asset):
+        """Remove black padding from a PNG asset and save cropped version locally."""
+        try:
+            with AccessManager.stream(asset.href) as fb:
+                img = PILImage.open(fb)
+                img.load()  # Force read before stream closes
+
+            w, h = img.size
+
+            # getbbox() returns the bounding box of non-zero pixels as (left, top, right, bottom)
+            # For near-black compression artifacts, point() thresholds first
+            grayscale = img.convert("L")
+            mask = grayscale.point(lambda px: 255 if px > 5 else 0)
+            content_box = mask.getbbox()
+
+            if content_box is None:
+                return  # Entirely black, nothing to crop
+
+            left, top, right, bottom = content_box
+
+            # Only crop if borders are significant (>3% on any side)
+            if top / h < 0.03 and (h - bottom) / h < 0.03 and left / w < 0.03 and (w - right) / w < 0.03:
+                return
+
+            cropped = img.crop(content_box)
+
+            # Save to the driver's local assets directory
+            role = Role.overview if asset.name == Role.overview.value else Role.thumbnail
+            local_asset = ImageDriverHelper.prepare_preview_asset(
+                self, url, role, MimeType.PNG, AssetFormat.png
+            )
+            os.makedirs(os.path.dirname(local_asset.href), exist_ok=True)
+            cropped.save(local_asset.href, format="PNG")
+
+            self.LOGGER.info(
+                "Cropped %s black borders: %dx%d -> %dx%d",
+                asset.name, w, h, right - left, bottom - top
+            )
+            asset.href = local_asset.href
+            asset.size = os.path.getsize(local_asset.href)
+
+        except Exception as e:
+            self.LOGGER.warning("Failed to crop black borders from %s: %s", asset.name, e)
 
     def load_metadata(self, url: str) -> dict:
         return self._get_cached_metadata()
