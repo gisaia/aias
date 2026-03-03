@@ -2,7 +2,8 @@ import os
 import unittest
 from aproc.core.models.ogc.enums import StatusCode
 from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000,
-                                     RADARSAT2, RAPID_EYE, SENTINEL1_GRDH, WYVERN, LANDSAT9,
+                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH,
+                                     WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
@@ -116,6 +117,10 @@ class Tests(IngestTests):
     def test_async_ingest_landsat9(self):  # Driver Landsat for landsat9 product
         url = os.path.join(ROOT, LANDSAT9)
         self.async_ingest(url, ["thumbnail", "overview", "pan", "metadata", "airs_item"],data_key="pan")
+
+    def test_async_ingest_satellogic(self):  # Driver SATELLOGIC
+        url = os.path.join(ROOT, SATELLOGIC)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "visual", "cloud", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':
