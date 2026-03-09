@@ -50,7 +50,7 @@ class Driver(IngestDriver):
             if AccessManager.is_local(self.tif_path) and Driver.configuration.get('build_overview_when_local', True):
                 Driver.LOGGER.debug(f"Building overview for local TIFF {self.tif_path}")
                 quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href)
+                geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT/5, Driver.OVERVIEW_FROM_TIFF_PCT/5, output_path=quicklook.href)
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
@@ -61,7 +61,7 @@ class Driver(IngestDriver):
                 overview_path = overview_folder + '/overview.jpg'
                 with AccessManager.make_local(self.tif_path) as local_tif_path:
                     quicklook = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    geotiff_to_jpg(local_tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href)
+                    geotiff_to_jpg(local_tif_path, Driver.OVERVIEW_FROM_TIFF_PCT/5, Driver.OVERVIEW_FROM_TIFF_PCT/5, output_path=quicklook.href)
                     quicklook.size = AccessManager.get_size(quicklook.href)
                     self.quicklook_path = quicklook.href
                     assets.append(quicklook)
