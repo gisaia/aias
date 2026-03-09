@@ -122,21 +122,25 @@ class Driver(IngestDriver):
         # Overwrite geometry and centroid if GIS_FILE is present with order shape file
         d = AccessManager.dirname(url)
         if AccessManager.is_dir(os.path.join(d, "GIS_FILES")):
+            files = []
             for file in AccessManager.listdir(os.path.join(d, "GIS_FILES")):
-                if file.name.endswith("_ORDER_SHAPE.shp"):
-                    setup_gdal()
-                    with AccessManager.make_local(os.path.join(d, "GIS_FILES", file.name)) as order_shape_file:
+                files.append(file.path)
+            with AccessManager.make_local_list(files) as local_files:
+                for f in local_files:
+                    if f.lower().endswith('.shp'):
+                        setup_gdal()
+                        Driver.LOGGER.debug(f"Found shapefile {f} in GIS_FILES, using it to calculate geometry and centroid")
                         ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
-                        component_source = ogr_driver.Open(order_shape_file, 0)  # read-only
+                        component_source = ogr_driver.Open(f, 0)  # read-only
                         layer = component_source.GetLayer()
                         component_feature = layer.GetNextFeature()
                         component_geometry = component_feature.geometry()
                         geometry = component_feature.ExportToJson(as_object=True)["geometry"]
                         centroid_geom = component_geometry.Centroid()
 
-                    centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
-                    centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
-                    break
+                        centroid_geom_list = str(centroid_geom).replace("(", "").replace(")", "").split(" ")
+                        centroid = [float(centroid_geom_list[1]), float(centroid_geom_list[2])]
+                        break
 
         date_time_str = metadata.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
