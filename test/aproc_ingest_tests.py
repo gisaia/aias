@@ -38,6 +38,7 @@ TIF = "images/cog.tiff"
 WORLDVIEW = "digitalglobe/WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
 WYVERN = "wyvern/f3aa9cc0-3622-4711-a729-41e573a316f3/wyvern_dragonette-001_20250101T072826_f3aa9cc0/"
 LANDSAT9 = "landsat/LC09_L1TP_201035_20251030_20251103_02_T1/"
+UMBRA_STAC = "umbra/2025-12-17-21-31-57_UMBRA-10"
 
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
