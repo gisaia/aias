@@ -127,7 +127,7 @@ class Driver(IngestDriver):
                 files.append(file.path)
             with AccessManager.make_local_list(files) as local_files:
                 for f in local_files:
-                    if f.lower().endswith('.shp'):
+                    if f.lower().endswith('_order_shape.shp'):
                         setup_gdal()
                         Driver.LOGGER.debug(f"Found shapefile {f} in GIS_FILES, using it to calculate geometry and centroid")
                         ogr_driver = ogr.GetDriverByName("ESRI Shapefile")
