@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from typing import Any
 
 from PIL import Image as PILImage
 
@@ -222,7 +223,7 @@ class Driver(IngestDriver):
             os.makedirs(os.path.dirname(local_asset.href), exist_ok=True)
             cropped.save(local_asset.href, format="PNG")
 
-            self.LOGGER.info(
+            self.LOGGER.debug(
                 "Cropped %s black borders: %dx%d -> %dx%d",
                 asset.name, w, h, right - left, bottom - top
             )
@@ -255,7 +256,7 @@ class Driver(IngestDriver):
             centroid = None
 
         # Parse datetime fields from properties
-        properties = metadata.get("properties", {})
+        properties: dict[str, Any] = metadata.get("properties", {})
         datetime_str = properties.get("datetime")
         if datetime_str:
             date_time = self._parse_datetime(datetime_str)
@@ -272,7 +273,7 @@ class Driver(IngestDriver):
             centroid=centroid,
             properties=Properties(
                 datetime=date_time,
-                constellation="Satellogic",  # Hardcoded (not "Aleph1" from STAC)
+                constellation=properties.get("constellation", "Satellogic"),
                 sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.satellogic.value,
@@ -295,7 +296,7 @@ class Driver(IngestDriver):
             return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        properties = metadata.get("properties", {})
+        properties: dict[str, Any] = metadata.get("properties", {})
 
         # GSD from properties.gsd
         item.properties.gsd = properties.get("gsd")
@@ -321,7 +322,7 @@ class Driver(IngestDriver):
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        properties = metadata.get("properties", {})
+        properties: dict[str, Any] = metadata.get("properties", {})
 
         # Cloud cover
         item.properties.eo__cloud_cover = properties.get("eo:cloud_cover")
@@ -333,7 +334,6 @@ class Driver(IngestDriver):
         item.properties.view__off_nadir = properties.get("view:off_nadir")
         item.properties.view__incidence_angle = properties.get("view:incidence_angle")
 
-        # Instrument from properties.instruments[0]
         instruments = properties.get("instruments", [])
         if instruments:
             item.properties.instrument = instruments[0]
