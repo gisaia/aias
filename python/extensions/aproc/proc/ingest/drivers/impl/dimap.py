@@ -11,6 +11,7 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from airs.core.models.model import SensorType
 
 
 class Driver(IngestDriver):
@@ -175,10 +176,14 @@ class Driver(IngestDriver):
                 if lgv.find('LOCATION_TYPE').text == "Center":
                     date_time = int(datetime.strptime(lgv.find('TIME').text, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
+        constellation = "AIRBUS"
         if "MISSION" in metadata:
             constellation = metadata["MISSION"]
         elif "DATASET_PRODUCER_NAME" in metadata:
             constellation = metadata["DATASET_PRODUCER_NAME"]
+        satellite = constellation
+        if metadata["MISSION_INDEX"]:
+            satellite = satellite + "-" + metadata["MISSION_INDEX"]
 
         item = Item(
             geometry=geometry,
@@ -187,8 +192,10 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=satellite,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=self.get_main_asset_format(root),
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
@@ -229,8 +236,10 @@ class Driver(IngestDriver):
         item.properties.view__sun_elevation = find_or_none(root, "SUN_ELEVATION")
 
         # To fit the case of PNEO 30 cm with no instrument metadata
-        item.properties.instrument = metadata.get("INSTRUMENT", None)
-        item.properties.sensor_type = metadata.get("MISSION_INDEX", None)
+        item.properties.instrument = metadata.get("INSTRUMENT", metadata.get("MISSION", None))
+        if item.properties.instrument:
+                    item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", "?"))
+
 
         return item
 

@@ -129,7 +129,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation='LANDSAT',
-                sensor_type=SensorType.OPTIC,
+                sensor_type=SensorType.OPTIC.value,
                 secondary_id=metadata.get("id", None),
                 item_format=ItemFormat.landsat,
                 item_type=ResourceType.gridded.value,

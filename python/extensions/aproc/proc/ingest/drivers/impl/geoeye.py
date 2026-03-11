@@ -4,7 +4,7 @@ from datetime import datetime
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
@@ -151,8 +151,10 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geoeye.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
@@ -179,8 +181,7 @@ class Driver(IngestDriver):
 
         item.properties.instrument = item.properties.constellation
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_type = metadata.get("Sensor Type", None)
-
+        
         if 'Scan Azimuth' in metadata:
             item.properties.view__azimuth = float(metadata['Scan Azimuth'].split(' ')[0])
         if 'Sun Angle Azimuth' in metadata:

@@ -132,7 +132,7 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation="Sentinel 2",
-                sensor_type=SensorType.OPTIC,
+                sensor_type=SensorType.OPTIC.value,
                 secondary_id=secondary_id,
                 item_format=ItemFormat.safe,
                 item_type=ResourceType.gridded.value,

@@ -85,7 +85,7 @@ class Driver(IngestDriver):
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
-        elif self.data_format == AssetFormat.h5 and AccessManager.is_local(self.data_path):
+        elif self.data_format == AssetFormat.h5:
             import h5py
             import numpy as np
             from PIL import Image
@@ -139,7 +139,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation="COSMO-SkyMed",
-                sensor_type=SensorType.SAR,
+                sensor_type=SensorType.SAR.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,
                 main_asset_format=self.data_format.value,

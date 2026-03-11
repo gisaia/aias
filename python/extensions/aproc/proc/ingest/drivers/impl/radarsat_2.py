@@ -125,7 +125,7 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=stop_time,
                 constellation=constellation,
-                sensor_type=SensorType.SAR,
+                sensor_type=SensorType.SAR.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.radarsat2,
                 main_asset_format=AssetFormat.geotiff,

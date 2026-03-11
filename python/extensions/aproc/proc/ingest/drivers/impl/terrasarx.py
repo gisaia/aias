@@ -11,6 +11,7 @@ from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from airs.core.models.model import SensorType
 
 
 class Driver(IngestDriver):
@@ -101,6 +102,7 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.terrasar.value,
+                sensor_type=SensorType.SAR.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value
@@ -129,7 +131,6 @@ class Driver(IngestDriver):
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
         item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
-        item.properties.sensor_type = find_or_none(root, "productInfo/acquisitionInfo/sensor")
         item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
 
         return item

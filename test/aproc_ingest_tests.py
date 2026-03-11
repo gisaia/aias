@@ -34,6 +34,8 @@ SATELLOGIC = "satellogic/SYNTHETIC_20260101_120000_000_SN01_L1D_SR_MS_999999"
 SENTINEL2 = "sentinel2/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 SKYSAT = "skysat/"
 SPOT5 = "spot5/"
+PNEOMS = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_MS-FS/"
+PNEOPAN = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_PAN/"
 TERRASARX = "terrasarx/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
 TIF = "images/cog.tiff"
 WORLDVIEW = "digitalglobe/WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
@@ -153,8 +155,12 @@ class IngestTests(unittest.TestCase):
             self.assertTrue(item.assets.get(Role.overview.value).airs__managed, f"overview asset should be managed for {id}")
         self.assertIsNotNone(item.properties.datetime, asset)
         if archive:
+            self.assertIsNotNone(item.properties.item_type)
+            self.assertIsNotNone(item.properties.item_format)
+            self.assertIsNotNone(item.properties.observation_type)
             self.assertIsNotNone(item.properties.secondary_id)
             self.assertIsNotNone(item.properties.constellation)
+            self.assertIsNotNone(item.properties.satellite)
             self.assertIsNotNone(item.properties.instrument)
             self.assertIsNotNone(item.properties.sensor)
             self.assertIsNotNone(item.properties.sensor_type)
