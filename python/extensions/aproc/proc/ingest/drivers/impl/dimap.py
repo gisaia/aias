@@ -237,7 +237,7 @@ class Driver(IngestDriver):
         # To fit the case of PNEO 30 cm with no instrument metadata
         item.properties.instrument = metadata.get("INSTRUMENT", metadata.get("MISSION", None))
         if item.properties.instrument:
-                    item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", None))
+                    item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", "?"))
 
         item.properties.sensor_type = SensorType.OPTIC.value
 
