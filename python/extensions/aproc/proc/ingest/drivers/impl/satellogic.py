@@ -156,6 +156,7 @@ class Driver(IngestDriver):
             for asset in assets:
                 if asset.name == Role.overview.value:
                     self._crop_black_borders(url, asset)
+                    break
         elif AccessManager.is_local(self.toa_path):
             # Fallback: generate overview from TOA data if no preview PNG
             tif_path = self.visual_path if self.visual_path else self.toa_path
