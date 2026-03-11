@@ -7,7 +7,8 @@ from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION
 import requests
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from test.aproc_ingest_tests import (AST, DIMAP, IKONOS, JP2000, RAPID_EYE,
-                                     TERRASARX, TIF, WORLDVIEW, IngestTests)
+                                     TERRASARX, TIF, WORLDVIEW,
+                                     IngestTests)
 
 ROOT = "/inputs"
 
@@ -58,7 +59,6 @@ class Tests(IngestTests):
         resource_status: list = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs/resources", status.resourceID])).content)
         self.assertGreaterEqual(len(resource_status), 1)
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)
-
 
 if __name__ == '__main__':
     unittest.main()
