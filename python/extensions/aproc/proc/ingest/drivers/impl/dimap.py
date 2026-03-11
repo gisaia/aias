@@ -195,6 +195,7 @@ class Driver(IngestDriver):
                 satellite=satellite,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.dimap.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=self.get_main_asset_format(root),
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
@@ -239,7 +240,6 @@ class Driver(IngestDriver):
         if item.properties.instrument:
                     item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", "?"))
 
-        item.properties.sensor_type = SensorType.OPTIC.value
 
         return item
 

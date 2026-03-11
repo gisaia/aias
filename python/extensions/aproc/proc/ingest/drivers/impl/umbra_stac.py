@@ -113,6 +113,7 @@ class Driver(IngestDriver):
         end_datetime = parse_dt(end_dt_str)
 
         constellation = props.get("constellation", "UMBRA").upper()
+        satellite = props.get("platform", "UMBRA")
 
         item = Item(
             geometry=geometry,

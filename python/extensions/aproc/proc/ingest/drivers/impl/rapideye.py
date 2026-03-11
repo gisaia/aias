@@ -102,6 +102,7 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.rapideye.value,
+                sensor_type = SensorType.OPTIC.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
@@ -128,7 +129,6 @@ class Driver(IngestDriver):
         item.properties.view__sun_azimuth = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationAzimuthAngle", lambda x: float(x), ns=Driver.ns)
         item.properties.view__sun_elevation = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/opt:illuminationElevationAngle", lambda x: float(x), ns=Driver.ns)
         item.properties.view__azimuth = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:acquisitionParameters/re:Acquisition/re:azimuthAngle", lambda x: float(x), ns=Driver.ns)
-        item.properties.sensor_type = SensorType.OPTIC.value
         item.properties.sensor = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:platform/eop:Platform/eop:shortName", ns=Driver.ns)
         item.properties.instrument = find_or_none(root, "gml:using/eop:EarthObservationEquipment/eop:instrument/eop:Instrument/eop:shortName", ns=Driver.ns)
         item.properties.eo__cloud_cover = find_or_none(root, "gml:resultOf/re:EarthObservationResult/opt:cloudCoverPercentage", lambda x: float(x), ns=Driver.ns)

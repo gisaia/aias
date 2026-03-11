@@ -114,6 +114,7 @@ class Driver(IngestDriver):
                 satellite=satellite,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.spot5.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
@@ -141,7 +142,6 @@ class Driver(IngestDriver):
 
         item.properties.instrument = metadata.get("INSTRUMENT", None)
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_type = SensorType.OPTIC.value
 
         item.properties.view__incidence_angle = metadata.get("INCIDENCE_ANGLE", None)
         item.properties.view__sun_azimuth = metadata.get("SUN_AZIMUTH", None)

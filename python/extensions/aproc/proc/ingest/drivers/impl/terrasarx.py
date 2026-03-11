@@ -102,6 +102,7 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.terrasar.value,
+                sensor_type=SensorType.SAR.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.radar.value
@@ -130,7 +131,6 @@ class Driver(IngestDriver):
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
         item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
-        item.properties.sensor_type = SensorType.SAR.value
         item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
 
         return item

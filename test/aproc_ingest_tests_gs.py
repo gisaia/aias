@@ -80,7 +80,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_csk(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
-        self.async_ingest(url, ["data", "airs_item"], check_epsg=False)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False)
 
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)

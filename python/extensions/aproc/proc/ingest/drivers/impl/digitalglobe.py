@@ -5,7 +5,7 @@ from datetime import datetime
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -154,6 +154,8 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=constellation,
+                sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.digitalglobe.value,
                 main_asset_format=AssetFormat.geotiff.value,
