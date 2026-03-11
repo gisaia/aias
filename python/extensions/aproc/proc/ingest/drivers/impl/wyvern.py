@@ -164,7 +164,7 @@ class Driver(IngestDriver):
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
                 constellation=constellation,
-                sensor_type=SensorType.OPTIC,
+                sensor_type=SensorType.OPTIC.value,
                 secondary_id=id,
                 item_format=ItemFormat.wyvern,
                 item_type=ResourceType.gridded.value,

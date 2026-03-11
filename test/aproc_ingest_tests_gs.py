@@ -1,9 +1,9 @@
 import os
 import unittest
 from aproc.core.models.ogc.enums import StatusCode
-from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000,
-                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH,
-                                     WYVERN, LANDSAT9,
+
+from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
@@ -125,6 +125,14 @@ class Tests(IngestTests):
     def test_async_ingest_satellogic(self):  # Driver SATELLOGIC
         url = os.path.join(ROOT, SATELLOGIC)
         self.async_ingest(url, ["thumbnail", "overview", "data", "visual", "cloud", "metadata", "airs_item"])
+
+    def test_async_ingest_pneo_ms(self):  # Driver DIMAP for PNEO MS
+        url = os.path.join(ROOT, PNEOMS)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_pneo_pan(self):  # Driver DIMAP for PNEO PAN
+        url = os.path.join(ROOT, PNEOPAN)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 
 if __name__ == '__main__':

@@ -108,6 +108,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.ast_dem.value,
                 main_asset_format=AssetFormat.geotiff.value,

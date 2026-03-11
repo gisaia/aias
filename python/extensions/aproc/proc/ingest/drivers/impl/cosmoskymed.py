@@ -139,7 +139,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation="COSMO-SkyMed",
-                sensor_type=SensorType.SAR,
+                sensor_type=SensorType.SAR.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.csk.value,
                 main_asset_format=self.data_format.value,

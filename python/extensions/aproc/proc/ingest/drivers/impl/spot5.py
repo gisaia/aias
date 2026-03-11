@@ -5,7 +5,7 @@ from datetime import datetime
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -100,6 +100,9 @@ class Driver(IngestDriver):
         date_time = int(datetime.strptime(date + time, "%Y-%m-%d%H:%M:%S").timestamp())
 
         constellation = metadata["MISSION"]
+        satellite = constellation
+        if "MISSION_INDEX" in metadata:
+            satellite = satellite + "-" + metadata["MISSION_INDEX"]
 
         item = Item(
             geometry=geometry,
@@ -108,6 +111,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
+                satellite=satellite,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.spot5.value,
                 main_asset_format=AssetFormat.geotiff.value,
@@ -137,7 +141,7 @@ class Driver(IngestDriver):
 
         item.properties.instrument = metadata.get("INSTRUMENT", None)
         item.properties.sensor = item.properties.constellation
-        item.properties.sensor_type = metadata.get("MISSION_INDEX", None)
+        item.properties.sensor_type = SensorType.OPTIC.value
 
         item.properties.view__incidence_angle = metadata.get("INCIDENCE_ANGLE", None)
         item.properties.view__sun_azimuth = metadata.get("SUN_AZIMUTH", None)
