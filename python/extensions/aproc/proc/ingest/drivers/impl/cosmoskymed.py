@@ -97,11 +97,17 @@ class Driver(IngestDriver):
                     max_height = -np.inf
                     values = []
 
-                    # Find QLK in HDF5 file
                     for v in h5f.values():
-                        data: np.ndarray = v['QLK'][()]
-                        max_height = max(max_height, data.shape[0])
-                        values.append(data)
+                        if isinstance(v, h5py.Dataset) and v.name.endswith("QLK"):
+                            data: np.ndarray = v[()]
+                            max_height = max(max_height, data.shape[0])
+                            values.append(data)
+                        elif isinstance(v, h5py.Group):
+                            for vv in v.values():
+                                if isinstance(vv, h5py.Dataset) and vv.name.endswith("QLK"):
+                                    data: np.ndarray = vv[()]
+                                    max_height = max(max_height, data.shape[0])
+                                    values.append(data)
 
                     for idx, data in enumerate(values):
                         if data.shape[0] < max_height:
