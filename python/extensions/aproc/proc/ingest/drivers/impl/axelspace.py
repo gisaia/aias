@@ -10,23 +10,17 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg,
-                                                             get_bbox,
-                                                             get_centroid,
-                                                             get_epsg)
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-
     configuration: dict = {}
 
     def __init__(self):
         super().__init__()
 
-        self.tif_path = None
-        self.udm_path = None
+        self.tif_paths: list[str] = []
         self.md_path = None
 
     # Implements drivers method
@@ -38,24 +32,22 @@ class Driver(IngestDriver):
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
-        assets.append(
-            Asset(
-                href=url,
-                roles=[Role.archive.value],
-                name=Role.archive.value,
-                type=MimeType.TIFF.value,
-                description=Role.archive.value,
-                airs__managed=False,
-                asset_format=AssetFormat.geotiff.value
-            )
-        )
+        ImageDriverHelper.add_archive(assets, url)
 
-        ImageDriverHelper.add_asset(assets, self.tif_path, Role.data,
-                                    MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.JSON, AssetFormat.json, ResourceType.other)
-        ImageDriverHelper.add_asset(assets, self.udm_path, Role.cloud,
-                                    MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+
+        for tif in self.tif_paths:
+            asset = Asset(href=tif, size=AccessManager.get_size(tif),
+                          roles=[Role.data.value, Role.visual.value], name=self.__get_asset_name(tif, Role.data), type=MimeType.TIFF.value,
+                          description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff, asset_type=ResourceType.gridded)
+
+            # Get asset's GSD
+            tile_md = self.__load_tile_md(tif)
+            if tile_md.get("rowGSD", None) and tile_md.get("columnGSD", None):
+                asset.eo__gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
+
+            assets.append(asset)
         return assets
 
     # Implements drivers method
@@ -64,12 +56,27 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if AccessManager.is_local(self.tif_path) and Driver.configuration.get('build_overview_when_local', True):
+        if (AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_remote', False)):
+            from osgeo import gdal
+            # Minify all the tiffs
+            minified_tiffs = []
+            options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], widthPct=Driver.OVERVIEW_FROM_TIFF_PCT, heightPct=Driver.OVERVIEW_FROM_TIFF_PCT)
+            for tif in self.tif_paths:
+                mini_tif = os.path.join(AccessManager.tmp_dir, os.path.basename(tif))
+                gdal.Translate(mini_tif, AccessManager.get_gdal_src(tif), options=options)
+                minified_tiffs.append(mini_tif)
+
+            # Create quicklook
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
+            gdal.Warp(quicklook.href, minified_tiffs, format="JPEG")
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
+            # Remove minified tiffs
+            for t in minified_tiffs:
+                AccessManager.clean(t)
+
+            # Create thumbnail
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
@@ -85,19 +92,25 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         from pyproj import Transformer
+        from shapely import union_all, Polygon, to_geojson
 
         try:
-            tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
-
-            # Convert geometry to correct projection
+            # The extent of the archive is the union of all extents
             epsg = metadata["productMetadata"]["spatialReferenceSystem"]["EPSGCode"]
             transformer = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326")
-            coordinates = tile_md["imageLocation"]["coordinates"][0]
-            xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
-            geometry = {"type": "Polygon", "coordinates": [[[y, x] for (x, y) in zip(xx, yy)]]}
 
-            centroid = get_centroid(geometry)
-            bbox = get_bbox(geometry["coordinates"][0])
+            geometries = []
+            for tif in self.tif_paths:
+                tile_md = self.__load_tile_md(tif)
+
+                # Convert geometry to correct projection
+                coordinates = tile_md["imageLocation"]["coordinates"][0]
+                xx, yy = transformer.transform([c[0] for c in coordinates], [c[1] for c in coordinates])
+                geometries.append(Polygon([[y, x] for (x, y) in zip(xx, yy)]))
+
+            merged_polygons: Polygon = union_all(geometries).normalize()
+            centroid = merged_polygons.centroid.xy
+            bbox = merged_polygons.bounds
 
             start_date_time = metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
             start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
@@ -107,10 +120,16 @@ class Driver(IngestDriver):
         except KeyError as ke:
             raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
 
+        # Use higher resolution asset as the main asset
+        main_asset = assets[0]
+        for asset in assets:
+            if (not main_asset.eo__gsd and asset.eo__gsd) or (asset.eo__gsd and asset.eo__gsd < main_asset.eo__gsd):
+                main_asset = asset
+
         item = Item(
-            geometry=geometry,
+            geometry=json.loads(to_geojson(merged_polygons)),
             bbox=bbox,
-            centroid=centroid,
+            centroid=[centroid[0][0], centroid[1][0]],
             properties=Properties(
                 datetime=start_date_time,
                 start_datetime=start_date_time,
@@ -120,7 +139,7 @@ class Driver(IngestDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.axelspace.value,
                 main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=Role.data.value,
+                main_asset_name=main_asset.name,
                 observation_type=ObservationType.optic.value
             ),
             assets={asset.name: asset for asset in assets}
@@ -129,56 +148,59 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        try:
-            # Is necessarily a dictionary as the core item was built using it
-            tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
+        # Item's gsd is the minimum of all assets gsd
+        gsd = None
+        for asset in item.assets.values():
+            if Role.data.value in asset.roles:
+                if gsd is None:
+                    gsd = asset.eo__gsd
+                elif asset.eo__gsd is not None:
+                    gsd = min(asset.eo__gsd, gsd)
 
-            if tile_md.get("rowGSD", None) and tile_md.get("columnGSD", None):
-                item.properties.gsd = sqrt(tile_md["rowGSD"]**2 + tile_md["columnGSD"]**2)
+        item.properties.satellite = metadata.get("EOMetadata", {}).get("satelliteName", None)
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
 
-            item.properties.secondary_id = self.tif_path.removesuffix(".tif")
-            item.properties.satellite = metadata.get("EOMetadata", {}).get("satelliteName", None)
-            item.properties.instrument = item.properties.satellite
-            item.properties.sensor = item.properties.satellite
-        except KeyError as ke:
-            raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
-
-        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.proj__epsg = metadata.get("productMetadata", {}).get("spatialReferenceSystem", {}).get("EPSGCode", None)
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        tile_md = metadata["imageTileMetadata"][os.path.basename(self.tif_path)]
-        item.properties.eo__cloud_cover = tile_md.get("cloudCoverPercentage", None)
-
         item.properties.view__sun_elevation = metadata.get("EOMetadata", {}).get("solarElevationAngleNominal", None)
         item.properties.view__sun_azimuth = metadata.get("EOMetadata", {}).get("solarAzimuthAngleNominal", None)
 
         item.properties.acq__acquisition_orbit_direction = metadata.get("EOMetadata", {}).get("orbitDirection", None)
+        if item.properties.acq__acquisition_orbit_direction is not None:
+            item.properties.acq__acquisition_orbit_direction = item.properties.acq__acquisition_orbit_direction.upper()
 
         return item
 
     def __check_path__(self, path: str):
         self.__init__()
 
+        if AccessManager.is_dir(path):
+            for f in AccessManager.listdir(path):
+                if not f.is_dir:
+                    # Only keep one md_path
+                    if self.md_path is None and f.name.lower().endswith("_udm_metadata.json"):
+                        self.md_path = f.path
+                    # Only keep the TCI tif. There should be a metadata UDM file associated
+                    if f.name.lower().endswith("tci.tif") and AccessManager.exists(f.path.replace("tci.tif", "msi_udm_metadata.json")):
+                        self.tif_paths.append(f.path)
+
+            return self.md_path is not None \
+                and len(self.tif_paths) > 0
+        return False
+
+    def __get_asset_name(self, path: str, role: Role):
         file_name = os.path.basename(path)
 
-        if file_name.endswith(".tif") and file_name.find("_UDM_") < 0 and AccessManager.is_file(path):
-            self.tif_path = path
-            dir_name = AccessManager.dirname(path)
+        # Asset name is id_role
+        return f"{role.value}_{file_name.split('_')[1]}"
 
-            core = "_".join(file_name.removesuffix(".tif").split("_")[:-1])
-            tile = file_name.removesuffix(".tif").split("_")[-1]
+    def __load_tile_md(self, tif: str) -> dict:
+        tile_md_file = tif.replace("tci.tif", "msi_udm_metadata.json")
+        with AccessManager.stream(tile_md_file) as fb:
+            tile_md = json.load(fb)["imageTileMetadata"]
 
-            md_path = os.path.join(dir_name, core + "_metadata.json")
-            if AccessManager.exists(md_path):
-                self.md_path = md_path
-
-            udm_path = os.path.join(dir_name, core + "_UDM_" + tile + ".tif")
-            if AccessManager.exists(udm_path):
-                self.udm_path = udm_path
-
-            return self.tif_path is not None \
-                and self.md_path is not None \
-                and self.udm_path is not None
-        return False
+        return tile_md

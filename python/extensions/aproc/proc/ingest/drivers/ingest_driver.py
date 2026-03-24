@@ -231,7 +231,6 @@ class IngestDriver(AbstractDriver):
 
         Args:
             url (str): archive's url
-            assets (list[Asset]): list of assets. Assets must have a valid name, href and roles.
 
         Returns:
             Object: A structure containing the metadata (diictionary, parsed xml, ...)

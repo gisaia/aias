@@ -77,7 +77,7 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         if metadata.get("geometry", None) is None and metadata.get("sensors", {}).get("rgb"):
-            geometry = metadata["sensors"]["rgb"]["geometry"]            
+            geometry = metadata["sensors"]["rgb"]["geometry"]
         else:
             geometry = metadata["geometry"]
         centroid = get_centroid(geometry)
@@ -108,7 +108,7 @@ class Driver(IngestDriver):
         item.properties.gsd = metadata.get("gsd", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("gsd", None))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
         item.properties.secondary_id = metadata.get("id", None)
-        item.properties.processing__level= metadata.get("processingLevel", None)
+        item.properties.processing__level = metadata.get("processingLevel", None)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
@@ -118,7 +118,7 @@ class Driver(IngestDriver):
         item.properties.view__off_nadir = metadata.get("offNadirAngle", None)
         item.properties.view__sun_azimuth = metadata.get("sunAzimuth", None)
         item.properties.view__sun_elevation = metadata.get("sunElevation", None)
-        item.properties.eo__cloud_cover= metadata.get("cloudCoverPercent", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("cloudCoverPercent", None))
+        item.properties.eo__cloud_cover = metadata.get("cloudCoverPercent", metadata.get("sensors", {}).get("rgb", {}).get("properties", {}).get("cloudCoverPercent", None))
         return item
 
     def __check_path__(self, path: str):

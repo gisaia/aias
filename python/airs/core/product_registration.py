@@ -518,7 +518,7 @@ def __set_assets_links(item: Item) -> Item:
     for asset_name in item.assets:
         asset = item.assets[asset_name]
         if asset.airs__managed is True:
-            LOGGER.info("Asset {} is maneged".format(asset_name))
+            LOGGER.info("Asset {} is managed".format(asset_name))
             object_relative_path = get_asset_relative_path(
                 item.collection, item.id, asset_name
             )
@@ -531,7 +531,7 @@ def __set_assets_links(item: Item) -> Item:
             asset.storage__platform = Configuration.settings.s3.platform
             asset.storage__tier = Configuration.settings.s3.tier
         else:
-            LOGGER.info("Asset {} is not maneged".format(asset_name))
+            LOGGER.info("Asset {} is not managed".format(asset_name))
     item_relative_path = get_item_relative_path(item.collection, item.id)
     item.assets[Role.airs_item.value] = Asset(
         name=Role.airs_item.value,

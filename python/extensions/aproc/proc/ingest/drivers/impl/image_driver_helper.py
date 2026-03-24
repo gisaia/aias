@@ -144,7 +144,7 @@ class ImageDriverHelper:
                             if value != nodata:
                                 geoms.append(shapely_geom)
                             else:
-                            # fallback if no geometry found
+                                # fallback if no geometry found
                                 nodata_geoms.append(shapely_geom)
 
                 except rasterio.errors.CRSError as e:

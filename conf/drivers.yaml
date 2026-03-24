@@ -123,6 +123,7 @@ drivers:
     assets_dir: /tmp/aproc/axelspace
     configuration:
       tmp_directory: $TMP_FOLDER|/tmp
+      build_overview_when_remote: true
     priority: 16
 
   -
