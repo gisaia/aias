@@ -8,15 +8,15 @@
 
 authentication:
   use_authent: true
-  auth_mode: openid
-  force_connect: true
+  auth_mode: 'iam'
+  force_connect: false
   use_discovery: true
   threshold: 60000
   url: https://localhost/arlas_iam_server
   issuer: https://localhost:9443/auth/realms/arlas
   client_id: arlas-front
   redirect_uri: https://localhost:4200/callback
-  silent_refresh_redirect_uri: http://localhost:4200/silent-refresh.html
+  silent_refresh_redirect_uri: https://localhost:4200/silent-refresh.html
   scope: profile
   token_endpoint: NOT_CONFIGURED
   userinfo_endpoint: NOT_CONFIGURED
@@ -36,15 +36,15 @@ authentication:
   custom_query_params: []
   sign_up_enabled: false
 file_manager:
-  url: https://localhost:4200/fam
+  url: https://localhost/fam
   default_path: ""
   collection: "catalogue"
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://localhost:4200/aproc
+  url: https://localhost/aproc
   collection: "catalogue"
   catalog: "catalogue"
 status:
-  url: https://localhost:4200/airs
+  url: https://localhost/airs
   collection: "catalogue"

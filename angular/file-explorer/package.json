@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:iam": "ng serve --ssl --ssl-cert=$EXPLO_SSL_CERT --ssl-key=$EXPLO_SSL_KEY",
     "build": "ng build --configuration production --base-href='$FAM_WUI_BASE_HREF/'",
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint",
@@ -31,7 +32,7 @@
   "dependencies": {
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
-    "arlas-wui-toolkit": "~27.0.1",
+    "arlas-wui-toolkit": "27.2.0-rc.1",
     "ngx-spinner": "^17.0.0",
     "ngx-toastr": "^19.0.0",
     "ngx-clipboard": "^16.0.0",
