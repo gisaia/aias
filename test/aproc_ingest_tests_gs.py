@@ -2,7 +2,7 @@ import os
 import unittest
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -134,6 +134,17 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, PNEOPAN)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
+    def test_async_ingest_capella1(self):  # Driver CAPELLA
+        url = os.path.join(ROOT, CAPELLA1)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_capella2(self):  # Driver CAPELLA
+        url = os.path.join(ROOT, CAPELLA2)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_capella3(self):  # Driver CAPELLA
+        url = os.path.join(ROOT, CAPELLA3)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 if __name__ == '__main__':
     unittest.main()

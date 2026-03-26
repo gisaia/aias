@@ -150,6 +150,7 @@ class ItemFormat(Enum):
     ast_dem = "AST_DEM"
     axelspace = "Axelspace"
     bsg = "BlackSkyGlobal"
+    capella = "CAPELLA"
     csk = "COSMO-SkyMed"
     digitalglobe = "DIGITALGLOBE"
     dimap = "DIMAP"

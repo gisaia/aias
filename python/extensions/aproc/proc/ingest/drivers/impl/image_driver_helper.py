@@ -7,8 +7,11 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.ingest.drivers.impl.utils import compute_simplified_polygon
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from aproc.core.logger import Logger
 
+LOGGER = Logger.logger
 
 class ImageDriverHelper:
     @staticmethod
@@ -37,9 +40,11 @@ class ImageDriverHelper:
 
     @staticmethod
     def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False):
-        assets.append(Asset(href=href, size=AccessManager.get_size(href),
+        asset = Asset(href=href, size=AccessManager.get_size(href),
                             roles=[role.value], name=role.value, type=type.value,
-                            description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value))
+                            description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value)
+        assets.append(asset)
+        return asset
 
     @staticmethod
     def add_archive(assets: list[Asset], href: str):
@@ -76,6 +81,24 @@ class ImageDriverHelper:
             raise DriverException("Can not read image metadata from {}: {}".format(url, e))
 
         return gdal_info
+
+    @staticmethod
+    def gdal_geometry(driver: IngestDriver, url: str) -> object:
+        from osgeo import gdal
+        options = gdal.InfoOptions(format="json")
+        gdal_info = AccessManager.get_gdal_info(url, options)
+        geometry = gdal_info.get("wgs84Extent", None)
+        gcps = gdal_info.get("gcps", {}).get("gcpList", [])
+        if geometry is None:
+            if gcps:
+                LOGGER.debug("No geometry found for {}, trying to compute it from gcps".format(url))
+                geometry = {
+                    "type": "Polygon",
+                    "coordinates": [compute_simplified_polygon(gcps)]
+                }
+            else:
+                LOGGER.warning("No geometry found for {} and no gcps to compute it from".format(url))
+        return geometry
 
     @staticmethod
     def build_core_item(driver: IngestDriver, url: str, item_format: ItemFormat, asset_format: AssetFormat, assets: list[Asset], metadata: object) -> Item:
@@ -158,3 +181,4 @@ class ImageDriverHelper:
             item.properties.datetime = AccessManager.get_creation_time(url)
 
         return item
+
