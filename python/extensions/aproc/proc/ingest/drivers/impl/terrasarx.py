@@ -16,6 +16,8 @@ from airs.core.models.model import SensorType
 
 class Driver(IngestDriver):
 
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.browse_path = None
@@ -27,6 +29,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -53,7 +56,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_BROWSE_PCT, Driver.OVERVIEW_FROM_BROWSE_PCT, quicklook.href)
+        geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_BROWSE_PCT, Driver.OVERVIEW_FROM_BROWSE_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
         quicklook.size = AccessManager.get_size(quicklook.href)
         assets.append(quicklook)
 

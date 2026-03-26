@@ -16,6 +16,8 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 class Driver(IngestDriver):
     ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
 
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -37,6 +39,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -70,7 +73,7 @@ class Driver(IngestDriver):
 
         if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(image_path, quicklook_pct, quicklook_pct, output_path=quicklook.href)
+            geotiff_to_jpg(image_path, quicklook_pct, quicklook_pct, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
