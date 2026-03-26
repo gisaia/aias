@@ -51,11 +51,11 @@ export class ExplorerComponent implements OnInit {
 
   public selectedFilePath = '';
 
-  getLevel = (node: DynamicFileNode) => node.level;
+  public getLevel = (node: DynamicFileNode) => node.level;
 
-  isExpandable = (node: DynamicFileNode) => node.is_dir;
+  public isExpandable = (node: DynamicFileNode) => node.is_dir;
 
-  hasChild = (_: number, nodeData: DynamicFileNode) => nodeData.is_dir;
+  public hasChild = (_: number, nodeData: DynamicFileNode) => nodeData.is_dir;
 
   public constructor(
     private readonly famService: FamService,
@@ -78,15 +78,15 @@ export class ExplorerComponent implements OnInit {
       },
       error: (err: Response) => {
         if (err.status === 404) {
-          this.toastr.error(this.translate.instant('Unable to retrieve files'))
+          this.toastr.error(this.translate.instant('Unable to retrieve files'));
         } else if (err.status === 403) {
-          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'));
         }
       }
     });
     this.collapseAllSubject.subscribe({
       next: (ok) => {
-        if (!!ok) {
+        if (ok) {
           this.treeControl.collapseAll();
         }
       }
@@ -104,11 +104,11 @@ export class ExplorerComponent implements OnInit {
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm.status) {
+        if (confirm.status) {
           this.jobService.ingestDirectory(node, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
-              this.toastr.success(this.translate.instant('Activation started'))
+              this.toastr.success(this.translate.instant('Activation started'));
             },
             error: (err: HttpErrorResponse) => {
               emitErrors(
@@ -122,7 +122,7 @@ export class ExplorerComponent implements OnInit {
           });
         }
       }
-    })
+    });
   }
 
 }

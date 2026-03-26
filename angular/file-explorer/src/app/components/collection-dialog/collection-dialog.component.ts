@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { CollectionListComponent } from "@components/collection-list/collection-list.component";
+import { CollectionListComponent } from '@components/collection-list/collection-list.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

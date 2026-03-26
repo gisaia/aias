@@ -20,8 +20,8 @@
 import { LOCATION_INITIALIZED } from '@angular/common';
 import { Injectable, Injector } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ArlasIamService, ArlasSettings, ArlasStartupService, FetchInterceptorService } from 'arlas-wui-toolkit';
 import { FamService } from '@services/fam/fam.service';
+import { ArlasIamService, ArlasSettings, ArlasStartupService, FetchInterceptorService } from 'arlas-wui-toolkit';
 import { JobService } from './job/job.service';
 import { StatusService } from './status/status.service';
 
@@ -35,13 +35,13 @@ export class StartupService {
 
   public static translationLoaded(translateService: TranslateService, injector: Injector) {
     return new Promise<any>((resolve: any) => {
-      const url = window.location.href;
+      const url = globalThis.location.href;
       const paramLangage = 'lg';
       // Set default language to current browser language
       let langToSet = navigator.language.slice(0, 2);
       const regex = new RegExp('[?&]' + paramLangage + '(=([^&#]*)|&|#|$)');
       const results = regex.exec(url);
-      if (results && results[2]) {
+      if (results?.[2]) {
         langToSet = decodeURIComponent(results[2].replace(/\+/g, ' '));
       }
       const locationInitialized = injector.get(LOCATION_INITIALIZED, Promise.resolve(null));
@@ -59,14 +59,14 @@ export class StartupService {
   }
 
   public constructor(
-    private arlasStartupService: ArlasStartupService,
-    private injector: Injector,
-    private translateService: TranslateService,
-    private arlasIamService: ArlasIamService,
-    private famService: FamService,
-    private jobService: JobService,
-    private statusService: StatusService,
-    private fetchInterceptorService: FetchInterceptorService
+    private readonly arlasStartupService: ArlasStartupService,
+    private readonly injector: Injector,
+    private readonly translateService: TranslateService,
+    private readonly arlasIamService: ArlasIamService,
+    private readonly famService: FamService,
+    private readonly jobService: JobService,
+    private readonly statusService: StatusService,
+    private readonly fetchInterceptorService: FetchInterceptorService
   ) { }
 
   public init(): Promise<string> {
@@ -77,10 +77,9 @@ export class StartupService {
         this.famService.setSettings((s as any).file_manager);
         this.jobService.setSettings((s as any).jobs);
         this.statusService.setSettings((s as any).status);
-        return Promise.resolve(s)
+        return s;
       })
-      .then((settings: ArlasSettings) => {
-        return new Promise((resolve, reject) => {
+      .then((settings: ArlasSettings) => new Promise((resolve, reject) => {
           const useAuthent = !!settings && !!settings.authentication
             && !!settings.authentication.use_authent;
           // The default behavior is openid, so if there is no auth_mode specified, it is openid
@@ -96,24 +95,23 @@ export class StartupService {
                     headers: {
                       Authorization: 'Bearer ' + authService.accessToken
                     }
-                  }
+                  };
                   this.famService.setOptions(headers);
                   this.jobService.setOptions(headers);
                   this.statusService.setOptions(headers);
                 }
                 resolve(settings);
               });
-            }
-            else if (useAuthentIam) {
+            } else if (useAuthentIam) {
               this.arlasIamService.tokenRefreshed$.subscribe({
                 next: loginData => {
-                  if (!!loginData) {
+                  if (loginData) {
                     const iamHeaders = {
                       headers: {
                         Authorization: 'bearer ' + loginData.access_token,
                         'arlas-org-filter': this.arlasIamService.getOrganisation()
                       }
-                    }
+                    };
                     this.famService.setOptions(iamHeaders);
                     this.jobService.setOptions(iamHeaders);
                     this.statusService.setOptions(iamHeaders);
@@ -122,20 +120,16 @@ export class StartupService {
                 }
               });
             }
-          }
-          else {
+          } else {
             this.famService.setOptions({});
             this.jobService.setOptions({});
             this.statusService.setOptions({});
             resolve(settings);
           }
-        });
-      }
+        })
 
       )
       // Init app with the language read from url
       .then(() => StartupService.translationLoaded(this.translateService, this.injector));
   }
-
-
 }

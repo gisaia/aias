@@ -20,7 +20,7 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from "@angular/material/chips";
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -50,7 +50,7 @@ export class ConfirmDialogComponent implements OnInit {
   public currentCollection = '';
 
   public ngOnInit(): void {
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION)
+    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION);
   }
 
   public onAnnotationChange(text: string) {

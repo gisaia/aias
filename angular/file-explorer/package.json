@@ -40,12 +40,12 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^20.3.15",
     "@angular-eslint/builder": "~20.7.0",
     "@angular-eslint/eslint-plugin": "~20.7.0",
     "@angular-eslint/eslint-plugin-template": "~20.7.0",
     "@angular-eslint/schematics": "~20.7.0",
     "@angular-eslint/template-parser": "~20.7.0",
-    "@angular/build": "^20.3.15",
     "@angular/cli": "^20.3.15",
     "@angular/compiler-cli": "^20.3.16",
     "@colsen1991/ngx-translate-extract-marker": "^3.0.1",
@@ -66,5 +66,9 @@
     "license-check-and-add": "^4.0.5",
     "node": "^24.10.1",
     "typescript": "5.8.3"
+  },
+  "overrides": {
+    "underscore": "^1.13.8",
+    "picomatch": "4.0.4"
   }
 }

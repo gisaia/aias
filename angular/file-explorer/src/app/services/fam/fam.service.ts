@@ -31,17 +31,17 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 })
 export class FamService {
   private options = {};
-  private famSettings: { url?: string; default_path?: string; collection?: string; archives_page_size?: number, files_page_size?: number; } = {};
+  private famSettings: { url?: string; default_path?: string; collection?: string; archives_page_size?: number; files_page_size?: number; } = {};
   public refreshArchives$: Subject<boolean> = new Subject();
   public refreshArchivesFromTasks$: Subject<boolean> = new Subject();
 
-  constructor(
-    private http: HttpClient,
-    private toastr: ToastrService,
-    private translate: TranslateService
+  public constructor(
+    private readonly http: HttpClient,
+    private readonly toastr: ToastrService,
+    private readonly translate: TranslateService
   ) { }
 
-  dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
+  public dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
 
   public setOptions(options: any) {
     this.options = options;
@@ -60,7 +60,8 @@ export class FamService {
   }
 
   public getArchive(path: string, drivers: string[] = []): Observable<Archive[]> {
-    return this.http.post(this.famSettings?.url + '/archives', { path, size: this.famSettings?.archives_page_size, include_drivers: drivers }, this.options) as Observable<Archive[]>;
+    return this.http.post(this.famSettings?.url + '/archives',
+      { path, size: this.famSettings?.archives_page_size, include_drivers: drivers }, this.options) as Observable<Archive[]>;
   }
 
   public initializeFiles(path: string) {
@@ -69,17 +70,17 @@ export class FamService {
         const nodes: DynamicFileNode[] = [];
         data.forEach((n: any) => {
           nodes.push(this.generateNode(n, 0));
-        })
-        this.dataChange.next(nodes)
+        });
+        this.dataChange.next(nodes);
       },
       error: (err: Response) => {
         if (err.status === 404) {
-          this.toastr.error(this.translate.instant('Unable to retrieve files'))
+          this.toastr.error(this.translate.instant('Unable to retrieve files'));
         } else if (err.status === 403) {
-          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'));
         }
       }
-    })
+    });
   }
 
   public generateNode(object: any, level: number): DynamicFileNode {

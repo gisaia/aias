@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
   public collections: string[] = [];
   public currentCollection = '';
 
-  constructor(
+  public constructor(
     private readonly famService: FamService,
     private readonly jobsService: JobService,
     private readonly dialog: MatDialog,
@@ -95,7 +95,7 @@ export class HomeComponent implements OnInit {
       next: (confirm) => {
         if (confirm) {
           localStorage.setItem(ARLAS_AIAS_DRIVERS_ACTIVATED, confirm.drivers);
-          this.toastr.success(this.translate.instant('Drivers updated'))
+          this.toastr.success(this.translate.instant('Drivers updated'));
         }
       }
     });
@@ -110,11 +110,11 @@ export class HomeComponent implements OnInit {
   public addCurrentCollectionIfMissing() {
     const newCollections = this.collections;
     if (this.currentCollection !== '' && !this.collections.includes(this.currentCollection)) {
-      newCollections.push(this.currentCollection)
+      newCollections.push(this.currentCollection);
     }
     this.collections = [...newCollections];
   }
-  
+
   /**
    * Refresh archives view
    */

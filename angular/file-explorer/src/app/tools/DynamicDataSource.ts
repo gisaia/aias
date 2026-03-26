@@ -17,45 +17,42 @@
  * under the License.
  */
 
-import { CollectionViewer, DataSource, SelectionChange } from "@angular/cdk/collections";
-import { FamService } from "../services/fam/fam.service";
-import { BehaviorSubject, Observable, map, merge } from "rxjs";
-import { FlatTreeControl } from "@angular/cdk/tree";
-import { DynamicFileNode } from "./interface";
+import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { BehaviorSubject, Observable, map, merge } from 'rxjs';
+import { FamService } from '../services/fam/fam.service';
+import { DynamicFileNode } from './interface';
 
 export class DynamicDataSource implements DataSource<DynamicFileNode> {
-  dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
+  public dataChange = new BehaviorSubject<DynamicFileNode[]>([]);
 
-  get data(): DynamicFileNode[] {
+  public get data(): DynamicFileNode[] {
     return this.dataChange.value;
   }
-  set data(value: DynamicFileNode[]) {
+  public set data(value: DynamicFileNode[]) {
     this._treeControl.dataNodes = value;
     this.dataChange.next(value);
   }
 
-  constructor(
-    private _treeControl: FlatTreeControl<DynamicFileNode>,
-    private famService: FamService
+  public constructor(
+    private readonly _treeControl: FlatTreeControl<DynamicFileNode>,
+    private readonly famService: FamService
   ) { }
 
-  connect(collectionViewer: CollectionViewer): Observable<DynamicFileNode[]> {
+  public connect(collectionViewer: CollectionViewer): Observable<DynamicFileNode[]> {
     this._treeControl.expansionModel.changed.subscribe(change => {
-      if (
-        (change as SelectionChange<DynamicFileNode>).added ||
-        (change as SelectionChange<DynamicFileNode>).removed
-      ) {
-        this.handleTreeControl(change as SelectionChange<DynamicFileNode>);
+      if (change.added || change.removed) {
+        this.handleTreeControl(change);
       }
     });
 
     return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
   }
 
-  disconnect(collectionViewer: CollectionViewer): void { }
+  public disconnect(collectionViewer: CollectionViewer): void { /* EMPTY */  }
 
   /** Handle expand/collapse behaviors */
-  handleTreeControl(change: SelectionChange<DynamicFileNode>) {
+  public handleTreeControl(change: SelectionChange<DynamicFileNode>) {
     if (change.added) {
       change.added.forEach(node => this.toggleNode(node, true));
     }
@@ -70,7 +67,7 @@ export class DynamicDataSource implements DataSource<DynamicFileNode> {
   /**
    * Toggle the node, remove from display list
    */
-  toggleNode(node: DynamicFileNode, expand: boolean) {
+  public toggleNode(node: DynamicFileNode, expand: boolean) {
     node.isLoading = true;
     const index = this.data.indexOf(node);
     if (expand) {
@@ -86,19 +83,17 @@ export class DynamicDataSource implements DataSource<DynamicFileNode> {
             );
             this.data.splice(index + 1, 0, ...nodes);
             this.dataChange.next(this.data);
-            node.isLoading = false
+            node.isLoading = false;
           }
         });
     } else {
       let count = 0;
-      for (
-        let i = index + 1;
-        i < this.data.length && this.data[i].level > node.level;
-        i++, count++
-      ) { }
+      for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++) {
+        count++;
+      }
       this.data.splice(index + 1, count);
       this.dataChange.next(this.data);
-      node.isLoading = false
+      node.isLoading = false;
     }
 
   }

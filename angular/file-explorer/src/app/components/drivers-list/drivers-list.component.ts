@@ -28,8 +28,8 @@ export class DriversListComponent implements OnInit {
       } else {
         selected = true;
       }
-      
-      return { name: driver, selected }
+
+      return { name: driver, selected };
     });
   }
 
