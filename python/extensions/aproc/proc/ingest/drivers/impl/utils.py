@@ -53,38 +53,18 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
     return geometry, bbox, get_centroid(geometry)
 
 
-def compute_simplified_polygon(gcp_list):
-    points = sorted(list(set((gcp['x'], gcp['y']) for gcp in gcp_list if 'x' in gcp and 'y' in gcp)))
+def compute_simplified_polygon(gcp_list)->list[list[float]]:
+    from scipy.spatial import ConvexHull
+    import numpy as np
+    # Extract (x, y) coordinates
+    points = np.array([[gcp["x"], gcp["y"]] for gcp in gcp_list])
 
-    if len(points) <= 1:
-        return [list(p) for p in points]
+    # Compute convex hull
+    hull = ConvexHull(points)
+    hull_points = points[hull.vertices]
 
-    def cross_product(o, a, b):
-        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-    # Build lower hull
-    lower = []
-    for p in points:
-        while len(lower) >= 2 and cross_product(lower[-2], lower[-1], p) <= 0:
-            lower.pop()
-        lower.append(p)
-
-    # Build upper hull
-    upper = []
-    for p in reversed(points):
-        while len(upper) >= 2 and cross_product(upper[-2], upper[-1], p) <= 0:
-            upper.pop()
-        upper.append(p)
-
-    # Concatenate lower and upper hull (removing the last point of each because it's repeated)
-    hull = lower[:-1] + upper[:-1]
-
-    # Format as list of lists and close the polygon
-    result = [list(p) for p in hull]
-    if result:
-        result.append(result[0])
-
-    return result
+    englobing_polygon = np.append(hull_points, [hull_points[0]], axis=0)
+    return englobing_polygon.tolist()
 
 
 def get_bbox(coordinates: list[list[float]]):
