@@ -11,7 +11,7 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info_gcps,
     get_geom_bbox_centroid_from_coordinates)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from dateutil import parser
@@ -137,7 +137,7 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.tif_path)
         item.properties.gsd = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", lambda x: float(x), Driver.ns)
         item.properties.processing__level = find_or_none(root, "./Production/PRODUCT_TYPE", Driver.ns)
         item.properties.secondary_id = self.tif_path.removesuffix(".tif")

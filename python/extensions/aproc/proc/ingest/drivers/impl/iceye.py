@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, get_epsg_from_gdal_info_gcps,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -111,7 +111,7 @@ class Driver(IngestDriver):
         if range_spacing and azimuth_spacing:
             item.properties.gsd = (range_spacing + azimuth_spacing) / 2
 
-        item.properties.proj__epsg = get_epsg_from_gdal_info(self.tif_path)
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.tif_path)
 
         return item
 
