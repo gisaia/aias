@@ -118,13 +118,27 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         image_for_quicklook = self.mux_jpg_path if self.mux_jpg_path else self.pan_jpg_path if self.pan_jpg_path else self.mux_tif_path if self.mux_tif_path else self.pan_tif_path if self.pan_tif_path else None
-        if self.quicklook_path is None and image_for_quicklook and AccessManager.is_local(image_for_quicklook):
+        if self.quicklook_path is None and image_for_quicklook and AccessManager.is_local(image_for_quicklook) and Driver.configuration.get('build_overview_when_local', True):
             Driver.LOGGER.debug(f"Use {image_for_quicklook} for quicklook")
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(image_for_quicklook, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
+        elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            Driver.LOGGER.debug(f"Building overview for remote {image_for_quicklook}")
+            overview_folder = self.assets_dir + '/superview/' + self.get_item_id(url) + '/overview'
+            AccessManager.makedir(overview_folder)
+            overview_path = overview_folder + '/overview.jpg'
+            # File is processed locally as it significantly speeds up processing time
+            with AccessManager.make_local(image_for_quicklook) as local_big_preview_path:
+                overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                overview.size = AccessManager.get_size(overview.href)
+                self.quicklook_path = overview.href
+                assets.append(overview)
+        else:
+            Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.big_preview_path))
 
         if self.quicklook_path is not None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
