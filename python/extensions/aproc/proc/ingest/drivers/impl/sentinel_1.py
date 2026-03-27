@@ -10,7 +10,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    find_or_none, get_epsg_from_gdal_info, get_geom_bbox_centroid_from_corners)
+    find_or_none, get_epsg_from_gdal_info_gcps, get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 # Level-1 Product Family Summary Table Dictionary
@@ -215,7 +215,7 @@ class Driver(IngestDriver):
             if text_info:
                 item.properties.processing__level = text_info.split(" ")[2]
 
-        item.properties.proj__epsg = get_epsg_from_gdal_info(self.main_asset_path)
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.main_asset_path)
 
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:

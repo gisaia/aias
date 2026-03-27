@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info,
+    downsample_image, find_or_none, geotiff_to_jpg, get_epsg_from_gdal_info_gcps,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -44,7 +44,7 @@ class Driver(IngestDriver):
         ImageDriverHelper.add_archive(assets, url)
 
         for pol in self.polarizations:
-            assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']), proj__epsg=get_epsg_from_gdal_info(pol['path']),
+            assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']), proj__epsg=get_epsg_from_gdal_info_gcps(pol['path']),
                                 roles=[Role.data.value], name=pol['name'], type=MimeType.GEOTIFF.value, sar__polarizations=[pol['polarization']],
                                 description=pol['name'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
@@ -142,7 +142,7 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(root, ".//rs2:productType", ns=Driver.ns)
         item.properties.secondary_id = find_or_none(root, ".//rs2:productId", ns=Driver.ns)
 
-        item.properties.proj__epsg = get_epsg_from_gdal_info(self.polarizations[0]['path'])
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.polarizations[0]['path'])
 
         pixel_spacing = find_or_none(root, ".//rs2:sampledPixelSpacing", ns=Driver.ns)
         line_spacing = find_or_none(root, ".//rs2:sampledLineSpacing", ns=Driver.ns)

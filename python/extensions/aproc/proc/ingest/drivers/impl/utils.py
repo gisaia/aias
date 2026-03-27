@@ -53,6 +53,20 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
     return geometry, bbox, get_centroid(geometry)
 
 
+def compute_simplified_polygon(gcp_list)->list[list[float]]:
+    from scipy.spatial import ConvexHull
+    import numpy as np
+    # Extract (x, y) coordinates
+    points = np.array([[gcp["x"], gcp["y"]] for gcp in gcp_list])
+
+    # Compute convex hull
+    hull = ConvexHull(points)
+    hull_points = points[hull.vertices]
+
+    englobing_polygon = np.append(hull_points, [hull_points[0]], axis=0)
+    return englobing_polygon.tolist()
+
+
 def get_bbox(coordinates: list[list[float]]):
     return [min([xy[0] for xy in coordinates]),
             min([xy[1] for xy in coordinates]),
@@ -127,7 +141,7 @@ def get_epsg(proj):
         return None
 
 
-def get_epsg_from_gdal_info(path: str) -> int | None:
+def get_epsg_from_gdal_info_gcps(path: str) -> int | None:
     try:
         from osgeo import gdal
         info = AccessManager.get_gdal_info(path, gdal.InfoOptions(format="json"))

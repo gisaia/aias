@@ -155,6 +155,15 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
     priority: 20
 
+  - name: capella
+    class_name: extensions.aproc.proc.ingest.drivers.impl.capella
+    assets_dir: /tmp/aproc/capella
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+      build_overview_when_remote: true
+      build_overview_when_local: true
+    priority: 21
+
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
