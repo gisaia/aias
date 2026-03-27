@@ -1,5 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
+import { provideToastr } from 'ngx-toastr';
 import { ExplorerComponent } from './explorer.component';
 
 describe('ExplorerComponent', () => {
@@ -8,7 +10,15 @@ describe('ExplorerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExplorerComponent ]
+      declarations: [ ExplorerComponent ],
+      providers: [
+        provideHttpClient(),
+        provideToastr()
+      ],
+      imports: [
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
+      ]
     })
     .compileComponents();
 

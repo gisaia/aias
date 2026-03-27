@@ -27,15 +27,15 @@ export interface IngestPayload {
     url?: string;
     directory?: string;
     annotations: string;
-    include_drivers: string[]
-  },
-  outputs: any,
-  response: "raw",
-  subscriber: any
+    include_drivers: string[];
+  };
+  outputs: any;
+  response: 'raw';
+  subscriber: any;
 }
 
 export class DynamicFileNode {
-  constructor(
+  public constructor(
     public name: string,
     public path: string,
     public level = 1,
@@ -64,17 +64,17 @@ export enum ProcessStatus {
 }
 
 export interface Process {
-  processID: "download" | "ingest" | "directory_ingest",
-  type: string,
-  jobID: string,
-  status: ProcessStatus,
-  message: string,
-  created: number,
-  started: number,
-  finished: number,
-  updated: number,
-  progress: number,
-  links: any,
+  processID: 'download' | 'ingest' | 'directory_ingest';
+  type: string;
+  jobID: string;
+  status: ProcessStatus;
+  message: string;
+  created: number;
+  started: number;
+  finished: number;
+  updated: number;
+  progress: number;
+  links: any;
   resourceID: string;
 }
 

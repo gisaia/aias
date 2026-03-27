@@ -46,7 +46,7 @@
     display: flex;
     padding-right: 15px;
     &--btn {
-      --mdc-icon-button-state-layer-size: 40px;
+      --mat-icon-button-state-layer-size: 40px;
       padding: 8px;
     }
   }
@@ -92,7 +92,8 @@
               height: 36px;
             }
             .mat-mdc-form-field-infix {
-              padding: 8px 0;
+              padding: 6px 0;
+              --mat-form-field-container-height: 36px;
             }
           }
         }

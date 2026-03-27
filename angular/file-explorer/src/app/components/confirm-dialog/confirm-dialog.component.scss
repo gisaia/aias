@@ -18,13 +18,13 @@
  */
 
 :host {
-  --mdc-dialog-subhead-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --mdc-dialog-subhead-tracking: 0;
-  --mdc-dialog-subhead-size: 16px;
-  --mdc-dialog-subhead-weight: 600;
+  --mat-dialog-subhead-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --mat-dialog-subhead-tracking: 0;
+  --mat-dialog-subhead-size: 16px;
+  --mat-dialog-subhead-weight: 600;
 
-  --mdc-dialog-supporting-text-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --mdc-dialog-supporting-text-tracking: 0;
+  --mat-dialog-supporting-text-font: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --mat-dialog-supporting-text-tracking: 0;
 
   .drivers-list {
     --drivers-chip-height: 24px;
@@ -37,10 +37,10 @@
   }
 
   .catalog .mat-mdc-chip {
-    --mdc-chip-label-text-size: 12px;
-    --mdc-chip-container-shape-radius: 4px;
-    --mdc-chip-with-avatar-avatar-size: 0px;
-    --mdc-chip-container-height: 24px;
+    --mat-chip-label-text-size: 12px;
+    --mat-chip-container-shape-radius: 4px;
+    --mat-chip-with-avatar-avatar-size: 0px;
+    --mat-chip-container-height: 24px;
   }
 }
 

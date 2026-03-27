@@ -1,5 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
+import { provideToastr } from 'ngx-toastr';
 import { ArchivesComponent } from './archives.component';
 
 describe('ArchivesComponent', () => {
@@ -8,7 +10,15 @@ describe('ArchivesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ArchivesComponent ]
+      declarations: [ ArchivesComponent ],
+      providers: [
+        provideHttpClient(),
+        provideToastr()
+      ],
+      imports: [
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
+      ]
     })
     .compileComponents();
 

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
 import { CollectionListComponent } from './collection-list.component';
 
 describe('CollectionListComponent', () => {
@@ -8,7 +8,11 @@ describe('CollectionListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollectionListComponent]
+      imports: [
+        CollectionListComponent,
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
+      ]
     })
     .compileComponents();
 

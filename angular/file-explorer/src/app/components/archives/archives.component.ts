@@ -35,13 +35,14 @@ import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, 
 @Component({
   selector: 'app-archives',
   templateUrl: './archives.component.html',
-  styleUrls: ['./archives.component.scss']
+  styleUrls: ['./archives.component.scss'],
+  standalone: false
 })
 export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 
   protected onDestroy = new Subject<void>();
 
-  @Input() public archivesPath: string = '';
+  @Input() public archivesPath = '';
   @Input() public currentCollection: string;
   public archives: Archive[] | undefined = undefined;
   public selectedDrivers = [];
@@ -101,7 +102,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
                 of(archive),
                 this.statusService.getResourceStatus(archive.id).pipe(catchError(() => of([])))
               ))
-            )
+            );
           } else {
             return of([]);
           }
@@ -109,7 +110,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
         map(data => data.map(result => {
           const archive: Archive = result[0];
           const resourceId: any = result[1].id;
-          if (!!resourceId) {
+          if (resourceId) {
             archive.status = ProcessStatus.successful;
           }
           return archive;
@@ -127,7 +128,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
             this.translate.instant('Unable to retrieve archives')
           );
         }
-      })
+      });
   }
 
   public activate(archive: Archive) {
@@ -136,11 +137,11 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm.status) {
+        if (confirm.status) {
           this.jobService.ingestArchive(archive, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
-              this.toastr.success(this.translate.instant('Activation started'))
+              this.toastr.success(this.translate.instant('Activation started'));
             },
             error: (err: HttpErrorResponse) => {
               emitErrors(
@@ -164,12 +165,12 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
     dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (!!confirm.status) {
+        if (confirm.status) {
           this.statusService.dereferenceArchive(archive.id).subscribe({
             next: () => {
               this.spinner.show('archives');
               this.getArchives(this.archivesPath);
-              this.toastr.success(this.translate.instant('Archive dereferenced'))
+              this.toastr.success(this.translate.instant('Archive dereferenced'));
             },
             error: (err: HttpErrorResponse) => {
               emitErrors(

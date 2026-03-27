@@ -38,7 +38,7 @@ export class StatusService {
 
   public existingCollections: Collection[] = [];
 
-  constructor(
+  public constructor(
     private readonly http: HttpClient,
     private readonly translate: TranslateService,
     private readonly toastr: ToastrService
@@ -77,7 +77,7 @@ export class StatusService {
             this.translate.instant('Error while fetching the collections')
           );
         }
-      })
+      });
   }
 
   private getCollection(): string {

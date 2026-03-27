@@ -1,5 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
+import { provideToastr } from 'ngx-toastr';
 import { DriversDialogComponent } from './drivers-dialog.component';
 
 describe('DriversDialogComponent', () => {
@@ -8,7 +10,15 @@ describe('DriversDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DriversDialogComponent]
+      imports: [
+        DriversDialogComponent,
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
+      ],
+      providers: [
+        provideHttpClient(),
+        provideToastr()
+      ]
     })
     .compileComponents();
 

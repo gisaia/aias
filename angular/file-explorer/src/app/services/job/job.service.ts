@@ -76,9 +76,9 @@ export class JobService {
         include_drivers: drivers
       },
       outputs: null,
-      response: "raw",
+      response: 'raw',
       subscriber: null
-    }
+    };
     return this.http.post(this.jobSettings?.url + '/processes/ingest/execution', payload, this.options);
   }
 
@@ -92,9 +92,9 @@ export class JobService {
         include_drivers: drivers
       },
       outputs: null,
-      response: "raw",
+      response: 'raw',
       subscriber: null
-    }
+    };
     return this.http.post(this.jobSettings?.url + '/processes/directory_ingest/execution', payload, this.options);
   }
 

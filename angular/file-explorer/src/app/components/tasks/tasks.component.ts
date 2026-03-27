@@ -42,10 +42,11 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
   ],
+  standalone: false
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(MatPaginator) public paginator!: MatPaginator;
+  @ViewChild(MatPaginator) public paginator: MatPaginator;
   public allTasksEnded = output<boolean>();
 
   public tasks: Process[] = [];
@@ -79,7 +80,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.jobService.refreshTasks.subscribe({
       next: refresh => {
-        if (!!refresh) {
+        if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
           this.paginator.firstPage();
@@ -88,11 +89,11 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }
       }
-    })
+    });
 
     this.jobService.refreshTasksAndArchives.subscribe({
       next: refresh => {
-        if (!!refresh) {
+        if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
           this.paginator.firstPage();
@@ -102,12 +103,11 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }
       }
-    })
-
+    });
   }
 
   public ngAfterViewInit(): void {
-    this.paginator.page.subscribe({
+    this.paginator?.page.subscribe({
       next: (pe: PageEvent) => {
         this.pageIndex = pe.pageIndex;
         this.pageSize = pe.pageSize;
@@ -117,7 +117,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    if (!!this.refreshSub) {
+    if (this.refreshSub) {
       this.refreshSub.unsubscribe();
     }
   }
@@ -127,16 +127,16 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (pr: ProcessResult) => {
         this.tasks = pr.status_list;
         this.totalProcess = pr.total;
-        if (this.tasks.filter(t => t.status !== ProcessStatus.successful && t.status !== ProcessStatus.failed && t.status !== ProcessStatus.dismissed).length === 0) {
+        if (this.tasks.filter(t => ![ProcessStatus.successful, ProcessStatus.failed, ProcessStatus.dismissed].includes(t.status)).length === 0) {
           this.unsubscribeRefreshTasks.next(true);
           this.allTasksEnded.emit(true);
         }
       },
       error: (err: Response) => {
         if (err.status === 404) {
-          this.toastr.error(this.translate.instant('Unable to retrieve status'))
+          this.toastr.error(this.translate.instant('Unable to retrieve status'));
         } else if (err.status === 403) {
-          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'))
+          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'));
         }
       }
     });
@@ -145,7 +145,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   public cancelJob(task, jobId: string) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Confirmation');
-    dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?')
+    dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?');
     dialogRef.componentInstance.action = this.translate.instant('Confirm');
     dialogRef.componentInstance.showActivationInfos = false;
     dialogRef.afterClosed().subscribe({

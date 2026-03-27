@@ -1,13 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule, MatSelect } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -29,13 +29,13 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./collection-list.component.scss']
 })
 export class CollectionListComponent implements OnInit, OnChanges {
-  @Input() collections: string[] = [];
-  @Input() selectedValue: string = '';
+  @Input() public collections: string[] = [];
+  @Input() public selectedValue = '';
 
-  @Output() selectedValueChange = new EventEmitter<string>();
+  @Output() public selectedValueChange = new EventEmitter<string>();
 
-  @ViewChild('select') select!: MatSelect;
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('select') public select!: MatSelect;
+  @ViewChild('searchInput') public searchInput!: ElementRef<HTMLInputElement>;
 
   public searchTerm = '';
   public filteredCollections: string[] = [];
