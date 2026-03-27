@@ -276,9 +276,6 @@ class Driver(IngestDriver):
                 if AccessManager.exists(shape_path_if_exists):
                     self.shape_path = shape_path_if_exists
 
-            Driver.LOGGER.debug(f"{self.xml_path}")
-            Driver.LOGGER.debug(f"{self.mux_tif_path is not None} {self.xml_path is not None}  {AccessManager.exists(self.xml_path)}")
-
             if self.mux_tif_path is not None and self.xml_path is not None and AccessManager.exists(self.xml_path):
                 return True
         return False
