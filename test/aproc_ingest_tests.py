@@ -46,7 +46,6 @@ UMBRA_STAC = "umbra/2025-12-17-21-31-57_UMBRA-10"
 CAPELLA1 = "capella/CAPELLA_C11_SM_SLC_VV_20251031191104_20251031191109/"
 CAPELLA2 = "capella/CAPELLA_C13_SM_GEC_VV_20251031014908_20251031014913/"
 CAPELLA3 = "capella/CAPELLA_C13_SP_GEO_HH_20251031120350_20251031120428/"
-SUPERVIEW = "spacewill/superview/SPACEWILL_SUPERVIEW_TIFF_MANUAL_TASKING_IMG-SUPERVIEW--2026-01-19T14-58-26-4/SVN1-01_20260122_L2A0001657316_1012600200030001_01"
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
 callback_job_status = {}
