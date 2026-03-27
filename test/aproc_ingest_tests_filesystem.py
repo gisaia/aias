@@ -61,5 +61,6 @@ class Tests(IngestTests):
         self.assertGreaterEqual(len(resource_status), 1)
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)
 
+
 if __name__ == '__main__':
     unittest.main()
