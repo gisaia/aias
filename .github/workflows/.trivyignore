@@ -1,5 +1,1 @@
-CIS-DI-0010
-CIS-DI-0009
-CVE-2025-29087 # sqlite: Integer Overflow in SQLite concat_ws Function / NOT USED
-DKL-DI-0005
-CVE-2025-37899 #Kernel CVE vulnerability: host-dependent, not Docker image-dependent; aproc does not use ksmbd and does not mount SMB shares
+CVE-2026-23231 # no fix yet on image

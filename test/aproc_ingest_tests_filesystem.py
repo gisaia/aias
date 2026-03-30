@@ -6,7 +6,7 @@ from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION
 
 import requests
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
-from test.aproc_ingest_tests import (AST, DIMAP, IKONOS, JP2000, RAPID_EYE,
+from test.aproc_ingest_tests import (AST, SPOT6, IKONOS, JP2000, RAPID_EYE,
                                      TERRASARX, TIF, WORLDVIEW,
                                      IngestTests)
 
@@ -23,7 +23,7 @@ class Tests(IngestTests):
         self.async_ingest(url, ["data", "airs_item"], archive=False)
 
     def test_ingest_directory(self):  # Test Folder ingestion
-        self.ingest_directory(os.path.join(ROOT, DIMAP), collection=COLLECTION, catalog=CATALOG)
+        self.ingest_directory(os.path.join(ROOT, SPOT6), collection=COLLECTION, catalog=CATALOG)
 
     def test_async_ingest_many(self):  # Many COGs
         local_dir = os.path.join("test", "inputs", "many")
