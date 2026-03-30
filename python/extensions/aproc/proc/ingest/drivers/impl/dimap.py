@@ -141,6 +141,7 @@ class Driver(IngestDriver):
                         # We suppose that the first word in the srs expression is the EPSG code
                         # Because the string in the GML is not a classic SRS expression
                         in_spatial_ref_code = srs.items()[0][1].split(" ")[0]
+                        break
 
         component_geometry = component_feature.geometry()
         # output SpatialReference
