@@ -194,6 +194,7 @@ class AssetFormat(Enum):
     pdf = "PDF"
     png = "PNG"
     pvl = "PVL"
+    rpb = "RPB"
     shape = "SHAPE"
     tar = "TAR"
     targz = "TARGZ"
@@ -203,7 +204,7 @@ class AssetFormat(Enum):
     yaml = "YAML"
     zarr = "ZARR"
     zip = "ZIP"
-    rpb = "RPB"
+
 
 class SensorType(str, Enum):
     SAR = "SAR"

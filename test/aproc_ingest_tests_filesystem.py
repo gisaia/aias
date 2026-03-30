@@ -62,5 +62,9 @@ class Tests(IngestTests):
         self.assertEqual(resource_status[0]["resourceID"], status.resourceID)
 
 
+    def test_async_ingest_superview(self):  # Driver SUPERVIEW from SPACEWILL
+        url = os.path.join(ROOT, "proprietary/SPACEWILL_SUPERVIEW_TIFF_MANUAL_TASKING_IMG-SUPERVIEW--2026-01-19T14-58-26-4/SVN1-01_20260122_L2A0001657316_1012600200030001_01/")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
 if __name__ == '__main__':
     unittest.main()

@@ -87,58 +87,61 @@ class Driver(IngestDriver):
         # RPCs
         if self.mux_rcps_path:
             assets.append(Asset(href=self.mux_rcps_path, size=AccessManager.get_size(self.mux_rcps_path),
-                                roles=[Role.rpc.value], name=os.path.basename(self.mux_rcps_path), type=MimeType.TEXT.value,
+                                roles=[Role.rpc.value], name=Role.rpc.value + "-mux", type=MimeType.TEXT.value,
                                 description=Role.rpc.value, airs__managed=False, asset_format=AssetFormat.rpb.value, asset_type=ResourceType.other.value))
 
         if self.pan_rcps_path:
             assets.append(Asset(href=self.pan_rcps_path, size=AccessManager.get_size(self.pan_rcps_path),
-                                roles=[Role.rpc.value], name=os.path.basename(self.pan_rcps_path), type=MimeType.TEXT.value,
+                                roles=[Role.rpc.value], name=Role.rpc.value + "-pan", type=MimeType.TEXT.value,
                                 description=Role.rpc.value, airs__managed=False, asset_format=AssetFormat.rpb.value, asset_type=ResourceType.other.value))
 
         # SHAPE Extent
         if self.shape_path:
             assets.append(Asset(href=self.shape_path, size=AccessManager.get_size(self.shape_path),
-                                roles=[Role.extent.value], name=os.path.basename(self.shape_path), type=MimeType.SHP.value,
+                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.SHP.value,
                                 description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.shape.value, asset_type=ResourceType.vector.value))
 
         # SHAPE Clouds
         if self.cloud_shape_path:
             assets.append(Asset(href=self.cloud_shape_path, size=AccessManager.get_size(self.cloud_shape_path),
-                                roles=[Role.cloud.value, Role.mask.value], name=os.path.basename(self.cloud_shape_path), type=MimeType.SHP.value,
+                                roles=[Role.cloud.value, Role.mask.value], name=Role.cloud.value, type=MimeType.SHP.value,
                                 description=Role.cloud.value, airs__managed=False, asset_format=AssetFormat.shape.value, asset_type=ResourceType.vector.value))
 
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.quicklook_path:
+        if self.quicklook_path is not None:
             quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.JPG, AssetFormat.jpg)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
+            Driver.LOGGER.debug(f"Using existing quicklook at {self.quicklook_path}")
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         image_for_quicklook = self.mux_jpg_path if self.mux_jpg_path else self.pan_jpg_path if self.pan_jpg_path else self.mux_tif_path if self.mux_tif_path else self.pan_tif_path if self.pan_tif_path else None
-        if self.quicklook_path is None and image_for_quicklook and AccessManager.is_local(image_for_quicklook) and Driver.configuration.get('build_overview_when_local', True):
-            Driver.LOGGER.debug(f"Use {image_for_quicklook} for quicklook")
-            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(image_for_quicklook, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-            quicklook.size = AccessManager.get_size(quicklook.href)
-            self.quicklook_path = quicklook.href
-            assets.append(quicklook)
-        elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
-            Driver.LOGGER.debug(f"Building overview for remote {image_for_quicklook}")
-            overview_folder = self.assets_dir + '/superview/' + self.get_item_id(url) + '/overview'
-            AccessManager.makedir(overview_folder)
-            overview_path = overview_folder + '/overview.jpg'
-            # File is processed locally as it significantly speeds up processing time
-            with AccessManager.make_local(image_for_quicklook) as local_big_preview_path:
-                overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
-                overview.size = AccessManager.get_size(overview.href)
-                self.quicklook_path = overview.href
-                assets.append(overview)
-        else:
-            Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.big_preview_path))
+
+        if self.quicklook_path is None:
+            if image_for_quicklook and AccessManager.is_local(image_for_quicklook) and Driver.configuration.get('build_overview_when_local', True):
+                Driver.LOGGER.debug(f"Use {image_for_quicklook} for quicklook")
+                quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(image_for_quicklook, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+                quicklook.size = AccessManager.get_size(quicklook.href)
+                self.quicklook_path = quicklook.href
+                assets.append(quicklook)
+            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+                Driver.LOGGER.debug(f"Building overview for remote {image_for_quicklook}")
+                overview_folder = self.assets_dir + '/superview/' + self.get_item_id(url) + '/overview'
+                AccessManager.makedir(overview_folder)
+                overview_path = overview_folder + '/overview.jpg'
+                # File is processed locally as it significantly speeds up processing time
+                with AccessManager.make_local(image_for_quicklook) as local_big_preview_path:
+                    overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                    geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                    overview.size = AccessManager.get_size(overview.href)
+                    self.quicklook_path = overview.href
+                    assets.append(overview)
+            else:
+                Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(image_for_quicklook))
 
         if self.quicklook_path is not None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)

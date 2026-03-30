@@ -153,7 +153,7 @@ class Tests(IngestTests):
     def test_async_ingest_capella3(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA3)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
-        
+
 
 if __name__ == '__main__':
     unittest.main()
