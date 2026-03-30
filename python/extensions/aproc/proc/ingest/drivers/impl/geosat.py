@@ -20,6 +20,8 @@ from dateutil import parser
 class Driver(IngestDriver):
     ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
 
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.thumbnail_path = None
@@ -31,6 +33,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -60,7 +63,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.quicklook_path is None and AccessManager.is_local(self.tif_path):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3])
+            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)

@@ -30,6 +30,8 @@ class Driver(IngestDriver):
     - Preview PNG (*_preview.png) - optional
     """
 
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -44,6 +46,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -170,7 +173,7 @@ class Driver(IngestDriver):
                 Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
                 output_path=quicklook.href,
                 bands_list=bands,
-                stretch=not self.visual_path
+                stretch=False if self.visual_path else Driver.configuration.get('overview_stretch', True)
             )
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)

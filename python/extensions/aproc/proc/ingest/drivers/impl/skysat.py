@@ -13,6 +13,9 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
+
+    configuration: dict = {}
+
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -26,6 +29,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -64,7 +68,7 @@ class Driver(IngestDriver):
         else:
             bands = [3, 2, 1]
             tif_path = self.sr_path
-            stretch = True
+            stretch = Driver.configuration.get('overview_stretch', True)
 
         # Skip generation if tif is not local
         if not AccessManager.is_local(tif_path):

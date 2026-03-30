@@ -81,7 +81,7 @@ class Driver(IngestDriver):
         if AccessManager.is_local(self.tci_path) and Driver.configuration.get('build_overview_when_local', True):
             Driver.LOGGER.debug(f"Building overview for local TCI {self.tci_path}")
             overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3])
+            geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
             overview.size = AccessManager.get_size(overview.href)
             assets.append(overview)
         elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
@@ -92,7 +92,7 @@ class Driver(IngestDriver):
             # File is processed locally as it significantly speeds up processing time
             with AccessManager.make_local(self.tci_path) as local_tci_path:
                 overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3])
+                geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
                 overview.size = AccessManager.get_size(overview.href)
                 assets.append(overview)
         else:
