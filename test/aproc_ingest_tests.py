@@ -87,6 +87,7 @@ class IngestTests(unittest.TestCase):
         status = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
+        sleep(2)
         self.assertEqual(status.status, callback_job_status[status.jobID])
         return status
 

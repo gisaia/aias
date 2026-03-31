@@ -1,6 +1,6 @@
 import os
 import unittest
-from test.aproc_ingest_tests import (AST, DIMAP, IKONOS, JP2000, RAPID_EYE,
+from test.aproc_ingest_tests import (AST, IKONOS, JP2000, RAPID_EYE,
                                      TERRASARX, TIF, WORLDVIEW,
                                      IngestTests)
 from test.utils import CATALOG, COLLECTION
