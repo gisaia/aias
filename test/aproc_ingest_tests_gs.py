@@ -2,7 +2,7 @@ import os
 import unittest
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, DIMAP, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -23,24 +23,32 @@ class Tests(IngestTests):
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
         self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
 
-    def test_async_ingest_dimap_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT, DIMAP)
+    def test_async_ingest_spot6_cloud(self):  # Driver DIMAP
+        url = os.path.join(ROOT, SPOT6)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], check_epsg=False)
+
+    def test_async_ingest_pneoms_cloud(self):  # Driver DIMAP
+        url = os.path.join(ROOT, PNEOMS)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
+
+    def test_async_ingest_pneopan_cloud(self):  # Driver DIMAP
+        url = os.path.join(ROOT, PNEOPAN)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])
 
     def test_async_ingest_dimap_driver_include_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT, DIMAP)
+        url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["dimap"])
 
     def test_async_ingest_dimap_driver_include_fail_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT, DIMAP)
+        url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["spot5"], expected=StatusCode.failed)
 
     def test_async_ingest_dimap_driver_exclude_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT, DIMAP)
+        url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["spot5"])
 
     def test_async_ingest_dimap_driver_exclude_fail_cloud(self):  # Driver DIMAP
-        url = os.path.join(ROOT, DIMAP)
+        url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["dimap"], expected=StatusCode.failed)
 
     def test_async_ingest_ikonos_cloud(self):  # Driver GEOEYE
