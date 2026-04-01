@@ -1,6 +1,8 @@
 from datetime import datetime
+import json
 import unittest
-from test.utils import s3_access_key, s3_access_key_id, s3_bucket, s3_endpoint_url, s3_region, index_collection_prefix, index_endpoint_url, COLLECTION
+from extensions.aproc.proc.drivers.exceptions import DriverException
+from test.utils import ID, ID_MANAGED, s3_access_key, s3_access_key_id, s3_bucket, s3_endpoint_url, s3_region, index_collection_prefix, index_endpoint_url, COLLECTION
 import elasticsearch
 
 
@@ -31,17 +33,10 @@ class AprocTests(TimedTests):
             try:
                 # Clean the index
                 es.indices.delete(index=index_collection_prefix + "_" + collection)
-            except Exception:
-                ...
-            try:
-                objects = self.get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID))
-                for object in objects["Contents"]:
-                    self.get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
-                self.get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
             except Exception as e:
                 ...
             try:
-                objects = self.get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID_MANAGED))
+                objects = self.get_client().list_objects(Bucket=s3_bucket, Prefix=collection)
                 for object in objects["Contents"]:
                     self.get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
                 self.get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
