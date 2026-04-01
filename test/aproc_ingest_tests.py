@@ -1,7 +1,9 @@
+from datetime import datetime
 import json
 import threading
 import unittest
 from time import sleep
+from test.aproc_tests import AprocTests
 
 import requests
 import uvicorn
@@ -16,8 +18,7 @@ from aproc.core.models.ogc.process import ProcessDescription, ProcessList
 from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
 from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
-from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS,
-                        setUpTest)
+from test.utils import (APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS)
 
 AST = "ast/"
 CSK = "csk/3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
@@ -68,9 +69,7 @@ def run_server(port=8080):
 threading.Thread(target=run_server, daemon=True).start()
 
 
-class IngestTests(unittest.TestCase):
-    def setUp(self):
-        setUpTest()
+class IngestTests(AprocTests):
 
     def wait_for(self, status: StatusInfo) -> StatusInfo:
         i: int = 0

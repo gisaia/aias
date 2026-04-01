@@ -1,21 +1,17 @@
 import json
-import os
-from time import sleep
 import unittest
-from airs.core.models.stacapi import CollectionDescriptionListResponse
-from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED, ITEM_PATH_MANAGED,
-                        index_collection_prefix, index_endpoint_url, setUpTest)
+from test.aproc_tests import AprocTests
+from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED,
+                        ITEM_PATH_MANAGED, index_collection_prefix,
+                        index_endpoint_url)
 
 import elasticsearch
 import requests
-
 from airs.core.models import mapper as mapper
+from airs.core.models.stacapi import CollectionDescriptionListResponse
 
 
-class Tests(unittest.TestCase):
-
-    def setUp(self):
-        setUpTest()
+class Tests(AprocTests):
 
     def test_not_found(self):
         # ADD ITEM FAIL BECAUSE ASSET MISSING
