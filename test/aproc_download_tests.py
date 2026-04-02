@@ -1,11 +1,11 @@
 import json
 import os
 import unittest
+from test.aproc_tests import AprocTests
 from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
                         COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
                         MINIO_ID, MINIO_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM, SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM,
-                        SMTP_SERVER, TOKEN, add_item, create_arlas_collection,
-                        setUpTest)
+                        SMTP_SERVER, TOKEN, add_item, create_arlas_collection)
 from time import sleep
 
 import requests
@@ -18,10 +18,10 @@ from extensions.aproc.proc.download.download_process import (
     InputDownloadProcess, OutputDownloadProcess)
 
 
-class Tests(unittest.TestCase):
+class Tests(AprocTests):
 
     def setUp(self):
-        setUpTest()
+        super().setUp()
         requests.delete(SMTP_SERVER + "/*")
         add_item(self, ITEM_PATH, ID)
         sleep(3)

@@ -1,21 +1,22 @@
 import json
 import os
 import unittest
+from test.aproc_tests import AprocTests
 from test.utils import (AGATE_ENDPOINT, AIRS_URL, ARLAS_COLLECTION, ARLAS_URL,
                         ASSET, ASSET_PATH, COLLECTION, ID, ITEM_PATH,
-                        index_collection_prefix, setUpTest)
+                        index_collection_prefix)
 from time import sleep
 from urllib import parse
-import requests
 
+import requests
 from airs.core.models import mapper
 from airs.core.models.model import Item
 
 
-class Tests(unittest.TestCase):
+class Tests(AprocTests):
 
     def setUp(self):
-        setUpTest()
+        super().setUp()
         try:
             requests.delete("/".join([ARLAS_URL, "arlas", "collections", ARLAS_COLLECTION]))
         except Exception:

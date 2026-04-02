@@ -4,18 +4,16 @@ import unittest
 from airs.core.models import mapper
 from aproc.core.models.ogc.enums import StatusCode
 from aproc.core.models.ogc.job import StatusInfo
+from test.aproc_tests import AprocTests
 from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, SENTINEL_2_ID, SENTINEL_2_ITEM, SENTINEL_2_ZIP_ID, MAX_ITERATIONS,
-                        SENTINEL_2_ZIP_ITEM, setUpTest, add_item)
-
+                        SENTINEL_2_ZIP_ITEM, add_item)
 import requests
 
 from aproc.core.models.ogc import Execute
 from extensions.aproc.proc.enrich.enrich_process import InputEnrichProcess
 
 
-class Tests(unittest.TestCase):
-    def setUp(self):
-        setUpTest()
+class Tests(AprocTests):
 
     def __enrich_cog(self, id: str, item: str):
         add_item(self, item, id)

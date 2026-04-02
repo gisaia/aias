@@ -49,34 +49,45 @@ class Driver(IngestDriver):
         if self.big_preview_path:
             asset = ImageDriverHelper.add_asset(assets, self.big_preview_path, Role.overview, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
             asset.name = "big_preview"
+
+        if self.quicklook_path:
+            ImageDriverHelper.add_asset(assets, self.quicklook_path, Role.overview, MimeType.PNG, AssetFormat.png, ResourceType.other, airs__managed=True)
+
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        if self.quicklook_path:
+            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        tif_for_overview = self.big_preview_path if self.big_preview_path else self.tif_path
-        if AccessManager.is_local(tif_for_overview) and Driver.configuration.get('build_overview_when_local', True):
-            Driver.LOGGER.debug(f"Building overview for local {tif_for_overview}")
-            overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
-            overview.size = AccessManager.get_size(overview.href)
-            self.quicklook_path = overview.href
-            assets.append(overview)
-        elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
-            Driver.LOGGER.debug(f"Building overview for remote {tif_for_overview}")
-            overview_folder = self.assets_dir + '/capella/' + self.get_item_id(url) + '/overview'
-            AccessManager.makedir(overview_folder)
-            overview_path = overview_folder + '/overview.jpg'
-            # File is processed locally as it significantly speeds up processing time
-            with AccessManager.make_local(tif_for_overview) as local_big_preview_path:
-                overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+        if self.quicklook_path is None:
+            tif_for_overview = self.big_preview_path if self.big_preview_path else self.tif_path
+            if AccessManager.is_local(tif_for_overview) and Driver.configuration.get('build_overview_when_local', True):
+                Driver.LOGGER.debug(f"Building overview for local {tif_for_overview}")
+                overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.quicklook_path = overview.href
                 assets.append(overview)
+            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+                Driver.LOGGER.debug(f"Building overview for remote {tif_for_overview}")
+                overview_folder = self.assets_dir + '/capella/' + self.get_item_id(url) + '/overview'
+                AccessManager.makedir(overview_folder)
+                overview_path = overview_folder + '/overview.jpg'
+                # File is processed locally as it significantly speeds up processing time
+                with AccessManager.make_local(tif_for_overview) as local_big_preview_path:
+                    overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                    geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                    overview.size = AccessManager.get_size(overview.href)
+                    self.quicklook_path = overview.href
+                    assets.append(overview)
+            else:
+                Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.big_preview_path))
         else:
-            Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.big_preview_path))
+            Driver.LOGGER.debug("Overview exists {}".format(self.quicklook_path))
 
         if self.quicklook_path is not None:
             thumbnail_type = MimeType.JPG
@@ -194,6 +205,8 @@ class Driver(IngestDriver):
             for f in files:
                 filename = f.name.lower()
                 if not f.is_dir and filename.startswith("capella_"):
+                    if filename.endswith("_thumb.png"):
+                        self.quicklook_path = f.path
                     if filename.endswith("_preview.tif"):
                         self.big_preview_path = f.path
                     elif filename.endswith(".tif"):

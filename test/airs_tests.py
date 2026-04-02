@@ -1,23 +1,26 @@
 import json
-import os
 from time import sleep
 import unittest
-from airs.core.models.stacapi import CollectionDescriptionListResponse
-from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED, ITEM_PATH_MANAGED,
-                        index_collection_prefix, index_endpoint_url, setUpTest)
+from test.aproc_tests import AprocTests
+from test.utils import (AIRS_URL, ASSET, ASSET_PATH, COLLECTION, ID_MANAGED,
+                        ITEM_PATH_MANAGED, index_collection_prefix,
+                        index_endpoint_url)
 
 import elasticsearch
 import requests
-
 from airs.core.models import mapper as mapper
+from airs.core.models.stacapi import CollectionDescriptionListResponse
 
 
-class Tests(unittest.TestCase):
-
-    def setUp(self):
-        setUpTest()
+class Tests(AprocTests):
 
     def test_not_found(self):
+        # ITEM does not exist
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items"]), headers={"Content-Type": "application/json"})
+        self.assertFalse(r.ok, str(r.status_code) + str(r.content))
+        # ASSET does not exist
+        r = requests.head(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED, "assets", ASSET]))
+        self.assertFalse(r.ok, str(r.status_code) + str(r.content))
         # ADD ITEM FAIL BECAUSE ASSET MISSING
         with open(ITEM_PATH_MANAGED, 'r') as file:
             data = file.read()

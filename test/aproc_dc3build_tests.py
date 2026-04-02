@@ -2,9 +2,10 @@ import datetime
 import json
 import time
 import unittest
+from test.aproc_tests import AprocTests
 from test.utils import (AIRS_URL, APROC_ENDPOINT, COLLECTION, MAX_ITERATIONS,
                         SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM, TOKEN, add_item,
-                        create_arlas_collection, setUpTest)
+                        create_arlas_collection)
 from time import sleep
 
 import requests
@@ -22,9 +23,7 @@ from extensions.aproc.proc.processes.arlas_services_helper import \
     ARLASServicesHelper
 
 
-class Tests(unittest.TestCase):
-    def setUp(self):
-        setUpTest()
+class Tests(AprocTests):
 
     def test_build_cube(self):
         item = self.ingest_sentinel()

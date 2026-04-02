@@ -95,7 +95,7 @@ class Driver(IngestDriver):
 
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
 
-            with AccessManager.stream(self.data_path) as f:
+            with AccessManager.make_local(self.data_path) as f:
                 with h5py.File(f) as h5f:
                     max_height = -np.inf
                     values = []

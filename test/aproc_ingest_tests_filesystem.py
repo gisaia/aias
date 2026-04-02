@@ -16,6 +16,7 @@ ROOT = "/inputs"
 class Tests(IngestTests):
 
     def setUp(self) -> None:
+        super().setUp()
         shutil.rmtree(os.path.join("test", "inputs", "many"), ignore_errors=True)
 
     def test_async_ingest_tif(self):  # Driver TIF

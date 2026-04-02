@@ -1,6 +1,5 @@
 import json
 import unittest
-import elasticsearch
 import os
 import time
 import unicodedata
@@ -65,39 +64,6 @@ AccessManager.init(AprocConfiguration.settings.access_manager)
 IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
 
-
-def get_client():
-    from boto3 import Session
-    session = Session(
-            aws_access_key_id=s3_access_key_id,
-            aws_secret_access_key=s3_access_key,
-            region_name=s3_region)
-    return session.client("s3", endpoint_url=s3_endpoint_url)
-
-
-def setUpTest():
-    import airs.core.product_registration as rs
-    es = elasticsearch.Elasticsearch(index_endpoint_url)
-    for collection in [COLLECTION, "collection1", "collection2", "collection3"]:
-        try:
-            # Clean the index
-            es.indices.delete(index=index_collection_prefix + "_" + collection)
-        except Exception:
-            ...
-        try:
-            objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID))
-            for object in objects["Contents"]:
-                get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
-            get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
-        except Exception as e:
-            ...
-        try:
-            objects = get_client().list_objects(Bucket=s3_bucket, Prefix=rs.get_assets_relative_path(collection, ID_MANAGED))
-            for object in objects["Contents"]:
-                get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
-            get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
-        except Exception as e:
-            ...
 
 
 def dir_to_list(dirname, parent={}):
