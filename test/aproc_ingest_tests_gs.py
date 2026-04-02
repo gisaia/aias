@@ -3,7 +3,7 @@ import unittest
 from aproc.core.models.ogc.enums import StatusCode
 
 from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
-                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, WYVERN, LANDSAT9,
+                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
@@ -154,6 +154,9 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, CAPELLA3)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
+    def test_async_ingest_superview(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
 
 if __name__ == '__main__':
     unittest.main()
