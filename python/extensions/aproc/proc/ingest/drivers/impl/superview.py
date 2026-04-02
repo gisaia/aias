@@ -183,7 +183,13 @@ class Driver(IngestDriver):
         if end_time_str:
             end_time = int(datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S").timestamp())
 
-        constellation = find_or_none(metadata, "SatelliteID")
+        satellite = find_or_none(metadata, "SatelliteID")
+        
+        # satellite=SV-2 and constellation=SV
+        if satellite and satellite.find('-') != -1:
+            constellation = satellite.split("-")[0]
+        else:
+            constellation = satellite
 
         item = Item(
             geometry=geometry,
@@ -194,7 +200,7 @@ class Driver(IngestDriver):
                 start_datetime=start_time,
                 end_datetime=end_time,
                 constellation=constellation,
-                satellite=constellation,
+                satellite=satellite,
                 sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.superview.value,
