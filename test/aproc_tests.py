@@ -33,14 +33,14 @@ class AprocTests(TimedTests):
             try:
                 # Clean the index
                 es.indices.delete(index=index_collection_prefix + "_" + collection)
-            except Exception as e:
+            except Exception:
                 ...
             try:
                 objects = self.get_client().list_objects(Bucket=s3_bucket, Prefix=collection)
                 for object in objects["Contents"]:
                     self.get_client().delete_object(Bucket=s3_bucket, Key=object["Key"])
                 self.get_client().delete_object(Bucket=s3_bucket, Key=rs.get_item_relative_path(collection, ID))
-            except Exception as e:
+            except Exception:
                 ...
 
     def setUp(self):
