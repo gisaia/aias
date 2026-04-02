@@ -28,33 +28,33 @@ on:
         type: boolean
 
       run_aias_g1:
-        description: 'Run AIAS G1 tests?'
+        description: 'Run AIAS G1 tests (Download)?'
         required: true
         default: false
         type: boolean
 
       run_aias_g2:
-        description: 'Run AIAS G2 tests?'
+        description: 'Run AIAS G2 tests (AIRS+agate+fam)?'
         required: true
         default: false
         type: boolean
       run_aias_g3:
-        description: 'Run AIAS G3 tests?'
+        description: 'Run AIAS G3 tests (Enrich+Dc3Build)?'
         required: true
         default: false
         type: boolean
       run_aias_g4_fs:
-        description: 'Run AIAS G4 FS tests?'
+        description: 'Run AIAS G4 FS tests (Ingest)?'
         required: true
         default: false
         type: boolean
       run_aias_g4_gs:
-        description: 'Run AIAS G4 GS tests?'
+        description: 'Run AIAS G4 GS tests (Ingest all drivers)?'
         required: true
         default: false
         type: boolean
       run_aias_g4_minio:
-        description: 'Run AIAS G4 Minio tests?'
+        description: 'Run AIAS G4 Minio tests (Ingest)?'
         required: true
         default: false
         type: boolean
