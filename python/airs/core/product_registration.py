@@ -400,6 +400,8 @@ def __add_generated_fields(item: Item) -> Item:
                 item.properties.generated__has_cog = True
             if Role.zarr.value in asset.roles:
                 item.properties.generated__has_zarr = True
+    item.properties.generated__asset_roles = list(set(item.properties.generated__asset_roles))
+
     acquisition = datetime.fromtimestamp(item.properties.datetime)
     try:
         acquisition = pytz.UTC.localize(acquisition)
@@ -436,12 +438,16 @@ def __add_generated_fields(item: Item) -> Item:
             map(lambda band: band.name, item.properties.eo__bands),
         )
     )
+    item.properties.generated__band_names = list(set(item.properties.generated__band_names))
+
     item.properties.generated__band_common_names = list(
         filter(
             lambda common_name: common_name is not None,
             map(lambda band: band.eo__common_name, item.properties.eo__bands),
         )
     )
+    item.properties.generated__band_common_names = list(set(item.properties.generated__band_common_names))
+
     return item
 
 

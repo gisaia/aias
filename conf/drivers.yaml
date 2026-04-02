@@ -164,6 +164,15 @@ drivers:
       build_overview_when_local: true
     priority: 21
 
+  - name: superview
+    class_name: extensions.aproc.proc.ingest.drivers.impl.superview
+    assets_dir: /tmp/aproc/superview
+    configuration:
+      tmp_directory: $TMP_FOLDER|/tmp
+      build_overview_when_remote: true
+      build_overview_when_local: true
+    priority: 22
+
   -
     name: tiff
     class_name: extensions.aproc.proc.ingest.drivers.impl.tiff
