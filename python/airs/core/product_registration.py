@@ -19,7 +19,7 @@ from airs.core.models.mapper import (
     to_airs_item,
     to_airs_json,
 )
-from airs.core.models.model import Asset, Item, MimeType, Properties, Band, Role
+from airs.core.models.model import Asset, Item, Lifecycle, MimeType, Properties, Band, Role
 from airs.core.settings import Configuration
 from airs.core.logger import Logger
 from aias_common.access.storages.s3 import S3Storage
@@ -203,15 +203,48 @@ def asset_exists(collection: str, item_id: str, asset_name: str) -> bool:
     return __s3storage().exists(__s3storage().get_full_href(key))
 
 
-def delete_item(collection: str, item_id: str):
+def item_exists(collection: str, item_id: str) -> bool:
+    """check whether the item exists or not on the configured S3
+
+    Args:
+        collection (str): collection name
+        item_id (str): item id
+
+    Returns:
+        bool: True if found on the S3 and in ES, False otherwise
+    """
+    if not __getES().indices.exists(index=__get_es_index_name(collection)):
+        LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
+        return False
+    try:
+        __getES().get(index=__get_es_index_name(collection), id=item_id)
+    except elasticsearch.NotFoundError:
+        return False
+    key = get_item_relative_path(collection, item_id)
+    return __s3storage().exists(__s3storage().get_full_href(key))
+
+
+def delete_item(collection: str, item_id: str, delete_assets: bool = False):
     if not __getES().indices.exists(index=__get_es_index_name(collection)):
         raise exceptions.InvalidItemsException(
             [item_id], reason="Collection does not exist"
         )
-    __getES().delete(index=__get_es_index_name(collection), id=item_id)
-    # the item is dereferenced from ES and the STAC json file is deleted, not the rest.
     LOGGER.info("deleting {} ...".format(get_item_relative_path(collection, item_id)))
-    __s3storage().clean(__s3storage().get_full_href(get_item_relative_path(collection, item_id)))
+
+    item = get_item_from_storage(collection, item_id)
+    if not item.airs__lifecycle:
+        item.airs__lifecycle = Lifecycle()
+    item.airs__lifecycle.version = item.airs__lifecycle.version + 1
+    item.airs__lifecycle.deleted = True
+    item.airs__lifecycle.delete_datetime = int(datetime.now().timestamp())
+    upload_item(item)
+    __getES().delete(index=__get_es_index_name(collection), id=item_id)
+
+    if delete_assets:
+        assets = __s3storage().listdir(__s3storage().get_full_href(get_assets_relative_path(collection, item_id)))
+        for asset in assets:
+            LOGGER.info("deleting {} ...".format(asset))
+            __delete_file(asset)
     LOGGER.info(__DELETED_MSG__.format(get_item_relative_path(collection, item_id)))
 
 
@@ -267,26 +300,60 @@ def register_item(item: Item) -> Item:
         Item: The registered item
     """
     item = to_airs_item(item)
+
     __check_register_item_params(item)
-    for asset in item.assets.values():
-        if asset.airs__managed is None:
-            asset.airs__managed = True
+
+    # lifecycle tracking if item exists
+    existing_item = None
+    if __s3storage().exists(__s3storage().get_full_href(get_item_relative_path(item.collection, item.id))):
+        LOGGER.debug("Item already exists in storage.")
+        existing_item = get_item_from_storage(item.collection, item.id)
+        if existing_item.airs__lifecycle:
+            item.airs__lifecycle = existing_item.airs__lifecycle
+            LOGGER.debug(f"its lifecycle is {item.airs__lifecycle}")
+    if item.airs__lifecycle is None:
+        item.airs__lifecycle = Lifecycle(add_datetime=int(datetime.now().timestamp()), update_datetime=None, version=0, deleted=False, visible=True)
+
+    if existing_item and existing_item.airs__lifecycle:
+        item.airs__lifecycle.update_datetime = int(datetime.now().timestamp())
+    item.airs__lifecycle.deleted = False
+    item.airs__lifecycle.delete_datetime = None
+    item.airs__lifecycle.version = item.airs__lifecycle.version + 1
+    item.airs__lifecycle.visible = True
+
+    if item.assets:
+        for asset in item.assets.values():
+            if asset.airs__managed is None:
+                asset.airs__managed = True
     not_found = __not_found_assets(item)
     if len(not_found) > 0:
         raise exceptions.InvalidAssetsException(not_found, ASSETS_NOT_FOUND)
     __set_assets_links(item)
-    LOGGER.info("Indexing {} in ARLAS".format(item.id))
+    __index_item(item)
+    try:
+        upload_item(item)
+        return item
+    except Exception as e:
+        if not existing_item:
+            # the insert failed, the item must not be indexed. 
+            # We don't remove if it was an update. 
+            # Problem: the storage differs from the index.
+            __getES().delete(index=__get_es_index_name(item.collection), id=item.id)
+        raise e
+
+
+def __index_item(item: Item) -> Item:
+    LOGGER.debug("Indexing {} in ARLAS".format(item.id))
     __dates_to_times(item)
     __collect_bands(item)
     __add_generated_fields(item)
-    upload_item(item)
     init_collection(item.collection)
     resp = __getES().index(
         index=__get_es_index_name(item.collection),
         id=item.id,
         document=to_airs_json(item),
     )
-    LOGGER.info("Indexing result:{}".format(resp["result"]))
+    LOGGER.debug("Indexing result:{}".format(resp["result"]))
     return item
 
 
@@ -300,14 +367,16 @@ def reindex(collection: str):
     )
     LOGGER.info("Start reindexing collection {}".format(collection))
     for key in keys:
-        tmp_file = "tmp" + ITEM_ARLAS_SUFFIX
-        LOGGER.info("Reindexing item from {}".format(key))
-        __s3storage().pull(__s3storage().get_full_href(key), tmp_file)
-        with open(tmp_file, "r") as f:
-            item = item_from_json_file(f)
-            LOGGER.debug(item)
-            register_item(item)
-        os.remove(tmp_file)  # !DELETE!
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=ITEM_ARLAS_SUFFIX) as tmp_file:
+            LOGGER.info("Reindexing item from {}".format(key))
+            __s3storage().pull(__s3storage().get_full_href(key), tmp_file.name)
+            tmp_file.seek(0)
+            item = item_from_json_file(tmp_file)
+            if item.airs__lifecycle is None or item.airs__lifecycle.deleted is False:
+                LOGGER.info(f"Reindex {item.collection}/{item.id}")
+                __index_item(item)
+            else:
+                LOGGER.info(f"{item.collection}/{item.id} is marked as deleted: the item will not be reindexed.")
     LOGGER.info("Done with reindexing collection {}".format(collection))
 
 
@@ -323,17 +392,6 @@ def list_collections() -> CollectionDescriptionListResponse:
     ], numberMatched=len(indices), numberReturned=len(indices))
 
 
-def item_exists(collection: str, item_id: str) -> bool:
-    if not __getES().indices.exists(index=__get_es_index_name(collection)):
-        LOGGER.info("index {} does not exists".format(__get_es_index_name(collection)))
-        return False
-    try:
-        __getES().get(index=__get_es_index_name(collection), id=item_id)
-    except elasticsearch.NotFoundError:
-        return False
-    return True
-
-
 def get_item(collection: str, item_id: str) -> Item:
     if not __getES().indices.exists(index=__get_es_index_name(collection)):
         raise exceptions.InvalidItemsException(
@@ -341,6 +399,18 @@ def get_item(collection: str, item_id: str) -> Item:
         )
     r = __getES().get(index=__get_es_index_name(collection), id=item_id)
     return item_from_dict(r["_source"])
+
+
+def get_item_from_storage(collection: str, item_id: str) -> Item:
+    key = get_item_relative_path(collection, item_id)
+    LOGGER.debug(get_item_relative_path(collection, item_id))
+    LOGGER.debug(__s3storage().get_full_href(key))
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=ITEM_ARLAS_SUFFIX) as tmp_file:
+        __s3storage().pull(__s3storage().get_full_href(key), tmp_file.name)
+        tmp_file.flush()
+        tmp_file.seek(0)
+        item = item_from_json_file(tmp_file)
+    return item
 
 
 def __collect_bands(item: Item) -> Item:

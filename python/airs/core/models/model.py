@@ -400,6 +400,15 @@ class Asset(BaseModel, extra=Extra.allow):
     proj__transform: List[float] | None = Field(default=None, title="[STAC, extension proj] The affine transformation coefficients for the default grid.")
 
 
+class Lifecycle(BaseModel, extra=Extra.allow):
+    add_datetime: Datetime = Field(title="Datetime of the item addition to the catalog")
+    update_datetime: Datetime | None = Field(default=None, title="Datetime of the item update in the catalog")
+    delete_datetime: Datetime | None = Field(default=None, title="Datetime of the item deletion from the catalog")
+    deleted: bool = Field(default=False, title="Whether the item has been deleted from the catalog or not")
+    visible: bool = Field(default=True, title="Whether the item is visible in the catalog or not")
+    version: int = Field(default=1, title="Version of the item in the catalog")
+
+
 class Properties(BaseModel, extra=Extra.allow):
     datetime: Datetime | None = Field(default=None, title="[STAC] datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
     start_datetime: Datetime | None = Field(default=None, title="[STAC] Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
@@ -517,6 +526,7 @@ class Properties(BaseModel, extra=Extra.allow):
 
 
 class Item(BaseModel, extra=Extra.allow):
+    airs__lifecycle: Lifecycle | None = Field(default=None, title="[ARLAS, extension AIRS] Lifecycle management of the item")
     collection: str | None = Field(default=None, title="[STAC] Name of the collection the item belongs to.", max_length=300)
     catalog: str | None = Field(default=None, title="Name of the catalog the item belongs to.", max_length=300)
     id: str | None = Field(default=None, title="[STAC] Unique item identifier. Must be unique within the collection.", max_length=300)
