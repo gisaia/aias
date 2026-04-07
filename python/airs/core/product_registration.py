@@ -310,7 +310,6 @@ def register_item(item: Item) -> Item:
         existing_item = get_item_from_storage(item.collection, item.id)
         if existing_item.airs__lifecycle:
             item.airs__lifecycle = existing_item.airs__lifecycle
-            LOGGER.debug(f"its lifecycle is {item.airs__lifecycle}")
     if item.airs__lifecycle is None:
         item.airs__lifecycle = Lifecycle(add_datetime=int(datetime.now().timestamp()), update_datetime=None, version=0, deleted=False, visible=True)
 
@@ -403,8 +402,6 @@ def get_item(collection: str, item_id: str) -> Item:
 
 def get_item_from_storage(collection: str, item_id: str) -> Item:
     key = get_item_relative_path(collection, item_id)
-    LOGGER.debug(get_item_relative_path(collection, item_id))
-    LOGGER.debug(__s3storage().get_full_href(key))
     with tempfile.NamedTemporaryFile(mode="w+", suffix=ITEM_ARLAS_SUFFIX) as tmp_file:
         __s3storage().pull(__s3storage().get_full_href(key), tmp_file.name)
         tmp_file.flush()
