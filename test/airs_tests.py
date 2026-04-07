@@ -116,6 +116,35 @@ class Tests(AprocTests):
         r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
         self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
 
+    def test_lifecycle(self):
+        # ADD ITEM
+        self.test_add_item()
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
+        item = mapper.item_from_json(r.content)
+        self.assertFalse(item.airs__lifecycle.deleted)
+        self.assertTrue(item.airs__lifecycle.visible)
+        self.assertEqual(item.airs__lifecycle.version, 1)
+        self.assertIsNotNone(item.airs__lifecycle.add_datetime)
+        self.assertIsNone(item.airs__lifecycle.update_datetime)
+
+        sleep(2)
+
+        # UPDATE
+        with open(ITEM_PATH_MANAGED, 'r') as file:
+            data = file.read()
+            r = requests.put(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]), data=data, headers={"Content-Type": "application/json"})
+            self.assertTrue(r.ok, str(r.status_code) + str(r.content))
+
+        # ITEM FOUND
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
+        item = mapper.item_from_json(r.content)
+        self.assertFalse(item.airs__lifecycle.deleted)
+        self.assertTrue(item.airs__lifecycle.visible)
+        self.assertEqual(item.airs__lifecycle.version, 2)
+        self.assertIsNotNone(item.airs__lifecycle.add_datetime)
+        self.assertIsNotNone(item.airs__lifecycle.update_datetime)
+        self.assertGreater(item.airs__lifecycle.update_datetime, item.airs__lifecycle.add_datetime)
+
     def test_reindex(self):
         self.test_add_item()
         # REMOVE ITEM
@@ -134,6 +163,23 @@ class Tests(AprocTests):
         # ITEM FOUND
         r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))
+
+    def test_reindex_of_deleted(self):
+        self.test_add_item()
+
+        # DELETE ITEM
+        r = requests.delete(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
+        self.assertTrue(r.ok, str(r.status_code) + str(r.content))
+        
+        # ITEM NOT FOUND
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
+        self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
+
+        # REINDEX
+        r = requests.post(url="/".join([AIRS_URL, "collections", COLLECTION, "_reindex"]), headers={"Content-Type": "application/json"})
+        # ITEM NOT FOUND
+        r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
+        self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))
 
 
 if __name__ == '__main__':
