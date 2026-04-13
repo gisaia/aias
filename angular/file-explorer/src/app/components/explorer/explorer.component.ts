@@ -20,10 +20,15 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatTree, MatTreeNode, MatTreeNodeDef, MatTreeNodePadding, MatTreeNodeToggle } from '@angular/material/tree';
 import { marker } from '@colsen1991/ngx-translate-extract-marker';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { DynamicDataSource } from '@tools/DynamicDataSource';
@@ -36,7 +41,10 @@ import { Subject } from 'rxjs';
   selector: 'app-explorer',
   templateUrl: './explorer.component.html',
   styleUrls: ['./explorer.component.scss'],
-  standalone: false
+  imports: [
+    MatTree, MatTreeNodeDef, MatTreeNode, MatTreeNodePadding, MatIconButton,
+    MatTreeNodeToggle, MatIcon, MatTooltip, MatProgressSpinner, TranslatePipe
+  ]
 })
 export class ExplorerComponent implements OnInit {
 

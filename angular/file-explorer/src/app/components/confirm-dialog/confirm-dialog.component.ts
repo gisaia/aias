@@ -25,17 +25,16 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ARLAS_AIAS_ACTIVE_COLLECTION } from '@tools/interface';
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
-  standalone: true,
   imports: [
     MatDialogModule, DriversListComponent, MatFormFieldModule,
-    MatButtonModule, TranslateModule, TextFieldModule, MatInputModule,
+    MatButtonModule, TranslatePipe, TextFieldModule, MatInputModule,
     MatChipsModule
   ]
 })

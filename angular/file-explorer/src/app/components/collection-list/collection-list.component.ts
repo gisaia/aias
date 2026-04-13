@@ -8,11 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-collection-list',
-  standalone: true,
   imports: [
     FormsModule,
     MatFormFieldModule,
@@ -22,7 +21,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatOptionModule,
     MatIconModule,
     MatDividerModule,
-    TranslateModule
+    TranslatePipe
 ],
   templateUrl: './collection-list.component.html',
   styleUrls: ['./collection-list.component.scss']

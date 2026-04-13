@@ -18,22 +18,33 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { CollectionDialogComponent } from '@components/collection-dialog/collection-dialog.component';
 import { DriversDialogComponent } from '@components/drivers-dialog/drivers-dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
 import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
+import { TopMenuComponent } from 'arlas-wui-toolkit';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
+import { ArchivesComponent } from '../archives/archives.component';
+import { CollectionListComponent } from '../collection-list/collection-list.component';
+import { ExplorerComponent } from '../explorer/explorer.component';
+import { TasksComponent } from '../tasks/tasks.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  standalone: false
+  imports: [
+    TopMenuComponent, MatIconButton, MatTooltip, MatIcon, ExplorerComponent,
+    CollectionListComponent, ArchivesComponent, TasksComponent, TranslatePipe
+  ]
 })
 export class HomeComponent implements OnInit {
 

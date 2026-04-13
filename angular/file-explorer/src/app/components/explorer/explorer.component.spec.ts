@@ -10,16 +10,17 @@ describe('ExplorerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExplorerComponent ],
-      providers: [
+    providers: [
         provideHttpClient(),
         provideToastr()
-      ],
-      imports: [
+    ],
+    imports: [
         TranslateModule.forRoot({
-          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
-      ]
-    })
+            loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader }
+        }),
+        ExplorerComponent
+    ]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ExplorerComponent);

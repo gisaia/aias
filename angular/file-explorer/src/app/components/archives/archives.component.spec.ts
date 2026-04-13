@@ -10,16 +10,17 @@ describe('ArchivesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ArchivesComponent ],
-      providers: [
+    providers: [
         provideHttpClient(),
         provideToastr()
-      ],
-      imports: [
+    ],
+    imports: [
         TranslateModule.forRoot({
-          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
-      ]
-    })
+            loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader }
+        }),
+        ArchivesComponent
+    ]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ArchivesComponent);

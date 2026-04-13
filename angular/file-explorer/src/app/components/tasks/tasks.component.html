@@ -87,9 +87,6 @@
       </td>
     </ng-container>
 
-    <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let task; columns: displayedColumns;"></tr> -->
-
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand; sticky: true"></tr>
     <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;" class="task-row"
       [class.task-row]="expandedTask === element" (click)="expandedTask = expandedTask === element ? null : element">

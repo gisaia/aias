@@ -10,16 +10,17 @@ describe('TasksComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TasksComponent ],
-      providers: [
+    providers: [
         provideHttpClient(),
         provideToastr()
-      ],
-      imports: [
+    ],
+    imports: [
         TranslateModule.forRoot({
-          loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader } })
-      ]
-    })
+            loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader }
+        }),
+        TasksComponent
+    ]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(TasksComponent);

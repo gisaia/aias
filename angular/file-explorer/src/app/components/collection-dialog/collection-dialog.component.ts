@@ -7,16 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CollectionListComponent } from '@components/collection-list/collection-list.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-collection-dialog',
-  standalone: true,
   imports: [
-    MatDialogModule, MatChipsModule, TranslateModule,
+    MatDialogModule, MatChipsModule, TranslatePipe,
     MatSelectModule, MatOptionModule, MatButtonModule,
-    MatIconModule, MatInputModule,
-    CollectionListComponent
+    MatIconModule, MatInputModule, CollectionListComponent
   ],
   templateUrl: './collection-dialog.component.html',
   styleUrl: './collection-dialog.component.scss'
