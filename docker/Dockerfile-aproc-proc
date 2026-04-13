@@ -15,9 +15,11 @@ RUN apt-get update --no-install-recommends \
     && apt-get install -y python3.12-dev python3.12-venv \
     && apt-get install -y g++ make  \
     && apt-get install -y libtiff-dev imagemagick  \
-    && apt-get install -y libhdf5-dev libhdf5-serial-dev netcdf-bin libnetcdf-dev \
+    && apt-get install -y libhdf5-dev libhdf5-serial-dev netcdf-bin libnetcdf-dev linux-libc-dev \
     && apt-get upgrade -y \
     && apt-get clean && apt-get remove -y --auto-remove curl
+
+RUN apt-get upgrade 
 
 USER 1000
 WORKDIR /app
