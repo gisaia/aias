@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +14,6 @@ import { TranslateModule } from '@ngx-translate/core';
   selector: 'app-collection-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -24,7 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatIconModule,
     MatDividerModule,
     TranslateModule
-  ],
+],
   templateUrl: './collection-list.component.html',
   styleUrls: ['./collection-list.component.scss']
 })

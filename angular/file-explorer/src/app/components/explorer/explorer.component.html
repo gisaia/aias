@@ -11,13 +11,17 @@
         </mat-icon>
       </button>
       <span (click)="listArchives(node.path)" [class.folder]="node.is_dir" class="name"
-        [class.active]="selectedFilePath === node.path">{{node.name}}</span>
-      <span *ngIf="node.is_dir" class="material-symbols-outlined pointer activate-btn" (click)="activate(node)"
-        [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection}" [matTooltipPosition]="'right'">
-        add_circle
-      </span>
-      <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'" *ngIf="node.isLoading"
+      [class.active]="selectedFilePath === node.path">{{node.name}}</span>
+      @if (node.is_dir) {
+        <span class="material-symbols-outlined pointer activate-btn" (click)="activate(node)"
+            [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection}" [matTooltipPosition]="'right'">
+          add_circle
+        </span>
+      }
+      @if (node.isLoading) {
+        <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'"
         mode="indeterminate"></mat-progress-spinner>
+      }
     </mat-tree-node>
   </mat-tree>
 </div>

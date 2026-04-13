@@ -1,70 +1,83 @@
 <div class="archives-content">
   <mat-list class="archives-list">
-    <mat-list-item *ngFor="let archive of archives" class="archive">
-      <span *ngIf="archive.is_dir; else file" class="material-symbols-outlined list-icon" mat-list-icon>
-        folder
-      </span>
-      <ng-template #file>
-        <span class="material-symbols-outlined list-icon">
-          note
-        </span>
-      </ng-template>
-      <div class="item-content">
-        <div class="info">
-          <div mat-line class="label">
-            {{archive.name}}
+    @for (archive of archives; track archive) {
+      <mat-list-item class="archive">
+        @if (archive.is_dir) {
+          <span class="material-symbols-outlined list-icon" mat-list-icon>
+            folder
+          </span>
+        } @else {
+          <span class="material-symbols-outlined list-icon">
+            note
+          </span>
+        }
+        <div class="item-content">
+          <div class="info">
+            <div mat-line class="label">
+              {{archive.name}}
+            </div>
+            <div mat-line class="detail">
+              {{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short') || '--'} }}
+            </div>
+
+            <div mat-line class="detail detail-id">
+              <span>{{ 'id:' | translate:{id: archive.id} }}</span>
+              <span class="copy">
+                <app-copy-id [idToCopy]="archive.id"></app-copy-id>
+              </span>
+            </div>
           </div>
-          <div mat-line class="detail">{{ 'last update:' | translate : {date: (archive.last_modification_date |
-            date:'short') || '--'} }}</div>
-          <div mat-line class="detail detail-id">
-            <span>{{ 'id:' | translate:{id: archive.id} }}</span>
-            <span class="copy">
-              <app-copy-id [idToCopy]="archive.id"></app-copy-id>
-            </span>
+          <div class="actions">
+            <mat-chip-listbox [selectable]="false">
+              <mat-chip-option [disableRipple]="true" class="driver-chip">
+                {{archive.driver_name}}
+              </mat-chip-option>
+            </mat-chip-listbox>
+            @if (archive.status === 'successful') {
+              <span class="material-symbols-outlined pointer"
+                  (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
+                remove_circle
+              </span>
+            } @else {
+              <span class="icon-spacer"></span>
+            }
+
+            @if (archive.status === 'successful') {
+              <span class="material-symbols-outlined no-pointer successful"
+                  [matTooltip]="'Already activated' | translate">
+                check_circle
+              </span>
+
+              <span class="material-symbols-outlined pointer"
+                (keydown)="activate(archive)" (click)="activate(archive)" [matTooltip]="'Re-activate'| translate">
+                add_circle
+              </span>
+            } @else if (!archive.status) {
+              <span class="material-symbols-outlined no-pointer not-activated"
+                  [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection}">
+                unpublished
+              </span>
+
+              <span class="material-symbols-outlined pointer" (keydown)="activate(archive)" (click)="activate(archive)"
+                  [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
+                add_circle
+              </span>
+            }
           </div>
         </div>
-        <div class="actions">
-          <mat-chip-listbox [selectable]="false">
-            <mat-chip-option [disableRipple]="true" class="driver-chip">
-              {{archive.driver_name}}
-            </mat-chip-option>
-          </mat-chip-listbox>
-          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
-            (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
-            remove_circle
-          </span>
-          <span class="icon-spacer" *ngIf="archive.status !== 'successful'"></span>
-          <span class="material-symbols-outlined no-pointer successful" *ngIf="archive.status === 'successful'"
-            [matTooltip]="'Already activated' | translate">
-            check_circle
-          </span>
-
-          <span class="material-symbols-outlined no-pointer not-activated" *ngIf="!archive.status"
-            [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection}">
-            unpublished
-          </span>
-
-          <span class="material-symbols-outlined pointer" *ngIf="!archive.status" (keydown)="activate(archive)"
-            (click)="activate(archive)"
-            [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
-            add_circle
-          </span>
-          <span class="material-symbols-outlined pointer" *ngIf="archive.status === 'successful'"
-            (keydown)="activate(archive)" (click)="activate(archive)" [matTooltip]="'Re-activate'| translate">
-            add_circle
-          </span>
-        </div>
-      </div>
-
-    </mat-list-item>
+      </mat-list-item>
+    }
   </mat-list>
 
-  <div class="no-archive" *ngIf="!archives">
-    {{'Select a folder to display list of available archives' | translate}}
-  </div>
-  <div class="no-archive" *ngIf="!!archives && archives.length === 0">
-    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath}}
-  </div>
+  @if (!archives) {
+    <div class="no-archive">
+      {{'Select a folder to display list of available archives' | translate}}
+    </div>
+  } @else if (archives.length === 0) {
+    <div class="no-archive">
+      {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath}}
+    </div>
+  }
   <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" [name]="'archives'" size="default" color="#fff" type="line-scale"
     [fullScreen]="false">
     <p style="color: white"> {{'Loading archives...' | translate}} </p>
