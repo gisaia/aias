@@ -16,6 +16,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
+    "skipLibCheck": true,
     "target": "ES2022",
     "module": "esnext",
     "paths": {

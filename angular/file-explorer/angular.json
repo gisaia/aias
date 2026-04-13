@@ -31,9 +31,6 @@
               "browser": ""
             },
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -112,27 +109,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": ["src/polyfills.ts"],
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/settings.yaml",
-              "src/styles",
-              "src/silent-refresh.html"
-            ],
-            "styles": [
-              "src/file-explorer-theme.scss",
-              "src/styles.scss",
-              "node_modules/ngx-spinner/animations/line-scale.css",
-              "node_modules/ngx-toastr/toastr.css"
-            ],
-            "scripts": []
+            "watch": false
           }
         },
         "lint": {

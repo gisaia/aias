@@ -4,7 +4,7 @@ import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
 import stylistic from '@stylistic/eslint-plugin'
 
-export default defineConfig([globalIgnores(["**/node_modules", "**/dist", "eslint.config.mjs", "test/app.js","test/webpack.config.js", "src/polyfills.ts"]), {
+export default defineConfig([globalIgnores(["**/node_modules", "**/dist", "eslint.config.mjs", "test/app.js","test/webpack.config.js"]), {
     plugins: {
         "@typescript-eslint": typescriptEslint,
         "@stylistic": stylistic
