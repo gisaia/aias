@@ -83,7 +83,7 @@ class Driver(EnrichDriver):
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
             start = time()
-            kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
+            kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857', 'COMPRESS': 'DEFLATE', 'ZLEVEL': '9', 'BIGTIFF': 'IF_SAFER'}
             gdal.Warp(asset_location, tci_file_path, **kwargs)
             self.LOGGER.info("Creating COG took {} s".format(time() - start))
 
