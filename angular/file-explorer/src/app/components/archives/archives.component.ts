@@ -20,6 +20,7 @@
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatList, MatListItem } from '@angular/material/list';
@@ -42,7 +43,7 @@ import { CopyIdComponent } from '../copy-id/copy-id.component';
   templateUrl: './archives.component.html',
   styleUrls: ['./archives.component.scss'],
   imports: [
-    MatList, MatListItem, CopyIdComponent, MatChipListbox,
+    MatList, MatListItem, CopyIdComponent, MatChipListbox, MatButtonModule,
     MatChipOption, MatTooltip, NgxSpinnerComponent, DatePipe, TranslatePipe
   ]
 })

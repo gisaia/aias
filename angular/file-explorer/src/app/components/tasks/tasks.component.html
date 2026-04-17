@@ -18,8 +18,10 @@
             {{task.status | translate}}</mat-chip-option>
           </mat-chip-listbox>
           @if (task.status === 'running') {
-            <span class="material-symbols-outlined cancel-job" [matTooltip]="'Cancel' | translate"
-              (click)="cancelJob(task, task.jobID); $event.stopPropagation()">cancel</span>
+            <button mat-icon-button class="cancel-job" [matTooltip]="'Cancel' | translate"
+                (click)="cancelJob(task, task.jobID); $event.stopPropagation()">
+              <span class="material-symbols-outlined">cancel</span>
+            </button>
           }
         </div>
       </td>

@@ -34,10 +34,9 @@
               </mat-chip-option>
             </mat-chip-listbox>
             @if (archive.status === 'successful') {
-              <span class="material-symbols-outlined pointer"
-                  (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
-                remove_circle
-              </span>
+              <button mat-icon-button class="deactivate" (click)="desactivate(archive)" [matTooltip]="'Desactivate'| translate">
+                <span class="material-symbols-outlined">remove_circle</span>
+              </button>
             } @else {
               <span class="icon-spacer"></span>
             }
