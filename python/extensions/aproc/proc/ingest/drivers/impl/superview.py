@@ -23,21 +23,29 @@ class Driver(IngestDriver):
     def __init__(self):
         super().__init__()
         self.xml_path = None
+        self.data_path = None
+        self.main_asset_role = None
+        self.overview_path = None
+        self.thumbnail_path = None
+        self.cloud_shape_path = None
 
         self.mux_rcps_path = None
         self.mux_xml_path = None
         self.mux_tif_path = None
-        self.mux_jpg_path = None
+        self.mux_overview_path = None
+        self.mux_thumbnail_path = None
 
         self.pan_rcps_path = None
         self.pan_xml_path = None
         self.pan_tif_path = None
-        self.pan_jpg_path = None
+        self.pan_overview_path = None
+        self.pan_thumbnail_path = None
 
-        self.cloud_shape_path = None
-        self.shape_path = None
-        self.rpcs_path = None
-        self.quicklook_path = None
+        self.psh_rcps_path = None
+        self.psh_xml_path = None
+        self.psh_tif_path = None
+        self.psh_overview_path = None
+        self.psh_thumbnail_path = None
 
 
     @staticmethod
@@ -49,25 +57,41 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        # Images
-        assets.append(Asset(href=self.mux_tif_path, size=AccessManager.get_size(self.mux_tif_path),
-                            roles=[Role.data.value, Role.visual.value], name=Role.data.value, type=MimeType.GEOTIFF.value,
+        # Main images
+        assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
+                            roles=[Role.data.value, Role.visual.value, self.main_asset_role], name=Role.data.value, type=MimeType.GEOTIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+
+        if self.mux_tif_path:
+            assets.append(Asset(href=self.mux_tif_path, size=AccessManager.get_size(self.mux_tif_path),
+                                roles=[Role.data.value, Role.visual.value, Role.multispectral.value], name=Role.multispectral.value, type=MimeType.GEOTIFF.value,
+                                description=Role.multispectral.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+
+        if self.psh_tif_path:
+            assets.append(Asset(href=self.psh_tif_path, size=AccessManager.get_size(self.psh_tif_path),
+                                roles=[Role.data.value, Role.visual.value, Role.pan_sharpened.value], name=Role.pan_sharpened.value, type=MimeType.GEOTIFF.value,
+                                description=Role.pan_sharpened.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         if self.pan_tif_path:
             assets.append(Asset(href=self.pan_tif_path, size=AccessManager.get_size(self.pan_tif_path),
-                                roles=[Role.data.value, Role.pan_sharpened.value], name=Role.pan_sharpened.value, type=MimeType.GEOTIFF.value,
-                                description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+                                roles=[Role.data.value, Role.visual.value, Role.pan.value], name=Role.pan.value, type=MimeType.GEOTIFF.value,
+                                description=Role.pan.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
-        if self.mux_jpg_path:
-            assets.append(Asset(href=self.mux_jpg_path, size=AccessManager.get_size(self.mux_jpg_path),
-                                roles=[Role.overview.value, Role.visual.value], name=Role.overview.value + "-mux", type=MimeType.JPEG.value,
-                                description=Role.overview.value, airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
+        # Overviews
+        if self.mux_overview_path:
+            assets.append(Asset(href=self.mux_overview_path, size=AccessManager.get_size(self.mux_overview_path),
+                                roles=[Role.overview.value, Role.visual.value, Role.multispectral.value], name=Role.overview.value + "-mux", type=MimeType.JPEG.value,
+                                description=Role.overview.value + "for multispectral", airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
 
-        if self.pan_jpg_path:
-            assets.append(Asset(href=self.pan_jpg_path, size=AccessManager.get_size(self.pan_jpg_path),
-                                roles=[Role.overview.value, Role.pan_sharpened.value], name=Role.overview.value + "-pan", type=MimeType.JPEG.value,
-                                description=Role.overview.value, airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
+        if self.pan_overview_path:
+            assets.append(Asset(href=self.pan_overview_path, size=AccessManager.get_size(self.pan_overview_path),
+                                roles=[Role.overview.value, Role.visual.value, Role.pan_sharpened.value], name=Role.overview.value + "-pan", type=MimeType.JPEG.value,
+                                description=Role.overview.value + "for pan", airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
+
+        if self.psh_overview_path:
+            assets.append(Asset(href=self.psh_overview_path, size=AccessManager.get_size(self.psh_overview_path),
+                                roles=[Role.overview.value, Role.visual.value, Role.visual.value, Role.pan_sharpened.value], name=Role.overview.value + "-psh", type=MimeType.JPEG.value,
+                                description=Role.overview.value + "for pan sharpened", airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
         # Metadata
         if self.xml_path:
             assets.append(Asset(href=self.xml_path, size=AccessManager.get_size(self.xml_path),
@@ -84,6 +108,11 @@ class Driver(IngestDriver):
                                 roles=[Role.metadata.value], name=Role.metadata.value + "-pan", type=MimeType.XML.value,
                                 description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
 
+        if self.psh_xml_path:
+            assets.append(Asset(href=self.psh_xml_path, size=AccessManager.get_size(self.psh_xml_path),
+                                roles=[Role.metadata.value], name=Role.metadata.value + "-psh", type=MimeType.XML.value,
+                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+
         # RPCs
         if self.mux_rcps_path:
             assets.append(Asset(href=self.mux_rcps_path, size=AccessManager.get_size(self.mux_rcps_path),
@@ -95,11 +124,10 @@ class Driver(IngestDriver):
                                 roles=[Role.rpc.value], name=Role.rpc.value + "-pan", type=MimeType.TEXT.value,
                                 description=Role.rpc.value, airs__managed=False, asset_format=AssetFormat.rpb.value, asset_type=ResourceType.other.value))
 
-        # SHAPE Extent
-        if self.shape_path:
-            assets.append(Asset(href=self.shape_path, size=AccessManager.get_size(self.shape_path),
-                                roles=[Role.extent.value], name=Role.extent.value, type=MimeType.SHP.value,
-                                description=Role.extent.value, airs__managed=False, asset_format=AssetFormat.shape.value, asset_type=ResourceType.vector.value))
+        if self.psh_rcps_path:
+            assets.append(Asset(href=self.psh_rcps_path, size=AccessManager.get_size(self.psh_rcps_path),
+                                roles=[Role.rpc.value], name=Role.rpc.value + "-psh", type=MimeType.TEXT.value,
+                                description=Role.rpc.value, airs__managed=False, asset_format=AssetFormat.rpb.value, asset_type=ResourceType.other.value))
 
         # SHAPE Clouds
         if self.cloud_shape_path:
@@ -110,42 +138,45 @@ class Driver(IngestDriver):
         return assets
 
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.quicklook_path is not None:
-            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.JPG, AssetFormat.jpg)
-            self.quicklook_path = quicklook.href
-            assets.append(quicklook)
-            Driver.LOGGER.debug(f"Using existing quicklook at {self.quicklook_path}")
+        if self.overview_path is not None:
+            overview = ImageDriverHelper.make_local_overview_asset(self, url, self.overview_path, MimeType.JPG, AssetFormat.jpg)
+            self.overview_path = overview.href
+            assets.append(overview)
+            Driver.LOGGER.debug(f"Using existing quicklook at {self.overview_path}")
+        if self.thumbnail_path is not None:
+            thumbnail = ImageDriverHelper.make_local_overview_asset(self, url, self.thumbnail_path, MimeType.JPG, AssetFormat.jpg)
+            self.overview_path = thumbnail.href
+            assets.append(thumbnail)
+            Driver.LOGGER.debug(f"Using existing thumbnail at {self.thumbnail_path}")
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        image_for_quicklook = self.mux_jpg_path if self.mux_jpg_path else self.pan_jpg_path if self.pan_jpg_path else self.mux_tif_path if self.mux_tif_path else self.pan_tif_path if self.pan_tif_path else None
-
-        if self.quicklook_path is None:
-            if image_for_quicklook and AccessManager.is_local(image_for_quicklook) and Driver.configuration.get('build_overview_when_local', True):
-                Driver.LOGGER.debug(f"Use {image_for_quicklook} for quicklook")
-                quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(image_for_quicklook, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-                quicklook.size = AccessManager.get_size(quicklook.href)
-                self.quicklook_path = quicklook.href
-                assets.append(quicklook)
+        if self.overview_path is None:
+            if self.overview_path and AccessManager.is_local(self.overview_path) and Driver.configuration.get('build_overview_when_local', True):
+                Driver.LOGGER.debug(f"Use {self.overview_path} for quicklook")
+                overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                geotiff_to_jpg(self.overview_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', False))
+                overview.size = AccessManager.get_size(overview.href)
+                self.overview_path = overview.href
+                assets.append(overview)
             elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
-                Driver.LOGGER.debug(f"Building overview for remote {image_for_quicklook}")
+                Driver.LOGGER.debug(f"Building overview for remote {self.overview_path}")
                 overview_folder = self.assets_dir + '/superview/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)
                 overview_path = overview_folder + '/overview.jpg'
                 # File is processed locally as it significantly speeds up processing time
-                with AccessManager.make_local(image_for_quicklook) as local_big_preview_path:
+                with AccessManager.make_local(overview_path) as local_big_preview_path:
                     overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
                     geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                     overview.size = AccessManager.get_size(overview.href)
-                    self.quicklook_path = overview.href
+                    self.overview_path = overview.href
                     assets.append(overview)
             else:
-                Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(image_for_quicklook))
+                Driver.LOGGER.debug("Skipping overview generation for TCI {}".format(self.overview_path))
 
-        if self.quicklook_path is not None:
+        if self.thumbnail_path is None and self.overview_path is not None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            downsample_image(self.overview_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets
@@ -159,7 +190,7 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: ET.Element) -> Item:
 
-        geometry = ImageDriverHelper.gdal_geometry(self, self.mux_tif_path)
+        geometry = ImageDriverHelper.gdal_geometry(self, self.data_path)
         Driver.LOGGER.debug(f"Extracted geometry for item {url}: {geometry}")
         if geometry is None:
             Driver.LOGGER.error(f"No geometry found for item {url}")
@@ -217,13 +248,14 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(metadata, "ProductLevel")
         item.properties.gsd = find_or_none(metadata, "GSDX", float)
         
-        proj = AccessManager.get_gdal_proj(self.mux_tif_path)
+        item.properties.secondary_id = find_or_none(metadata, "ProductID")
+
+        proj = AccessManager.get_gdal_proj(self.data_path)
         if proj:
             item.properties.proj__epsg = get_epsg(proj)
         else:
-            item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.mux_tif_path)
+            item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.data_path)
 
-        item.properties.secondary_id = find_or_none(metadata, "ProductID")
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
@@ -255,36 +287,64 @@ class Driver(IngestDriver):
             for file in files:
                 if not file.is_dir:
                     fname = file.name.lower()
-                    if fname.endswith('_thumb.jpg'):
-                        self.quicklook_path = file.path
-
-                    elif fname.endswith('-mux.tiff'):
+                    if fname.endswith('-mux.tiff'):
                         self.mux_tif_path = file.path
-                        self.xml_path = self.mux_tif_path[:-9] + ".xml"
                     elif fname.endswith(('-mux.jpg', '-mux.jpeg')):
-                        self.mux_jpg_path = file.path
+                        self.mux_overview_path = file.path
                     elif fname.endswith('-mux.xml'):
                         self.mux_xml_path = file.path
                     elif fname.endswith('-mux.rpb'):
                         self.mux_rcps_path = file.path
+                    elif fname.endswith(('-mux_thumb.jpg', '-mux_thumb.jpeg')):
+                        self.mux_thumbnail_path = file.path
 
                     elif fname.endswith(('-pan.tiff', '-pan.tif')):
                         self.pan_tif_path = file.path
                     elif fname.endswith(('-pan.jpg', '-pan.jpeg')):
-                        self.pan_jpg_path = file.path
+                        self.pan_overview_path = file.path
                     elif fname.endswith('-pan.xml'):
                         self.pan_xml_path = file.path
                     elif fname.endswith('-pan.rpb'):
                         self.pan_rcps_path = file.path
+                    elif fname.endswith(('-pan_thumb.jpg', '-pan_thumb.jpeg')):
+                        self.pan_thumbnail_path = file.path
+
+                    elif fname.endswith(('-psh.tiff', '-psh.tif')):
+                        self.psh_tif_path = file.path
+                    elif fname.endswith(('-psh.jpg', '-psh.jpeg')):
+                        self.psh_overview_path = file.path
+                    elif fname.endswith('-psh.xml'):
+                        self.psh_xml_path = file.path
+                    elif fname.endswith('-psh.rpb'):
+                        self.psh_rcps_path = file.path
+                    elif fname.endswith(('-psh_thumb.jpg', '-psh_thumb.jpeg')):
+                        self.psh_thumbnail_path = file.path
 
                     elif fname.endswith('-cloud.shp'):
                         self.cloud_shape_path = file.path
 
-            if self.xml_path:
-                shape_path_if_exists = self.xml_path.removesuffix('.xml') + ".shp"
-                if AccessManager.exists(shape_path_if_exists):
-                    self.shape_path = shape_path_if_exists
+            # the metadata reference is in order of priority: mux, psh, pan
+            if self.pan_xml_path and self.pan_tif_path:
+                self.xml_path = self.pan_xml_path
+                self.data_path = self.pan_tif_path
+                self.main_asset_role = Role.pan.value
+                self.overview_path = self.pan_overview_path
+                self.thumbnail_path = self.pan_thumbnail_path
 
-            if self.mux_tif_path is not None and self.xml_path is not None and AccessManager.exists(self.xml_path):
+            if self.psh_xml_path and self.psh_tif_path:
+                self.xml_path = self.psh_xml_path
+                self.data_path = self.psh_tif_path
+                self.main_asset_role = Role.pan_sharpened.value
+                self.overview_path = self.psh_overview_path
+                self.thumbnail_path = self.psh_thumbnail_path
+
+            if self.mux_xml_path and self.mux_tif_path:
+                self.xml_path = self.mux_xml_path
+                self.data_path = self.mux_tif_path
+                self.main_asset_role = Role.multispectral.value
+                self.overview_path = self.mux_overview_path
+                self.thumbnail_path = self.mux_thumbnail_path
+
+            if self.xml_path is not None and self.data_path is not None:
                 return True
         return False

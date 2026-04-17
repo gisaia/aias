@@ -1,5 +1,6 @@
 import os
 import unittest
+from airs.core.models.model import Role
 from aproc.core.models.ogc.enums import StatusCode
 
 from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
@@ -157,6 +158,22 @@ class Tests(IngestTests):
     def test_async_ingest_superview(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])
+
+    def test_async_ingest_superview_mux(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW + "_MUX/")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"])
+
+    def test_async_ingest_superview_mux_pan(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW + "_MUX_PAN")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.pan.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux", Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"])
+
+    def test_async_ingest_superview_pan(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW + "_PAN")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"])
+
+    def test_async_ingest_superview_psh(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW + "_PSH")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan_sharpened.value, Role.overview.value + "-psh", Role.rpc.value + "-psh", Role.metadata.value + "-psh"])
 
 if __name__ == '__main__':
     unittest.main()
