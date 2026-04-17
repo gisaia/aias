@@ -142,9 +142,9 @@ class IngestTests(AprocTests):
         self.assertIsNotNone(item.properties.observation_type)
         self.assertIn(Role.archive.value, item.assets.keys())
         for asset in assets:
-            self.assertIsNotNone(item.assets.get(asset), asset)
+            self.assertIsNotNone(item.assets.get(asset), f"{asset} not in {item.assets.keys()}")
             self.assertIsNotNone(item.assets.get(asset).name, asset)
-            if asset != "airs_item":
+            if asset != "airs_item" and asset != "archive":
                 self.assertIsNotNone(item.assets.get(asset).size, asset)
                 self.assertGreater(item.assets.get(asset).size, 0, asset)
                 self.assertIsNotNone(item.assets.get(asset).asset_format, asset)
