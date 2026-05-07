@@ -20,7 +20,7 @@
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatIconButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -42,7 +42,7 @@ import { Subject } from 'rxjs';
   templateUrl: './explorer.component.html',
   styleUrls: ['./explorer.component.scss'],
   imports: [
-    MatTree, MatTreeNodeDef, MatTreeNode, MatTreeNodePadding, MatIconButton,
+    MatTree, MatTreeNodeDef, MatTreeNode, MatTreeNodePadding, MatButtonModule,
     MatTreeNodeToggle, MatIcon, MatTooltip, MatProgressSpinner, TranslatePipe
   ]
 })

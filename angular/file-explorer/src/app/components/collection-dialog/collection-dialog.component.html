@@ -4,7 +4,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="actions">
-  <button mat-flat-button color="primary" [disabled]="!selectedCollection" [color]="'primary'"
+  <button matButton="filled" color="primary" [disabled]="!selectedCollection" [color]="'primary'"
     [mat-dialog-close]="{collection: selectedCollection}">
     {{'Validate' | translate}}
   </button>

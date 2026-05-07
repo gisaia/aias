@@ -10,7 +10,7 @@
           {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
         </mat-icon>
       </button>
-      <button mat-button (click)="listArchives(node.path)" class="name"
+      <button matButton (click)="listArchives(node.path)" class="name"
         [class.name--folder]="node.is_dir" [class.active]="selectedFilePath === node.path">{{node.name}}</button>
       @if (node.is_dir) {
         <button mat-icon-button class="activate-btn" (click)="activate(node)"
