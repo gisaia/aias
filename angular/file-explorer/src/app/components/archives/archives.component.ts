@@ -17,26 +17,35 @@
  * under the License.
  */
 
+import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatTooltip } from '@angular/material/tooltip';
 import { marker } from '@colsen1991/ngx-translate-extract-marker';
 import { ConfirmDialogComponent } from '@components/confirm-dialog/confirm-dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
 import { emitErrors } from '@tools/errors';
 import { Archive, ARLAS_AIAS_DRIVERS_ACTIVATED, ProcessStatus } from '@tools/interface';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, zip } from 'rxjs';
+import { CopyIdComponent } from '../copy-id/copy-id.component';
 
 @Component({
   selector: 'app-archives',
   templateUrl: './archives.component.html',
   styleUrls: ['./archives.component.scss'],
-  standalone: false
+  imports: [
+    MatList, MatListItem, CopyIdComponent, MatChipListbox, MatButtonModule,
+    MatChipOption, MatTooltip, NgxSpinnerComponent, DatePipe, TranslatePipe
+  ]
 })
 export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
 

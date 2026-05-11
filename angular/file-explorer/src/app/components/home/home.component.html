@@ -24,7 +24,7 @@
         </span>
       </div>
       @if(currentCollection !== ''){
-      <app-explorer [collapseAllSubject]="collapseEvent" [currentCollection]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
+        <app-explorer [collapseAllSubject]="collapseEvent" [currentCollection]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
       }
     </div>
     <div class="archives">
@@ -37,7 +37,7 @@
         </div>
       </div>
       @if(currentCollection !== ''){
-      <app-archives [archivesPath]="archivesPath" [currentCollection]="currentCollection"></app-archives>
+        <app-archives [archivesPath]="archivesPath" [currentCollection]="currentCollection"></app-archives>
       }
     </div>
   </div>
@@ -49,8 +49,8 @@
         expand_more
       </span>
     </div>
-    @if(currentCollection !== ''){
-    <app-tasks *ngIf="showTasks" (allTasksEnded)="refreshArchives()"></app-tasks>
+    @if (currentCollection !== '' && showTasks) {
+      <app-tasks (allTasksEnded)="refreshArchives()"></app-tasks>
     }
   </div>
 </div>

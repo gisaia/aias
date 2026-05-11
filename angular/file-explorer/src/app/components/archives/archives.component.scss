@@ -100,6 +100,12 @@
             height: 24px;
           }
 
+          .deactivate {
+            padding: 0;
+            --mat-icon-button-state-layer-size: 24px;
+            --mat-icon-button-touch-target-size: 24px;
+          }
+
           .driver-chip {
             border: 1px solid rgba(0, 0, 0, 0.75);
             background: white;

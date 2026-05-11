@@ -6,31 +6,30 @@
         <mat-icon class="search-icon">search</mat-icon>
         <input #searchInput class="search-input" [placeholder]="'Search or add a collection' | translate"
           [(ngModel)]="searchTerm" (input)="onSearchChange()" autocomplete="off" />
-        <button mat-icon-button *ngIf="searchTerm" (click)="searchTerm = ''; onSearchChange()" class="clear-btn"
-          type="button">
-          <mat-icon>close</mat-icon>
-        </button>
+        @if (searchTerm) {
+          <button mat-icon-button (click)="searchTerm = ''; onSearchChange()" class="clear-btn" type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
       </div>
       <mat-divider></mat-divider>
     </div>
 
     @for (collection of filteredCollections; track collection) {
-    <mat-option [value]="collection">
-      {{ collection }}
-    </mat-option>
+      <mat-option [value]="collection">
+        {{ collection }}
+      </mat-option>
     }
 
     @if (searchTerm && !exists()) {
-    <mat-option class="add-custom-option" [disabled]="isInvalid()" (keydown)="!isInvalid() && addCustomValue()" (click)="!isInvalid() && addCustomValue()">
-      <mat-icon [color]="isInvalid() ? '' : 'primary'">add_circle_outline</mat-icon>
-      <span class="add-text">
-        {{'Add' | translate}} "{{ searchTerm }}"
-      </span>
-    </mat-option>
-    }
-
-    @if (filteredCollections.length === 0 && (exists() || !searchTerm)) {
-    <div class="no-results-msg">{{'No results found' | translate}}</div>
+      <mat-option class="add-custom-option" [disabled]="isInvalid()" (keydown)="!isInvalid() && addCustomValue()" (click)="!isInvalid() && addCustomValue()">
+        <mat-icon [color]="isInvalid() ? '' : 'primary'">add_circle_outline</mat-icon>
+        <span class="add-text">
+          {{'Add' | translate}} "{{ searchTerm }}"
+        </span>
+      </mat-option>
+    } @else if (filteredCollections.length === 0) {
+      <div class="no-results-msg">{{'No results found' | translate}}</div>
     }
   </mat-select>
 </mat-form-field>

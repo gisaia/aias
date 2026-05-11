@@ -5,7 +5,6 @@ import { ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
 
 @Component({
   selector: 'app-drivers-list',
-  standalone: true,
   imports: [MatChipsModule],
   templateUrl: './drivers-list.component.html',
   styleUrl: './drivers-list.component.scss'

@@ -10,14 +10,18 @@
           {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
         </mat-icon>
       </button>
-      <span (click)="listArchives(node.path)" [class.folder]="node.is_dir" class="name"
-        [class.active]="selectedFilePath === node.path">{{node.name}}</span>
-      <span *ngIf="node.is_dir" class="material-symbols-outlined pointer activate-btn" (click)="activate(node)"
-        [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection}" [matTooltipPosition]="'right'">
-        add_circle
-      </span>
-      <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'" *ngIf="node.isLoading"
-        mode="indeterminate"></mat-progress-spinner>
+      <button matButton (click)="listArchives(node.path)" class="name"
+        [class.name--folder]="node.is_dir" [class.active]="selectedFilePath === node.path">{{node.name}}</button>
+      @if (node.is_dir) {
+        <button mat-icon-button class="activate-btn" (click)="activate(node)"
+            [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection}" [matTooltipPosition]="'right'">
+          <span class="material-symbols-outlined">add_circle</span>
+        </button>
+      }
+      @if (node.isLoading) {
+        <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'"
+          mode="indeterminate"></mat-progress-spinner>
+      }
     </mat-tree-node>
   </mat-tree>
 </div>

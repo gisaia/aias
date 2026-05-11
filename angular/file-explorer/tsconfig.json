@@ -16,15 +16,9 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
+    "skipLibCheck": true,
     "target": "ES2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "module": "esnext",
-    "lib": [
-      "es2019",
-      "dom"
-    ],
     "paths": {
       "@components/*": [
         "app/components/*"
