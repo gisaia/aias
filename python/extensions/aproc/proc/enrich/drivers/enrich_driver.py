@@ -1,6 +1,7 @@
 from abc import abstractmethod
 import hashlib
 import os
+from typing import Any
 from airs.core.models.model import Asset, Item, Role
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
@@ -13,6 +14,9 @@ class EnrichDriver(AbstractDriver):
         super().__init__()
         self.thumbnail_size = 256
         self.overview_size = 1024
+
+    def __supports__(self, resource: Item, extra_params: dict[str, Any], supported_assets, item_formats) -> bool:
+        return extra_params.get("enrichments", []) and set(extra_params.get("enrichments", [])).issubset(set(supported_assets)) and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() in item_formats
 
     @staticmethod
     def init(configuration: dict) -> None:
@@ -35,18 +39,18 @@ class EnrichDriver(AbstractDriver):
         AccessManager.makedir(assets_dir)
         return assets_dir
 
-    def get_asset_filepath(self, url: str, asset: Asset) -> str:
+    def get_asset_filepath(self, url: str, asset_name: str) -> str:
         """Provides the name of the file for storing the asset
 
         Args:
             url (str): the original url
-            asset (Asset): the asset to be stored, it's name must be provided.
+            asset_name (str): the name of the asset to be stored
 
         Returns:
             str: the path to the file for storing the asset's file
         """
         assets_dir = self.get_assets_dir(url)
-        return os.path.sep.join([assets_dir, asset.name])
+        return os.path.sep.join([assets_dir, asset_name])
 
     def get_asset_href(self, item: Item) -> str | None:
         if self.alternative_asset_href_field:
@@ -55,14 +59,21 @@ class EnrichDriver(AbstractDriver):
         return data.href if data else None
 
     @abstractmethod
-    def create_assets(self, item: Item, asset_type: str) -> list[Asset]:
+    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
         """Create the assets metadata (Asset) and data (file) for a given item
 
         Args:
             item (Item): The item to be enriched
-            asset_type (str): name of the asset type to create, e.g. 'cog'
+            enrichment (list[str]): names of the enrichment to create, e.g. 'cog'. This can lead to multiple asset creation.
 
         Returns:
             list[Asset]: the list of the created assets
         """
         ...
+
+    def create_enrichments(self, item: Item, enrichments: list[str]) -> list[Asset]:
+        assets = []
+        for enrichment in enrichments:
+            self.LOGGER.info("adding {} to item {}".format(enrichment, item.id))
+            assets.append(self.create_enrichement(item, enrichment))
+        return assets

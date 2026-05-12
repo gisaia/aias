@@ -51,9 +51,11 @@ class HttpStorage(AbstractStorage):
     def is_dir(self, href: str):
         return False
 
-    def get_file_size(self, href: str):
+    def get_file_size(self, href: str) -> int | None:
         r = requests_head(href, self.get_configuration().headers)
-        return r.headers.get("Content-Length")
+        if r.headers.get("Content-Length"):
+            return int(r.headers.get("Content-Length", 0))
+        return None
 
     def listdir(self, href: str) -> list[File]:
         raise NotImplementedError(f"It is not possible to list the content of a directory with {self.get_configuration().type} protocol")

@@ -7,37 +7,13 @@ drivers:
     priority: 1
   -
     name: digitalglobe
-    class_name: extensions.aproc.proc.enrich.drivers.impl.digitalglobe_cog
+    class_name: extensions.aproc.proc.enrich.drivers.impl.data_cog
     assets_dir: /tmp/aproc/cog
     configuration:
     priority: 2
-  -
-    name: dimap
-    class_name: extensions.aproc.proc.enrich.drivers.impl.dimap_cog
-    assets_dir: /tmp/aproc/cog
-    configuration:
-    priority: 3
-  -
-    name: geoeye
-    class_name: extensions.aproc.proc.enrich.drivers.impl.geoeye_cog
-    assets_dir: /tmp/aproc/cog
-    configuration:
-    priority: 4
-  -
-    name: geosat
-    class_name: extensions.aproc.proc.enrich.drivers.impl.geosat_cog
-    assets_dir: /tmp/aproc/cog
-    configuration:
-    priority: 5
   -
     name: landsat
     class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
     assets_dir: /tmp/aproc/cog
     configuration:
     priority: 6
-  -
-    name: wyvern
-    class_name: extensions.aproc.proc.enrich.drivers.impl.wyvern_cog
-    assets_dir: /tmp/aproc/cog
-    configuration:
-    priority: 7

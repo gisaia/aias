@@ -19,7 +19,7 @@ from test.aproc_ingest_tests_gs import ROOT, Tests as IngestionTests
 class Tests(AprocTests):
 
     def __enrich_cog(self, id: str):
-        inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": COLLECTION, "item_id": id}], asset_type="cog")
+        inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": COLLECTION, "item_id": id}], enrichments=["cog"])
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
         r = requests.post("/".join([APROC_ENDPOINT, "processes/enrich/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok)

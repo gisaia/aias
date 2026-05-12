@@ -135,11 +135,9 @@ class S3Storage(AbstractStorage):
                         continue
                     if path == obj['Key']:
                         # The href points to a file and the path is the exact location for the file, we remove the full prefix
-                        LOGGER.debug("The href points to a file")
                         local_file_path = dst
                     else:
                         # The href points to a folder, we remove the href prefix only
-                        LOGGER.debug("The href points to a folder")
                         prefix_to_remove = self.__get_href_key(href).removesuffix("/") + "/"
                         local_file_path = os.path.join(dst, obj['Key'].removeprefix(prefix_to_remove))
 
@@ -225,9 +223,9 @@ class S3Storage(AbstractStorage):
         objects = self.__list_objects(href)
         return (objects is not None) and (objects['KeyCount'] > 0 or len(objects.get('CommonPrefixes', [])) > 0)
 
-    def get_file_size(self, href: str):
+    def get_file_size(self, href: str) -> int | None:
         response = self.__head_object(href)
-        if response:
+        if response and response.get('ContentLength'):
             return response['ContentLength']
         else:
             return None

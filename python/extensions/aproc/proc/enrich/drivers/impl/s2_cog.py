@@ -15,7 +15,7 @@ from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 
 class Driver(EnrichDriver):
 
-    SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower()]
+    SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower(), AssetFormat.all_bands_cog.value.lower()]
 
     def __init__(self):
         super().__init__()
@@ -27,10 +27,10 @@ class Driver(EnrichDriver):
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
-        return extra_params.get("asset_type", "") == "cog" and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() == ItemFormat.safe.value.lower()
+        return self.__supports__(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.safe.value.lower()])
 
     # Implements drivers method
-    def create_assets(self, item: Item, asset_type: str) -> list[Asset]:
+    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
         if asset_type:
             if asset_type.lower() in Driver.SUPPORTED_ASSET_TYPES:
                 self.LOGGER.info("adding {} to item {}".format(asset_type, item.id))
@@ -59,7 +59,7 @@ class Driver(EnrichDriver):
             proj__epsg=3857,
             airs__managed=True
         )
-        asset_location = self.get_asset_filepath(item.id, asset)
+        asset_location = self.get_asset_filepath(item.id, asset.name)
         asset.href = asset_location
         self.__build_TCI_COG(item, asset_location)
         asset.size = AccessManager.get_size(asset_location)
@@ -141,7 +141,7 @@ class Driver(EnrichDriver):
             proj__epsg=3857,
             airs__managed=True
         )
-        asset_location = self.get_asset_filepath(item.id, asset)
+        asset_location = self.get_asset_filepath(item.id, asset.name)
         asset.href = asset_location
         self.__build_all_bands_COG(item, asset_location)
         asset.size = AccessManager.get_size(asset_location)

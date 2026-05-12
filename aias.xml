@@ -1,0 +1,148 @@
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttParam>
+</AuxInfo>
+</CameraParam>
+</GeoQuality>
+</GpsData>
+</GpsData>
+</GpsData>
+</GpsData>
+</GpsParam>
+</ProductMetaData>
+</QualityInfo>
+</RadioQuality>
+<AbsCeof>0.0000</AbsCeof>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttParam>
+<AttPOINT>0.000000 0.000000 0.000000 1.000000</AttPOINT>
+<AttPOINT>0.000000 0.000000 0.000000 1.000000</AttPOINT>
+<AttPOINT>0.000000 0.000000 0.000000 1.000000</AttPOINT>
+<AttPOINT>0.000000 0.000000 0.000000 1.000000</AttPOINT>
+<AttTime>2026-01-01 12:00:00</AttTime>
+<AttTime>2026-01-01 12:00:00</AttTime>
+<AttTime>2026-01-01 12:00:00</AttTime>
+<AttTime>2026-01-01 12:00:00</AttTime>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AuxInfo>
+<AvgDN>0</AvgDN>
+<Bands>4</Bands>
+<BottomLeftLatitude>32.127000</BottomLeftLatitude>
+<BottomLeftLongitude>-110.924000</BottomLeftLongitude>
+<BottomLeftMapX/>
+<BottomLeftMapY/>
+<BottomRightLatitude>32.127000</BottomRightLatitude>
+<BottomRightLongitude>-110.821000</BottomRightLongitude>
+<BottomRightMapX/>
+<BottomRightMapY/>
+<BrowseFile/>
+<CameraParam>
+<CenterLatitude>32.172000</CenterLatitude>
+<CenterLongitude>-110.872500</CenterLongitude>
+<CloudPercent>5</CloudPercent>
+<Compression>NULL</Compression>
+<ContactInfo/>
+<DataFile/>
+<Desending>D</Desending>
+<DetectorNumber>0</DetectorNumber>
+<EarthEllipsoid/>
+<EndLine>4</EndLine>
+<EndTime>2026-01-01 12:00:00</EndTime>
+<ESUN>1943.5,1848.8,1553.1,1068.8</ESUN>
+<FirstDetectorPositionX>0.0</FirstDetectorPositionX>
+<FirstDetectorPositionY>0.0</FirstDetectorPositionY>
+<FocusLength>10.00000000</FocusLength>
+<Gain>0.0736,0.0611,0.0447,0.0934</Gain>
+<GainMode>1</GainMode>
+<GeoQuality>
+<GpsData>
+<GpsData>
+<GpsData>
+<GpsData>
+<GpsParam>
+<GpsPOINT>0.000000 0.000000 0.000000</GpsPOINT>
+<GpsPOINT>0.000000 0.000000 0.000000</GpsPOINT>
+<GpsPOINT>0.000000 0.000000 0.000000</GpsPOINT>
+<GpsPOINT>0.000000 0.000000 0.000000</GpsPOINT>
+<GpsTime>2026-01-01 12:00:00</GpsTime>
+<GpsTime>2026-01-01 12:00:00</GpsTime>
+<GpsTime>2026-01-01 12:00:00</GpsTime>
+<GpsTime>2026-01-01 12:00:00</GpsTime>
+<GSDX>1.200000</GSDX>
+<GSDY>1.200000</GSDY>
+<HeightInMeters>4.800000</HeightInMeters>
+<HeightInPixels>4</HeightInPixels>
+<HeightMode/>
+<incidenceAngle>11.000000</incidenceAngle>
+<IntegrationLevel>0</IntegrationLevel>
+<IntegrationTime>0.00098</IntegrationTime>
+<LastDetectorPositionX>0.0</LastDetectorPositionX>
+<LastDetectorPositionY>0.0</LastDetectorPositionY>
+<MapProjection/>
+<MaxDN>0</MaxDN>
+<MinDN>0</MinDN>
+<MtfCorrection>InOrb</MtfCorrection>
+<NIIRS>A</NIIRS>
+<Offset>0,0,0,0</Offset>
+<OrbitID>00000</OrbitID>
+<OrbitType>GPS</OrbitType>
+<Orderid/>
+<PitchSatelliteAngle>0.00000</PitchSatelliteAngle>
+<PixelBits>16</PixelBits>
+<PixelSize>0.000007</PixelSize>
+<PosAccuracy>0.000000</PosAccuracy>
+<ProduceTime>2026-01-01 12:00:00</ProduceTime>
+<ProduceType/>
+<ProductAddress/>
+<ProductCode>SYNTHETIC</ProductCode>
+<ProductFormat>GEOTIFF</ProductFormat>
+<ProductID>0000001</ProductID>
+<ProductLevel>LEVEL2A</ProductLevel>
+<ProductMetaData>
+<ProductURL/>
+<QualityInfo>
+<QualityScore>0.000000</QualityScore>
+<RadioQuality>
+<ReceiveStationID>SYNTHETIC</ReceiveStationID>
+<RegAccuracyX>0.000000</RegAccuracyX>
+<RegAccuracyY>0.000000</RegAccuracyY>
+<ResamplingKernel/>
+<RollSatelliteAngle>0.00000</RollSatelliteAngle>
+<SatelliteAzimuth>180.000000</SatelliteAzimuth>
+<SatelliteID_alias>SVN1-01</SatelliteID_alias>
+<SatelliteID>SV2-01</SatelliteID>
+<SatelliteZenith>15.000000</SatelliteZenith>
+<SceneID>000000</SceneID>
+<SensorID>MUX</SensorID>
+<SnowPercent>0</SnowPercent>
+<SolarAzimuth>160.000000</SolarAzimuth>
+<SolarZenith>30.000000</SolarZenith>
+<StartLine>0</StartLine>
+<StartTime>2026-01-01 12:00:00</StartTime>
+<StdDN>0</StdDN>
+<StripID>0000000000</StripID>
+<SubID>0000000000000001</SubID>
+<ThumbFile/>
+<TopLeftLatitude>32.217000</TopLeftLatitude>
+<TopLeftLongitude>-110.924000</TopLeftLongitude>
+<TopLeftMapX/>
+<TopLeftMapY/>
+<TopRightLatitude>32.217000</TopRightLatitude>
+<TopRightLongitude>-110.821000</TopRightLongitude>
+<TopRightMapX/>
+<TopRightMapY/>
+<ValidPixelBits>11</ValidPixelBits>
+<ViewAngle>10.000000</ViewAngle>
+<WidthInMeters>4.800000</WidthInMeters>
+<WidthInPixels>4</WidthInPixels>
+<YawSatelliteAngle>0.00000</YawSatelliteAngle>
+<ZoneNo/>

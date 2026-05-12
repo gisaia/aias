@@ -1,6 +1,7 @@
 import hashlib
 import os
 from time import time
+from typing import Literal
 
 import requests
 from celery import shared_task
@@ -34,11 +35,11 @@ AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.get_logger()
 
+supported_assets_for_enrichment = set()
 
 class InputEnrichProcess(InputProcess):
     requests: list[dict[str, str]] = Field(default=[], title="The list of items (collection, item_id) to enrich")
-    asset_type: str = Field(default=None, title="Name of the asset type to add (e.g. cog)")
-
+    enrichments: list[str] = Field(default=[], title="The list of assets for enriching the item")
 
 class OutputEnrichProcess(BaseModel):
     item_locations: list[str] = Field(title="Items locations", description="Locations of the Item on the ARLAS Item Registration Service")
@@ -86,7 +87,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
         return {}
 
     @staticmethod
@@ -96,7 +97,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], asset_type: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
         item_locations = []
         for request in requests:
             collection: str = request.get("collection")
@@ -108,18 +109,18 @@ class AprocProcess(Process):
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 raise DriverException(error_msg)
             extra_params = {
-                "asset_type": asset_type
+                "enrichments": enrichments
             }
             driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers, extra_params=extra_params)
             if driver is not None:
                 try:
                     LOGGER.debug("ingestion: 1 - enrichment will be done by {}".format(driver.name))
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
-                    LOGGER.info("Build asset {}".format(asset_type))
+                    LOGGER.info("Build asset {}".format(enrichments))
                     start = time()
-                    assets = driver.create_assets(
+                    assets = driver.create_enrichments(
                         item=item,
-                        asset_type=asset_type)
+                        enrichments=enrichments)
                     end = time()
                     LOGGER.info("took {} ms".format(end - start))
                     LOGGER.info("Enrichment success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "success", EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
@@ -129,7 +130,8 @@ class AprocProcess(Process):
                         item.assets[asset.name] = asset
                         if item.properties.keywords is None:
                             item.properties.keywords = []
-                        item.properties.keywords.append("has_{}".format(asset_type))
+                        for enrichment in enrichments:
+                            item.properties.keywords.append("has_{}".format(enrichment))
 
                         Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                         start = time()

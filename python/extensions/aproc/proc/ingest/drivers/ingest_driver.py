@@ -47,23 +47,17 @@ class IngestDriver(AbstractDriver):
         AccessManager.makedir(assets_dir)
         return assets_dir
 
-    def get_asset_filepath(self, url: str, asset: Asset) -> str:
+    def get_asset_filepath(self, url: str, asset_name: str) -> str:
         """Provides the name of the file for storing the asset
 
         Args:
             url (str): the original url
-            asset (Asset): the asset to be stored, it's name must be provided.
+            asset (str): the asset to be stored
 
         Returns:
             str: the path to the file for storing the asset's file
         """
-        if not url:
-            raise DriverException("Url can not be None")
-        if not asset:
-            raise DriverException("Asset can not be None")
-        if not asset.name:
-            raise DriverException("Asset name is undefined for {}".format(asset.model_dump_json(exclude_none=True, exclude_unset=True)))
-        return os.path.sep.join([self.get_assets_dir(url), asset.name])
+        return os.path.sep.join([self.get_assets_dir(url), asset_name])
 
     # Implements drivers method
     def supports(self, resource: str, extra_params: dict[str, Any] = {}) -> bool:

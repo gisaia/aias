@@ -258,7 +258,7 @@ class AccessManager:
         return storage.is_dir(href)
 
     @staticmethod
-    def get_size(href: str):
+    def get_size(href: str) -> int | None:
         storage = AccessManager.resolve_storage(href)
         if AccessManager.exists(href):
             if AccessManager.is_file(href):
@@ -266,7 +266,9 @@ class AccessManager:
             else:
                 folder_size = 0
                 for f in AccessManager.listdir(href):
-                    folder_size += AccessManager.get_size(f.path)
+                    s = AccessManager.get_size(f.path)
+                    if s is not None:
+                        folder_size += s
                 return folder_size
         raise FileNotFoundError(f"Given href does not exist: {href}")
 

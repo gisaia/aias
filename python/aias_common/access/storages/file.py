@@ -52,7 +52,7 @@ class FileStorage(AbstractStorage):
     def is_dir(self, href: str):
         return os.path.isdir(href)
 
-    def get_file_size(self, href: str):
+    def get_file_size(self, href: str) -> int | None:
         return os.stat(href).st_size
 
     def listdir(self, href: str) -> list[File]:

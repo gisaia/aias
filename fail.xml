@@ -1,0 +1,241 @@
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttData>
+</AttParam>
+</AutoBandRegistration>
+</AutoBandRegistration>
+</AutoBandRegistration>
+</AuxInfo>
+</BandRegistrationQual>
+</CameraParam>
+</GeoQualInfor>
+</GpsData>
+</GpsData>
+</GpsData>
+</GpsData>
+</GpsParam>
+</ProcessInfo>
+</ProductInfo>
+</ProductMetadata>
+</QualityEvaluationReport>
+</RadBandQualInfor>
+</RadQualInfor>
+<AbsCalibrationBias>0,0,0,0</AbsCalibrationBias>
+<AbsCalibrationGain>0.101258,0.095436,0.088,0.0726</AbsCalibrationGain>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>
+<AttData>Origin_1b2b-PRECISE-No_Modify_Tmp-Angle_Mean</AttData>
+<AttParam>
+<AttPOINT>0.320302 0.767293 0.227446 -0.506889</AttPOINT>
+<AttPOINT>0.320314 0.767254 0.227438 -0.506944</AttPOINT>
+<AttPOINT>0.320326 0.767215 0.227429 -0.506999</AttPOINT>
+<AttPOINT>0.320338 0.767176 0.227421 -0.507054</AttPOINT>
+<AttPOINT>0.320351 0.767137 0.227412 -0.507109</AttPOINT>
+<AttPOINT>0.320363 0.767098 0.227403 -0.507164</AttPOINT>
+<AttPOINT>0.320375 0.767059 0.227395 -0.507220</AttPOINT>
+<AttPOINT>0.320387 0.767020 0.227386 -0.507275</AttPOINT>
+<AttPOINT>0.320399 0.766981 0.227378 -0.507330</AttPOINT>
+<AttPOINT>0.320411 0.766942 0.227369 -0.507385</AttPOINT>
+<AttPOINT>0.320423 0.766903 0.227360 -0.507440</AttPOINT>
+<AttPOINT>0.320436 0.766864 0.227352 -0.507495</AttPOINT>
+<AttPOINT>0.320448 0.766826 0.227343 -0.507550</AttPOINT>
+<AttPOINT>0.320460 0.766787 0.227334 -0.507605</AttPOINT>
+<AttPOINT>0.320472 0.766748 0.227325 -0.507660</AttPOINT>
+<AttPOINT>0.320484 0.766709 0.227317 -0.507715</AttPOINT>
+<AttPOINT>0.320496 0.766670 0.227308 -0.507770</AttPOINT>
+<AttTime>2026-4-7T9:42:27.677700</AttTime>
+<AttTime>2026-4-7T9:42:27.802700</AttTime>
+<AttTime>2026-4-7T9:42:27.927600</AttTime>
+<AttTime>2026-4-7T9:42:28.052700</AttTime>
+<AttTime>2026-4-7T9:42:28.177700</AttTime>
+<AttTime>2026-4-7T9:42:28.302700</AttTime>
+<AttTime>2026-4-7T9:42:28.427700</AttTime>
+<AttTime>2026-4-7T9:42:28.552700</AttTime>
+<AttTime>2026-4-7T9:42:28.677700</AttTime>
+<AttTime>2026-4-7T9:42:28.802700</AttTime>
+<AttTime>2026-4-7T9:42:28.927600</AttTime>
+<AttTime>2026-4-7T9:42:29.052700</AttTime>
+<AttTime>2026-4-7T9:42:29.177700</AttTime>
+<AttTime>2026-4-7T9:42:29.302700</AttTime>
+<AttTime>2026-4-7T9:42:29.427700</AttTime>
+<AttTime>2026-4-7T9:42:29.552700</AttTime>
+<AttTime>2026-4-7T9:42:29.677700</AttTime>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AttType>Quater</AttType>
+<AutoBandRegistration>
+<AutoBandRegistration>
+<AutoBandRegistration>
+<AuxInfo>
+<BandRegistrationQual>
+<Bands>4</Bands>
+<BaseBand>0</BaseBand>
+<BaseBand>0</BaseBand>
+<BaseBand>0</BaseBand>
+<BottomLeftLatitude>24.469441</BottomLeftLatitude>
+<BottomLeftLongitude>54.345907</BottomLeftLongitude>
+<BottomLeftMapX>230974.000000</BottomLeftMapX>
+<BottomLeftMapY>2720839.000000</BottomLeftMapY>
+<BottomRightLatitude>24.471565</BottomRightLatitude>
+<BottomRightLongitude>54.469623</BottomRightLongitude>
+<BottomRightMapX>230974.000000</BottomRightMapX>
+<BottomRightMapY>2720839.000000</BottomRightMapY>
+<BrowseFile>/PGS/WORKDIR/SVN1-04/2026/0407/6152/SWKSC2/AAA_AAA/SVN1-04_20260407_0000078008_L1B0000080075//SVN1-04_20260407_0000078008_L1B0000080075-MUX.jpg</BrowseFile>
+<CameraFile>/HDFS/CC/Bin/PGS-SVN1-0304/config/camera/SVN1-04/MUX/20250221_SVN1-04_geometric-MUX.txt</CameraFile>
+<CameraParam>
+<CenterLatitude>24.523821</CenterLatitude>
+<CenterLongitude>54.405530</CenterLongitude>
+<CenterMapX>230974.000000</CenterMapX>
+<CenterMapY>2720839.000000</CenterMapY>
+<Centertime>2026-04-07 17:42:29</Centertime>
+<CloudFile>/PGS/WORKDIR/SVN1-04/2026/0407/6152/SWKSC2/AAA_AAA/SVN1-04_20260407_0000078008_L1B0000080075///SVN1-04_20260407_0000078008_L1B0000080075-Cloud.png</CloudFile>
+<CloudPercent>0</CloudPercent>
+<ContactInfo>xxxx@xxxxx.com</ContactInfo>
+<DataBits>16</DataBits>
+<Desending>D</Desending>
+<DetectorNumber>13529</DetectorNumber>
+<EarthEllipsoid>WGS84</EarthEllipsoid>
+<EndTime>2026-04-07 17:42:29</EndTime>
+<ESUN>1945.3,1850.1,1553.8,1084.3,</ESUN>
+<FirstDetectorPositionX>0.0</FirstDetectorPositionX>
+<FirstDetectorPositionY>127.0</FirstDetectorPositionY>
+<FocusLength>5.062</FocusLength>
+<GainMode>1.50,1.50,1.50,1.50</GainMode>
+<GeoPrecision_X>0</GeoPrecision_X>
+<GeoPrecision_Y>0</GeoPrecision_Y>
+<GeoQualInfor>
+<GnssData>GPS_BD2-DIRECT</GnssData>
+<GpsData>
+<GpsData>
+<GpsData>
+<GpsData>
+<GpsParam>
+<GpsPOINT>3562549.520000 5181566.660000 2786493.670000</GpsPOINT>
+<GpsPOINT>3565538.590000 5183226.900000 2779602.660000</GpsPOINT>
+<GpsPOINT>3568523.540000 5184880.380000 2772708.230000</GpsPOINT>
+<GpsPOINT>3571504.390000 5186527.100000 2765810.390000</GpsPOINT>
+<GpsTime>2026-4-7T9:42:27.000000</GpsTime>
+<GpsTime>2026-4-7T9:42:28.000000</GpsTime>
+<GpsTime>2026-4-7T9:42:29.000000</GpsTime>
+<GpsTime>2026-4-7T9:42:30.000000</GpsTime>
+<GSDX>1.000000</GSDX>
+<GSDY>1.000000</GSDY>
+<HeightInMeters>13473.000000</HeightInMeters>
+<HeightInPixels>12055</HeightInPixels>
+<HeightMode>Ellip</HeightMode>
+<ImageType>Product</ImageType>
+<InstrumentMode>MONO</InstrumentMode>
+<IntegratedQuality>0</IntegratedQuality>
+<IntegrationLevel>8,8,20,32</IntegrationLevel>
+<IntegrationTime>0.00098</IntegrationTime>
+<LastDetectorPositionX>0.0</LastDetectorPositionX>
+<LastDetectorPositionY>-127.0</LastDetectorPositionY>
+<MapProjection>UTM</MapProjection>
+<Max>0</Max>
+<Mean>0</Mean>
+<Min>0</Min>
+<MtfCorrection>InOrb</MtfCorrection>
+<offx>0</offx>
+<offx>0</offx>
+<offx>0</offx>
+<offy>0</offy>
+<offy>0</offy>
+<offy>0</offy>
+<OrbitID>6152</OrbitID>
+<OrbitType>GPS</OrbitType>
+<PitchSatelliteAngle>-5.00040</PitchSatelliteAngle>
+<PixelSize>0.00001</PixelSize>
+<ProcessInfo>
+<ProduceTime>2026-04-08 01:26:00</ProduceTime>
+<ProduceType>Stander</ProduceType>
+<ProductAddress>Beijing.China</ProductAddress>
+<ProductCode>China SiWei</ProductCode>
+<ProductFormat>GEOTIFF</ProductFormat>
+<ProductID>80075</ProductID>
+<ProductInfo>
+<ProductLevel>LEVEL2A</ProductLevel>
+<ProductMetadata>
+<ProductURL>www.xxxxxx.com</ProductURL>
+<ProgramVersion>PGS-2.1.0</ProgramVersion>
+<QualityEvaluationReport>
+<QualityScore>100.000000</QualityScore>
+<RadBandQualInfor>
+<RadQualInfor>
+<ReceiveStation>SWKSC2</ReceiveStation>
+<RollSatelliteAngle>-12.96660</RollSatelliteAngle>
+<SatelliteAzimuth>117.494970</SatelliteAzimuth>
+<SatelliteElevation>75.322804</SatelliteElevation>
+<SatelliteID>SVN1-04</SatelliteID>
+<SceneID>78008</SceneID>
+<SensorID>PMS</SensorID>
+<SnowFile>/PGS/WORKDIR/SVN1-04/2026/0407/6152/SWKSC2/AAA_AAA/SVN1-04_20260407_0000078008_L1B0000080075///SVN1-04_20260407_0000078008_L1B0000080075-Snow.png</SnowFile>
+<SnowPercent>0</SnowPercent>
+<SolarAzimuth>229.686186</SolarAzimuth>
+<SolarElevation>64.348436</SolarElevation>
+<SpectralRangeEnd>0.520,0.590,0.690,0.890</SpectralRangeEnd>
+<SpectralRangeStart>0.450,0.520,0.630,0.770</SpectralRangeStart>
+<StartTime>2026-04-07 17:42:27</StartTime>
+<StripID>0000009539</StripID>
+<SwathID>1</SwathID>
+<TargetBand>0</TargetBand>
+<TargetBand>0</TargetBand>
+<TargetBand>0</TargetBand>
+<ThumbFile>/PGS/WORKDIR/SVN1-04/2026/0407/6152/SWKSC2/AAA_AAA/SVN1-04_20260407_0000078008_L1B0000080075//SVN1-04_20260407_0000078008_L1B0000080075-MUX_thumb.jpg</ThumbFile>
+<TopLeftLatitude>24.578201</TopLeftLatitude>
+<TopLeftLongitude>54.343619</TopLeftLongitude>
+<TopLeftMapX>230974.000000</TopLeftMapX>
+<TopLeftMapY>2720839.000000</TopLeftMapY>
+<TopRightLatitude>24.580335</TopRightLatitude>
+<TopRightLongitude>54.467441</TopRightLongitude>
+<TopRightMapX>230974.000000</TopRightMapX>
+<TopRightMapY>2720839.000000</TopRightMapY>
+<ValidDataBits>12</ValidDataBits>
+<Viewangle>12.575051</Viewangle>
+<WidthInMeters>13464.000000</WidthInMeters>
+<WidthInPixels>12550</WidthInPixels>
+<YawSatelliteAngle>3.38600</YawSatelliteAngle>
+<ZoneNo>40</ZoneNo>
