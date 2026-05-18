@@ -17,12 +17,12 @@
  * under the License.
  */
 
-@import "styles/colors.scss";
-@import "styles/sizes.scss";
+@use "styles/colors.scss" as colors;
+@use "styles/sizes.scss" as sizes;
 
 @mixin section-title() {
   font-size: 20px;
-  border-bottom: 1px solid $borderColor;
+  border-bottom: 1px solid colors.$borderColor;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -54,7 +54,7 @@
 
 ::ng-deep .top-menu {
   // height: $topMenuHeight;
-  background-color: $primaryColor !important;
+  background-color: colors.$primaryColor !important;
   color: white !important;
   font-weight: 400 !important;
   padding: 0 10px !important;
@@ -64,15 +64,15 @@
 .content {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - $topMenuHeight);
+  height: calc(100vh - sizes.$topMenuHeight);
 
   .files {
     display: flex;
-    height: calc(100% - $tasksHeight - 1px); // 1px => border bottom
-    border-bottom: 1px solid $borderColor;
+    height: calc(100% - sizes.$tasksHeight - 1px); // 1px => border bottom
+    border-bottom: 1px solid colors.$borderColor;
 
     &.reduce {
-      height: calc(100% - $sectionTitleHeight - 1px); // 1px => border bottom
+      height: calc(100% - sizes.$sectionTitleHeight - 1px); // 1px => border bottom
     }
 
     .archives {
@@ -101,7 +101,7 @@
     }
     .explorer {
       flex: 1;
-      border-right: 1px solid $borderColor;
+      border-right: 1px solid colors.$borderColor;
       .section-title {
         @include section-title();
       }
@@ -109,12 +109,12 @@
   }
 
   .jobs {
-    height: $tasksHeight;
+    height: sizes.$tasksHeight;
     .section-title {
       @include section-title();
     }
     &.reduce {
-      height: $sectionTitleHeight;
+      height: sizes.$sectionTitleHeight;
     }
   }
 }

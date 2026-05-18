@@ -17,11 +17,11 @@
  * under the License.
  */
 
-@import "styles/colors.scss";
-@import "styles/sizes.scss";
+@use "styles/colors.scss" as colors;
+@use "styles/sizes.scss" as sizes;
 
 .archives-content {
-  height: calc(100% - $sectionTitleHeight);
+  height: calc(100% - sizes.$sectionTitleHeight);
   overflow: auto;
   position: relative;
   .archives-list {
@@ -116,23 +116,23 @@
           }
 
           .successful {
-            color: $successColor;
+            color: colors.$successColor;
           }
 
           .failed {
-            color: $errorColor;
+            color: colors.$errorColor;
           }
 
           .running {
-            color: $progressColor;
+            color: colors.$progressColor;
           }
 
           .accepted {
-            color: $infoColor;
+            color: colors.$infoColor;
           }
 
           .not-activated {
-            color: $disabledColor;
+            color: colors.$disabledColor;
           }
         }
       }
@@ -141,9 +141,9 @@
 
   .no-archive {
     padding: 10px;
-    border: 1px solid $infoBorderColor;
-    color: $infoColor;
-    background-color: $infoBackgroundColor;
+    border: 1px solid colors.$infoBorderColor;
+    color: colors.$infoColor;
+    background-color: colors.$infoBackgroundColor;
     font-size: 14px;
   }
 }

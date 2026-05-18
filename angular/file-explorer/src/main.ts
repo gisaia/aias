@@ -29,7 +29,7 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import {
     ArlasCollaborativesearchService, ArlasConfigurationDescriptor, ArlasIamService, ArlasSettingsService,
     ArlasStartupService, ArlasToolkitSharedModule, auhtentServiceFactory, AuthentificationService, CONFIG_UPDATER,
-    configUpdaterFactory, FETCH_OPTIONS, GET_OPTIONS, getOptionsFactory, iamServiceFactory, LoginModule, PersistenceService
+    configUpdaterFactory, FETCH_OPTIONS, GET_OPTIONS, getOptionsFactory, iamServiceFactory, PersistenceService
 } from 'arlas-wui-toolkit';
 import { ClipboardModule } from 'ngx-clipboard';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -51,7 +51,6 @@ bootstrapApplication(AppComponent, {
             ArlasToolkitSharedModule,
             NgxSpinnerModule,
             ClipboardModule,
-            LoginModule,
             RouterModule,
             ToastrModule.forRoot({
                 disableTimeOut: true,

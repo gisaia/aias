@@ -17,11 +17,11 @@
  * under the License.
  */
 
-@import "styles/colors.scss";
-@import "styles/sizes.scss";
+@use "styles/colors.scss" as colors;
+@use "styles/sizes.scss" as sizes;
 
 .tasks-content {
-  max-height: calc($tasksHeight - $sectionTitleHeight);
+  max-height: calc(sizes.$tasksHeight - sizes.$sectionTitleHeight);
   overflow: auto;
 
   .tasks-table {
@@ -62,7 +62,7 @@
           .label {
             min-width: 100px;
             text-align: right;
-            color: $labelColor;
+            color: colors.$labelColor;
           }
           .value {
             font-family: monospace;
@@ -90,27 +90,27 @@
   }
 
   .mat-chip-successful {
-    color: $successColor;
-    border: 1px solid $successColor;
+    color: colors.$successColor;
+    border: 1px solid colors.$successColor;
   }
 
   .mat-chip-accepted {
-    color: $infoColor;
-    border: 1px solid $infoColor;
+    color: colors.$infoColor;
+    border: 1px solid colors.$infoColor;
   }
 
   .mat-chip-running {
-    color: $progressColor;
-    border: 1px solid $progressColor;
+    color: colors.$progressColor;
+    border: 1px solid colors.$progressColor;
   }
 
   .mat-chip-failed {
-    color: $errorColor;
-    border: 1px solid $errorColor;
+    color: colors.$errorColor;
+    border: 1px solid colors.$errorColor;
   }
 
   .mat-chip-dismissed {
-    color: $dismissedColor;
-    border: 1px solid $dismissedColor;
+    color: colors.$dismissedColor;
+    border: 1px solid colors.$dismissedColor;
   }
 }

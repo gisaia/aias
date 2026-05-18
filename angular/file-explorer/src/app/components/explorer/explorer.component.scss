@@ -17,12 +17,12 @@
  * under the License.
  */
 
-@import "styles/colors.scss";
-@import "styles/sizes.scss";
+@use "styles/colors.scss" as colors;
+@use "styles/sizes.scss" as sizes;
 
 .files-tree {
   overflow: auto;
-  height: calc(100% - $sectionTitleHeight);
+  height: calc(100% - sizes.$sectionTitleHeight);
   .file {
     .name {
       padding: 10px 5px;
@@ -35,7 +35,7 @@
       }
     }
     .active {
-      background-color: $primaryColor;
+      background-color: colors.$primaryColor;
       color: white;
     }
     .activate-btn {
