@@ -1,8 +1,8 @@
-@import "styles/colors.scss";
+@use "styles/colors.scss" as colors;
 
 .copy-btn {
   border: none;
-  color: $hintColor;
+  color: colors.$hintColor;
   padding: 2px 5px;
   background-color: transparent;
   cursor: pointer;
@@ -15,6 +15,6 @@
   }
 
   &.copied {
-    color: $successColor;
+    color: colors.$successColor;
   }
 }

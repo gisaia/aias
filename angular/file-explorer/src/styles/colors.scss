@@ -18,10 +18,10 @@
  */
 
 @use '@angular/material' as mat;
-@import '../file-explorer-theme.scss';
+@use '../file-explorer-theme.scss' as theme;
 
-$primaryColor: mat.get-theme-color($app-theme, primary, 500);
-$accentColor: mat.get-theme-color($app-theme, accent, 500);
+$primaryColor: mat.get-theme-color(theme.$app-theme, primary, 500);
+$accentColor: mat.get-theme-color(theme.$app-theme, accent, 500);
 
 $infoColor: #0c5460;
 $infoBackgroundColor: #d1ecf1;
