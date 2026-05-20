@@ -164,15 +164,18 @@ def downsample_image(image_path: str, out_path: str, factor: int):
         im_new.save(out_path)
 
 
-def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[str, str] = None):
+def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[str, str] = None, alt_key: str = None):
     """
     Tries to find the key in the given element. If found, returns its text value, optionally processed
     """
     value = root.find(key, ns)
+    if value is None and alt_key:
+        value = root.find(alt_key, ns)
+
     if value is not None:
 
         if process is not None:
             return process(value.text)
         return value.text
-
+        
     return None

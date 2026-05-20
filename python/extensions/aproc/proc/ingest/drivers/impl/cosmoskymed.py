@@ -224,7 +224,6 @@ class Driver(IngestDriver):
                 condition = (
                     self.attr_path is not None
                     and self.browse_path is not None
-                    and self.met_path is not None
                 )
             # If the CSK archive is h5 based
             elif file_name.endswith(".h5"):
