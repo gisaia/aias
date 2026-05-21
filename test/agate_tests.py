@@ -34,16 +34,16 @@ class Tests(AprocTests):
     def test_airs_access(self):
         # TEST OK for non public
         r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+        self.assertEqual(r.status_code, 202, str(r.status_code) + " " + str(r.content))
         # TEST KO for non public with wrong prefix
         r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
+        self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
         # TEST KO for non public
         r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET])})
-        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
+        self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
         # TEST OK for public
         r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotworkbutpublic", "assets", "thumbnail"])})
-        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+        self.assertEqual(r.status_code, 202, str(r.status_code) + " " + str(r.content))
 
     def test_titiler_access(self):
         # TEST OK for non public
