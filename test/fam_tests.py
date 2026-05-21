@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
         root: File = File(**r.json())
         r = requests.post(url="/".join([Tests.URL, "archives"]), data=PathRequest(path="/".join([root.path, "images"])).model_dump_json(), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
-        archive = Archive(**(json.loads(r.content)[0]))
+        archive = Archive(**next((item for item in json.loads(r.content) if item["name"] == "nogeo.tiff"), None))
         self.assertTrue(archive.path.startswith("/inputs/images/") or archive.path.startswith("http://minio:9000/archives/inputs/images/") or archive.path.startswith("gs://gisaia-public/test-aias/images/"))
         self.assertFalse(archive.is_dir)
         self.assertEqual(archive.driver_name, "tiff")

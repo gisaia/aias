@@ -175,5 +175,10 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SUPERVIEW + "_PSH")
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan_sharpened.value, Role.overview.value + "-psh", Role.rpc.value + "-psh", Role.metadata.value + "-psh"])
 
+    def test_async_ingest_superview_product_info(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, SUPERVIEW + "_MUX_ProductInfo")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"])
+
+
 if __name__ == '__main__':
     unittest.main()
