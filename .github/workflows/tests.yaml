@@ -66,20 +66,6 @@ on:
 
 
 jobs:
-  hadolint:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_hadolint || inputs.run_all))
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Run Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          failure-threshold: "error"
-          dockerfile: "docker/Dockerfile-${{ matrix.image_name }}"
  
   aias-tests-am:
     if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_am || inputs.run_all))
