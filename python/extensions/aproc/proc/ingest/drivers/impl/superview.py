@@ -3,8 +3,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import json
 import subprocess
-
-import pytz
+from zoneinfo import ZoneInfo
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -209,8 +208,8 @@ class Driver(IngestDriver):
         end_time = None
         if start_time_str:
             start_time = int(datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
-                             .replace(tzinfo=pytz.timezone("Asia/Shanghai"))  # Beijing Time to UTC
-                             .astimezone(pytz.UTC)
+                             .replace(tzinfo=ZoneInfo("Asia/Shanghai"))  # Beijing Time to UTC
+                             .astimezone(ZoneInfo("UTC"))
                              .timestamp())
             date_time = start_time
         else:
@@ -218,8 +217,8 @@ class Driver(IngestDriver):
             raise DriverException(f"Missing required 'StartTime' for {url}")
         if end_time_str:
             end_time = int(datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
-                           .replace(tzinfo=pytz.timezone("Asia/Shanghai"))  # Beijing Time to UTC
-                           .astimezone(pytz.UTC)
+                           .replace(tzinfo=ZoneInfo("Asia/Shanghai"))  # Beijing Time to UTC
+                           .astimezone(ZoneInfo("UTC"))
                            .timestamp())
 
         satellite = find_or_none(metadata, "SatelliteID", alt_key="ProductInfo/SatelliteID")
