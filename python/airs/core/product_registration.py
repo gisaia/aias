@@ -5,7 +5,7 @@ from typing import List
 import elasticsearch
 from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse
 import pygeohash as pgh
-import pytz
+from zoneinfo import ZoneInfo
 import requests
 import tempfile
 
@@ -469,11 +469,7 @@ def __add_generated_fields(item: Item) -> Item:
                 item.properties.generated__has_zarr = True
     item.properties.generated__asset_roles = list(set(item.properties.generated__asset_roles))
 
-    acquisition = datetime.fromtimestamp(item.properties.datetime)
-    try:
-        acquisition = pytz.UTC.localize(acquisition)
-    except Exception:
-        ...  # LOGGER.error("Can not localize {}: {}".format(acquisition, e))
+    acquisition = datetime.fromtimestamp(item.properties.datetime, tz=ZoneInfo("UTC"))
     item.properties.generated__day_of_week = acquisition.weekday()
     item.properties.generated__day_of_year = int(acquisition.strftime("%j"))
     item.properties.generated__hour_of_day = acquisition.hour

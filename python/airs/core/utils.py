@@ -1,18 +1,17 @@
 import datetime
 
-import pytz
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 
-utc = pytz.UTC
-seasons = {'Summer': (utc.localize(datetime.datetime(2014, 6, 21)), utc.localize(datetime.datetime(2014, 9, 22))),
-           'Autumn': (utc.localize(datetime.datetime(2014, 9, 23)), utc.localize(datetime.datetime(2014, 12, 20))),
-           'Spring': (utc.localize(datetime.datetime(2014, 3, 21)), utc.localize(datetime.datetime(2014, 6, 20)))}
+seasons = {'Summer': (datetime.datetime(2014, 6, 21, tzinfo=ZoneInfo("UTC")), datetime.datetime(2014, 9, 22, tzinfo=ZoneInfo("UTC"))),
+           'Autumn': (datetime.datetime(2014, 9, 23, tzinfo=ZoneInfo("UTC")), datetime.datetime(2014, 12, 20, tzinfo=ZoneInfo("UTC"))),
+           'Spring': (datetime.datetime(2014, 3, 21, tzinfo=ZoneInfo("UTC")), datetime.datetime(2014, 6, 20, tzinfo=ZoneInfo("UTC")))}
 
 
 class Utils:
     @staticmethod
     def get_season(date):
-        date = pytz.UTC.localize(datetime.datetime(date.year, date.month, date.day))
+        date = datetime.datetime(date.year, date.month, date.day, tzinfo=ZoneInfo("UTC"))
         date = date - relativedelta(years=date.year - 2014)
         for season, (season_start, season_end) in seasons.items():
             if date >= season_start and date <= season_end:
