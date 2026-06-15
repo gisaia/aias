@@ -12,9 +12,6 @@ class Reference(BaseModel):
         extra = Extra.forbid
         populate_by_name = True
 
-    ref_: str = Field(alias="$ref")
-
-
 class SchemaItem(BaseModel):
     class Config:
         extra = Extra.forbid
