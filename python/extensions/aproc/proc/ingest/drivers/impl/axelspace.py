@@ -120,12 +120,6 @@ class Driver(IngestDriver):
         except KeyError as ke:
             raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
 
-        # Use higher resolution asset as the main asset
-        main_asset = assets[0]
-        for asset in assets:
-            if (not main_asset.eo__gsd and asset.eo__gsd) or (asset.eo__gsd and asset.eo__gsd < main_asset.eo__gsd):
-                main_asset = asset
-
         item = Item(
             geometry=json.loads(to_geojson(merged_polygons)),
             bbox=bbox,
@@ -139,7 +133,7 @@ class Driver(IngestDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.axelspace.value,
                 main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=main_asset.name,
+                main_asset_name=self.__get_asset_name(self.tif_paths[0], Role.data),
                 observation_type=ObservationType.optic.value
             ),
             assets={asset.name: asset for asset in assets}
