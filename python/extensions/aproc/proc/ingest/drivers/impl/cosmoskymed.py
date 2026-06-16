@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Literal
@@ -25,7 +26,6 @@ class Driver(IngestDriver):
         self.data_format: Literal[AssetFormat.geotiff] | Literal[AssetFormat.h5] = None
 
         self.tfw_path = None
-        self.met_path = None
         self.attr_path = None
         self.browse_path = None
         self.h5met_path = None
@@ -51,10 +51,6 @@ class Driver(IngestDriver):
                             roles=[Role.metadata.value], name="h5", type=MimeType.XML.value,
                             description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
 
-        if self.met_path:
-            assets.append(Asset(href=self.met_path, size=AccessManager.get_size(self.met_path),
-                                roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
         if self.attr_path:
             assets.append(Asset(href=self.attr_path, size=AccessManager.get_size(self.attr_path),
                                 roles=[Role.metadata.value], name="attributes", type=MimeType.XML.value,
@@ -192,64 +188,51 @@ class Driver(IngestDriver):
 
         return item
 
-    def __check_path__(self, file_path: str):
+    def __check_path__(self, file_path: str) -> bool:
         self.__init__()
+        directory = AccessManager.dirname(file_path)
         file_name = os.path.basename(file_path)
-        path = AccessManager.dirname(file_path)
 
         if AccessManager.is_file(file_path):
-            condition = True
-
-            met_path = file_path + '.aux.xml'
-            if AccessManager.is_file(met_path):
-                self.met_path = met_path
 
             # If the CSK archive is tif based
-            if file_name.endswith(".tif") and file_name.find(".QLK.") < 0:
+            if file_name.lower().endswith(".tif") and not file_name.lower().endswith(".qlk.tif"):
                 self.data_path = file_path
                 self.data_format = AssetFormat.geotiff
-
-                browse_path = path + '/' + file_name.split(".")[0] + "." + file_name.split(".")[1] + '.QLK.tif'
-                if AccessManager.is_file(browse_path):
-                    self.browse_path = browse_path
-
-                attr_path = path + '/' + file_name.split(".")[0] + ".attribs.xml"
-                if AccessManager.is_file(attr_path):
-                    self.attr_path = attr_path
-
-                tfw_path = os.path.splitext(self.data_path)[0] + ".tfw"
-                if AccessManager.exists(tfw_path):
-                    self.tfw_path = tfw_path
-
-                condition = (
-                    self.attr_path is not None
-                    and self.browse_path is not None
-                )
             # If the CSK archive is h5 based
-            elif file_name.endswith(".h5"):
+            if file_name.endswith(".h5"):
                 self.data_path = file_path
                 self.data_format = AssetFormat.h5
-            else:
+
+            if not self.data_path:
                 return False
 
-            h5met_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.xml"
-            if AccessManager.is_file(h5met_path):
-                self.h5met_path = h5met_path
-
-            h5pdf_path = path + '/' + "DFDN_" + file_name.split(".")[0] + ".h5.pdf"
-            if AccessManager.is_file(h5pdf_path):
-                self.h5pdf_path = h5pdf_path
+            tfw_path = os.path.basename(self.data_path).lower().removesuffix(".tif") + ".tfw"
+            data_file_prefix = file_name.lower().split(".")[0]
+            for f in AccessManager.listdir(directory):
+                if f.name.lower().startswith(data_file_prefix):
+                    if f.name.lower().endswith(".qlk.tif"):
+                        self.browse_path = f.path
+                    if f.name.lower().endswith(".attribs.xml"):
+                        self.attr_path = f.path
+                    if f.name.lower() == tfw_path.lower():
+                        self.tfw_path = f.path
+                h5_prefix_file = "dfdn_" + data_file_prefix
+                if f.name.lower().startswith(h5_prefix_file):
+                    if f.name.lower().endswith(".h5.xml"):
+                        self.h5met_path = f.path
+                    if f.name.lower().endswith(".h5.pdf"):
+                        self.h5pdf_path = f.path
 
             return (
-                condition
-                and self.data_path is not None
+                self.data_path is not None
                 and self.data_format is not None
                 and self.h5met_path is not None
             )
         return False
 
     def __get_proj__(self, metadata: object, centroid: tuple[float, float]):
-        if self.data_format == AssetFormat.geotiff:
+        if self.data_path and self.data_format == AssetFormat.geotiff:
             return get_epsg(AccessManager.get_gdal_proj(self.data_path))
         else:
             try:

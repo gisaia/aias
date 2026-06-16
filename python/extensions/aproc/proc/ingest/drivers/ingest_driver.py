@@ -68,7 +68,9 @@ class IngestDriver(AbstractDriver):
     # Implements drivers method
     def supports(self, resource: str, extra_params: dict[str, Any] = {}) -> bool:
         try:
+            IngestDriver.LOGGER.info(f"check path for {resource} with class {self.__class__}")
             result = self.__check_path__(resource)
+            IngestDriver.LOGGER.info(f"return {result}")
             return result
         except Exception as e:
             self.LOGGER.warn(e)
