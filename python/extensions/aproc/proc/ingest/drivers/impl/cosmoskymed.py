@@ -188,28 +188,27 @@ class Driver(IngestDriver):
 
         return item
 
-    def __check_path__(self, file_path: str) -> bool:
+    def __check_path__(self, path: str) -> bool:
         self.__init__()
-        directory = AccessManager.dirname(file_path)
-        file_name = os.path.basename(file_path)
+        if AccessManager.is_dir(path):
 
-        if AccessManager.is_file(file_path):
-
-            # If the CSK archive is tif based
-            if file_name.lower().endswith(".tif") and file_name.lower().find(".qlk.") < 0:
-                self.data_path = file_path
-                self.data_format = AssetFormat.geotiff
-            # If the CSK archive is h5 based
-            if file_name.endswith(".h5"):
-                self.data_path = file_path
-                self.data_format = AssetFormat.h5
+            # Identify data file
+            for f in AccessManager.listdir(path):
+                # If the CSK archive is tif based
+                if f.name.lower().endswith(".tif") and f.name.lower().find(".qlk.") < 0:
+                    self.data_path = f.path
+                    self.data_format = AssetFormat.geotiff
+                # If the CSK archive is h5 based
+                if f.name.endswith(".h5"):
+                    self.data_path = f.path
+                    self.data_format = AssetFormat.h5
 
             if not self.data_path:
                 return False
 
             tfw_path = os.path.basename(self.data_path).lower().removesuffix(".tif") + ".tfw"
-            data_file_prefix = file_name.lower().split(".")[0]
-            for f in AccessManager.listdir(directory):
+            data_file_prefix = os.path.basename(self.data_path).lower().split(".")[0]
+            for f in AccessManager.listdir(path):
                 if f.name.lower().startswith(data_file_prefix):
                     if f.name.lower().endswith(".qlk.tif"):
                         self.browse_path = f.path
