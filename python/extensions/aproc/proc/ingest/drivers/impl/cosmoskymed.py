@@ -196,7 +196,7 @@ class Driver(IngestDriver):
         if AccessManager.is_file(file_path):
 
             # If the CSK archive is tif based
-            if file_name.lower().endswith(".tif") and not file_name.lower().endswith(".qlk.tif"):
+            if file_name.lower().endswith(".tif") and file_name.lower().find(".qlk.tif") < 0:
                 self.data_path = file_path
                 self.data_format = AssetFormat.geotiff
             # If the CSK archive is h5 based
