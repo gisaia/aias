@@ -170,7 +170,7 @@ class Tests(AprocTests):
         # DELETE ITEM
         r = requests.delete(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))
-        
+
         # ITEM NOT FOUND
         r = requests.get(url="/".join([AIRS_URL, "collections", COLLECTION, "items", ID_MANAGED]))
         self.assertEqual(r.status_code, 404, str(r.status_code) + str(r.content))

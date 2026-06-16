@@ -6,9 +6,7 @@ from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION
 
 import requests
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
-from test.aproc_ingest_tests import (AST, SPOT6, IKONOS, JP2000, RAPID_EYE,
-                                     TERRASARX, TIF, WORLDVIEW,
-                                     IngestTests)
+from test.aproc_ingest_tests import SPOT6, TIF, IngestTests
 
 ROOT = "/inputs"
 

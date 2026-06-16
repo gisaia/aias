@@ -108,7 +108,7 @@ class Driver(IngestDriver):
         props = metadata.get("properties", {})
         dt_str = props.get("start_datetime") or props.get("datetime")
         start_datetime = parse_dt(dt_str)
-        
+
         end_dt_str = props.get("end_datetime") or props.get("datetime")
         end_datetime = parse_dt(end_dt_str)
 
@@ -158,7 +158,7 @@ class Driver(IngestDriver):
 
         item.properties.sar__frequency_band = props.get("sar:frequency_band", None)
         item.properties.sar__center_frequency = props.get("sar:center_frequency", None)
-        
+
         polarizations = props.get("sar:polarizations", None)
         if polarizations and isinstance(polarizations, list) and len(polarizations) > 0:
             item.properties.sar__polarizations = polarizations

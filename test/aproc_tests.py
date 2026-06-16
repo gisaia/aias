@@ -1,8 +1,6 @@
 from datetime import datetime
-import json
 import unittest
-from extensions.aproc.proc.drivers.exceptions import DriverException
-from test.utils import ID, ID_MANAGED, s3_access_key, s3_access_key_id, s3_bucket, s3_endpoint_url, s3_region, index_collection_prefix, index_endpoint_url, COLLECTION
+from test.utils import ID, s3_access_key, s3_access_key_id, s3_bucket, s3_endpoint_url, s3_region, index_collection_prefix, index_endpoint_url, COLLECTION
 import elasticsearch
 
 

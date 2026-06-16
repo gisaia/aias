@@ -17,12 +17,12 @@ class Tests(IngestTests):
     def test_async_ingest_invalid_tif_cloud(self):  # Test Driver error handling
         url = os.path.join(ROOT, "images/empty.tiff")
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
-        self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
+        self.assertGreaterEqual(status.message.find("Exception while ingesting"), 0)
 
     def test_async_ingest_nogeo_tif_cloud(self):  # Test Driver error handling
         url = os.path.join(ROOT, "images/nogeo.tiff")
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
-        self.assertGreaterEqual(status.message.index("Exception while ingesting"), 0)
+        self.assertGreaterEqual(status.message.find("Exception while ingesting"), 0)
 
     def test_async_ingest_spot6_cloud(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
@@ -125,7 +125,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_landsat9(self):  # Driver Landsat for landsat9 product
         url = os.path.join(ROOT, LANDSAT9)
-        self.async_ingest(url, ["thumbnail", "overview", "pan", "metadata", "airs_item"],data_key="pan")
+        self.async_ingest(url, ["thumbnail", "overview", "pan", "metadata", "airs_item"], data_key="pan")
 
     def test_async_ingest_umbra_stac(self):  # Driver Umbra Stac
         url = os.path.join(ROOT, UMBRA_STAC)
