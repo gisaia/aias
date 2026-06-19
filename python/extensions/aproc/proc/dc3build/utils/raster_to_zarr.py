@@ -3,6 +3,7 @@ import os.path as path
 
 import numpy as np
 import zarr
+import zarr.storage
 from rasterio.coords import BoundingBox
 from rasterio.crs import CRS
 from rasterio.io import DatasetReader
@@ -94,7 +95,7 @@ class RasterToZarr:
 
     def create_zarr_dir(self, zarr_root_path: str,
                         product_timestamp: int,
-                        raster_timestamp: int) -> zarr.DirectoryStore:
+                        raster_timestamp: int) -> zarr.storage.LocalStore:
         """
         Creates a zarr from the Raster file
 
@@ -103,7 +104,7 @@ class RasterToZarr:
         :param raster_timestamp: Timestamp used for the slice of the datacube
         """
 
-        store = zarr.DirectoryStore(path.join(zarr_root_path, self.band))
+        store = zarr.storage.LocalStore(path.join(zarr_root_path, self.band))
 
         xmin, ymin, xmax, ymax = self.bounds
         x = zarr.create(
@@ -111,7 +112,8 @@ class RasterToZarr:
             dtype='float32',
             store=store,
             overwrite=True,
-            path="x"
+            path="x",
+            dimension_names=["x"]
         )
         x[:] = np.arange(xmin, xmax, (xmax - xmin) / self.width)
         x.attrs['_ARRAY_DIMENSIONS'] = ['x']
@@ -121,7 +123,8 @@ class RasterToZarr:
             dtype='float32',
             store=store,
             overwrite=True,
-            path="y"
+            path="y",
+            dimension_names=["y"]
         )
         y[:] = np.arange(ymin, ymax, (ymax - ymin) / self.height)
         y.attrs['_ARRAY_DIMENSIONS'] = ['y']
@@ -131,7 +134,8 @@ class RasterToZarr:
             dtype="int",
             store=store,
             overwrite=True,
-            path="t"
+            path="t",
+            dimension_names=["t"]
         )
         t[:] = [raster_timestamp]
         t.attrs['_ARRAY_DIMENSIONS'] = ['t']
@@ -146,7 +150,8 @@ class RasterToZarr:
             dtype=self.dtype,
             store=store,
             overwrite=True,
-            path=self.band
+            path=self.band,
+            dimension_names=["x", "y", "t"]
         )
 
         # Add band metadata to the zarr file

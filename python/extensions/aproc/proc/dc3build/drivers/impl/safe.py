@@ -32,7 +32,7 @@ class Driver(DC3Driver):
         import numpy as np
         import rasterio
         import xarray as xr
-        import zarr
+        import zarr.storage
         from shapely import to_geojson
 
         from extensions.aproc.proc.dc3build.utils.geo import roi2geometry
@@ -85,7 +85,7 @@ class Driver(DC3Driver):
                                 if src.res[0] < min_res:
                                     min_res = src.res[0]
 
-                        zarrs: list[zarr.DirectoryStore] = []
+                        zarrs: list[zarr.storage.LocalStore] = []
 
                         # For each object, create a zarr
                         for band, path in bands.items():
@@ -129,8 +129,8 @@ class Driver(DC3Driver):
 
                 # Clean up the temporary files created
                 for zarr_dir in zarrs:
-                    if AccessManager.exists(zarr_dir.path):
-                        AccessManager.clean(zarr_dir.path)  # !DELETE!
+                    if AccessManager.exists(zarr_dir.root.as_uri()):
+                        AccessManager.clean(zarr_dir.root.as_uri())  # !DELETE!
                 del zarrs
                 del merged_bands
 

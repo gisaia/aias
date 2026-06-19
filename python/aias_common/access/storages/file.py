@@ -16,6 +16,11 @@ class FileStorage(AbstractStorage):
 
     def is_path_authorized(self, href: str, action: AccessType) -> bool:
         paths = self.get_authorized_pathes(href, action)
+
+        # If there is a scheme, remove it
+        if urlparse(href).scheme != "":
+            href = href.split("://")[1]
+
         return any(list(map(lambda p: Path(href).is_relative_to(Path(p)), paths)))
 
     def get_configuration(self) -> FileStorageConfiguration:

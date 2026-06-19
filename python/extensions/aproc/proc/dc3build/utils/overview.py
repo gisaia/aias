@@ -7,7 +7,6 @@ from matplotlib import colormaps
 from PIL import Image
 
 from airs.core.models.model import RGB
-from extensions.aproc.proc.dc3build.drivers.dc3_driver import DC3Driver
 from extensions.aproc.proc.dc3build.utils.xarray import (
     MinMax, coarse_bands, get_approximate_quantile)
 
