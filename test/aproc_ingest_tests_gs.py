@@ -3,7 +3,7 @@ import unittest
 from airs.core.models.model import Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -87,9 +87,13 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SENTINEL2)
         self.async_ingest(url, ["metadata", "data", "airs_item", *SENTINEL2_BANDS])
 
-    def test_async_ingest_csk(self):  # Driver CSK h5
+    def test_async_ingest_csk_h5(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
         self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False)
+
+    def test_async_ingest_csk_tif(self):  # Driver CSK h5
+        url = os.path.join(ROOT, CSK2)
+        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False, check_secondary_id=False)
 
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)

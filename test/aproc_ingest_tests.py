@@ -19,7 +19,8 @@ from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
 from fastapi import FastAPI, Request
 
 AST = "ast/"
-CSK = "csk/3155919-2167789/CSKS4_SCS_B_WR_03_VV_RA_SF_20141001061215_20141001061230.h5"
+CSK = "csk/3155919-2167789/"
+CSK2 = "csk/3766521-2583221/"
 SPOT6 = "spot6/PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
 PNEOMS = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_MS-FS/"
 PNEOPAN = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_PAN/"
@@ -106,11 +107,11 @@ class IngestTests(AprocTests):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value):
+    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
-        self.check_result(item, assets, archive, check_epsg, data_key)
+        self.check_result(item, assets, archive, check_epsg, data_key, check_secondary_id=check_secondary_id)
         return status
 
     def test_processes_list(self):
@@ -128,7 +129,7 @@ class IngestTests(AprocTests):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, data_key=Role.data.value):
+    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, data_key=Role.data.value, check_secondary_id=True):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertIsNotNone(item.id)
@@ -161,7 +162,8 @@ class IngestTests(AprocTests):
             self.assertIsNotNone(item.properties.item_type)
             self.assertIsNotNone(item.properties.item_format)
             self.assertIsNotNone(item.properties.observation_type)
-            self.assertIsNotNone(item.properties.secondary_id)
+            if check_secondary_id:
+                self.assertIsNotNone(item.properties.secondary_id)
             self.assertIsNotNone(item.properties.constellation)
             self.assertIsNotNone(item.properties.satellite)
             self.assertIsNotNone(item.properties.instrument)
