@@ -196,8 +196,9 @@ class Driver(IngestDriver):
         self.__init__()
         if AccessManager.is_dir(path):
 
+            dir_content = AccessManager.listdir(path)
             # Identify data file
-            for f in AccessManager.listdir(path):
+            for f in dir_content:
                 # If the CSK archive is tif based
                 if f.name.lower().endswith(".tif") and f.name.lower().find(".qlk.") < 0:
                     self.data_path = f.path
@@ -212,7 +213,7 @@ class Driver(IngestDriver):
 
             tfw_path = os.path.basename(self.data_path).lower().removesuffix(".tif") + ".tfw"
             data_file_prefix = os.path.basename(self.data_path).lower().split(".")[0]
-            for f in AccessManager.listdir(path):
+            for f in dir_content:
                 if f.name.lower().startswith(data_file_prefix):
                     if f.name.lower().endswith(".qlk.tif"):
                         self.browse_path = f.path
