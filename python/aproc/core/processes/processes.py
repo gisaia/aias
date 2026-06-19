@@ -79,7 +79,7 @@ class Processes:
                     LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
         else:
             LOGGER.warning(f"Status info is not found for task {task_id}. No update performed.")        
-        
+
 
     @staticmethod
     @task_prerun.connect

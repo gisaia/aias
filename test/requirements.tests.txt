@@ -1,7 +1,7 @@
 boto3==1.39.11
 aioboto3==15.1.0
 elasticsearch==8.9.0
-pydantic==2.10.6
+pydantic==2.13.4
 python-dateutil==2.8.2
 fastapi==0.137.1
 python-multipart==0.0.30

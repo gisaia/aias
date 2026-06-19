@@ -1,6 +1,6 @@
 click==8.1.6
 typer==0.9.0
-pydantic==2.10.6
+pydantic==2.13.4
 fastapi==0.137.1
 uvicorn==0.34.2
 envyaml==1.10.211231

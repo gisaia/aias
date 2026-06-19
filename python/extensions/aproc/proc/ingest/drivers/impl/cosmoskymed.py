@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -8,6 +9,7 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -131,11 +133,11 @@ class Driver(IngestDriver):
         options = gdal.InfoOptions(format="json")
         info = AccessManager.get_gdal_info(self.data_path, options)
 
-        return info["metadata"]
+        return info
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         geometry, bbox, centroid = self.__get_geometries__(metadata)
-        date_time = int(datetime.strptime(metadata[""]["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
+        date_time = int(datetime.strptime(metadata["metadata"][""]["Scene_Sensing_Start_UTC"][:-3], "%Y-%m-%d %H:%M:%S.%f").timestamp())
 
         item = Item(
             geometry=geometry,
@@ -157,11 +159,13 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
-        gsd = metadata.get("", {}).get("Ground_Range_Geometric_Resolution", None)
+        gsd = metadata["metadata"].get("", {}).get("Ground_Range_Geometric_Resolution", None)
+        if gsd is None:
+            gsd = metadata["metadata"].get("", {}).get("S01_Ground_Range_Instrument_Geometric_Resolution", None)                                                
         if gsd is not None:
             item.properties.gsd = float(gsd)
-        item.properties.satellite = metadata.get("", {}).get("Satellite_ID", None)
-        item.properties.secondary_id = metadata.get("", {}).get("Product_Filename", None)
+        item.properties.satellite = metadata["metadata"].get("", {}).get("Satellite_ID", None)
+        item.properties.secondary_id = metadata["metadata"].get("", {}).get("Product_Filename", None)
 
         with AccessManager.make_local(self.h5met_path) as local_h5met_path:
             h5_tree = ET.parse(local_h5met_path)
@@ -170,7 +174,7 @@ class Driver(IngestDriver):
         if processing__level is not None and processing__level.text:
             item.properties.processing__level = processing__level.text
 
-        item.properties.proj__epsg = self.__get_proj__(metadata.get(""), item.centroid)
+        item.properties.proj__epsg = self.__get_proj__(metadata["metadata"].get(""), item.centroid)
 
         return item
 
@@ -178,13 +182,13 @@ class Driver(IngestDriver):
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
-        near_incidence_angle = metadata.get("", {}).get("MBI_Near_Incidence_Angle", None)
-        far_incidence_angle = metadata.get("", {}).get("MBI_Far_Incidence_Angle", None)
+        near_incidence_angle = metadata["metadata"].get("", {}).get("MBI_Near_Incidence_Angle", None)
+        far_incidence_angle = metadata["metadata"].get("", {}).get("MBI_Far_Incidence_Angle", None)
         if near_incidence_angle and far_incidence_angle:
             item.properties.view__incidence_angle = (float(near_incidence_angle) + float(far_incidence_angle)) / 2
 
-        item.properties.acq__acquisition_orbit_direction = metadata.get("", {}).get("Orbit_Direction", None)
-        item.properties.acq__acquisition_orbit = metadata.get("", {}).get("Orbit_Number", None)
+        item.properties.acq__acquisition_orbit_direction = metadata["metadata"].get("", {}).get("Orbit_Direction", None)
+        item.properties.acq__acquisition_orbit = metadata["metadata"].get("", {}).get("Orbit_Number", None)
 
         return item
 
@@ -237,8 +241,8 @@ class Driver(IngestDriver):
             try:
                 from pyproj import CRS
 
-                proj_id: str = metadata["Projection_ID"]
-                proj_zone = int(metadata["Map_Projection_Zone"])
+                proj_id: str = metadata["metadata"]["Projection_ID"]
+                proj_zone = int(metadata["metadata"]["Map_Projection_Zone"])
                 is_south = centroid[1] < 0
 
                 crs = CRS.from_dict({'proj': proj_id.lower(), 'zone': proj_zone, 'south': is_south})
@@ -246,33 +250,41 @@ class Driver(IngestDriver):
             except Exception:
                 return None
 
-    def __get_geometries__(self, gdal_info_json: object):
-        metadata = gdal_info_json[""]
-        try:
-            ul_lat = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
-            ul_lon = float(metadata["MBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
-            ur_lat = float(metadata["MBI_Top_Right_Geodetic_Coordinates"].split(" ")[0])
-            ur_lon = float(metadata["MBI_Top_Right_Geodetic_Coordinates"].split(" ")[1])
-            lr_lat = float(metadata["MBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[0])
-            lr_lon = float(metadata["MBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[1])
-            ll_lat = float(metadata["MBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[0])
-            ll_lon = float(metadata["MBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[1])
-        except Exception:
+    def __get_value_by_prefix_suffix_or_none(self, dictionary: dict, prefixes: list[str], suffix: str):
+        for key, value in dictionary.items():
+            if key.endswith(suffix) and (not prefixes or any(key.startswith(p) for p in prefixes)):
+                return value
+        return None
+
+    def __get_geometries__(self, metadata: dict):
+        coords = metadata.get("wgs84Extent", {}).get("coordinates", None)
+        if coords:
+            return get_geom_bbox_centroid_from_corners(coords[0][0][0], coords[0][0][1], coords[0][1][0], coords[0][1][1], coords[0][2][0], coords[0][2][1], coords[0][3][0], coords[0][3][1],)
+
+        ul = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Left_Geodetic_Coordinates")
+        ur = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Right_Geodetic_Coordinates")
+        lr = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Right_Geodetic_Coordinates")
+        ll = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Left_Geodetic_Coordinates")
+        if (ul is None or ur is None or lr is None or ll is None) and metadata["metadata"].get("SUBDATASETS") is not None:
             # Not all products have those coordinates in this format
             # Some have their measures split up in multiple scenes
 
             # 2 datasets per scene, with each a name and description
-            last_scene = int(len(gdal_info_json["SUBDATASETS"]) / 4)
+            last_scene = int(len(metadata["metadata"]["SUBDATASETS"]) / 4)
+            ul = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Top_Left_Geodetic_Coordinates")
+            ur = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Top_Right_Geodetic_Coordinates")
+            lr = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Bottom_Right_Geodetic_Coordinates")
+            ll = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Bottom_Left_Geodetic_Coordinates")
 
-            # Top left and bottom left of first scene
-            ul_lat = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[0])
-            ul_lon = float(metadata["S01_SBI_Top_Left_Geodetic_Coordinates"].split(" ")[1])
-            ll_lat = float(metadata["S01_SBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[0])
-            ll_lon = float(metadata["S01_SBI_Bottom_Left_Geodetic_Coordinates"].split(" ")[1])
-            # Top right and bottom right of last scene
-            ur_lat = float(metadata[f"S0{last_scene}_SBI_Top_Right_Geodetic_Coordinates"].split(" ")[0])
-            ur_lon = float(metadata[f"S0{last_scene}_SBI_Top_Right_Geodetic_Coordinates"].split(" ")[1])
-            lr_lat = float(metadata[f"S0{last_scene}_SBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[0])
-            lr_lon = float(metadata[f"S0{last_scene}_SBI_Bottom_Right_Geodetic_Coordinates"].split(" ")[1])
-
-        return get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+        if ul and ur and lr and ll:
+            ul_lat = float(ul.split(" ")[0])
+            ul_lon = float(ul.split(" ")[1])
+            ur_lat = float(ur.split(" ")[0])
+            ur_lon = float(ur.split(" ")[1])
+            lr_lat = float(lr.split(" ")[0])
+            lr_lon = float(lr.split(" ")[1])
+            ll_lat = float(ll.split(" ")[0])
+            ll_lon = float(ll.split(" ")[1])
+            return get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+        else:
+            raise DriverException("Geodetic Coordinates not found in the metadata")
