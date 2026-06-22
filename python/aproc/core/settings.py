@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from aias_common.access.configuration import AccessManagerSettings
 from aproc.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 DEFAULT_PROCESS_QUEUE_NAME = "aproc_default_queue"
 
 

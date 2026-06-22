@@ -11,7 +11,8 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import compute_simplified_p
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from aproc.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
+
 
 class ImageDriverHelper:
     @staticmethod
@@ -41,8 +42,8 @@ class ImageDriverHelper:
     @staticmethod
     def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False):
         asset = Asset(href=href, size=AccessManager.get_size(href),
-                            roles=[role.value], name=role.value, type=type.value,
-                            description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value)
+                      roles=[role.value], name=role.value, type=type.value,
+                      description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value)
         assets.append(asset)
         return asset
 

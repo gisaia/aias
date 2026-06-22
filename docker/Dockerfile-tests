@@ -1,4 +1,4 @@
-FROM python:3.10.18-alpine3.22
+FROM python:3.14-alpine3.24
 RUN pip3 install --no-cache-dir --upgrade pip setuptools
 
 RUN apk update && apk add --upgrade libexpat
@@ -13,5 +13,4 @@ ENV PYTHONPATH=/app/python/
 
 WORKDIR /app
 
-RUN pip install -r requirements.tests.txt
-RUN pip install -r requirements.aias_common.txt
+RUN pip install -r requirements.tests.txt -r requirements.aias_common.txt

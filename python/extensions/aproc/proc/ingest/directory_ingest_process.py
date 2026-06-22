@@ -10,7 +10,7 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
-from aproc.core.processes.process import Process as Process, Subscriber
+from aproc.core.processes.process import Process
 from aproc.core.models.ogc.execute import Subscriber as OGCSubscriber
 from aproc.core.utils import base_model2description
 from aias_common.access.manager import AccessManager
@@ -26,7 +26,7 @@ from extensions.aproc.proc.processes.process_model import InputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class InputDirectoryIngestProcess(InputProcess):

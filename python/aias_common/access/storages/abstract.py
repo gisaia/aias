@@ -9,7 +9,7 @@ from aias_common.access.logger import Logger
 
 from aias_common.access.storages.path_helper import http_href_to_s3
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class AbstractStorage(ABC):

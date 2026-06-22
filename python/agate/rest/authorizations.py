@@ -1,11 +1,11 @@
 import requests
 from agate.logger import Logger
-from agate.settings import Configuration, Rule, Service
+from agate.settings import Configuration, Rule
 import jwt
 from urllib import parse
 import re
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class Authorizations:
@@ -114,8 +114,8 @@ class Authorizations:
 
         This method iterates through the provided rules and checks if any of them
         match the specified path using regular expression patterns. It uses the
-        extract_url_part method to determine which part of the path to match against. 
-        If arlas_control activated, then the collection and item id are used for 
+        extract_url_part method to determine which part of the path to match against.
+        If arlas_control activated, then the collection and item id are used for
         searching the hit on ARLAS with the user token. The rule matches if at least
         one hit is returned.
 
@@ -129,7 +129,7 @@ class Authorizations:
         Note:
             - The method returns False immediately if no part can be extracted from the path
               according to the rule configuration.
-            - Matching is performed using re.finditer with pattern matching and searchs on ARLAS 
+            - Matching is performed using re.finditer with pattern matching and searchs on ARLAS
               if arlas_control is True.
         """
         for rule in rules:
@@ -138,7 +138,7 @@ class Authorizations:
                 LOGGER.debug("Using {} as target for pattern matching on {}".format(part, rule.pattern))
             else:
                 msg = "Unable to identify the URL part for pattern matching with rule '{}'".format(rule)
-                LOGGER.warn(msg)
+                LOGGER.warning(msg)
                 continue
             matches = re.finditer(pattern=rule.pattern, string=part)
             for match in matches:

@@ -1,8 +1,5 @@
-import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import json
-import subprocess
 from zoneinfo import ZoneInfo
 
 from aias_common.access.manager import AccessManager
@@ -47,7 +44,6 @@ class Driver(IngestDriver):
         self.psh_tif_path = None
         self.psh_overview_path = None
         self.psh_thumbnail_path = None
-
 
     @staticmethod
     def init(configuration: dict):
@@ -222,7 +218,7 @@ class Driver(IngestDriver):
                            .timestamp())
 
         satellite = find_or_none(metadata, "SatelliteID", alt_key="ProductInfo/SatelliteID")
-        
+
         # satellite=SV-2 and constellation=SV
         if satellite and satellite.find('-') != -1:
             constellation = satellite.split("-")[0]
@@ -254,7 +250,7 @@ class Driver(IngestDriver):
 
         item.properties.processing__level = find_or_none(metadata, "ProductLevel", alt_key="ProductInfo/ProductLevel")
         item.properties.gsd = find_or_none(metadata, "GSDX", float, alt_key="ProductInfo/GSDX")
-        
+
         item.properties.secondary_id = find_or_none(metadata, "ProductID", alt_key="ProductInfo/ProductID")
 
         proj = AccessManager.get_gdal_proj(self.data_path)
@@ -266,13 +262,13 @@ class Driver(IngestDriver):
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
-        
+
         item.properties.instrument = find_or_none(metadata, "SensorID", alt_key="ProductInfo/SensorID")
         item.properties.sensor = item.properties.instrument
 
         item.properties.view__azimuth = find_or_none(metadata, "SatelliteAzimuth", float, alt_key="ProductInfo/SatelliteAzimuth")
         item.properties.view__sun_azimuth = find_or_none(metadata, "SolarAzimuth", float, alt_key="ProductInfo/SolarAzimuth")
-        
+
         sun_zenith = find_or_none(metadata, "SolarZenith", float, alt_key="ProductInfo/SolarZenith")
         if sun_zenith is not None:
             item.properties.view__sun_elevation = 90.0 - sun_zenith

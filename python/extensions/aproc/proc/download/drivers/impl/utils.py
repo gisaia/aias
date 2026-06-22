@@ -1,13 +1,11 @@
-import hashlib
 import os
-import time
 from contextlib import contextmanager
 
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
 from aias_common.access.manager import AccessManager
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 def setup_gdal():

@@ -34,7 +34,7 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class OutputDC3BuildProcess(BaseModel):

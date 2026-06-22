@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME
+from aproc.core.logger import Logger
 
 
 class Subscriber(BaseModel):
@@ -21,18 +22,9 @@ class InputProcess(BaseModel):
 class Process(ABC):
     name: str = ""
     queue_name: str = DEFAULT_PROCESS_QUEUE_NAME
-    LOGGER = logging.getLogger(__name__)
+    LOGGER = Logger.get_logger()
     input_model: type[InputProcess]
     __task_name__: str = ""
-
-    @classmethod
-    def set_logger(cls, logger) -> None:
-        """ Sets the driver's logger
-
-        Args:
-            logger (logger): the driver's logger
-        """
-        cls.LOGGER = logger
 
     @staticmethod
     def update_task_status(LOGGER: logging.Logger, task: Task, state: str, meta: dict = {}):

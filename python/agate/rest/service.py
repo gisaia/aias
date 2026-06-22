@@ -8,7 +8,7 @@ from agate.logger import Logger
 from agate.rest.authorizations import Authorizations
 from agate.settings import Configuration, ParamLocation, Service
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 ROUTER = APIRouter()
 MISSING_MSG = "{} missing"
 
@@ -40,7 +40,7 @@ async def urbac(request: Request):
         LOGGER.error(msg)
         LOGGER.debug(authorization)
         return Response(status_code=status.HTTP_403_FORBIDDEN, content=msg)
-    
+
     LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
     for n, r in Configuration.settings.urbac.roles.technicalRoles.items():
         if n in user_roles:
@@ -73,7 +73,7 @@ async def authorization(request: Request, service: str):
 
     requested_path: str = request.headers[Configuration.settings.url_header]
     LOGGER.debug("Incoming URI: {}".format(requested_path))
-    
+
     if Authorizations.at_least_one_rule_match_on_path(service_conf.public, requested_path, arlas_control=False):
         return Response(status_code=status.HTTP_202_ACCEPTED)
     else:
@@ -89,7 +89,7 @@ async def authorization(request: Request, service: str):
                 headers[service_conf.jwt_name] = v[0]
             else:
                 LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
-        except:
+        except Exception:
             LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
     if Authorizations.at_least_one_rule_match_on_path(service_conf.private, requested_path, arlas_control=True, headers=headers):
         return Response(status_code=status.HTTP_202_ACCEPTED)

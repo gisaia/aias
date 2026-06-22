@@ -7,7 +7,7 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.drivers.driver_configuration import DriverConfiguration
 from aproc.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class DriverManager():

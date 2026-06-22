@@ -5,7 +5,7 @@ from agate.logger import Logger
 from agate.roles_model import Roles
 import yaml
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class Rule(BaseModel, extra=Extra.allow):

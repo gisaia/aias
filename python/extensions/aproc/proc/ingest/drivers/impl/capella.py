@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
@@ -39,10 +38,10 @@ class Driver(IngestDriver):
 
         if self.tif_path:
             ImageDriverHelper.add_asset(assets, self.tif_path, Role.data, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
-            
+
         if self.extended_md_path:
             ImageDriverHelper.add_asset(assets, self.extended_md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
-            
+
         if self.digest_md_path:
             ImageDriverHelper.add_asset(assets, self.digest_md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other)
 
@@ -126,7 +125,6 @@ class Driver(IngestDriver):
             if dt_str.endswith("Z"):
                 dt_str = dt_str[:-1] + "+00:00"
             return datetime.fromisoformat(dt_str).replace(tzinfo=None)
-
 
         props = metadata.get("collect", {})
         start_datetime = parse_dt(props.get("start_timestamp"))

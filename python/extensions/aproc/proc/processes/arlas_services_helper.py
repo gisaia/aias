@@ -7,15 +7,14 @@ from aias_common.access.manager import AccessManager
 from aias_common.access.multipart_encoder import MultipartEncoder
 from airs.core.models import mapper
 from airs.core.models.model import Asset, Item
-from airs.core.settings import S3 as S3Configuration
 from aproc.core.processes.process import Process
 from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       RegisterException)
 from aias_common.access.storages.s3 import S3Storage
-from aproc.core.logger import Logger
 
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
+
 
 class ARLASServicesHelper(ABC):
 
@@ -30,7 +29,7 @@ class ARLASServicesHelper(ABC):
                 if result.get("hits") and len(result.get("hits")) > 0:
                     return mapper.item_from_dict(result.get("hits")[0]["data"])
                 else:
-                    Process.LOGGER.warn("No result found for {}/{}".format(collection, item_id))
+                    Process.LOGGER.warning("No result found for {}/{}".format(collection, item_id))
                     return None
             else:
                 Process.LOGGER.error("Error while retrieving {}/{} ({})".format(collection, item_id, r.content))
@@ -86,7 +85,7 @@ class ARLASServicesHelper(ABC):
         return (send_to, user_id)
 
     @staticmethod
-    def dir2s3(directory: str, s3_dir: str, storage: S3Storage):        
+    def dir2s3(directory: str, s3_dir: str, storage: S3Storage):
         upload_file_names = []
         for (source_dir, dirname, files) in os.walk(directory):
             for file in files:

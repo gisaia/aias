@@ -17,7 +17,7 @@ from aias_common.access.storages.s3 import S3Storage
 
 AnyStorage = Annotated[Union[FileStorage, GoogleStorage, HttpStorage, HttpsStorage, S3Storage], Field(discriminator="type")]
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class AccessManager:
