@@ -60,7 +60,7 @@ class ImageDriverHelper:
         return preview
 
     @staticmethod
-    def make_local_overview_asset(driver: IngestDriver, archive_href: str, overview_href: str, type: MimeType, format: AssetFormat, role: Role = Role.overview) -> Asset:
+    def make_local_preview_asset(driver: IngestDriver, archive_href: str, overview_href: str, type: MimeType, format: AssetFormat, role: Role = Role.overview) -> Asset:
         overview = ImageDriverHelper.prepare_preview_asset(driver, archive_href, role, type, format)
         if not AccessManager.is_local(overview_href):
             AccessManager.pull(overview_href, overview.href)

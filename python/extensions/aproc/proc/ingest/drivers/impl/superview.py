@@ -140,12 +140,12 @@ class Driver(IngestDriver):
 
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.overview_path is not None:
-            overview = ImageDriverHelper.make_local_overview_asset(self, url, self.overview_path, MimeType.JPG, AssetFormat.jpg)
+            overview = ImageDriverHelper.make_local_preview_asset(self, url, self.overview_path, MimeType.JPG, AssetFormat.jpg)
             self.overview_path = overview.href
             assets.append(overview)
             Driver.LOGGER.debug(f"Using existing quicklook at {self.overview_path}")
         if self.thumbnail_path is not None:
-            thumbnail = ImageDriverHelper.make_local_overview_asset(self, url, self.thumbnail_path, MimeType.JPG, AssetFormat.jpg, role=Role.thumbnail)
+            thumbnail = ImageDriverHelper.make_local_preview_asset(self, url, self.thumbnail_path, MimeType.JPG, AssetFormat.jpg, role=Role.thumbnail)
             self.overview_path = thumbnail.href
             assets.append(thumbnail)
             Driver.LOGGER.debug(f"Using existing thumbnail at {self.thumbnail_path}")

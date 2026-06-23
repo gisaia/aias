@@ -41,7 +41,7 @@ class Driver(IngestDriver):
 
     def fetch_assets(self, url: str, assets: list[Asset]):
         if self.quicklook_path:
-            quicklook = ImageDriverHelper.make_local_overview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
+            quicklook = ImageDriverHelper.make_local_preview_asset(self, url, self.quicklook_path, MimeType.PNG, AssetFormat.png)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
         return assets
