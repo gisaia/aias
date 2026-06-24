@@ -195,6 +195,13 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_PAN")
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"])
 
+    def test_async_ingest_opencosmos_platero(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, "opencosmos/PLATERO_L1C_000002034_20250808115624_20250808115639_C0763AC3_assets")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.rpc.value, Role.metadata.value, 'metadata.json'])
+
+    def test_async_ingest_opencosmos_hammer(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, "opencosmos/HAMMER_L1C_000003173_20251230113811_20251230113815_9ABD70F6_assets")
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.rpc.value, Role.metadata.value, 'metadata.json'])
 
 if __name__ == '__main__':
     unittest.main()
