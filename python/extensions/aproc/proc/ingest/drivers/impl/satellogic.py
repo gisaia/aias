@@ -126,7 +126,7 @@ class Driver(IngestDriver):
         eo_bands_raw = analytic_asset.get("eo:bands", [])
 
         if not eo_bands_raw:
-            self.LOGGER.warn("No eo:bands found in STAC metadata analytic asset")
+            self.LOGGER.warning("No eo:bands found in STAC metadata analytic asset")
 
         for b in eo_bands_raw:
             name = b.get("name")

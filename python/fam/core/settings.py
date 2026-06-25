@@ -3,7 +3,7 @@ from pydantic import BaseModel, Extra, Field
 
 from fam.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class Settings(BaseModel, extra=Extra.allow):

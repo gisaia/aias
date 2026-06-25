@@ -11,7 +11,7 @@ from memory_profiler import profile
 
 from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class S3Storage(AbstractStorage):
@@ -118,7 +118,7 @@ class S3Storage(AbstractStorage):
             return "s3://" + join_pathes(self.get_configuration().bucket, path)
 
     def __get_href_key(self, href: str):
-        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/") 
+        return urlparse(href).path.removeprefix(f"/{self.get_configuration().bucket}").removeprefix("/").removesuffix("/")
 
     def pull(self, href: str, dst: str):
         import botocore.client
@@ -175,7 +175,7 @@ class S3Storage(AbstractStorage):
             extra_args["ContentType"] = content_type
         total = 0
         nb_calls = 0
-        
+
         def log_progress(bytes_amount):
             nonlocal total
             nonlocal nb_calls
@@ -186,7 +186,7 @@ class S3Storage(AbstractStorage):
 
         async with self.__aioboto3_client() as s3:
             await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args, Callback=log_progress)
-        
+
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
         conf = self.get_configuration()
@@ -195,7 +195,7 @@ class S3Storage(AbstractStorage):
                 return self.get_storage_parameters()["client"].head_object(
                     Bucket=conf.bucket,
                     Key=self.__get_href_key(href))
-            except:
+            except Exception:
                 return None
         else:
             return None

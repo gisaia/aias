@@ -27,7 +27,7 @@ from aias_common.access.configuration import S3ApiKey, S3StorageConfiguration
 
 ASSETS_NOT_FOUND = "Asset(s) not found"
 ITEM_ARLAS_SUFFIX = ".airs.json"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 __DELETED_MSG__ = "{} deleted."
 
@@ -334,8 +334,8 @@ def register_item(item: Item) -> Item:
         return item
     except Exception as e:
         if not existing_item:
-            # the insert failed, the item must not be indexed. 
-            # We don't remove if it was an update. 
+            # the insert failed, the item must not be indexed.
+            # We don't remove if it was an update.
             # Problem: the storage differs from the index.
             __getES().delete(index=__get_es_index_name(item.collection), id=item.id)
         raise e

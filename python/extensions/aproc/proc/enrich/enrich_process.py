@@ -29,11 +29,10 @@ from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              EVENT_KIND_KEY, EVENT_MODULE_KEY,
                                              EVENT_OUTCOME_KEY, EVENT_REASON,
                                              EVENT_TYPE_KEY, USER_ACTION_KEY)
-from extensions.aproc.proc.processes.process_model import InputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class InputEnrichProcess(InputProcess):

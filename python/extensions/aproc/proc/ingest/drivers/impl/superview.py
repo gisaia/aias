@@ -1,8 +1,5 @@
-import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import json
-import subprocess
 from zoneinfo import ZoneInfo
 
 from aias_common.access.manager import AccessManager
@@ -47,7 +44,6 @@ class Driver(IngestDriver):
         self.psh_tif_path = None
         self.psh_overview_path = None
         self.psh_thumbnail_path = None
-
 
     @staticmethod
     def init(configuration: dict):
@@ -222,7 +218,7 @@ class Driver(IngestDriver):
                            .timestamp())
 
         satellite = find_or_none(metadata, "SatelliteID", alt_keys=["ProductInfo/SatelliteID"])
-        
+
         # satellite=SV-2 and constellation=SV
         if satellite and satellite.find('-') != -1:
             constellation = satellite.split("-")[0]

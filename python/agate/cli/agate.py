@@ -16,7 +16,7 @@ AGATE_CORS_ORIGINS = os.getenv("AGATE_CORS_ORIGINS", "*")
 AGATE_CORS_METHODS = os.getenv("AGATE_CORS_METHODS", "*")
 AGATE_CORS_HEADERS = os.getenv("AGATE_CORS_HEADERS", "*")
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 api = FastAPI(version=AIAS_VERSION, title='ARLAS Asset Gateway',
               description='ARLAS Asset Gateway API',

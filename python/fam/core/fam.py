@@ -7,10 +7,10 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from fam.core.model import Archive
 from fam.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
-class Fam():
+class Fam:
 
     @staticmethod
     def list_archives(path: str, max_size: int = 10, include_drivers: list[str] = [], timeout_in_seconds: int = 60) -> list[Archive]:

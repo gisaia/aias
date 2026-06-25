@@ -71,7 +71,7 @@ class IngestDriver(AbstractDriver):
             result = self.__check_path__(resource)
             return result
         except Exception as e:
-            self.LOGGER.warn(e)
+            self.LOGGER.warning(e)
             return False
 
     def get_item_id(self, url: str) -> str:
@@ -146,7 +146,7 @@ class IngestDriver(AbstractDriver):
         try:
             item = self.add_major_metadata(url, item, metadata)
         except Exception as e:
-            self.LOGGER.warn(f"Failed to retrieve additional information: {e}")
+            self.LOGGER.warning(f"Failed to retrieve additional information: {e}")
 
         self.log_if_missing(url, item)
 
@@ -209,21 +209,21 @@ class IngestDriver(AbstractDriver):
             item (Item): the item
         """
         if item.properties.sensor_type is None:
-            self.LOGGER.warn(f"No sensor type was found for {url}")
+            self.LOGGER.warning(f"No sensor type was found for {url}")
         if item.properties.secondary_id is None:
-            self.LOGGER.warn(f"No ID was found for {url}")
+            self.LOGGER.warning(f"No ID was found for {url}")
         if item.properties.satellite is None:
-            self.LOGGER.warn(f"No satellite was found for {url}")
+            self.LOGGER.warning(f"No satellite was found for {url}")
         if item.properties.gsd is None:
-            self.LOGGER.warn(f"No resolution was found for {url}")
+            self.LOGGER.warning(f"No resolution was found for {url}")
         if item.properties.processing__level is None:
-            self.LOGGER.warn(f"No processing level was found for {url}")
+            self.LOGGER.warning(f"No processing level was found for {url}")
         if item.properties.proj__epsg is None:
-            self.LOGGER.warn(f"No projection was found for {url}")
+            self.LOGGER.warning(f"No projection was found for {url}")
         if item.assets.get(Role.thumbnail.value) is None:
-            self.LOGGER.warn(f"No thumbnail was found for {url}")
+            self.LOGGER.warning(f"No thumbnail was found for {url}")
         if item.assets.get(Role.overview.value) is None:
-            self.LOGGER.warn(f"No overview was found for {url}")
+            self.LOGGER.warning(f"No overview was found for {url}")
 
     @abstractmethod
     def load_metadata(self, url: str) -> object:

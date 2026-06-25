@@ -24,12 +24,12 @@ class CustomLogger:
         cls.__logger.addHandler(console_handler)
 
         handler = logging.StreamHandler()
+        handler.setLevel(cls.level)
         handler.setFormatter(ecs_logging.StdlibFormatter())
         cls.__logger.addHandler(handler)
 
     @classmethod
-    @property
-    def logger(cls):
+    def get_logger(cls):
         if cls.__logger is None:
             cls.init()
         return cls.__logger

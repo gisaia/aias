@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from urllib.parse import urlparse
 
-from celery import Celery, Task, states
+from celery import Celery, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
 from redis import Redis
@@ -16,7 +16,6 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 from celery.signals import task_postrun, task_prerun
 
-from celery.signals import Signal
 import requests
 
 from aias_common.access.manager import AccessManager
@@ -28,7 +27,7 @@ from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import InputProcess, Process, Subscriber
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME, Configuration
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
@@ -43,7 +42,8 @@ APROC_CELERY_APP = Celery(
     backend=Configuration.settings.celery_result_backend,
     result_backend_transport_options=Configuration.settings.celery_result_backend_transport_options)
 
-APROC_JOBS_INDEX="idx:aproc_jobs"
+APROC_JOBS_INDEX = "idx:aproc_jobs"
+
 
 class Processes:
     processes: list[Process] = []
@@ -56,7 +56,7 @@ class Processes:
             if status_info is None:
                 sleep(5)  # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
                 status_info = Processes.__retrieve_status_info__(task_id)
-            if status_info :
+            if status_info:
                 if status_info.status is None or not status_info.status.is_final():
                     status_info.status = Processes.__to_status_info_code__(new_status)
                     status_info.updated = round(datetime.now().timestamp())
@@ -74,12 +74,11 @@ class Processes:
                         if new_status == states.FAILURE and subscriber.failedUri:
                             result = Processes.result(task_id)
                             Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True, exclude_unset=True))
-                    LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()  }")
+                    LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()}")
                 else:
                     LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
         else:
-            LOGGER.warning(f"Status info is not found for task {task_id}. No update performed.")        
-
+            LOGGER.warning(f"Status info is not found for task {task_id}. No update performed.")
 
     @staticmethod
     @task_prerun.connect
@@ -109,11 +108,11 @@ class Processes:
                         sleep(5)  # task is sent before its data are stored, this means that we can get the event before we're able to retrieve it. We get here a second chance.
                         status_info: StatusInfo = Processes.__retrieve_status_info__(task_id)
                     if status_info is None:
-                        LOGGER.warn("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
+                        LOGGER.warning("Can not retrieve task {} . Its status will not be updated with this event.".format(task_id))
                     else:
                         Processes.__update_satus(task_id, event.get('state'), None, "")
                 else:
-                    LOGGER.warn("Task id not found in event {}".format(event))
+                    LOGGER.warning("Task id not found in event {}".format(event))
             except Exception as e:
                 LOGGER.error("STATUS UPDATE ERROR !!!")
                 LOGGER.exception(e)
@@ -380,7 +379,7 @@ class Processes:
                 raise ConnectionError("Invalid configuration: master_name and sentinel_password must be provided")
             sentinel_kwargs = celery_result_backend_transport_options.get("sentinel_kwargs")
             sentinels: list[tuple[str, int]] = [(urlparse(s).hostname, urlparse(s).port) for s in Configuration.settings.celery_result_backend.split(";")]
-            host, port = Sentinel(sentinels, sentinel_kwargs=celery_result_backend_transport_options.get("sentinel_kwargs")).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
+            host, port = Sentinel(sentinels, sentinel_kwargs=sentinel_kwargs).discover_master(Configuration.settings.celery_result_backend_transport_options.get("master_name"))
             con = {
                 "host": host,
                 "port": port,
@@ -392,5 +391,6 @@ class Processes:
             return Redis(**con)
         else:
             raise Exception("Unsupported backend {}".format(uri.scheme))
+
 
 Processes.init()
