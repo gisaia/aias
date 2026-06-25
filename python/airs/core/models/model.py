@@ -253,6 +253,7 @@ class Role(Enum):
     snow_ice = "snow-ice"
     sun_azimuth = "sun-azimuth"
     sun_elevation = "sun-elevation"
+    tci = "tci"
     temperature = "temperature"
     terrain_illumination = "terrain-illumination"
     terrain_occlusion = "terrain-occlusion"

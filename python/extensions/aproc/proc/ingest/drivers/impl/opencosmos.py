@@ -23,7 +23,7 @@ class Driver(IngestDriver):
         super().__init__()
         self.data_path = None
         self.main_asset_role = None
-        self.tif_pathes = []
+        self.tif_paths = []
         self.tci_path = None
         self.pan_path = None
         self.md_path = None
@@ -50,7 +50,7 @@ class Driver(IngestDriver):
 
         # Main image
         assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
-                            roles=[Role.data.value, Role.visual.value, self.main_asset_role], name=Role.data.value, type=MimeType.GEOTIFF.value,
+                            roles=list(set([Role.data.value, Role.visual.value, self.main_asset_role])), name=Role.data.value, type=MimeType.GEOTIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         if self.thumbnail_path:
@@ -60,7 +60,7 @@ class Driver(IngestDriver):
         if self.pan_path:
             ImageDriverHelper.add_asset(assets, self.pan_path, Role.pan, MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
 
-        for tif_path in self.tif_pathes:
+        for tif_path in self.tif_paths:
             asset = Asset(href=tif_path, size=AccessManager.get_size(tif_path),
                           roles=[Role.data.value, Role.visual.value], name=os.path.basename(tif_path), type=MimeType.TIFF.value,
                           description=os.path.basename(tif_path), airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value)
@@ -76,7 +76,7 @@ class Driver(IngestDriver):
     def fetch_assets(self, url: str, assets: list[Asset]):
         if self.thumbnail_path:
             thumbnail = ImageDriverHelper.make_local_preview_asset(self, url, self.thumbnail_path, MimeType.PNG, AssetFormat.png, role=Role.thumbnail)
-            self.quicklook_path = thumbnail.href
+            self.thumbnail_path = thumbnail.href
             assets.append(thumbnail)
         return assets
 
@@ -89,7 +89,7 @@ class Driver(IngestDriver):
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
-            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            elif not AccessManager.is_local(self.tci_path) and Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
                 Driver.LOGGER.debug(f"Building overview for remote TIFF {self.tci_path}")
                 overview_folder = self.assets_dir + '/opencosmos/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)
@@ -186,13 +186,13 @@ class Driver(IngestDriver):
         item.properties.satellite = props.get("platform", None)
         item.properties.gsd = props.get("gsd", None)
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.data_path))
-        item.eo__cloud_cover=props.get("eo:cloud_cover", None)
+        item.eo__cloud_cover = props.get("eo:cloud_cover", None)
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         props = metadata.get("properties", {})
 
-        item.processing__level=props.get("processing:level", [None])[0],
+        item.processing__level = props.get("processing:level", [None])[0],
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
@@ -231,15 +231,15 @@ class Driver(IngestDriver):
                             elif f.name.lower().startswith("pan"):
                                 self.pan_path = f.path
                             else:
-                                self.tif_pathes.append(f.path)
+                                self.tif_paths.append(f.path)
                         elif not f.is_dir and f.name.lower().endswith("metadata.json"):
                             self.extra_md_path = f.path
                         elif not f.is_dir and f.name.lower().endswith("rpc.txt"):
                             self.rpc_path = f.path
                         elif not f.is_dir and (f.name.lower().endswith("thumbnail.webp")):
                             self.thumbnail_path = f.path
-            if self.md_path is not None and (self.tif_pathes or self.tci_path is not None or self.pan_path is not None):
-                self.data_path = self.tci_path if self.tci_path is not None else (self.pan_path if self.pan_path is not None else self.tif_pathes[0])
-                self.main_asset_role = Role.data.value if self.tci_path is not None else (Role.pan.value if self.pan_path is not None else Role.data.value)
+            if self.md_path is not None and (self.tif_paths or self.tci_path is not None or self.pan_path is not None):
+                self.data_path = self.tci_path if self.tci_path is not None else (self.pan_path if self.pan_path is not None else self.tif_paths[0])
+                self.main_asset_role = Role.tci.value if self.tci_path is not None else (Role.pan.value if self.pan_path is not None else Role.data.value)
                 return True
         return False
