@@ -136,12 +136,12 @@ class Driver(IngestDriver):
 
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.overview_path is not None:
-            overview = ImageDriverHelper.make_local_overview_asset(self, url, self.overview_path, MimeType.JPG, AssetFormat.jpg)
+            overview = ImageDriverHelper.make_local_preview_asset(self, url, self.overview_path, MimeType.JPG, AssetFormat.jpg)
             self.overview_path = overview.href
             assets.append(overview)
             Driver.LOGGER.debug(f"Using existing quicklook at {self.overview_path}")
         if self.thumbnail_path is not None:
-            thumbnail = ImageDriverHelper.make_local_overview_asset(self, url, self.thumbnail_path, MimeType.JPG, AssetFormat.jpg)
+            thumbnail = ImageDriverHelper.make_local_preview_asset(self, url, self.thumbnail_path, MimeType.JPG, AssetFormat.jpg, role=Role.thumbnail)
             self.overview_path = thumbnail.href
             assets.append(thumbnail)
             Driver.LOGGER.debug(f"Using existing thumbnail at {self.thumbnail_path}")
@@ -199,8 +199,8 @@ class Driver(IngestDriver):
         if centroid is None and geometry is not None:
             centroid = get_centroid(geometry)
 
-        start_time_str = find_or_none(metadata, "StartTime", alt_key="ProductInfo/StartTime")
-        end_time_str = find_or_none(metadata, "EndTime", alt_key="ProductInfo/EndTime")
+        start_time_str = find_or_none(metadata, "StartTime", alt_keys=["ProductInfo/StartTime"])
+        end_time_str = find_or_none(metadata, "EndTime", alt_keys=["ProductInfo/EndTime"])
         end_time = None
         if start_time_str:
             start_time = int(datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
@@ -217,7 +217,7 @@ class Driver(IngestDriver):
                            .astimezone(ZoneInfo("UTC"))
                            .timestamp())
 
-        satellite = find_or_none(metadata, "SatelliteID", alt_key="ProductInfo/SatelliteID")
+        satellite = find_or_none(metadata, "SatelliteID", alt_keys=["ProductInfo/SatelliteID"])
 
         # satellite=SV-2 and constellation=SV
         if satellite and satellite.find('-') != -1:
@@ -248,10 +248,10 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
 
-        item.properties.processing__level = find_or_none(metadata, "ProductLevel", alt_key="ProductInfo/ProductLevel")
-        item.properties.gsd = find_or_none(metadata, "GSDX", float, alt_key="ProductInfo/GSDX")
-
-        item.properties.secondary_id = find_or_none(metadata, "ProductID", alt_key="ProductInfo/ProductID")
+        item.properties.processing__level = find_or_none(metadata, "ProductLevel", alt_keys=["ProductInfo/ProductLevel"])
+        item.properties.gsd = find_or_none(metadata, "GSDX", float, alt_keys=["ProductInfo/GSDX"])
+        
+        item.properties.secondary_id = find_or_none(metadata, "ProductID", alt_keys=["ProductInfo/ProductID"])
 
         proj = AccessManager.get_gdal_proj(self.data_path)
         if proj:
@@ -262,22 +262,23 @@ class Driver(IngestDriver):
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
-
-        item.properties.instrument = find_or_none(metadata, "SensorID", alt_key="ProductInfo/SensorID")
+        
+        item.properties.instrument = find_or_none(metadata, "SensorID", alt_keys=["ProductInfo/SensorID"])
         item.properties.sensor = item.properties.instrument
 
-        item.properties.view__azimuth = find_or_none(metadata, "SatelliteAzimuth", float, alt_key="ProductInfo/SatelliteAzimuth")
-        item.properties.view__sun_azimuth = find_or_none(metadata, "SolarAzimuth", float, alt_key="ProductInfo/SolarAzimuth")
-
-        sun_zenith = find_or_none(metadata, "SolarZenith", float, alt_key="ProductInfo/SolarZenith")
+        item.properties.view__azimuth = find_or_none(metadata, "SatelliteAzimuth", float, alt_keys=["SatelliteElevation", "ProductInfo/SatelliteAzimuth", "ProductInfo/SatelliteElevation"])
+        item.properties.view__sun_azimuth = find_or_none(metadata, "SolarAzimuth", float, alt_keys=["ProductInfo/SolarAzimuth"])
+        
+        sun_zenith = find_or_none(metadata, "SolarZenith", float, alt_keys=["SolarElevation", "ProductInfo/SolarZenith", "ProductInfo/SolarElevation"])
         if sun_zenith is not None:
             item.properties.view__sun_elevation = 90.0 - sun_zenith
 
-        item.properties.view__off_nadir = find_or_none(metadata, "ViewAngle", float, alt_key="ProductInfo/ViewAngle")
-        item.properties.eo__cloud_cover = find_or_none(metadata, "CloudPercent", float, alt_key="ProductInfo/CloudPercent")
-        item.properties.eo__snow_cover = find_or_none(metadata, "SnowPercent", float, alt_key="ProductInfo/SnowPercent")
+        item.properties.view__off_nadir = find_or_none(metadata, "ViewAngle", float, alt_keys=["ProductInfo/ViewAngle"])
+        item.properties.view__off_nadir = find_or_none(metadata, "ViewAngle", float, alt_keys=["Viewangle", "ProductInfo/ViewAngle", "ProductInfo/Viewangle"])
+        item.properties.eo__cloud_cover = find_or_none(metadata, "CloudPercent", float, alt_keys=["ProductInfo/CloudPercent"])
+        item.properties.eo__snow_cover = find_or_none(metadata, "SnowPercent", float, alt_keys=["ProductInfo/SnowPercent"])
 
-        item.properties.acq__acquisition_orbit = find_or_none(metadata, "OrbitID", alt_key="ProductInfo/OrbitID")
+        item.properties.acq__acquisition_orbit = find_or_none(metadata, "OrbitID", alt_keys=["ProductInfo/OrbitID"])
         od = find_or_none(metadata, "OrbitDirection")
         item.properties.acq__acquisition_orbit_direction = "DESCENDING" if od == "D" else "ASCENDING" if od == "A" else None
 
