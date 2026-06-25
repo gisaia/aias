@@ -252,7 +252,7 @@ class Driver(IngestDriver):
                         self.quicklook_path = file.path
                     elif file.name.endswith("_thumbnail.png"):
                         self.thumbnail_path = file.path
-                    elif file.name.endswith(".tiff"):
+                    elif file.name.endswith((".tif", ".tiff")):
                         self.tif_path = file.path
                     elif file.name.endswith(".json"):
                         self.md_path = file.path

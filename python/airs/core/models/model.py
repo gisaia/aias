@@ -114,6 +114,7 @@ class MimeType(Enum):
     SHP = "application/vnd.shp"
     TEXT = "text/plain"
     TIFF = "image/tiff"
+    WEBP = "image/webp"
     XML = "text/xml"
     ZARR = "application/vnd+zarr"  # https://github.com/openMetadataInitiative/openMINDS_core/blob/v4/instances/data/contentTypes/zarr.jsonld
     ZIP = "application/zip"
@@ -162,6 +163,7 @@ class ItemFormat(Enum):
     jpeg2000 = "JPEG2000"
     landsat = "landsat"
     other = "OTHER"
+    opencosmos = "OPENCOSMOS"
     radarsat2 = "RADARSAT-2",
     rapideye = "RAPIDEYE"
     safe = "SAFE"
@@ -200,6 +202,7 @@ class AssetFormat(Enum):
     targz = "TARGZ"
     tfw = "TFW"
     txt = "TEXT"
+    webp = "WEBP"
     xml = "XML"
     yaml = "YAML"
     zarr = "ZARR"
@@ -250,6 +253,7 @@ class Role(Enum):
     snow_ice = "snow-ice"
     sun_azimuth = "sun-azimuth"
     sun_elevation = "sun-elevation"
+    tci = "tci"
     temperature = "temperature"
     terrain_illumination = "terrain-illumination"
     terrain_occlusion = "terrain-occlusion"
