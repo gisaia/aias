@@ -54,7 +54,7 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        # Main images
+        # Main image
         assets.append(Asset(href=self.data_path, size=AccessManager.get_size(self.data_path),
                             roles=[Role.data.value, Role.visual.value, self.main_asset_role], name=Role.data.value, type=MimeType.GEOTIFF.value,
                             description=Role.data.value, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))

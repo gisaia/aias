@@ -123,7 +123,6 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
     # Define output format and options
     options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0], scaleParams=scale_params)
-    print(f"Converting {input_path} to JPEG with widthPct={width_pct}, heightPct={height_pct}, bands={bands_list}, stretch={stretch}")
     # Translate to JPEG
     if output_path is not None:
         gdal.Translate(output_path, dataset, options=options)
