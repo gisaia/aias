@@ -8,20 +8,18 @@ from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
 class EnrichDriver(AbstractDriver):
-    alternative_asset_href_field = None
 
     def __init__(self):
         super().__init__()
         self.thumbnail_size = 256
         self.overview_size = 1024
 
-    def __supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets, item_formats) -> bool:
-        return extra_params.get("enrichments", []) and set(extra_params.get("enrichments", [])).issubset(set(supported_assets)) and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() in item_formats
+    def supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets) -> bool:
+        return extra_params.get("enrichments", []) and set(extra_params.get("enrichments", [])).issubset(set(supported_assets))
 
     @staticmethod
     def init(configuration: dict) -> None:
-        if configuration:
-            EnrichDriver.alternative_asset_href_field = configuration.get("alternative_asset_href_field")
+        ...
 
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
@@ -75,5 +73,5 @@ class EnrichDriver(AbstractDriver):
         assets = []
         for enrichment in enrichments:
             self.LOGGER.info("adding {} to item {}".format(enrichment, item.id))
-            assets.append(self.create_enrichement(item, enrichment))
+            assets.extend(self.create_enrichement(item, enrichment))
         return assets

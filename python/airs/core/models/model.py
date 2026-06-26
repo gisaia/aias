@@ -538,7 +538,7 @@ class Item(BaseModel, extra=Extra.allow):
     airs__lifecycle: Lifecycle | None = Field(default=None, title="[ARLAS, extension AIRS] Lifecycle management of the item")
     collection: str | None = Field(default=None, title="[STAC] Name of the collection the item belongs to.", max_length=300)
     catalog: str | None = Field(default=None, title="Name of the catalog the item belongs to.", max_length=300)
-    id: str = Field(title="[STAC] Unique item identifier. Must be unique within the collection.", max_length=300)
+    id: str | None = Field(default=None, title="[STAC] Unique item identifier. Must be unique within the collection.", max_length=300)
     geometry: Dict[str, Any] | None = Field(default=None, title="[STAC] Defines the full footprint of the asset represented by this item, formatted according to `RFC 7946, section 3.1 (GeoJSON) <https://tools.ietf.org/html/rfc7946>`_")
     bbox: List[float] | None = Field(default=None, title="[STAC] Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2*n where n is the number of dimensions. Could also be None in the case of a null geometry.")
     centroid: List[float] | None = Field(default=None, title="Coordinates (lon/lat) of the geometry's centroid.")

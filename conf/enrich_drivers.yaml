@@ -1,19 +1,19 @@
 drivers:
   -
-    name: sentinel2
-    class_name: extensions.aproc.proc.enrich.drivers.impl.s2_cog
-    assets_dir: /tmp/aproc/s2_cog
-    configuration:
-    priority: 1
-  -
     name: geotiff
     class_name: extensions.aproc.proc.enrich.drivers.impl.geotiff_cog
     assets_dir: /tmp/aproc/geotiff_cog
     configuration:
-    priority: 2
-  -
-    name: landsat
-    class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
-    assets_dir: /tmp/aproc/landsat_cog
-    configuration:
-    priority: 3
+    priority: 1
+  # -
+  #   name: sentinel2
+  #   class_name: extensions.aproc.proc.enrich.drivers.impl.s2_cog
+  #   assets_dir: /tmp/aproc/s2_cog
+  #   configuration:
+  #   priority: 2
+  # -
+  #   name: landsat
+  #   class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
+  #   assets_dir: /tmp/aproc/landsat_cog
+  #   configuration:
+  #   priority: 3

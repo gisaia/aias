@@ -23,16 +23,22 @@ class Driver(EnrichDriver):
     @staticmethod
     def init(configuration: dict):
         EnrichDriver.init(configuration)
+        if configuration:
+            Driver.configuration = configuration
         supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
         Driver.configuration['asset_name_as_source_for_cog_generation'] = Driver.configuration.get('asset_name_as_source_for_cog_generation', Role.data.value)
         Driver.configuration['cog_overview_max_resolution_m'] = Driver.configuration.get('cog_overview_max_resolution_m', 500)
         Driver.configuration['cog_overview_downscale_factor'] = Driver.configuration.get('cog_overview_downscale_factor', 10)
-        Driver.configuration['cog_max_resolution_m'] = Driver.configuration.get('cog_overview_max_resolution_m', -1)
-        Driver.configuration['cog_downscale_factor'] = Driver.configuration.get('cog_overview_downscale_factor', -1)
+        Driver.configuration['cog_max_resolution_m'] = Driver.configuration.get('cog_max_resolution_m', -1)
+        Driver.configuration['cog_downscale_factor'] = Driver.configuration.get('cog_downscale_factor', 10)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
-        return self.__supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.dimap.value.lower()]) and resource.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation']) is not None and resource.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation']).href is not None and resource.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation']).asset_format == AssetFormat.geotiff
+        if self.supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES):
+            asset_source = resource.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation'])
+            if asset_source is not None and asset_source.href is not None and asset_source.type in [MimeType.TIFF.value, MimeType.COG.value, MimeType.JPEG2000.value]:
+                return True
+        return False
 
     # Implements drivers method
     def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:

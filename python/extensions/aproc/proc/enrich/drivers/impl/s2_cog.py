@@ -35,7 +35,7 @@ class Driver(EnrichDriver):
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
-        return self.__supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.safe.value.lower()])
+        return self.supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.safe.value.lower()])
 
     # Implements drivers method
     def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
