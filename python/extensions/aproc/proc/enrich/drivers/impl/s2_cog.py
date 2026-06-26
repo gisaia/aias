@@ -11,11 +11,13 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
+from extensions.aproc.proc.enrich.enrich_process import supported_assets_for_enrichment
 
 
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower(), AssetFormat.all_bands_cog.value.lower()]
+    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -24,10 +26,16 @@ class Driver(EnrichDriver):
     @staticmethod
     def init(configuration: dict):
         EnrichDriver.init(configuration)
+        supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
+        Driver.configuration['asset_name_as_source_for_cog_generation'] = Driver.configuration.get('asset_name_as_source_for_cog_generation', Role.data.value)
+        Driver.configuration['cog_overview_max_resolution_m'] = Driver.configuration.get('cog_overview_max_resolution_m', 500)
+        Driver.configuration['cog_overview_downscale_factor'] = Driver.configuration.get('cog_overview_downscale_factor', 10)
+        Driver.configuration['cog_max_resolution_m'] = Driver.configuration.get('cog_overview_max_resolution_m', -1)
+        Driver.configuration['cog_downscale_factor'] = Driver.configuration.get('cog_overview_downscale_factor', -1)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
-        return self.__supports__(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.safe.value.lower()])
+        return self.__supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES, [ItemFormat.safe.value.lower()])
 
     # Implements drivers method
     def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:

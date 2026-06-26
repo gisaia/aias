@@ -15,7 +15,7 @@ class EnrichDriver(AbstractDriver):
         self.thumbnail_size = 256
         self.overview_size = 1024
 
-    def __supports__(self, resource: Item, extra_params: dict[str, Any], supported_assets, item_formats) -> bool:
+    def __supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets, item_formats) -> bool:
         return extra_params.get("enrichments", []) and set(extra_params.get("enrichments", [])).issubset(set(supported_assets)) and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() in item_formats
 
     @staticmethod
