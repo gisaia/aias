@@ -26,33 +26,32 @@ class Driver(EnrichDriver):
         if configuration:
             Driver.configuration = configuration
         supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
-        Driver.configuration['asset_name_as_source_for_cog_generation'] = Driver.configuration.get('asset_name_as_source_for_cog_generation', Role.data.value)
-        Driver.configuration['cog_overview_max_resolution_m'] = Driver.configuration.get('cog_overview_max_resolution_m', 500)
-        Driver.configuration['cog_overview_downscale_factor'] = Driver.configuration.get('cog_overview_downscale_factor', 10)
-        Driver.configuration['cog_max_resolution_m'] = Driver.configuration.get('cog_max_resolution_m', -1)
-        Driver.configuration['cog_downscale_factor'] = Driver.configuration.get('cog_downscale_factor', 10)
+        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', 2000)
+        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', 10000)
+
+    def has_mime_type(self, mime_type: str, mime_types: list[str]) -> bool:
+        return next((True for mt in mime_types if mime_type.lower().find(mt.lower()) != -1), False)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
         if self.supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES):
-            asset_source = resource.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation'])
-            if asset_source is not None and asset_source.href is not None and asset_source.type in [MimeType.TIFF.value, MimeType.COG.value, MimeType.JPEG2000.value]:
-                return True
+            asset_source = resource.assets.get(Role.data.value)
+            if asset_source is not None and asset_source.href:
+                if self.has_mime_type(asset_source.type, [MimeType.TIFF.value, MimeType.COG.value]) or asset_source.asset_format in [AssetFormat.cog.value, AssetFormat.geotiff.value]:
+                    return True
         return False
 
     # Implements drivers method
     def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
-        data_asset = item.assets.get(Driver.configuration['asset_name_as_source_for_cog_generation'])
+        data_asset = item.assets.get(Role.data.value)
         if not data_asset or not data_asset.href:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
 
         source = data_asset.href
-        target = self.get_asset_filepath(item.id, enrichment)
-        max_resolution_m = Driver.configuration['cog_max_resolution_m']
-        downscale_factor = Driver.configuration['cog_downscale_factor']
+        target = self.get_target_asset_filepath(item.id, enrichment)
+        cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
         if enrichment == AssetFormat.overview_cog.value.lower():
-            max_resolution_m = Driver.configuration['cog_overview_max_resolution_m']
-            downscale_factor = Driver.configuration['cog_overview_downscale_factor']
+            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
-        helper_build_cog(source, target, params={}, downscale_factor=downscale_factor, max_resolution_m=max_resolution_m)
+        helper_build_cog(source, target, max_px_width_or_height=cog_max_width_or_height)
         return [helper_create_asset_from_location(item, enrichment, target)]

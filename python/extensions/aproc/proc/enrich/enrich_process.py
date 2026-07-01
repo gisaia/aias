@@ -103,6 +103,7 @@ class AprocProcess(Process):
             collection: str = request.get("collection")
             item_id: str = request.get("item_id")
             item: Item = AprocProcess.__get_item_from_airs__(collection=collection, item_id=item_id)
+            enrichments = [e.lower() for e in enrichments]
             if item is None:
                 error_msg = "{}/{} not found".format(collection, item_id)
                 LOGGER.error(error_msg)
@@ -114,7 +115,7 @@ class AprocProcess(Process):
             driver: EnrichDriver = DriverManager.solve(summary.id, item, include_drivers=include_drivers, exclude_drivers=exclude_drivers, extra_params=extra_params)
             if driver is not None:
                 try:
-                    LOGGER.debug("ingestion: 1 - enrichment will be done by {}".format(driver.name))
+                    LOGGER.debug("ingestion: 1 - enrichment of {} will be done by {}".format(item_id, driver.name))
                     Process.update_task_status(LOGGER, self, state='PROGRESS', meta={"ACTION": "ENRICH", "TARGET": item_id})
                     LOGGER.info("Build asset {}".format(enrichments))
                     start = time()
@@ -126,12 +127,11 @@ class AprocProcess(Process):
                     LOGGER.info("Enrichment success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "success", EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
 
                     LOGGER.debug("ingestion: 2 - upload asset if needed")
+                    if item.properties.keywords is None:
+                        item.properties.keywords = []
                     for asset in assets:
                         item.assets[asset.name] = asset
-                        if item.properties.keywords is None:
-                            item.properties.keywords = []
-                        for enrichment in enrichments:
-                            item.properties.keywords.append("has_{}".format(enrichment))
+                        item.properties.keywords.append("has_{}".format(asset.name))
 
                         Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                         start = time()

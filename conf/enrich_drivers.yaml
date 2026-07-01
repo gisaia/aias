@@ -4,16 +4,24 @@ drivers:
     class_name: extensions.aproc.proc.enrich.drivers.impl.geotiff_cog
     assets_dir: /tmp/aproc/geotiff_cog
     configuration:
+      cog_max_width_or_height: 500
+      cog_overview_max_width_or_height: 200
     priority: 1
-  # -
-  #   name: sentinel2
-  #   class_name: extensions.aproc.proc.enrich.drivers.impl.s2_cog
-  #   assets_dir: /tmp/aproc/s2_cog
-  #   configuration:
-  #   priority: 2
-  # -
-  #   name: landsat
-  #   class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
-  #   assets_dir: /tmp/aproc/landsat_cog
-  #   configuration:
-  #   priority: 3
+  -
+    name: sentinel2
+    class_name: extensions.aproc.proc.enrich.drivers.impl.s2_cog
+    assets_dir: /tmp/aproc/s2_cog
+    configuration:
+      cog_max_width_or_height: 500
+      cog_overview_max_width_or_height: 200
+      all_bands_cog_max_width_or_height: 300
+    priority: 2
+  -
+    name: landsat
+    class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
+    assets_dir: /tmp/aproc/landsat_cog
+    configuration:
+      cog_max_width_or_height: 500
+      cog_overview_max_width_or_height: 200
+      all_bands_cog_max_width_or_height: 300
+    priority: 3

@@ -47,7 +47,7 @@ class IngestDriver(AbstractDriver):
         AccessManager.makedir(assets_dir)
         return assets_dir
 
-    def get_asset_filepath(self, url: str, asset_name: str) -> str:
+    def get_target_asset_filepath(self, url: str, asset_name: str) -> str:
         """Provides the name of the file for storing the asset
 
         Args:

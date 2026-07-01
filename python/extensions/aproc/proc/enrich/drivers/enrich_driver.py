@@ -14,8 +14,8 @@ class EnrichDriver(AbstractDriver):
         self.thumbnail_size = 256
         self.overview_size = 1024
 
-    def supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets) -> bool:
-        return extra_params.get("enrichments", []) and set(extra_params.get("enrichments", [])).issubset(set(supported_assets))
+    def supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets: list[str]) -> bool:
+        return extra_params.get("enrichments", []) and set([e.lower() for e in extra_params.get("enrichments", [])]).issubset(set(supported_assets))
 
     @staticmethod
     def init(configuration: dict) -> None:
@@ -37,7 +37,7 @@ class EnrichDriver(AbstractDriver):
         AccessManager.makedir(assets_dir)
         return assets_dir
 
-    def get_asset_filepath(self, url: str, asset_name: str) -> str:
+    def get_target_asset_filepath(self, url: str, asset_name: str) -> str:
         """Provides the name of the file for storing the asset
 
         Args:
@@ -51,8 +51,6 @@ class EnrichDriver(AbstractDriver):
         return os.path.sep.join([assets_dir, asset_name])
 
     def get_asset_href(self, item: Item) -> str | None:
-        if self.alternative_asset_href_field:
-            return item.properties[self.alternative_asset_href_field]
         data = item.assets.get(Role.data.value)
         return data.href if data else None
 
@@ -72,6 +70,6 @@ class EnrichDriver(AbstractDriver):
     def create_enrichments(self, item: Item, enrichments: list[str]) -> list[Asset]:
         assets = []
         for enrichment in enrichments:
-            self.LOGGER.info("adding {} to item {}".format(enrichment, item.id))
+            self.LOGGER.info("creating {} for item {}".format(enrichment, item.id))
             assets.extend(self.create_enrichement(item, enrichment))
         return assets
