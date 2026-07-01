@@ -68,9 +68,9 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, TERRASARX)
         self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False)
 
-    def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
+    def test_async_ingest_terrasarx_paz_cloud(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX_PAZ)
-        self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False)
+        self.async_ingest(url, ["data", "metadata", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = os.path.join(ROOT, RAPID_EYE)

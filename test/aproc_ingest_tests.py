@@ -76,11 +76,13 @@ class IngestTests(AprocTests):
     def wait_for(self, status: StatusInfo) -> StatusInfo:
         i: int = 0
         s = status
+        print(f"Waiting for job {s.jobID} status {s.status}", flush=True, end="")
         while s.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
-            print(f"Waiting for job {s.jobID} status {s.status}...", flush=True)
             sleep(1)
+            print(".", flush=True, end="")
             i = i + 1
             s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
+        print("", flush=True)
         return s
 
     def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
