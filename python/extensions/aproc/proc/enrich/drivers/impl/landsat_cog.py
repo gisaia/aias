@@ -56,7 +56,6 @@ class Driver(EnrichDriver):
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
             band_files = [storage.gdal_transform_href_vsi(item.assets.get(a.value).href) for a in [Role.red_band, Role.green_band, Role.blue_band]]        
         elif enrichment.lower() == AssetFormat.all_bands_cog.value.lower():
-            # TODO : list bands
             cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
             # Assets describing a band (it has eo__bands) is used in the all_bands_cog.
             bands = [b for b in item.assets.values() if b.eo__bands ]
