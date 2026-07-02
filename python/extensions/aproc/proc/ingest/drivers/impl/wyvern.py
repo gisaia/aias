@@ -237,7 +237,5 @@ class Driver(IngestDriver):
                     elif file.name.endswith(".json"):
                         self.md_path = file.path
             return self.tif_path is not None \
-                and self.md_path is not None \
-                and self.quicklook_path is not None \
-                and self.thumbnail_path is not None
+                and self.md_path is not None 
         return False
