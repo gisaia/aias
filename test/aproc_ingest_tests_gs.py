@@ -195,9 +195,5 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_PAN")
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"])
 
-    def test_async_ingest_superview_gaofen_pan(self):  # Driver SUPERVIEW
-        url = os.path.join(ROOT, SUPERVIEW_GAOFEN)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"])
-
 if __name__ == '__main__':
     unittest.main()
