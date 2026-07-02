@@ -19,6 +19,7 @@ class Driver(IngestDriver):
         self.quicklook_path = None
         self.thumbnail_path = None
         self.data_mask_path = None
+        self.quality_mask_path = None
 
     # Implements drivers method
     @staticmethod
@@ -62,50 +63,25 @@ class Driver(IngestDriver):
                 bands.append(Band(**kwargs))
             return bands
 
-        def get_bands(asset_name, include_solar=True):
-            """
-            Extract bands from metadata for a given asset name.
-            Raises DriverException if a key is missing.
-            """
-            try:
-                md_assets = md.get('assets', {})
-                asset = md_assets.get(asset_name, {})
-                bands = asset.get('eo:bands', [])
-                return make_bands(bands, include_solar)
-            except KeyError as ke:
-                raise DriverException(f"Invalid metadata file {self.md_path}: missing key {ke.args[0]}")
-
         # Extract bands for each asset type
-        cog_eo_bands = get_bands('Cloud optimized GeoTiff', include_solar=True)
-        ov_eo_bands = get_bands('Overview image', include_solar=False)
-        th_eo_bands = get_bands('Thumbnail image', include_solar=False)
-
-        def add_asset(path, role, mime, fmt, resource_type, bands, managed):
-            """
-            Add an Asset object to the assets list.
-            """
-            assets.append(Asset(
-                href=path,
-                size=AccessManager.get_size(path),
-                roles=[role.value],
-                name=role.value,
-                type=mime.value,
-                description=role.value,
-                airs__managed=managed,
-                asset_format=fmt.value,
-                asset_type=resource_type.value,
-                eo__bands=bands
-            ))
+        cog_eo_bands = make_bands(md.get('assets', {}).get('Cloud optimized GeoTiff', {}).get('eo:bands', []), include_solar=True)
+        ov_eo_bands = make_bands(md.get('assets', {}).get('Overview image', {}).get('eo:bands', []), include_solar=False)
+        th_eo_bands = make_bands(md.get('assets', {}).get('Thumbnail image', {}).get('eo:bands', []), include_solar=False)
 
         # Add cog, overview and thumbnail assets
-        add_asset(self.tif_path, Role.data, MimeType.COG, AssetFormat.cog, ResourceType.gridded, cog_eo_bands, managed=False)
-        add_asset(self.quicklook_path, Role.overview, MimeType.PNG, AssetFormat.png, ResourceType.gridded, ov_eo_bands, managed=True)
-        add_asset(self.thumbnail_path, Role.thumbnail, MimeType.PNG, AssetFormat.png, ResourceType.gridded, th_eo_bands, managed=True)
-
+        ImageDriverHelper.add_asset(assets, href=self.tif_path, role=Role.data, type=MimeType.COG, asset_format=AssetFormat.cog, asset_type=ResourceType.gridded, eo_bands=cog_eo_bands, airs__managed=False)
         # Add metadata JSON asset
-        ImageDriverHelper.add_asset(
-            assets, self.md_path, Role.metadata, MimeType.JSON, AssetFormat.json, ResourceType.other
-        )
+        ImageDriverHelper.add_asset(assets, href=self.md_path, role=Role.metadata, type=MimeType.JSON, asset_format=AssetFormat.json, asset_type=ResourceType.other)
+
+        if self.quicklook_path:
+            ImageDriverHelper.add_asset(assets, href=self.quicklook_path, role=Role.overview, type=MimeType.PNG, asset_format=AssetFormat.png, asset_type=ResourceType.gridded, eo_bands=ov_eo_bands, airs__managed=True)
+        if self.thumbnail_path:
+            ImageDriverHelper.add_asset(assets, href=self.thumbnail_path, role=Role.thumbnail, type=MimeType.PNG, asset_format=AssetFormat.png, asset_type=ResourceType.gridded, eo_bands=th_eo_bands, airs__managed=True)
+
+        if self.quality_mask_path:
+            ImageDriverHelper.add_asset(assets, href=self.quality_mask_path, role=Role.quality_mask, type=MimeType.TIFF, asset_format=AssetFormat.geotiff, asset_type=ResourceType.gridded)
+        if self.data_mask_path:
+            ImageDriverHelper.add_asset(assets, href=self.data_mask_path, role=Role.data_mask, type=MimeType.TIFF, asset_format=AssetFormat.geotiff, asset_type=ResourceType.gridded)
 
         return assets
 
@@ -252,13 +228,14 @@ class Driver(IngestDriver):
                         self.quicklook_path = file.path
                     elif file.name.endswith("_thumbnail.png"):
                         self.thumbnail_path = file.path
+                    elif file.name.endswith("_pixel_quality_mask.tiff"):
+                        self.quality_mask_path = file.path
+                    elif file.name.endswith("_mask.tiff"):
+                        Driver.LOGGER.warning(f"Found mask file {file.path} but not registered as asset")
                     elif file.name.endswith((".tif", ".tiff")):
                         self.tif_path = file.path
                     elif file.name.endswith(".json"):
                         self.md_path = file.path
             return self.tif_path is not None \
-                and self.md_path is not None \
-                and self.quicklook_path is not None \
-                and self.thumbnail_path is not None \
-                and self.data_mask_path is not None
+                and self.md_path is not None 
         return False
