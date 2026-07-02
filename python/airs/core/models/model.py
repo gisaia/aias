@@ -226,6 +226,7 @@ class Role(Enum):
     covmat = "covmat"
     data = "data"
     data_mask = "data-mask"
+    quality_mask = "quality-mask"
     datacube = "datacube"
     date = "date"
     date_offset = "date-offset"
