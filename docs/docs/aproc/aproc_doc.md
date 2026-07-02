@@ -35,14 +35,31 @@ A driver must implement the abstract class [Driver](https://github.com/gisaia/ai
 
 The following drivers are available in the `extensions` directory:
 
-- ast_dem
+- ast
+- axelspace
+- bsg
+- capella
+- cosmoskymed
 - digitalglobe
 - dimap
 - geoeye
+- geosat
+- iceye
+- jpeg2000
+- landsat
+- opencosmos
+- radarsat_2
 - rapideye
+- satellogic
+- sentinel_1
+- sentinel_2
+- skysat
 - spot5
+- superview
 - terrasarx
-- geotif and jpeg2000
+- tiff
+- umbra
+- wyvern
 
 The drivers are configured in [drivers.yaml](https://github.com/gisaia/aias/blob/develop/conf/drivers.yaml){:target="_blank"}
 
@@ -55,9 +72,32 @@ The `enrich` process takes a list of tuple collection/item id. The process runs 
 - update the item
 
 A driver must implement the abstract class [Driver](https://github.com/gisaia/aias/blob/develop/extensions/aproc/proc/enrich/drivers/enrich_driver.py){:target="_blank"}.
+
 The following drivers are available in the `extensions` directory:
 
-- `safe` for sentinel 2 products
+- `s2` for sentinel 2 archives
+- `geotiff` for archives having a geotiff `data` asset
+- `landsat` archives
+
+for generating three types of cogs:
+- `cog` as a full resolution cog of the product:
+   - if `asset.data` is a geotiff: all bands of the geotiff are included in the cog
+   - if one file per band, then the cog contains the three visible bands (R/G/B)
+- `overview_cog`: same as `cog` but with limited image size
+- for one file per band, a `all_bands_cog` is created with all archive the bands
+
+Note: it is possible to configure the maximum resolution of each type in the driver configuration file. Use `-1` to disable maximum resolution. Example:
+```yaml
+  -
+    name: landsat
+    class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
+    ...
+    configuration:
+      cog_max_width_or_height: -1
+      cog_overview_max_width_or_height: 2000
+      all_bands_cog_max_width_or_height: 10000
+    ...
+```
 
 The drivers are configured in [enrich_drivers.yaml](https://github.com/gisaia/aias/blob/develop/conf/enrich_drivers.yaml){:target="_blank"}
 
