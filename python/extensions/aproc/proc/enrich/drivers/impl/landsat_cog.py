@@ -47,7 +47,7 @@ class Driver(EnrichDriver):
         return False
 
     # Implements drivers method
-    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
+    def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         storage: AnyStorage = AccessManager.resolve_storage(item.assets.get(Role.red_band.value).href)
         if enrichment.lower() == AssetFormat.cog.value.lower():
             cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']

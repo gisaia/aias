@@ -4,11 +4,10 @@ RUN pip3 install --no-cache-dir --upgrade pip setuptools
 RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl gcc python3-dev musl-dev linux-headers
 
-# 1. Installation des dépendances système nécessaires à l'exécution et à la compilation
+# Fetch dependencies for gdal
 RUN apk add --no-cache \
     gdal \
     gdal-dev \
-    # Dépendances requises pour compiler l'extension C++ (supprimées après coup pour alléger l'image)
     && apk add --no-cache --virtual .build-deps \
     gcc \
     g++ \
@@ -16,10 +15,8 @@ RUN apk add --no-cache \
     python3-dev \
     && pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# 2. Installation de GDAL via pip (aligné précisément sur la version système)
 RUN pip install gdal==3.13.0
 
-# 3. Nettoyage des paquets de compilation devenus inutiles
 RUN apk del .build-deps
 
 

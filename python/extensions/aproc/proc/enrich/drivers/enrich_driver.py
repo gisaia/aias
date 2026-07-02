@@ -55,7 +55,7 @@ class EnrichDriver(AbstractDriver):
         return data.href if data else None
 
     @abstractmethod
-    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
+    def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         """Create the assets metadata (Asset) and data (file) for a given item
 
         Args:
@@ -71,5 +71,5 @@ class EnrichDriver(AbstractDriver):
         assets = []
         for enrichment in enrichments:
             self.LOGGER.info("creating {} for item {}".format(enrichment, item.id))
-            assets.extend(self.create_enrichement(item, enrichment))
+            assets.extend(self.create_enrichment(item, enrichment))
         return assets

@@ -42,7 +42,7 @@ class Driver(EnrichDriver):
         return False
 
     # Implements drivers method
-    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
+    def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         data_asset = item.assets.get(Role.data.value)
         if not data_asset or not data_asset.href:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))

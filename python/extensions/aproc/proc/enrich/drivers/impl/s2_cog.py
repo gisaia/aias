@@ -55,7 +55,7 @@ class Driver(EnrichDriver):
         return False
 
     # Implements drivers method
-    def create_enrichement(self, item: Item, enrichment: str) -> list[Asset]:
+    def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         if enrichment.lower() == AssetFormat.cog.value.lower() or enrichment.lower() == AssetFormat.overview_cog.value.lower():
             return [self.__create_TCI_asset(item, enrichment)]
         elif enrichment.lower() == AssetFormat.all_bands_cog.value.lower():
