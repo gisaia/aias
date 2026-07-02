@@ -1,4 +1,4 @@
-FROM ghcr.io/osgeo/gdal:ubuntu-full-3.12.3
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.1
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
@@ -12,7 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update --no-install-recommends \
-    && apt-get install -y python3.12-dev python3.12-venv \
+    && apt-get install -y python3.14-dev python3.14-venv \
     && apt-get install -y g++ make  \
     && apt-get install -y libtiff-dev imagemagick  \
     && apt-get install -y libhdf5-dev libhdf5-serial-dev netcdf-bin libnetcdf-dev linux-libc-dev \
