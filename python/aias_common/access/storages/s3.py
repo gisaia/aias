@@ -122,7 +122,6 @@ class S3Storage(AbstractStorage):
 
     def pull(self, href: str, dst: str):
         import botocore.client
-        print("Downloading from %s to %s", href, dst)
         client: botocore.client.BaseClient = self.get_storage_parameters()["client"]
         path = self.__get_href_key(href)
 
@@ -141,7 +140,7 @@ class S3Storage(AbstractStorage):
                         prefix_to_remove = self.__get_href_key(href).removesuffix("/") + "/"
                         local_file_path = os.path.join(dst, obj['Key'].removeprefix(prefix_to_remove))
 
-                    print("Downloading S3 object %s to local file %s", obj['Key'], local_file_path)
+                    LOGGER.debug("Downloading S3 object %s to local file %s", obj['Key'], local_file_path)
                     # Create local directory structure
                     if os.path.dirname(local_file_path):
                         os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
