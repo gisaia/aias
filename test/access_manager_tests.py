@@ -19,6 +19,7 @@ MINIO_HOST = "minio"
 S3_RO_DIR_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/spot6/"
 S3_RO_DIR_NO_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/ast"
 S3_RO_FILE = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
+S3_RO_FILE2 = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tif"
 S3_RO_SMALL_DIR = "https://storage.googleapis.com/gisaia-public/test-aias/spot6/PROD_SPOT6_001/LIBRARY"
 S3_RO_DIR = "http://" + MINIO_HOST + ":9000/downloads/readonly/"
 S3_RW_DIR = "http://" + MINIO_HOST + ":9000/downloads/readwrite/"
@@ -173,7 +174,7 @@ NOT_EXISTS = [
 
 CAN_PULL = [
     GS_RO_FILE,
-    S3_RO_FILE,
+    S3_RO_FILE2,
     HTTPS_RO_FILE,
     #    GS_RO_SMALL_DIR, // todo fix pull of directories for gs. See issue #366
     S3_RO_SMALL_DIR
