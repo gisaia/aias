@@ -19,6 +19,10 @@ from aproc.core.models.ogc import Execute
 from extensions.aproc.proc.enrich.enrich_process import InputEnrichProcess
 from test.aproc_ingest_tests_gs import ROOT, Tests as IngestionTests
 
+COG_MAX_SIZE = 500
+COG_OVERVIEW_MAX_SIZE = 200
+COG_ALL_BANDS_MAX_SIZE = 300
+
 class Tests(AprocTests):
 
     def enrich_with(self, id: str, enrichments: list[str]) -> Item:
@@ -49,6 +53,10 @@ class Tests(AprocTests):
             src_height = ds.RasterYSize
             self.assertLessEqual(src_width, max_size, f"{asset_type} width less than {max_size}")
             self.assertLessEqual(src_height, max_size, f"{asset_type} height less than {max_size}")
+            self.assertGreater(src_width, 0, f"{asset_type} width greater than 0")
+            self.assertGreater(src_height, 0, f"{asset_type} height greater than 0")
+            self.assertIsNotNone(src_width, f"{asset_type} width is not None")
+            self.assertIsNotNone(src_height, f"{asset_type} height is not None")
         info = gdal.Info(item.assets.get(asset_type).href, options=gdal.InfoOptions(format="json"))
         self.assertEqual(info.get("metadata").get("IMAGE_STRUCTURE", {}).get("LAYOUT", None), "COG", "layout is COG")
 
@@ -56,15 +64,15 @@ class Tests(AprocTests):
     def test_enrich_s2_cog_from_zip(self):
         add_item(self, SENTINEL_2_ZIP_ITEM, SENTINEL_2_ZIP_ID)
         i = self.enrich_with(SENTINEL_2_ZIP_ID, [AssetFormat.overview_cog.value, AssetFormat.cog.value])
-        self.check_cog(i, AssetFormat.cog.value.lower(), 500)
-        self.check_cog(i, AssetFormat.overview_cog.value.lower(), 200)
+        self.check_cog(i, AssetFormat.cog.value.lower(), COG_MAX_SIZE)
+        self.check_cog(i, AssetFormat.overview_cog.value.lower(), COG_OVERVIEW_MAX_SIZE)
 
     def test_enrich_s2_cog_from_folder(self):
         add_item(self, SENTINEL_2_ITEM, SENTINEL_2_ID)
         i: Item = self.enrich_with(SENTINEL_2_ID, [AssetFormat.overview_cog.value, AssetFormat.cog.value, AssetFormat.all_bands_cog.value])
-        self.check_cog(i, AssetFormat.cog.value.lower(), 500)
-        self.check_cog(i, AssetFormat.overview_cog.value.lower(), 200)
-        self.check_cog(i, AssetFormat.all_bands_cog.value.lower(), 300)
+        self.check_cog(i, AssetFormat.cog.value.lower(), COG_MAX_SIZE)
+        self.check_cog(i, AssetFormat.overview_cog.value.lower(), COG_OVERVIEW_MAX_SIZE)
+        self.check_cog(i, AssetFormat.all_bands_cog.value.lower(), COG_ALL_BANDS_MAX_SIZE)
 
     def enrich_archive_cog(self, url, enrichments: list[str] = [AssetFormat.cog.value, AssetFormat.overview_cog.value]):
         r = IngestionTests().ingest_no_wait(url, COLLECTION, CATALOG)
@@ -73,14 +81,14 @@ class Tests(AprocTests):
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         i = mapper.item_from_json(requests.get(result["item_location"]).content)
         i = self.enrich_with(i.id, enrichments)
-        self.check_cog(i, AssetFormat.cog.value.lower(), 500)
-        self.check_cog(i, AssetFormat.overview_cog.value.lower(), 200)
+        self.check_cog(i, AssetFormat.cog.value.lower(), COG_MAX_SIZE)
+        self.check_cog(i, AssetFormat.overview_cog.value.lower(), COG_OVERVIEW_MAX_SIZE)
         return i
 
     def test_enrich_landsat9_cog(self):
         url = os.path.join(ROOT, LANDSAT9)
         i = self.enrich_archive_cog(url, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
-        self.check_cog(i, AssetFormat.all_bands_cog.value.lower(), 300)
+        self.check_cog(i, AssetFormat.all_bands_cog.value.lower(), COG_ALL_BANDS_MAX_SIZE)
 
     def test_enrich_ast_cog(self):
         url = os.path.join(ROOT, AST)

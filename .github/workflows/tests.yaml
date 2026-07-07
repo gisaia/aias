@@ -27,34 +27,24 @@ on:
         default: false
         type: boolean
 
-      run_aias_g1:
-        description: 'Run AIAS G1 tests (Download)?'
+      run_aias_download:
+        description: 'Run AIAS Downloads tests?'
         required: true
         default: false
         type: boolean
 
-      run_aias_g2:
-        description: 'Run AIAS G2 tests (AIRS+agate+fam)?'
+      run_aias_airs_agate_fam:
+        description: 'Run AIAS AIRS+agate+fam tests?'
         required: true
         default: false
         type: boolean
-      run_aias_g3:
-        description: 'Run AIAS G3 tests (Enrich+Dc3Build)?'
+      run_aias_dc3:
+        description: 'Run AIAS DC3 tests?'
         required: true
         default: false
         type: boolean
-      run_aias_g4_fs:
-        description: 'Run AIAS G4 FS tests (Ingest)?'
-        required: true
-        default: false
-        type: boolean
-      run_aias_g4_gs:
-        description: 'Run AIAS G4 GS tests (Ingest all drivers)?'
-        required: true
-        default: false
-        type: boolean
-      run_aias_g4_minio:
-        description: 'Run AIAS G4 Minio tests (Ingest)?'
+      run_aias_ingest:
+        description: 'Run AIAS Ingest tests?'
         required: true
         default: false
         type: boolean
@@ -80,12 +70,12 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack
       run: test/start_stack.sh
-    - name: Run g1 tests
+    - name: Run am tests
       run: test/tests_am.sh
 
 
-  aias-tests-g1:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g1 || inputs.run_all))
+  aias-tests-downloads:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_download || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -97,8 +87,8 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack
       run: test/start_stack.sh
-    - name: Run g1 tests
-      run: test/tests_g1.sh
+    - name: Run downloads tests
+      run: test/tests_downloads.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
@@ -109,8 +99,8 @@ jobs:
       run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
       if: always()
       
-  aias-tests-g2:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g2 || inputs.run_all))
+  aias-tests-airs-agate-fam:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_airs_agate_fam || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -125,8 +115,8 @@ jobs:
     - name: Logs dockers aproc-service
       run: test/logs.sh arlas-server
       if: always()
-    - name: Run g2 tests
-      run: test/tests_g2.sh
+    - name: Run airs, agate and fam tests
+      run: test/tests_airs_agate_fam.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
@@ -138,8 +128,8 @@ jobs:
       if: always()
 
 
-  aias-tests-g3:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g3 || inputs.run_all))
+  aias-tests-dc3:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_dc3 || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -151,8 +141,8 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack
       run: test/start_stack.sh
-    - name: Run g3 tests
-      run: test/tests_g3.sh
+    - name: Run dc3 tests
+      run: test/tests_dc3.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
@@ -164,8 +154,8 @@ jobs:
       if: always()
   
 
-  aias-tests-g4-fs:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_fs || inputs.run_all))
+  aias-tests-ingest-fs:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_fs || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -177,8 +167,8 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack fs
       run: test/start_stack.sh
-    - name: Run g4 tests fs
-      run: test/tests_g4_fs.sh
+    - name: Run ingest tests on file system
+      run: test/tests_ingest_fs.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
@@ -190,8 +180,8 @@ jobs:
       if: always()
   
 
-  aias-tests-g4-gs:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_gs || inputs.run_all))
+  aias-tests-ingest-gs:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_gs || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -203,8 +193,8 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack gs
       run: test/start_stack.sh gs
-    - name: Run g4 tests gs
-      run: test/tests_g4_gs.sh
+    - name: Run ingest tests on google storage
+      run: test/tests_ingest_gs.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
@@ -215,8 +205,8 @@ jobs:
       run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
       if: always()
   
-  aias-tests-g4-minio:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_g4_minio || inputs.run_all))
+  aias-tests-ingest-minio:
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_minio || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -228,8 +218,8 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack minio
       run: test/start_stack.sh minio
-    - name: Run g4 tests minio
-      run: test/tests_g4_minio.sh
+    - name: Run ingest tests on minio
+      run: test/tests_ingest_minio.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()

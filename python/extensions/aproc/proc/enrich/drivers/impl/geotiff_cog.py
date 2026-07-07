@@ -7,6 +7,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aias_common.access.manager import AccessManager, AnyStorage
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
+from extensions.aproc.proc.enrich.drivers.impl.cog_constants import COG_MAX_WIDTH_OR_HEIGHT, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT
 from extensions.aproc.proc.utils.cog_helper import helper_build_cog, helper_create_asset_from_location
 from extensions.aproc.proc.enrich.enrich_process import supported_assets_for_enrichment
 
@@ -26,11 +27,11 @@ class Driver(EnrichDriver):
         if configuration:
             Driver.configuration = configuration
         supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
-        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', 2000)
-        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', 10000)
+        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
+        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
 
     def has_mime_type(self, mime_type: str, mime_types: list[str]) -> bool:
-        return next((True for mt in mime_types if mime_type.lower().find(mt.lower()) != -1), False)
+        return any(s.lower() == mime_type.lower() for s in mime_types)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:

@@ -82,11 +82,11 @@ The following drivers are available in the `extensions` directory:
 for generating three types of cogs:
 - `cog` as a full resolution cog of the product:
    - if `asset.data` is a geotiff: all bands of the geotiff are included in the cog
-   - if one file per band, then the cog contains the three visible bands (R/G/B)
+   - if the archive has one raster file (jpeg2000 or tiff) per band, then the cog contains the three visible bands (R/G/B)
 - `overview_cog`: same as `cog` but with limited image size
 - for one file per band, a `all_bands_cog` is created with all archive the bands
 
-Note: it is possible to configure the maximum resolution of each type in the driver configuration file. Use `-1` to disable maximum resolution. Example:
+Note: it is possible to configure the maximum number of pixels in width/height for each cog type in the driver configuration file. Use `-1` to disable maximum resolution. Example:
 ```yaml
   -
     name: landsat

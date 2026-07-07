@@ -9,7 +9,7 @@ def helper_create_asset_from_location(item: Item, asset_type: str, asset_locatio
     asset = Asset(
         name=asset_type,
         size=AccessManager.get_size(asset_location),     # set once asset created
-        href=asset_location,  # set below
+        href=asset_location,
         asset_type=resource_type,
         asset_format=asset_format,
         roles=[asset_type],
@@ -23,6 +23,14 @@ def helper_create_asset_from_location(item: Item, asset_type: str, asset_locatio
 
 
 def helper_build_cog(source: str, target: str, max_px_width_or_height: int = 2000, options: dict = {}):
+    """ Generate a COG from a source file and store it in the target location. 
+
+    Args:
+        source (str): source file location (can be a local path or a remote URL like VSI)
+        target (str): target file location
+        max_px_width_or_height (int, optional): maximum width or height for the COG.
+        options (dict, optional): additional GDAL options provided to WARP. See osgeo.gdal.WarpOptions in https://gdal.org/en/stable/api/python/utilities.html
+    """
     from osgeo import gdal
     LOGGER = EnrichDriver.LOGGER
     storage: AnyStorage = AccessManager.resolve_storage(source)

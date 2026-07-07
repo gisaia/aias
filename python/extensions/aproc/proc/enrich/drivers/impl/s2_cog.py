@@ -11,6 +11,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
+from extensions.aproc.proc.enrich.drivers.impl.cog_constants import ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT, COG_MAX_WIDTH_OR_HEIGHT, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT
 from extensions.aproc.proc.enrich.enrich_process import supported_assets_for_enrichment
 from extensions.aproc.proc.utils.cog_helper import helper_build_cog
 
@@ -30,9 +31,9 @@ class Driver(EnrichDriver):
         if configuration:
             Driver.configuration = configuration
         supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
-        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', 2000)
-        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', 10000)
-        Driver.configuration['all_bands_cog_max_width_or_height'] = Driver.configuration.get('all_bands_cog_max_width_or_height', 10000)
+        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
+        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
+        Driver.configuration['all_bands_cog_max_width_or_height'] = Driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
 
 
     # Implements drivers method
