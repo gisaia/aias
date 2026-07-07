@@ -6,7 +6,7 @@ from aproc.core.models.ogc.enums import StatusCode
 from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
-                                     TERRASARX, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
+                                     TERRASARX, TERRASARX_PAZ, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
 from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
 
 ROOT = "gs://gisaia-public/test-aias"
@@ -67,6 +67,10 @@ class Tests(IngestTests):
     def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX)
         self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False)
+
+    def test_async_ingest_terrasarx_paz_cloud(self):  # Driver TERRASRX
+        url = os.path.join(ROOT, TERRASARX_PAZ)
+        self.async_ingest(url, ["data", "metadata", "airs_item"], archive=False)
 
     def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = os.path.join(ROOT, RAPID_EYE)

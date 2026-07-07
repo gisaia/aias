@@ -125,7 +125,7 @@ class GoogleStorage(AbstractStorage):
         files = self.__list_blobs(href.removesuffix("/") + "/")
         return len(list(filter(lambda f: f.path.removesuffix("/") != href.removesuffix("/"), files))) > 0
 
-    def get_file_size(self, href: str):
+    def get_file_size(self, href: str) -> int | None:
         return self.__get_blob(href).size
 
     def listdir(self, href: str) -> list[File]:
@@ -160,7 +160,8 @@ class GoogleStorage(AbstractStorage):
         if not self.get_configuration().is_anon_client:
             params["GS_OAUTH2_PRIVATE_KEY"] = self.get_configuration().api_key.private_key
             params["GS_OAUTH2_CLIENT_EMAIL"] = self.get_configuration().api_key.client_email
-
+        else:
+            params["GS_NO_SIGN_REQUEST"] = "YES"
         return params
 
     def gdal_transform_href_vsi(self, href: str) -> str:

@@ -11,11 +11,15 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
+from extensions.aproc.proc.enrich.drivers.impl.cog_constants import ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT, COG_MAX_WIDTH_OR_HEIGHT, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT
+from extensions.aproc.proc.enrich.enrich_process import supported_assets_for_enrichment
+from extensions.aproc.proc.utils.cog_helper import helper_build_cog
 
 
 class Driver(EnrichDriver):
 
-    SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower()]
+    SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower(), AssetFormat.all_bands_cog.value.lower()]
+    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -24,52 +28,73 @@ class Driver(EnrichDriver):
     @staticmethod
     def init(configuration: dict):
         EnrichDriver.init(configuration)
+        if configuration:
+            Driver.configuration = configuration
+        supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
+        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
+        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
+        Driver.configuration['all_bands_cog_max_width_or_height'] = Driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
+
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
-        return extra_params.get("asset_type", "") == "cog" and resource.properties is not None and resource.properties.item_format is not None and resource.properties.item_format.lower() == ItemFormat.safe.value.lower()
+        # Is it able to build the requested enrichment type?
+        if self.supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES):
+            # Is it a SAFE archive?
+            if resource.properties and resource.properties.item_format and resource.properties.item_format.lower() == ItemFormat.safe.value.lower():
+                # Does it have a data asset?
+                if resource.assets.get(Role.data.value) and resource.assets.get(Role.data.value).href:
+                    # If a all band cog is requested, check that the data asset is not a zip (SAFE archive)
+                    if self.supports_format(resource, extra_params, [AssetFormat.all_bands_cog.value.lower()]):
+                        if resource.assets.get(Role.data.value).type != MimeType.ZIP.value:
+                            return True
+                        else:
+                            return False
+                    else:
+                        # no all band cog requested, so we can build the TCI COG from the SAFE archive
+                        return True
+        return False
 
     # Implements drivers method
-    def create_assets(self, item: Item, asset_type: str) -> list[Asset]:
-        if asset_type:
-            if asset_type.lower() in Driver.SUPPORTED_ASSET_TYPES:
-                self.LOGGER.info("adding {} to item {}".format(asset_type, item.id))
-                assets = [self.__create_TCI_asset(item, asset_type)]
-
-                # If the data asset is not zipped, create all bands COG
-                if item.assets.get(Role.data.value).type != MimeType.ZIP.value:
-                    assets.append(self.__create_all_bands_asset(item))
-                return assets
+    def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
+        if enrichment.lower() == AssetFormat.cog.value.lower() or enrichment.lower() == AssetFormat.overview_cog.value.lower():
+            return [self.__create_TCI_asset(item, enrichment)]
+        elif enrichment.lower() == AssetFormat.all_bands_cog.value.lower():
+            # If the data asset is not zipped, create all bands COG
+            if item.assets.get(Role.data.value).type != MimeType.ZIP.value:
+                return [self.__create_all_bands_asset(item)]
             else:
-                raise DriverException("Unsupported asset type {}. Supported types are : {}".format(asset_type, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
+                raise DriverException("Cannot create all bands COG from a zipped SAFE archive. Please provide a SAFE archive with unzipped data assets.")
         else:
-            raise DriverException("Asset type must be provided.")
+            raise DriverException("Unsupported asset type {}. Supported types are : {}".format(enrichment, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
 
-    def __create_TCI_asset(self, item: Item, asset_type: str):
+    def __create_TCI_asset(self, item: Item, enrichment: str):
+        cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
+        if enrichment == AssetFormat.overview_cog.value.lower():
+            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
         asset = Asset(
-            name=Role.cog.value,
+            name=enrichment,
             size=0,     # set once asset created
             href=None,  # set below
             asset_type=ResourceType.gridded.value,
-            asset_format=AssetFormat.geotiff.value,
-            roles=[Role.cog.value],
+            asset_format=AssetFormat.cog.value,
+            roles=[enrichment],
             type=MimeType.TIFF.value,
-            title="{} for {}/{}".format(asset_type, item.collection, item.id),
-            description="{} for {}/{}".format(asset_type, item.collection, item.id),
+            title="{} for {}/{}".format(enrichment, item.collection, item.id),
+            description="{} for {}/{}".format(enrichment, item.collection, item.id),
             proj__epsg=3857,
             airs__managed=True
         )
-        asset_location = self.get_asset_filepath(item.id, asset)
-        asset.href = asset_location
-        self.__build_TCI_COG(item, asset_location)
-        asset.size = AccessManager.get_size(asset_location)
+        target_asset_location = self.get_target_asset_filepath(item.id, asset.name)
+        asset.href = target_asset_location
+        self.__build_TCI_COG(item, target_asset_location, cog_max_width_or_height)
+        asset.size = AccessManager.get_size(target_asset_location)
         return asset
 
-    def __build_TCI_COG(self, item: Item, asset_location: str):
+    def __build_TCI_COG(self, item: Item, target_asset_location: str, cog_max_width_or_height: int):
         href = self.get_asset_href(item)
         if href:
             self.LOGGER.info("Building cog for {}".format(item.id))
-
             from osgeo import gdal
             is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
             if is_asset_zip:
@@ -82,11 +107,7 @@ class Driver(EnrichDriver):
                 AccessManager.pull(href, tci_file_path)
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-            start = time()
-            kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
-            gdal.Warp(asset_location, tci_file_path, **kwargs)
-            self.LOGGER.info("Creating COG took {} s".format(time() - start))
-
+            helper_build_cog(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height)
             os.remove(tci_file_path)  # !DELETE!
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
@@ -133,7 +154,7 @@ class Driver(EnrichDriver):
             size=0,     # set once asset created
             href=None,  # set below
             asset_type=ResourceType.gridded.value,
-            asset_format=AssetFormat.geotiff.value,
+            asset_format=AssetFormat.cog.value,
             roles=[Role.cog.value],
             type=MimeType.TIFF.value,
             title="all bands COG for {}/{}".format(item.collection, item.id),
@@ -141,35 +162,31 @@ class Driver(EnrichDriver):
             proj__epsg=3857,
             airs__managed=True
         )
-        asset_location = self.get_asset_filepath(item.id, asset)
-        asset.href = asset_location
-        self.__build_all_bands_COG(item, asset_location)
-        asset.size = AccessManager.get_size(asset_location)
+        target_asset_location = self.get_target_asset_filepath(item.id, asset.name)
+        asset.href = target_asset_location
+        self.__build_all_bands_COG(item, target_asset_location)
+        asset.size = AccessManager.get_size(target_asset_location)
 
         return asset
 
-    def __build_all_bands_COG(self, item: Item, asset_location: str):
-        secondary_data_assets = list(filter(lambda a: Role.data.value in a.roles and a.name != Role.data.value, item.assets.values()))
-        secondary_data_href = [a.href for a in secondary_data_assets]
+    def __build_all_bands_COG(self, item: Item, target_asset_location: str):
+        band_assets = list(filter(lambda a: Role.data.value in a.roles and a.name != Role.data.value, item.assets.values()))
+        band_files = [a.href for a in band_assets]
 
-        if secondary_data_href:
-            secondary_data_href.sort()
-            self.LOGGER.info("Building all bands cog for {}".format(item.id))
-            vrt_file = tempfile.NamedTemporaryFile("w+", suffix=".zip", delete=False).name
+        if band_files:
+            band_files.sort()
+            self.LOGGER.info("Building all bands cog for {} made of {}".format(item.id, ", ".join(band_files)))
+            source_files_vrt = tempfile.NamedTemporaryFile("w+", suffix=".files", delete=False).name
 
             from osgeo import gdal
-            with AccessManager.make_local_list(secondary_data_href) as local_assets:
-                start = time()
+            with AccessManager.make_local_list(band_files) as local_assets:
 
                 # Build VRT to facilitate COG built
                 kwargs = {"separate": True, "resolution": "highest"}
-                gdal.BuildVRT(vrt_file, local_assets, **kwargs)
+                gdal.BuildVRT(source_files_vrt, local_assets, **kwargs)
+                all_bands_cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
+                helper_build_cog(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
 
-                # Build COG from VRT
-                kwargs = {'format': 'COG', 'dstSRS': 'EPSG:3857'}
-                gdal.Warp(asset_location, vrt_file, **kwargs)
-                self.LOGGER.info("Creating all bands COG took {} s".format(time() - start))
-
-            AccessManager.clean(vrt_file)  # !DELETE!
+            AccessManager.clean(source_files_vrt)  # !DELETE!
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))

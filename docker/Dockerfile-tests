@@ -4,6 +4,22 @@ RUN pip3 install --no-cache-dir --upgrade pip setuptools
 RUN apk update && apk add --upgrade libexpat
 RUN apk --no-cache add curl gcc python3-dev musl-dev linux-headers
 
+# Fetch dependencies for gdal
+RUN apk add --no-cache \
+    gdal \
+    gdal-dev \
+    && apk add --no-cache --virtual .build-deps \
+    gcc \
+    g++ \
+    musl-dev \
+    python3-dev \
+    && pip install --no-cache-dir --upgrade pip setuptools wheel
+
+RUN pip install gdal==3.13.0
+
+RUN apk del .build-deps
+
+
 COPY ./test/requirements.tests.txt /app/
 COPY ./python/aias_common/requirements.aias_common.txt /app/
 

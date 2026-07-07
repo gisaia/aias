@@ -39,6 +39,7 @@ SPOT5 = "spot5/"
 PNEOMS = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_MS-FS/"
 PNEOPAN = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_PAN/"
 TERRASARX = "terrasarx/TDX1_SAR__MGD_SE___HS_S_SRA_20210824T165400_20210824T165401/"
+TERRASARX_PAZ = "terrasarx/PAZ/PAZ1_SAR__EEC_RE___HS_S_SRA_20230708T052526_20230708T052527"
 TIF = "images/cog.tiff"
 WORLDVIEW = "digitalglobe/WorldView_3_sample_infrared_data_View_ready_2A_infrared/"
 WYVERN = "wyvern/f3aa9cc0-3622-4711-a729-41e573a316f3/wyvern_dragonette-001_20250101T072826_f3aa9cc0/"
@@ -75,11 +76,13 @@ class IngestTests(AprocTests):
     def wait_for(self, status: StatusInfo) -> StatusInfo:
         i: int = 0
         s = status
+        print(f"Waiting for job {s.jobID} status {s.status}", flush=True, end="")
         while s.status not in [StatusCode.failed, StatusCode.dismissed, StatusCode.successful] and i < MAX_ITERATIONS:
-            print(f"Waiting for job {s.jobID} status {s.status}...", flush=True)
             sleep(1)
+            print(".", flush=True, end="")
             i = i + 1
             s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
+        print("", flush=True)
         return s
 
     def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):

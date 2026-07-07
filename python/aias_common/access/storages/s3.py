@@ -224,9 +224,9 @@ class S3Storage(AbstractStorage):
         objects = self.__list_objects(href)
         return (objects is not None) and (objects['KeyCount'] > 0 or len(objects.get('CommonPrefixes', [])) > 0)
 
-    def get_file_size(self, href: str):
+    def get_file_size(self, href: str) -> int | None:
         response = self.__head_object(href)
-        if response:
+        if response and response.get('ContentLength'):
             return response['ContentLength']
         else:
             return None

@@ -26,8 +26,8 @@ The configuration of the URL Role Based Access Control (URBAC) contains:
 
 A configuration per service must be provided. A service configuration provides:
 
-- a list of `url_patterns` to extract the collection name and the item id. At least one is needed.
 - a list of `public_url_patterns` for public resources: if matching, then AGATE authorizes the access
+- otherwise, a list of `url_patterns` to extract the collection name and the item id. At least one is needed.
 - a `pattern_target` to tell AGATE where to look:
     - if undefined, then the pattern is matched against the path
     - if `query.{param}` then the `{param}`* query parameter is used

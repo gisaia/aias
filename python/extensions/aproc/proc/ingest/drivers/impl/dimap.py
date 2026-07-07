@@ -189,6 +189,7 @@ class Driver(IngestDriver):
             satellite = satellite + "-" + metadata["MISSION_INDEX"]
 
         item = Item(
+            id="",
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,

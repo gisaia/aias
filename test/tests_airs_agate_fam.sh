@@ -22,6 +22,3 @@ docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m te
 
 echo "run test.fam_tests gs"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_gs_tests
-
-echo "run test.aproc_ingest_tests"
-docker run --name somewhere  --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests
