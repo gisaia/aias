@@ -2,6 +2,7 @@ from abc import abstractmethod
 import hashlib
 import os
 from typing import Any
+from aias_common.access.storages import file
 from airs.core.models.model import Asset, Item, Role
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
@@ -56,18 +57,28 @@ class EnrichDriver(AbstractDriver):
 
     @abstractmethod
     def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
+        """Create the asset metadata (Asset) and data (file) for a given item
+
+        Args:
+            item (Item): The item to be enriched
+            enrichment (str): name of the enrichment to create, e.g. 'cog'. This can lead to multiple asset creation.
+
+        Returns:
+            list[Asset]: the list of the created assets for this specific enrichment
+        """
+        ...
+
+
+    def create_enrichments(self, item: Item, enrichments: list[str]) -> list[Asset]:
         """Create the assets metadata (Asset) and data (file) for a given item
 
         Args:
             item (Item): The item to be enriched
-            enrichment (list[str]): names of the enrichment to create, e.g. 'cog'. This can lead to multiple asset creation.
+            enrichments (list[str]): names of the enrichment to create, e.g. 'cog'. This leads to multiple asset creation.
 
         Returns:
             list[Asset]: the list of the created assets
         """
-        ...
-
-    def create_enrichments(self, item: Item, enrichments: list[str]) -> list[Asset]:
         assets = []
         for enrichment in enrichments:
             self.LOGGER.info("creating {} for item {}".format(enrichment, item.id))
