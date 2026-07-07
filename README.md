@@ -63,17 +63,17 @@ The following environment variables must be set to run AIRS:
 
 | Variable                                               |
 | ------------------------------------------------------ |
-| AIRS_HOST  |
-| AIRS_PORT  |
-| AIRS_CORS_ORIGINS  |
-| AIRS_CORS_METHODS  |
-| AIRS_CORS_HEADERS  |
+| AIRS_HOST                                              |
+| AIRS_PORT                                              |
+| AIRS_CORS_ORIGINS                                      |
+| AIRS_CORS_METHODS                                      |
+| AIRS_CORS_HEADERS                                      |
 | AIRS_ARLAS_COLLECTION_NAME                             |
 | AIRS_ARLAS_URL                                         |
 | AIRS_INDEX_ENDPOINT_URL                                |
 | AIRS_INDEX_COLLECTION_PREFIX                           |
 | AIRS_INDEX_LOGIN                                       |
-| AIRS_INDEX_PWD                                       |
+| AIRS_INDEX_PWD                                         |
 | AIRS_S3_BUCKET                                         |
 | AIRS_S3_ACCESS_KEY_ID                                  |
 | AIRS_S3_SECRET_ACCESS_KEY                              |
@@ -82,8 +82,7 @@ The following environment variables must be set to run AIRS:
 | AIRS_S3_PLATFORM                                       |
 | AIRS_S3_ASSET_HTTP_ENDPOINT_URL                        |
 | AIRS_S3_ENDPOINT_URL                                   |
-| ARLASEO_MAPPING_URL                                       |
-| AIRS_COLLECTION_URL                                    |
+| ARLASEO_MAPPING_URL                                    |
 | AIRS_PREFIX                                            |
 | AIRS_LOGGER_LEVEL                                      |
 
@@ -139,9 +138,9 @@ The following environment variables must be set to run FAM:
 
 | Variable                                               |
 | ------------------------------------------------------ |
-|   INGESTED_FOLDER                                     |
-|   FAM_LOGGER_LEVEL                                         |
-|   FAM_PREFIX                                         |
+|   INGESTED_FOLDER                                      |
+|   FAM_LOGGER_LEVEL                                     |
+|   FAM_PREFIX                                           |
 
 ### AGATE Configuration
 
@@ -152,7 +151,7 @@ The following environment variables must be set to run AGATE:
 |   ARLAS_URL_SEARCH                                     |
 |   AGATE_PREFIX                                         |
 |   AGATE_HOST                                           |
-|   AGATE_PORT                                   |
+|   AGATE_PORT                                           |
 |   AGATE_ENDPOINT                                       |
 |   AGATE_URL_HEADER                                     |
 |   AGATE_URL_HEADER_PREFIX                              |
