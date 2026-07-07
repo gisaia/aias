@@ -85,8 +85,8 @@ class IngestTests(AprocTests):
         print("", flush=True)
         return s
 
-    def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
-        r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
+    def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []):
+        r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers, enrichments)
         status = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
@@ -94,8 +94,8 @@ class IngestTests(AprocTests):
         self.assertEqual(status.status, callback_job_status[status.jobID])
         return status
 
-    def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
-        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+    def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []):
+        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments)
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
@@ -111,8 +111,8 @@ class IngestTests(AprocTests):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
-        status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
+        status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments)
         result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
         item = mapper.item_from_json(requests.get(result["item_location"]).content)
         self.check_result(item, assets, archive, check_epsg, data_key, check_secondary_id=check_secondary_id)

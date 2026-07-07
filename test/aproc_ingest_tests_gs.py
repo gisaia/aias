@@ -189,7 +189,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_superview3_4_mux(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_MUX/")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"])
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=["cog"])
 
     def test_async_ingest_superview3_4_mux_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_MUX_PAN")
