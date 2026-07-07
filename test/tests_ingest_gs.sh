@@ -12,4 +12,4 @@ echo "run test.aproc_ingest_tests_gs"
 docker run --name somewhere  --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_gs
 
 echo "run test.aproc_enrich_tests"
-docker run --name somewhere  --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_enrich_tests -v
+docker run --name somewhere  --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_enrich_tests
