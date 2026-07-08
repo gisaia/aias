@@ -1,4 +1,5 @@
-FROM python:3.14-alpine3.24
+ARG AIAS_DOCKER_BASE_IMAGE="python:3.14-alpine3.24"
+FROM $AIAS_DOCKER_BASE_IMAGE
 
 ARG version="latest"
 ENV AIAS_VERSION=${version}

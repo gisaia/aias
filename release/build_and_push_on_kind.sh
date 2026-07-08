@@ -11,7 +11,9 @@ VERSION=$1
 shift
 IMAGES=$@
 
+AIAS_DOCKER_BASE_IMAGE=python:3.14-alpine3.24
+
 for image in $IMAGES; do
     echo "Build and push image $image with version $VERSION on kind"
-    docker build -f docker/Dockerfile-$image -t gisaia/$image:$VERSION . ; kind load docker-image gisaia/$image:$VERSION --name arlas-kind-cluster
+    docker build -f docker/Dockerfile-$image -t gisaia/$image:$VERSION --build-arg AIAS_DOCKER_BASE_IMAGE=${AIAS_DOCKER_BASE_IMAGE} . ; kind load docker-image gisaia/$image:$VERSION --name arlas-kind-cluster
 done
