@@ -51,3 +51,12 @@ def execute2inputs(execute: Execute):
         else:
             result[key] = input.root.root
     return result
+
+
+def add_msg_to_text(message: str, messages: str) -> str:
+    if message:
+        message = messages + "; " + message
+    else:
+        messages = message
+    return messages
+

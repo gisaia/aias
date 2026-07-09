@@ -11,9 +11,9 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
-from aproc.core.processes.process import Process as Process
+from aproc.core.processes.process import Process as Process, Subscriber as OGCSubscriber
 from aproc.core.settings import Configuration
-from aproc.core.utils import base_model2description
+from aproc.core.utils import add_msg_to_text, base_model2description
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
@@ -25,7 +25,7 @@ from extensions.aproc.proc.ingest.settings import \
     Configuration as IngestConfiguration
 from extensions.aproc.proc.processes.arlas_services_helper import (
     JSON_HEADER, ARLASServicesHelper)
-from extensions.aproc.proc.processes.process_model import InputProcess
+from extensions.aproc.proc.processes.process_model import InputProcess, OutputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -40,12 +40,12 @@ class InputIngestProcess(InputProcess):
     enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item", minOccurs=0, maxOccurs=-1)
 
 
-class OutputIngestProcess(BaseModel):
+class OutputIngestProcess(OutputProcess):
     item_location: str = Field(title="Item location", description="Location of the Item on the ARLAS Item Registration Service")
     archive_url: str = Field(title="Archive location", description="Initial location of the ingested archive")
     collection: str = Field(title="Target collection", description="Collection that contains the item")
     catalog: str = Field(title="Target catalog", description="Catalog that contains the item")
-    sub_jobs: list[str] = Field(default=[], title="Sub jobs", description="List of sub jobs that have been created for the process", minOccurs=0, maxOccurs=-1)
+
 
 summary: ProcessSummary = ProcessSummary(
     title="Ingest an archive in AIRS.",
@@ -96,8 +96,9 @@ class AprocProcess(Process):
             return driver.get_item_id(url)
         raise DriverException("No driver found for  {}".format(url))
 
+
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], subscriber: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], cascade_subscriber: bool = False) -> dict:
         # self is a celery task because bind=True
         """ ingest the archive url in 6 step:
         - identify the driver for ingestion
@@ -128,6 +129,8 @@ class AprocProcess(Process):
         driver: IngestDriver = DriverManager.solve(summary.id, url, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
         if driver is not None:
             try:
+                message = ""
+                error = ""
                 LOGGER.info("Driver {} will be used".format(driver.name))
                 LOGGER.debug("ingestion: 1 - identify_assets")
                 Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'identify_assets', "ACTION": "INGEST", "TARGET": url})
@@ -170,22 +173,24 @@ class AprocProcess(Process):
                 sub_jobs: list[str] = []
                 if enrichments:
                     try:
-                        inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": item.collection, "item_id": item.id}], asset_type="cog")
-                        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+                        inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": item.collection, "item_id": item.id}], enrichments=enrichments, cascade_subscriber=cascade_subscriber)
+                        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
                         r: requests.Response = requests.post("/".join([IngestConfiguration.settings.aproc_endpoint, "processes", "enrich", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                         if not r.ok:
-                            msg = "Failed to submit the ingest request for {} ({}): {}".format(url, item.id, str(r.status_code) + ":" + str(r.content))
+                            msg = "Failed to submit the enrich request for {} ({}): {}".format(url, item.id, str(r.status_code) + ":" + str(r.content))
                             LOGGER.error(msg)
-                            raise Exception(msg)
+                            error = add_msg_to_text(msg, error)
                         else:
                             sub_jobs.append(json.loads(r.content).get("jobID"))
+                            msg = "Send enrichment request for {} ({}) ok".format(url, item.id)
                             LOGGER.debug("Send ingestion request for {} ({}) ok".format(url, item.id))
+                            message = add_msg_to_text(msg, message)
                     except Exception as err:
                         msg = "Exception while requesting enrichment {} with {}: {}".format(url, enrichments, str(err))
+                        error = add_msg_to_text(msg, error)
                         LOGGER.error(msg)
                         LOGGER.exception(err)
-                        raise DriverException(msg)
-                return OutputIngestProcess(collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs).model_dump(exclude_none=True, exclude_unset=True)
+                return OutputIngestProcess(process="ingest", collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs, message=message, error=error).model_dump(exclude_none=True, exclude_unset=True)
             except Exception as err:
                 msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)
