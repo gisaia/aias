@@ -149,9 +149,9 @@ class Driver(IngestDriver):
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
         satellite = metadata.find("./IMD/IMAGE/SATID").text
-        if satellite.startswith("LG"):
+        if satellite.lower().startswith("lg"):
             constellation = "WorldView Legion"
-        elif satellite.startswith("WV"):
+        elif satellite.lower().startswith("wv"):
             constellation = "WorldView"
         else:
             constellation = "Digitalglobe"
