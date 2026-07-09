@@ -19,6 +19,14 @@
 
 @use "styles/colors.scss" as colors;
 @use "styles/sizes.scss" as sizes;
+@use "styles/mixins.scss" as mixins;
+
+:host {
+  ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 
 .tasks-content {
   max-height: calc(sizes.$tasksHeight - sizes.$sectionTitleHeight);
@@ -33,6 +41,9 @@
 
     tr.task-detail-row {
       height: 0;
+      .mat-column-expandedDetail {
+        border-bottom-width: 0;
+      }
     }
 
     tr.task-row:not(.task-expanded-row):hover {
@@ -85,32 +96,23 @@
     }
   }
 
-  .mat-mdc-chip {
-    background-color: white;
-  }
-
   .mat-chip-successful {
-    color: colors.$successColor;
-    border: 1px solid colors.$successColor;
+    @include mixins.chip-color-border(colors.$successColor, colors.$successBackgroundColor);
   }
 
   .mat-chip-accepted {
-    color: colors.$infoColor;
-    border: 1px solid colors.$infoColor;
+    @include mixins.chip-color-border(colors.$infoColor, colors.$infoBackgroundColor);
   }
 
   .mat-chip-running {
-    color: colors.$progressColor;
-    border: 1px solid colors.$progressColor;
+    @include mixins.chip-color-border(colors.$progressColor, colors.$progressBackgroundColor);
   }
 
   .mat-chip-failed {
-    color: colors.$errorColor;
-    border: 1px solid colors.$errorColor;
+    @include mixins.chip-color-border(colors.$errorColor, colors.$errorBackgroundColor);
   }
 
   .mat-chip-dismissed {
-    color: colors.$dismissedColor;
-    border: 1px solid colors.$dismissedColor;
+    @include mixins.chip-color-border(colors.$dismissedColor, colors.$dismissedBackgroundColor);
   }
 }

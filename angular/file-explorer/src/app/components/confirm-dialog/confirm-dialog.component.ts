@@ -18,7 +18,7 @@
  */
 
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -44,7 +44,7 @@ export class ConfirmDialogComponent implements OnInit {
   public message = '';
   public action = '';
   public showActivationInfos = true;
-  public selectedDrivers = [];
+  public selectedDrivers = signal<string[]>([]);
   public annotation = '';
   public currentCollection = '';
 
@@ -55,4 +55,9 @@ export class ConfirmDialogComponent implements OnInit {
   public onAnnotationChange(text: string) {
     this.annotation = text;
   }
+
+  public updateSelectedDrivers(drivers: string[]): void {
+    this.selectedDrivers.set(drivers);
+  }
 }
+

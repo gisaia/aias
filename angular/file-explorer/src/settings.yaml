@@ -7,7 +7,7 @@
 #   sign_up_enabled: false
 
 authentication:
-  use_authent: true
+  use_authent: false
   auth_mode: 'iam'
   force_connect: false
   use_discovery: true
@@ -36,17 +36,17 @@ authentication:
   custom_query_params: []
   sign_up_enabled: false
 file_manager:
-  url: https://localhost/fam
+  url: http://localhost:8005/arlas/fam
   default_path: ""
   collection: "catalogue"
   archives_page_size: 20
   files_page_size: 50
 jobs:
-  url: https://localhost/aproc
+  url: http://localhost:8001/arlas/aproc
   collection: "catalogue"
   catalog: "catalogue"
 status:
-  url: https://localhost/airs
+  url: http://localhost:8000/arlas/airs
   collection: "catalogue"
 
 whitelistedUrls: []

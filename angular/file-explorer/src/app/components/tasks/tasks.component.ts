@@ -22,7 +22,7 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
-import { MatChipListbox, MatChipOption } from '@angular/material/chips';
+import { MatChip, MatChipSet } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -60,9 +60,10 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
       ]),
   ],
   imports: [
-    MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatChipListbox, MatChipOption, MatTooltip,
-    MatIconButton, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe, TranslatePipe
-  ]
+    MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatChipSet, MatChip, MatTooltip,
+    MatIconButton, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe, TranslatePipe,
+    MatChip
+]
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
