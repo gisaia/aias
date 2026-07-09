@@ -148,7 +148,13 @@ class Driver(IngestDriver):
         date_time_str = metadata.find("./IMD/MAP_PROJECTED_PRODUCT/EARLIESTACQTIME").text
         date_time = int(datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
 
-        constellation = metadata.find("./IMD/IMAGE/SATID").text
+        satellite = metadata.find("./IMD/IMAGE/SATID").text
+        if satellite.startswith("LG"):
+            constellation = "WorldView Legion"
+        elif satellite.startswith("WV"):
+            constellation = "WorldView"
+        else:
+            constellation = "Digitalglobe"
 
         item = Item(
             geometry=geometry,
@@ -157,7 +163,7 @@ class Driver(IngestDriver):
             properties=Properties(
                 datetime=date_time,
                 constellation=constellation,
-                satellite=constellation,
+                satellite=satellite,
                 sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.digitalglobe.value,
@@ -174,13 +180,12 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(metadata, "./IMD/PRODUCTLEVEL")
         item.properties.gsd = find_or_none(metadata, "./IMD/IMAGE/MEANCOLLECTEDGSD", lambda x: float(x))
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
-        item.properties.satellite = find_or_none(metadata, "./IMD/IMAGE/SATID")
         item.properties.secondary_id = find_or_none(metadata, "./IMD/PRODUCTORDERID")
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
-        item.properties.instrument = item.properties.constellation
-        item.properties.sensor = item.properties.constellation
+        item.properties.instrument = item.properties.satellite
+        item.properties.sensor = item.properties.satellite
 
         if metadata.find("./IMD/IMAGE/SATAZ") is not None:
             item.properties.view__azimuth = float(metadata.find("./IMD/IMAGE/SATAZ").text)
