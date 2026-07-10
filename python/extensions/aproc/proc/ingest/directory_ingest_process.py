@@ -30,11 +30,11 @@ LOGGER = Logger.get_logger()
 
 
 class InputDirectoryIngestProcess(InputProcess):
-    collection: str = Field(title="Collection name", description="Name of the collection where the items will be registered", minOccurs=1, maxOccurs=1)
-    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered", minOccurs=1, maxOccurs=1)
-    directory: str = Field(title="Directory URL", description="URL pointing at a directory containing one or more archives", minOccurs=1, maxOccurs=1)
-    annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
-    enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item", minOccurs=0, maxOccurs=-1)
+    collection: str = Field(title="Collection name", description="Name of the collection where the items will be registered")
+    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered")
+    directory: str = Field(title="Directory URL", description="URL pointing at a directory containing one or more archives")
+    annotations: str = Field(title="Item annotations", description="Item annotations")
+    enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item")
 
 
 class OutputDirectoryIngestProcess(OutputProcess):

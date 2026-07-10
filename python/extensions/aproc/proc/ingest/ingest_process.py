@@ -33,10 +33,10 @@ LOGGER = Logger.get_logger()
 
 
 class InputIngestProcess(InputProcess):
-    collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered", minOccurs=1, maxOccurs=1)
-    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
-    url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
-    annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
+    collection: str = Field(title="Collection name", description="Name of the collection where the item will be registered")
+    catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered")
+    url: str = Field(title="Archive URL", description="URL pointing at the archive")
+    annotations: str = Field(title="Item annotations", description="Item annotations")
     enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item")
 
 

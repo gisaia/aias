@@ -35,6 +35,8 @@ class InputDescription(DescriptionType):
 
     minOccurs: int | None = 1
     maxOccurs: int | MaxOccur | None = None
+    minItems: int | None = None
+    maxItems: int | None = None
     schema_: Reference | SchemaItem = Field(alias="schema")
 
 
