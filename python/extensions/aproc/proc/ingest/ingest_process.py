@@ -37,7 +37,7 @@ class InputIngestProcess(InputProcess):
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the item will be registered", minOccurs=1, maxOccurs=1)
     url: str = Field(title="Archive URL", description="URL pointing at the archive", minOccurs=1, maxOccurs=1)
     annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
-    enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item", minOccurs=0, maxOccurs=-1)
+    enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item")
 
 
 class OutputIngestProcess(OutputProcess):

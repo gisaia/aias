@@ -54,9 +54,8 @@ def execute2inputs(execute: Execute):
 
 
 def add_msg_to_text(message: str, messages: str) -> str:
-    if message:
-        message = messages + "; " + message
+    if messages:
+        messages = messages + "; " + message
     else:
         messages = message
     return messages
-
