@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import os
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -90,10 +91,9 @@ class Driver(IngestDriver):
                                 roles=[Role.overview.value, Role.visual.value, Role.visual.value, Role.pan_sharpened.value], name=Role.overview.value + "-psh", type=MimeType.JPEG.value,
                                 description=Role.overview.value + "for pan sharpened", airs__managed=False, asset_format=AssetFormat.jpg.value, asset_type=ResourceType.gridded.value))
         # Metadata
-        if self.xml_path:
-            assets.append(Asset(href=self.xml_path, size=AccessManager.get_size(self.xml_path),
-                                roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
-                                description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        assets.append(Asset(href=self.xml_path, size=AccessManager.get_size(self.xml_path),
+                            roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,
+                            description=Role.metadata.value, airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
 
         if self.mux_xml_path:
             assets.append(Asset(href=self.mux_xml_path, size=AccessManager.get_size(self.mux_xml_path),
@@ -217,13 +217,14 @@ class Driver(IngestDriver):
                            .astimezone(ZoneInfo("UTC"))
                            .timestamp())
 
-        satellite = find_or_none(metadata, "SatelliteID", alt_keys=["ProductInfo/SatelliteID"])
-
-        # satellite=SV-2 and constellation=SV
-        if satellite and satellite.find('-') != -1:
-            constellation = satellite.split("-")[0]
+        # Use XML file name to determine satellite and constellation
+        satellite: str = os.path.basename(self.xml_path).split('_')[0]
+        if satellite.lower() == "sv-2":
+            constellation = "Gaofen Duomo"
+        elif satellite.lower().startswith('svn'):
+            constellation = "Superview Neo"
         else:
-            constellation = satellite
+            constellation = "Superview"
 
         item = Item(
             geometry=geometry,
@@ -250,7 +251,7 @@ class Driver(IngestDriver):
 
         item.properties.processing__level = find_or_none(metadata, "ProductLevel", alt_keys=["ProductInfo/ProductLevel"])
         item.properties.gsd = find_or_none(metadata, "GSDX", float, alt_keys=["ProductInfo/GSDX"])
-        
+
         item.properties.secondary_id = find_or_none(metadata, "ProductID", alt_keys=["ProductInfo/ProductID"])
 
         proj = AccessManager.get_gdal_proj(self.data_path)
@@ -262,13 +263,13 @@ class Driver(IngestDriver):
         return item
 
     def add_minor_metadata(self, url: str, item: Item, metadata: ET.Element) -> Item:
-        
+
         item.properties.instrument = find_or_none(metadata, "SensorID", alt_keys=["ProductInfo/SensorID"])
         item.properties.sensor = item.properties.instrument
 
         item.properties.view__azimuth = find_or_none(metadata, "SatelliteAzimuth", float, alt_keys=["SatelliteElevation", "ProductInfo/SatelliteAzimuth", "ProductInfo/SatelliteElevation"])
         item.properties.view__sun_azimuth = find_or_none(metadata, "SolarAzimuth", float, alt_keys=["ProductInfo/SolarAzimuth"])
-        
+
         sun_zenith = find_or_none(metadata, "SolarZenith", float, alt_keys=["SolarElevation", "ProductInfo/SolarZenith", "ProductInfo/SolarElevation"])
         if sun_zenith is not None:
             item.properties.view__sun_elevation = 90.0 - sun_zenith
