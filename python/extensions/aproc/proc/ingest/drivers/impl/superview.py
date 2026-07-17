@@ -217,12 +217,15 @@ class Driver(IngestDriver):
                            .astimezone(ZoneInfo("UTC"))
                            .timestamp())
 
+        observation_type = ObservationType.optic.value
         # Use XML file name to determine satellite and constellation
         satellite: str = os.path.basename(self.xml_path).split('_')[0]
         if satellite.lower() == "sv-2":
             constellation = "Gaofen Duomo"
         elif satellite.lower().startswith('svn'):
             constellation = "Superview Neo"
+            if satellite.lower().startswith('svn2'):
+                observation_type = ObservationType.radar.value
         else:
             constellation = "Superview"
 
@@ -241,7 +244,7 @@ class Driver(IngestDriver):
                 item_format=ItemFormat.superview.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
-                observation_type=ObservationType.optic.value,
+                observation_type=observation_type
             ),
             assets={asset.name: asset for asset in assets}
         )
