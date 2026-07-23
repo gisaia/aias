@@ -35,7 +35,6 @@ class Driver(EnrichDriver):
         Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
         Driver.configuration['all_bands_cog_max_width_or_height'] = Driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
 
-
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
         # Is it able to build the requested enrichment type?
@@ -95,8 +94,10 @@ class Driver(EnrichDriver):
         href = self.get_asset_href(item)
         if href:
             self.LOGGER.info("Building cog for {}".format(item.id))
+
             from osgeo import gdal
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
+            
             is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
             if is_asset_zip:
                 start = time()

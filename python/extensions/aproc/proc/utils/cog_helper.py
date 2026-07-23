@@ -1,10 +1,9 @@
 import tempfile
 
 from aias_common.access.manager import AccessManager, AnyStorage
-from airs.core.models.model import Role, ResourceType, AssetFormat, MimeType, Item, Asset
+from airs.core.models.model import ResourceType, AssetFormat, MimeType, Item, Asset
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from time import time
-import os
 
 
 def helper_create_asset_from_location(item: Item, asset_type: str, asset_location: str, resource_type=ResourceType.gridded.value, asset_format=AssetFormat.cog.value, mime_type=MimeType.TIFF.value) -> Asset:
@@ -25,7 +24,7 @@ def helper_create_asset_from_location(item: Item, asset_type: str, asset_locatio
 
 
 def helper_build_cog(source: str, target: str, max_px_width_or_height: int = 2000, options: dict = {}):
-    """ Generate a COG from a source file and store it in the target location. 
+    """ Generate a COG from a source file and store it in the target location.
 
     Args:
         source (str): source file location (can be a local path or a remote URL like VSI)
@@ -45,7 +44,7 @@ def helper_build_cog(source: str, target: str, max_px_width_or_height: int = 200
                 src_width = ds.RasterXSize
                 src_height = ds.RasterYSize
             # We take the max between the width and the height and we compute the scale factor.
-            # We use the min between the scale factor and 1 because 
+            # We use the min between the scale factor and 1 because
             # we do not want to upscale the image if the width or height < max_px.
             factor = min(1, max_px_width_or_height / max(src_width, src_height))
             target_width = int(src_width * factor)
