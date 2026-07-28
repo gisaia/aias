@@ -13,7 +13,7 @@ pygeohash==1.2.0
 celery==5.3.1
 celery[redis]==5.3.1
 jsonref==1.1.0
-pillow==12.2.0
+pillow==12.3.0
 typer==0.9.0
 fastapi-utilities==0.3.1
 pytest==8.4.2
