@@ -13,9 +13,7 @@ WORKDIR /usr/src
 
 # Python runtime behavior:
 # - do not create .pyc files
-# - send logs directly to stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
 
 # Virtual environment location used during build and copied later to runtime
 ENV VIRTUAL_ENV=/opt/aproc
