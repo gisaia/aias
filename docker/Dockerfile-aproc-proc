@@ -1,4 +1,6 @@
-FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.1
+# Builder stage
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.2 AS builder
+
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
 
@@ -6,35 +8,57 @@ LABEL io.arlas.aproc-proc.version=${version}
 LABEL vendor="Gisaïa"
 LABEL description="This container serves ARLAS APROC Processing"
 
+# Base working directory for build operations
 WORKDIR /usr/src
 
+# Python runtime behavior:
+# - do not create .pyc files
+# - send logs directly to stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN apt-get update --no-install-recommends \
-    && apt-get install -y python3.14-dev python3.14-venv \
-    && apt-get install -y g++ make  \
-    && apt-get install -y libtiff-dev imagemagick  \
-    && apt-get install -y libhdf5-dev libhdf5-serial-dev netcdf-bin libnetcdf-dev linux-libc-dev \
-    && apt-get upgrade -y \
-    && apt-get clean && apt-get remove -y --auto-remove curl
+# Virtual environment location used during build and copied later to runtime
+ENV VIRTUAL_ENV=/opt/aproc
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
-USER 1000
-WORKDIR /app
+# Install build dependencies only:
+# - python3.14-dev / venv for Python package builds
+# - g++ / make for native compilation
+# - libtiff-dev for srtm4 build (tiffio.h)
+# - linux-libc-dev kept only in builder for compilation needs
+# - other native libs required by project dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3.14-dev \
+        python3.14-venv \
+        g++ \
+        make \
+        libtiff-dev \
+        imagemagick \
+        libhdf5-dev \
+        libhdf5-serial-dev \
+        netcdf-bin \
+        libnetcdf-dev \
+        linux-libc-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN python -m venv --system-site-packages aproc
+# Create the Python virtual environment using system site packages
+RUN python -m venv --system-site-packages ${VIRTUAL_ENV}
 
+# Copy dependency files first to improve Docker layer caching
 COPY ./python/requirements.aias.services.txt /app/
-
 COPY ./python/aias_common/requirements.aias_common.txt /app/
-
 COPY ./python/aproc/requirements.aproc.txt /app/
-RUN aproc/bin/pip install --no-cache-dir -r /app/requirements.aproc.txt 
 
+# Install core Python dependencies into the virtual environment
+RUN ${VIRTUAL_ENV}/bin/pip install --no-cache-dir -r /app/requirements.aproc.txt
+
+# Copy and install extension dependencies
 COPY ./python/extensions/requirements.aproc.ext.txt /app/
-RUN aproc/bin/pip install --no-cache-dir -r /app/requirements.aproc.ext.txt 
+RUN ${VIRTUAL_ENV}/bin/pip install --no-cache-dir -r /app/requirements.aproc.ext.txt
 
-
+# Copy application source code and configuration files
 COPY ./python/aproc /app/aproc
 COPY ./python/extensions /app/extensions
 COPY ./python/aias_common /app/aias_common
@@ -44,9 +68,71 @@ COPY ./python/airs/core /app/airs/core
 COPY ./docker/materials/scripts/aproc-proc/start.sh /app/
 COPY ./docker/materials/scripts/aproc-proc/ping.sh /app/
 
+# Ensure startup scripts are executable
+RUN chmod +x /app/start.sh /app/ping.sh
+
+# Runtime stage
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.2 AS runtime
+
+ARG version="0.0"
+ENV AIAS_VERSION=${version}
+
+LABEL io.arlas.aproc-proc.version=${version}
+LABEL vendor="Gisaïa"
+LABEL description="This container serves ARLAS APROC Processing"
+
+# Final application working directory
+WORKDIR /app
+
+# Python runtime behavior:
+# - do not create .pyc files
+# - send logs directly to stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Reuse the virtual environment created in the builder stage
+ENV VIRTUAL_ENV=/opt/aproc
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+# Install runtime-only OS packages.
+# No compilers or development headers are kept here.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3.14 \
+        python3.14-venv \
+        imagemagick \
+        netcdf-bin \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Remove pebble from the final runtime image because it is not needed
+# by the application and was reported by the vulnerability scan
+RUN rm -f /usr/bin/pebble
+
+# Copy the prepared virtual environment from the builder stage
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+# Copy application code, assets, configuration, and scripts
+COPY --from=builder /app/aproc /app/aproc
+COPY --from=builder /app/extensions /app/extensions
+COPY --from=builder /app/aias_common /app/aias_common
+COPY --from=builder /app/conf /app/conf
+COPY --from=builder /app/assets /app/assets
+COPY --from=builder /app/airs/core /app/airs/core
+COPY --from=builder /app/start.sh /app/start.sh
+COPY --from=builder /app/ping.sh /app/ping.sh
+
+# Ensure runtime scripts are executable
+RUN chmod +x /app/start.sh /app/ping.sh
+
+# Application runtime configuration
 ENV APROC_CONFIGURATION_FILE=/app/conf/aproc.yaml
 ENV ARLASEO_MAPPING_URL=/app/conf/mapping.json
 ENV DOWNLOAD_MAPPING_URL=/app/conf/downloads_mapping.json
 ENV PYTHONPATH=/app
 
+# Run the container as a non-root user
+USER 1000
+
+# Default container entrypoint
 ENTRYPOINT ["./start.sh"]
