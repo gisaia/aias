@@ -171,13 +171,14 @@ class Driver(IngestDriver):
             metadata = self.load_metadata(url)
 
             with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
-                gdal.Warp(quicklook.href, tiffs, format="PNG")
+                # Because of the multiple scenes, the image is wider than high, so only contrain the height
+                gdal.Warp(quicklook.href, tiffs, format="PNG", height=Driver.OVERVIEW_SIZE)
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 assets.append(quicklook)
 
             # Downsample quicklook for thumbnail
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.PNG, AssetFormat.png)
-            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 
