@@ -39,7 +39,7 @@ LOGGER = Logger.get_logger()
 
 
 class InputDownloadProcess(InputProcess):
-    requests: list[dict[str, str]] = Field(default=[], title="The list of item (collection, item_id) to download")
+    requests: list[dict[str, str]] = Field(title="The list of item (collection, item_id) to download")
     crop_wkt: str = Field(default="", title="WKT geometry for cropping the data")
     target_projection: str = Field(default="", title="epsg target projection")
     target_format: str = Field(default="", title="target format")
