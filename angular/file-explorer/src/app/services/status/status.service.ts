@@ -17,10 +17,9 @@
  * under the License.
  */
 
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { emitErrors } from '@tools/errors';
 import { ARLAS_AIAS_ACTIVE_COLLECTION, Collection } from '@tools/interface';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -65,19 +64,7 @@ export class StatusService {
   }
 
   public fetchExistingCollections() {
-    return this.http.get(this.statusSettings?.url + '/collections', this.options)
-      .subscribe({
-        next: (data: any) => this.existingCollections = data,
-        error: (err: HttpErrorResponse) => {
-          emitErrors(
-            this.toastr,
-            err,
-            this.translate.instant('Unable to fetch collections'),
-            this.translate.instant('You are not allowed to access this feature'),
-            this.translate.instant('Error while fetching the collections')
-          );
-        }
-      });
+    return this.http.get(this.statusSettings?.url + '/collections', this.options);
   }
 
   private getCollection(): string {

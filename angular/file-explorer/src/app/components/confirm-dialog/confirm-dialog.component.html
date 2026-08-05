@@ -7,16 +7,14 @@
   @if(showActivationInfos){
   <mat-form-field class="annotations" appearance="fill">
     <mat-label>{{'Annotations' | translate}}</mat-label>
-    <textarea matInput #anno (input)="onAnnotationChange(anno.value)" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4"
-      cdkAutosizeMaxRows="6"></textarea>
+    <textarea matInput #anno (input)="onAnnotationChange(anno.value)" cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4" cdkAutosizeMaxRows="6"></textarea>
   </mat-form-field>
-
-
 
   <div>{{'In collection' | translate}} <strong>{{currentCollection}}</strong></div>
   <br />
   <div>{{'Enabled drivers' | translate}}</div>
-  <app-drivers-list class="drivers-list" (selectedDrivers)="selectedDrivers=$event"></app-drivers-list>
+  <app-drivers-list class="drivers-list" (selectedDrivers)="updateSelectedDrivers($event)"></app-drivers-list>
 
   }
 
@@ -26,7 +24,8 @@
   <button matButton="outlined" [mat-dialog-close]="{status: false}">
     {{'Cancel' | translate}}
   </button>
-  <button matButton="filled" color="primary" [mat-dialog-close]="{status: true, annotations: annotation, drivers: selectedDrivers}">
+  <button matButton="filled" color="primary"
+    [mat-dialog-close]="{status: true, annotations: annotation, drivers: selectedDrivers()}">
     {{action | translate}}
   </button>
 </mat-dialog-actions>

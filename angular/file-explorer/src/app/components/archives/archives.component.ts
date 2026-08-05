@@ -21,7 +21,7 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipListbox, MatChipOption } from '@angular/material/chips';
+import { MatChip, MatChipListbox, MatChipOption, MatChipSet } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatList, MatListItem } from '@angular/material/list';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -43,8 +43,8 @@ import { CopyIdComponent } from '../copy-id/copy-id.component';
   templateUrl: './archives.component.html',
   styleUrls: ['./archives.component.scss'],
   imports: [
-    MatList, MatListItem, CopyIdComponent, MatChipListbox, MatButtonModule,
-    MatChipOption, MatTooltip, NgxSpinnerComponent, DatePipe, TranslatePipe
+    MatList, MatListItem, CopyIdComponent, MatChipSet, MatButtonModule,
+    MatChip, MatTooltip, NgxSpinnerComponent, DatePipe, TranslatePipe
   ]
 })
 export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {

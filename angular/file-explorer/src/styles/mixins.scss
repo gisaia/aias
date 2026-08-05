@@ -1,0 +1,16 @@
+@use '@angular/material' as mat;
+
+@mixin chip-color-border($color, $backgroundColor) {
+  
+
+  @include mat.chips-overrides(
+    (
+      label-text-color: $color,
+      elevated-container-color: $backgroundColor,
+      container-shape-radius: 12px,
+      label-text-weight: 600,
+      label-text-size: 12px,
+      container-height: 24px
+    )
+  );
+}

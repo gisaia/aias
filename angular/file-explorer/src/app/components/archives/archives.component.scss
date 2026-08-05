@@ -19,6 +19,7 @@
 
 @use "styles/colors.scss" as colors;
 @use "styles/sizes.scss" as sizes;
+@use "styles/mixins.scss" as mixins;
 
 .archives-content {
   height: calc(100% - sizes.$sectionTitleHeight);
@@ -28,17 +29,15 @@
     .archive {
       height: fit-content;
       padding: 4px 8px;
+      border-bottom: 1px solid #f1f5f9;
 
       ::ng-deep.mdc-list-item__primary-text {
         display: flex;
-      }
-
-      &:nth-child(odd) {
-        background-color: rgba(0, 0, 0, 0.1);
+        gap: 0 5px;
       }
 
       .list-icon {
-        width: 24px;
+        width: 20px;
         height: 20px;
         font-size: 20px;
       }
@@ -54,6 +53,7 @@
 
           .label {
             font-size: 14px;
+            font-weight: 500;
           }
           .detail {
             color: rgba(0, 0, 0, 0.58);
@@ -66,7 +66,7 @@
             gap: 0 10px;
 
             &.detail-id {
-              height: 21px;
+              height: 18px;
               .copy {
                 display: none;
               }
@@ -107,12 +107,7 @@
           }
 
           .driver-chip {
-            border: 1px solid rgba(0, 0, 0, 0.75);
-            background: white;
-            color: rgba(0, 0, 0, 0.75);
-            &:after {
-              background: white !important;
-            }
+            @include mixins.chip-color-border(colors.$dismissedColor, colors.$dismissedBackgroundColor);
           }
 
           .successful {

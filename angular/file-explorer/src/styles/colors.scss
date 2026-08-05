@@ -24,16 +24,19 @@ $primaryColor: mat.get-theme-color(theme.$app-theme, primary, 500);
 $accentColor: mat.get-theme-color(theme.$app-theme, accent, 500);
 
 $infoColor: #0c5460;
-$infoBackgroundColor: #d1ecf1;
+$infoBackgroundColor: #e0f2fe;
 $infoBorderColor: #bee5eb;
-
 $warnColor: #f0ad4e;
-$errorColor: #d43f3a;
-$successColor: #5cb85c;
-$progressColor: #337ab7;
+$errorColor: #991b1b;
+$errorBackgroundColor: #fecaca;
+$successColor: #166534;
+$successBackgroundColor: #bbf7d0;
+$progressColor: #1d4ed8;
+$progressBackgroundColor: #e1f5fe;
+$dismissedColor: #475569;
+$dismissedBackgroundColor: #e2e8f0;
+
 $disabledColor: #b4b4b4;
 $labelColor: #757575;
-$dismissedColor: #5f5f5f;
-
-$borderColor: #dfdfdf;
+$borderColor: #e2e8f0;
 $hintColor: #6b7280;

@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -28,7 +29,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
-import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED } from '@tools/interface';
+import { emitErrors } from '@tools/errors';
+import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED, Collection } from '@tools/interface';
 import { TopMenuComponent } from 'arlas-wui-toolkit';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
@@ -66,13 +68,27 @@ export class HomeComponent implements OnInit {
 
   public ngOnInit(): void {
     this.jobsService.fetchAvailableDrivers();
-    this.statusService.fetchExistingCollections();
-    this.collections = this.statusService.existingCollections.map(c => c.id);
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.statusService.statusSettings.collection;
-    this.addCurrentCollectionIfMissing();
-    if (this.currentCollection === '') {
-      this.openCatalogSelection();
-    }
+    this.statusService.fetchExistingCollections().subscribe({
+      next: (data: any) => {
+        this.collections = data.collections.map((c: Collection) => c.id);
+        this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.statusService.statusSettings.collection;
+        this.addCurrentCollectionIfMissing();
+        if (this.currentCollection === '') {
+          this.openCatalogSelection();
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        emitErrors(
+          this.toastr,
+          err,
+          this.translate.instant('Unable to fetch collections'),
+          this.translate.instant('You are not allowed to access this feature'),
+          this.translate.instant('Error while fetching the collections')
+        );
+      }
+    });
+
+
   }
 
   public openCatalogSelection() {
@@ -113,8 +129,10 @@ export class HomeComponent implements OnInit {
   }
 
   public collectionChange(event) {
-    localStorage.setItem(ARLAS_AIAS_ACTIVE_COLLECTION, event);
-    this.currentCollection = event;
+    if (event !== '') {
+      localStorage.setItem(ARLAS_AIAS_ACTIVE_COLLECTION, event);
+      this.currentCollection = event;
+    }
     this.famService.refreshArchives$.next(true);
   }
 
@@ -129,7 +147,7 @@ export class HomeComponent implements OnInit {
   /**
    * Refresh archives view
    */
-  public refreshArchives(){
+  public refreshArchives() {
     this.famService.refreshArchives$.next(true);
   }
 }

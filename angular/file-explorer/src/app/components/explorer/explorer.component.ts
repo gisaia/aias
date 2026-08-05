@@ -112,7 +112,7 @@ export class ExplorerComponent implements OnInit {
     dialogRef.componentInstance.action = marker('Activate');
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
-        if (confirm.status) {
+        if (confirm?.status) {
           this.jobService.ingestDirectory(node, confirm.annotations, confirm.drivers).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
