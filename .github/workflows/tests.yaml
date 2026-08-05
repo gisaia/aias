@@ -2,7 +2,7 @@ name: Test AIAS
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
     branches:
       - develop
       - master
@@ -58,7 +58,7 @@ on:
 jobs:
  
   aias-tests-am:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_am || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_am || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -75,7 +75,7 @@ jobs:
 
 
   aias-tests-downloads:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_download || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_download || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
       if: always()
       
   aias-tests-airs-agate-fam:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_airs_agate_fam || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_airs_agate_fam || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -129,7 +129,7 @@ jobs:
 
 
   aias-tests-dc3:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_dc3 || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_dc3 || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -155,7 +155,7 @@ jobs:
   
 
   aias-tests-ingest-fs:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_fs || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_fs || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -181,7 +181,7 @@ jobs:
   
 
   aias-tests-ingest-gs:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_gs || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_gs || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
     - uses: actions/checkout@v4
@@ -206,7 +206,7 @@ jobs:
       if: always()
   
   aias-tests-ingest-minio:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_minio || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_minio || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -232,7 +232,7 @@ jobs:
   
 
   geodes-stac-test:
-    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && (inputs.run_geodes_stac || inputs.run_all))
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_geodes_stac || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
