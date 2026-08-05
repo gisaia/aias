@@ -112,10 +112,8 @@ class Driver(IngestDriver):
             centroid = merged_polygons.centroid.xy
             bbox = merged_polygons.bounds
 
-            start_date_time = metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"]
-            start_date_time = datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S%z")
-            end_date_time = metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"]
-            end_date_time = datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+            start_date_time = self._parse_dt(metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionStartDateTime"])
+            end_date_time = self._parse_dt(metadata["EOMetadata"]["acquisitionDateTime"]["acquisitionEndDateTime"])
 
         except KeyError as ke:
             raise DriverException(f"Invalid metadata file {self.md_path}: a key is missing: {ke.args[0]}")
@@ -198,3 +196,11 @@ class Driver(IngestDriver):
             tile_md = json.load(fb)["imageTileMetadata"]
 
         return tile_md
+
+    def _parse_dt(self, value: str) -> datetime:
+        for fmt in ("%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z"):
+            try:
+                return datetime.strptime(value, fmt)
+            except ValueError:
+                pass
+        raise ValueError(f"Unsupported datetime format: {value}")
