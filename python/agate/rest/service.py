@@ -54,7 +54,7 @@ async def urbac(request: Request):
                             for match in matches:
                                 if match.start() == 0:
                                     LOGGER.debug("{} matches {} with method {} in role {}".format(request_path, url_pattern, request_method, n))
-                                    return Response(status_code=status.HTTP_202_ACCEPTED, headers={Configuration.settings.urbac.jwt_header: authorization})
+                                    return Response(status_code=status.HTTP_200_OK, headers={Configuration.settings.urbac.jwt_header: authorization})
                             LOGGER.debug("{} does not matches {}".format(request_path, url_pattern))
                 else:
                     LOGGER.warning("unrecognized permission {}".format(p))
@@ -75,7 +75,7 @@ async def authorization(request: Request, service: str):
     LOGGER.debug("Incoming URI: {}".format(requested_path))
 
     if Authorizations.at_least_one_rule_match_on_path(service_conf.public, requested_path, arlas_control=False):
-        return Response(status_code=status.HTTP_202_ACCEPTED)
+        return Response(status_code=status.HTTP_200_OK)
     else:
         LOGGER.debug("No public rule matches {}".format(requested_path))
 
@@ -92,7 +92,7 @@ async def authorization(request: Request, service: str):
         except Exception:
             LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
     if Authorizations.at_least_one_rule_match_on_path(service_conf.private, requested_path, arlas_control=True, headers=headers):
-        return Response(status_code=status.HTTP_202_ACCEPTED)
+        return Response(status_code=status.HTTP_200_OK)
     else:
         LOGGER.debug("No private rule matches {}".format(requested_path))
     return Response(status_code=status.HTTP_403_FORBIDDEN)
