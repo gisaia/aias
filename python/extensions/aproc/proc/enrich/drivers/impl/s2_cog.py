@@ -96,6 +96,7 @@ class Driver(EnrichDriver):
         if href:
             self.LOGGER.info("Building cog for {}".format(item.id))
             from osgeo import gdal
+            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
             if is_asset_zip:
                 start = time()
@@ -179,6 +180,7 @@ class Driver(EnrichDriver):
             source_files_vrt = tempfile.NamedTemporaryFile("w+", suffix=".files", delete=False).name
 
             from osgeo import gdal
+            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             with AccessManager.make_local_list(band_files) as local_assets:
 
                 # Build VRT to facilitate COG built

@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from math import sqrt
+import tempfile
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -58,18 +59,26 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if (AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_remote', False)):
             from osgeo import gdal
+            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             # Minify all the tiffs
             minified_tiffs = []
             options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], widthPct=Driver.OVERVIEW_FROM_TIFF_PCT, heightPct=Driver.OVERVIEW_FROM_TIFF_PCT)
             for tif in self.tif_paths:
                 mini_tif = os.path.join(AccessManager.tmp_dir, os.path.basename(tif))
+                Driver.LOGGER.debug(f"Minifying {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
                 gdal.Translate(mini_tif, AccessManager.get_gdal_src(tif), options=options)
+                if not AccessManager.exists(mini_tif):
+                    raise DriverException(f"Failed to minify {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
                 minified_tiffs.append(mini_tif)
 
             # Create quicklook
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
             gdal.Warp(quicklook.href, minified_tiffs, format="JPEG")
+            if not AccessManager.exists(quicklook.href):
+                raise DriverException(f"Failed to create quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
             quicklook.size = AccessManager.get_size(quicklook.href)
+            Driver.LOGGER.debug(f"Quicklook {quicklook.href} created with size {quicklook.size}")
             assets.append(quicklook)
 
             # Remove minified tiffs
@@ -78,8 +87,13 @@ class Driver(IngestDriver):
 
             # Create thumbnail
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
+            Driver.LOGGER.debug(f"Creating thumbnail {thumbnail.href} from quicklook {quicklook.href}")
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+            if not AccessManager.exists(thumbnail.href):
+                raise DriverException(f"Failed to create thumbnail {thumbnail.href} from quicklook {quicklook.href}")
             thumbnail.size = AccessManager.get_size(thumbnail.href)
+            Driver.LOGGER.debug(f"Thumbnail {thumbnail.href} created with size {thumbnail.size}")
+
             assets.append(thumbnail)
 
         return assets

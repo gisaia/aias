@@ -1,3 +1,5 @@
+import tempfile
+
 from aias_common.access.manager import AccessManager, AnyStorage
 from airs.core.models.model import Role, ResourceType, AssetFormat, MimeType, Item, Asset
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
@@ -32,6 +34,7 @@ def helper_build_cog(source: str, target: str, max_px_width_or_height: int = 200
         options (dict, optional): additional GDAL options provided to WARP. See osgeo.gdal.WarpOptions in https://gdal.org/en/stable/api/python/utilities.html
     """
     from osgeo import gdal
+    gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
     LOGGER = EnrichDriver.LOGGER
     storage: AnyStorage = AccessManager.resolve_storage(source)
     source = storage.gdal_transform_href_vsi(source)

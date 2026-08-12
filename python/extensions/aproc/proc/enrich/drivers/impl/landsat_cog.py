@@ -72,6 +72,7 @@ class Driver(EnrichDriver):
     # Landsat has a tiff file per band. The cogs can be built without downloading the tiff files by using gdal virtual file system (vsi).
     def __create_cog_asset_from_bands(self, item: Item, enrichment: str, band_files: list[str], cog_max_width_or_height: int) -> Asset:
         from osgeo import gdal
+        gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
         asset = Asset(
             name=enrichment,
             size=0,     # set once asset created
