@@ -85,7 +85,7 @@ class Tests(IngestTests):
         self.async_ingest(url, ["data", "airs_item"], archive=False)
 
     def test_ingest_directory_cloud(self):  # Test Folder in cloud ingestion
-        self.ingest_directory(ROOT + "/", collection=COLLECTION, catalog=CATALOG)
+        self.ingest_directory(ROOT + "/spacewill", collection=COLLECTION, catalog=CATALOG)
 
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)
