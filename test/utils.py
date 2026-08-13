@@ -65,7 +65,6 @@ IngestConfiguration.init(configuration_file='./conf/drivers.yaml')
 DriverManager.init(summary.id, IngestConfiguration.settings.drivers)
 
 
-
 def dir_to_list(dirname, parent={}):
     data = []
     for name in [unicodedata.normalize('NFC', f) for f in os.listdir(dirname)]:
