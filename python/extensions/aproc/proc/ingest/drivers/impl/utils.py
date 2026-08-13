@@ -2,6 +2,7 @@ import hashlib
 import os
 import xml.etree.ElementTree as ET
 from typing import Callable
+import tempfile
 
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
@@ -10,6 +11,7 @@ from extensions.aproc.proc.ingest.settings import Configuration
 def setup_gdal():
     from osgeo import gdal
     gdal.SetConfigOption('GDAL_DISABLE_READDIR_ON_OPEN', 'YES')
+    gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
     gdal.UseExceptions()
     gdal.PushErrorHandler('CPLQuietErrorHandler')
     gdal.VSICurlClearCache()
@@ -104,6 +106,7 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
     Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages
     """
     from osgeo import gdal
+    gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
 
     # Open input file
     dataset = AccessManager.get_gdal_src(input_path)

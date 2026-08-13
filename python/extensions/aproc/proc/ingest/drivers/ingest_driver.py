@@ -43,6 +43,7 @@ class IngestDriver(AbstractDriver):
             raise DriverException("Url can not be None")
         unique = hashlib.md5(url.encode("utf-8")).hexdigest()
         assets_dir = os.path.sep.join([self.assets_dir, unique])
+        IngestDriver.LOGGER.debug(f"Creating assets directory {assets_dir}")
         AccessManager.makedir(self.assets_dir)
         AccessManager.makedir(assets_dir)
         return assets_dir
