@@ -21,7 +21,7 @@ from extensions.aproc.proc.drivers.exceptions import (DriverException,
                                                       RegisterException)
 from extensions.aproc.proc.processes.arlas_services_helper import \
     ARLASServicesHelper
-from extensions.aproc.proc.processes.process_model import InputProcess
+from extensions.aproc.proc.processes.process_model import InputProcess, OutputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              DOWNLOAD_FAILED_MSG, EVENT_ACTION,
@@ -46,7 +46,7 @@ class InputDownloadProcess(InputProcess):
     raw_archive: bool = Field(default=True, title="raw archive")
 
 
-class OutputDownloadProcess(BaseModel):
+class OutputDownloadProcess(OutputProcess):
     download_locations: list[str] = Field(title="Downloaded file location", description="Location of the downloaded file")
 
 
@@ -93,7 +93,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], cascade_subscriber: bool = False) -> dict[str, str]:
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         for request in requests:
             collection: str = request.get("collection")
@@ -140,7 +140,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], crop_wkt: str, target_projection: str = "native", target_format: str = "native", raw_archive: bool = True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], cascade_subscriber: bool = False) -> dict:
         (send_to, user_id) = ARLASServicesHelper.get_user_email(headers.get("authorization"))
         LOGGER.debug("processing download requests from {}".format(send_to))
         download_locations = []
@@ -214,7 +214,7 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(item, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
-        return OutputDownloadProcess(download_locations=download_locations).model_dump(exclude_none=True, exclude_unset=True)
+        return OutputDownloadProcess(process="download", download_locations=download_locations, message="", error="").model_dump(exclude_none=True, exclude_unset=True)
 
     @staticmethod
     def __update_paths__(mail_context: dict[str, str]):

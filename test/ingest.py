@@ -24,7 +24,6 @@ def ingest_folders(data, collection, catalog, writer):
                 ingest(d['path'], collection, catalog)
             else:
                 # Write a csv file with two columns path and id
-                print("Try to ingest : " + d['path'] + " with id " + d['id'])
                 row=[d['path'], d['id']]
                 writer.writerow(row)
         else:

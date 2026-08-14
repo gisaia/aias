@@ -5,18 +5,13 @@ from celery import Task
 from pydantic import BaseModel, Field
 
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
+from aproc.core.models.ogc.execute import Subscriber
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME
 from aproc.core.logger import Logger
 
 
-class Subscriber(BaseModel):
-    successUri: str = Field(default="", title="Subscriber to be notified of success.")
-    inProgressUri: str = Field(default="", title="Subscriber to be notified of progress.")
-    failedUri: str = Field(default="", title="Subscriber to be notified of failure.")
-
-
 class InputProcess(BaseModel):
-    subscriber: Subscriber | None = Field(default=None, title="Subscriber to be notified of success, progress and failure")
+    subscriber: Subscriber = Field(default=Subscriber(), title="Subscriber to be notified of success, progress and failure")
 
 
 class Process(ABC):
@@ -53,7 +48,7 @@ class Process(ABC):
         ...
 
     @abstractmethod
-    def execute(self, context: dict[str, str], subscriber: dict[str, str], **kwargs) -> BaseModel:
+    def execute(self, context: dict[str, str], subscriber: dict[str, str], sub_jobs_subscriber: dict | None, cascade_subscriber: bool, **kwargs) -> BaseModel:
         ...
 
     @staticmethod

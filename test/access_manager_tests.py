@@ -386,7 +386,7 @@ def test_listdir_fail(fixture_am, href: str):
 
 @pytest.mark.parametrize("href", FILES)
 def test_get_last_modification_time(fixture_am, href: str):
-    print(manager.AccessManager.get_last_modification_time(href))
+    manager.AccessManager.get_last_modification_time(href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_READ)
@@ -397,7 +397,7 @@ def test_get_last_modification_time_fail(fixture_am, href: str):
 
 @pytest.mark.parametrize("href", FILES)
 def test_get_creation_time(fixture_am, href: str):
-    print(manager.AccessManager.get_creation_time(href))
+    manager.AccessManager.get_creation_time(href)
 
 
 @pytest.mark.parametrize("href", CAN_NOT_READ)
@@ -442,7 +442,6 @@ def test_dirname_fail(fixture_am, href: str):
 
 @pytest.mark.parametrize("href", CAN_CLEAN)
 def test_clean(fixture_am, href: str):
-    print(href)
     manager.AccessManager.clean(href)
 
 

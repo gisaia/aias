@@ -10,9 +10,9 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
-from aproc.core.processes.process import Process
+from aproc.core.processes.process import Process, Subscriber
 from aproc.core.models.ogc.execute import Subscriber as OGCSubscriber
-from aproc.core.utils import base_model2description
+from aproc.core.utils import add_msg_to_text, base_model2description
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.drivers.driver_manager import DriverManager
 from extensions.aproc.proc.drivers.exceptions import DriverException
@@ -22,7 +22,7 @@ from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
 from extensions.aproc.proc.ingest.settings import \
     Configuration as IngestConfiguration
-from extensions.aproc.proc.processes.process_model import InputProcess
+from extensions.aproc.proc.processes.process_model import InputProcess, OutputProcess
 
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
@@ -34,9 +34,10 @@ class InputDirectoryIngestProcess(InputProcess):
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered", minOccurs=1, maxOccurs=1)
     directory: str = Field(title="Directory URL", description="URL pointing at a directory containing one or more archives", minOccurs=1, maxOccurs=1)
     annotations: str = Field(title="Item annotations", description="Item annotations", minOccurs=1, maxOccurs=1)
+    enrichments: list[str] = Field(default=[], title="Enrichments", description="List of enrichments to apply on the item", minOccurs=0, maxOccurs=-1)
 
 
-class OutputDirectoryIngestProcess(BaseModel):
+class OutputDirectoryIngestProcess(OutputProcess):
     archives: list[str] = Field(title="List of archive urls", description="URL of the archives identified in the directory and that will be ingested")
 
 
@@ -85,7 +86,7 @@ class AprocProcess(Process):
         return InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], subscriber: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], cascade_subscriber: bool = False) -> dict:
         # self is a celery task because bind=True
         """ ingest the archives contained in the directory url. Every archive ingestion becomes a new process
 
@@ -104,24 +105,29 @@ class AprocProcess(Process):
 
         archives: list[Archive] = AprocProcess.list_archives(directory, max_size=Configuration.settings.max_number_of_archive_for_ingest)
         LOGGER.info("{} archives to be ingested from {}".format(len(archives), directory))
+        sub_jobs: list[str] = []
+        message = ""
         for archive in archives:
             LOGGER.info(archive.model_dump_json(exclude_none=True, exclude_unset=True))
             try:
-                inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_unset=True, exclude_none=True)), subscriber=OGCSubscriber(**subscriber))
+                inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments, cascade_subscriber=cascade_subscriber)
+                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_unset=True, exclude_none=True)), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
                 r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
                     msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))
                     LOGGER.error(msg)
                     raise Exception(msg)
                 else:
+                    sub_jobs.append(json.loads(r.content).get("jobID"))
+                    msg = "Ingest request for {} ({}) submitted successfully".format(archive.path, archive.id)
+                    message = add_msg_to_text(msg, message)
                     LOGGER.debug("Send ingestion request for {} ({}) ok".format(archive.path, archive.id))
             except Exception as e:
                 msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(e))
                 LOGGER.error(msg)
                 LOGGER.exception(e)
                 raise Exception(msg)
-        return list(map(lambda a: a.model_dump(exclude_none=True, exclude_unset=True), archives))
+        return OutputDirectoryIngestProcess(process="directory_ingest", archives=[a.path for a in archives], sub_jobs=sub_jobs, message=message, error="").model_dump(exclude_none=True, exclude_unset=True)
 
     @staticmethod
     def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:

@@ -9,7 +9,7 @@ class Settings(BaseModel, extra='allow'):
     drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the ingestion drivers.")
     inputs_directory: str = Field(title="Archive tree root location", description="Location of the archives tree that can be explored and ingested.")
     max_number_of_archive_for_ingest: int = Field(default=1000000, title="Max number of archive for ingestion", description="Maximum number of archives to ingest when ingesting a directory")
-    aproc_endpoint: str | None = Field(title="APROC endpoint", description="APROC endpoint for submitting sub tasks")
+    aproc_endpoint: str = Field(title="APROC endpoint", description="APROC endpoint for submitting sub tasks")
     resource_id_hash_starts_at: int = Field(1, title="Ignore first N chars for hash", description="For some drivers, the resource id is the hash of the url path. Prefix can be ignored with this property.")
     alternative_asset_href_field: str | None = Field(None, title="Data href alternative", description="By default, data are fetched from the href of the asset named \"data\". Instead, data can be retrieved from an item's property.")
 

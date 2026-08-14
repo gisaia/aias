@@ -1,6 +1,8 @@
 import json
 import threading
 import unittest
+from unittest import result
+from extensions.aproc.proc.enrich.enrich_process import OutputEnrichProcess
 from test.aproc_tests import AprocTests
 from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS
 from time import sleep
@@ -8,14 +10,14 @@ from time import sleep
 import requests
 import uvicorn
 from airs.core.models import mapper
-from airs.core.models.model import Item, Role
+from airs.core.models.model import AssetFormat, Item, Role
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.execute import Subscriber
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
 from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
-from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess
+from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess, OutputIngestProcess
 from fastapi import FastAPI, Request
 
 AST = "ast/"
@@ -52,6 +54,10 @@ SUPERVIEW = "spacewill/superview/SPACEWILL_SUPERVIEW_TIFF_MANUAL_TASKING_SYNTHET
 SUPERVIEW3_4 = "spacewill/superview/SPACEWILL_SUPERVIEW-NEO-03-04_TIFF_MANUAL_TASKING_SYNTHETIC/SVN1-04_20260101_L2A0000000001_1012600200000001"
 SUBSCRIBER = Subscriber(successUri="http://somewhere:8080/subscriber/" + StatusCode.successful + "/{jobID}", failedUri="http://somewhere:8080/subscriber/" + StatusCode.failed + "/{jobID}", inProgressUri="http://somewhere:8080/subscriber/progress/{jobID}")   # NOSONAR
 
+COG_MAX_SIZE = 500
+COG_OVERVIEW_MAX_SIZE = 200
+COG_ALL_BANDS_MAX_SIZE = 300
+
 callback_job_status = {}
 
 app = FastAPI()
@@ -73,6 +79,11 @@ threading.Thread(target=run_server, daemon=True).start()
 
 class IngestTests(AprocTests):
 
+    def get_job_status(self, job_id: str) -> StatusInfo:
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs", job_id]))
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
+        return StatusInfo(**json.loads(r.content))
+
     def wait_for(self, status: StatusInfo) -> StatusInfo:
         i: int = 0
         s = status
@@ -81,21 +92,30 @@ class IngestTests(AprocTests):
             sleep(1)
             print(".", flush=True, end="")
             i = i + 1
-            s = StatusInfo(**json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", s.jobID])).content))
+            s = self.get_job_status(s.jobID)
         print("", flush=True)
         return s
 
-    def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
-        r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers)
+    def get_ingest_job_result(self, job_id: str) -> OutputIngestProcess:
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs", job_id, "results"]))
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
+        return OutputIngestProcess(**json.loads(r.content))
+
+    def get_enrich_job_result(self, job_id: str) -> OutputEnrichProcess:
+        r = requests.get("/".join([APROC_ENDPOINT, "jobs", job_id, "results"]))
+        self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
+        return OutputEnrichProcess(**json.loads(r.content))
+
+    def ingest(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []) -> StatusInfo:
+        r = self.ingest_no_wait(url, collection, catalog, expected, include_drivers, exclude_drivers, enrichments)
         status = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)
         self.assertEqual(status.status, expected, status.model_dump_json())
-        sleep(2)
         self.assertEqual(status.status, callback_job_status[status.jobID])
         return status
 
-    def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = []):
-        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers)
+    def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []):
+        inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments, cascade_subscriber=True)
         execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
         r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
@@ -111,11 +131,28 @@ class IngestTests(AprocTests):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
-        status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers)
-        result = json.loads(requests.get("/".join([APROC_ENDPOINT, "jobs", status.jobID, "results"])).content)
-        item = mapper.item_from_json(requests.get(result["item_location"]).content)
+    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
+        status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments)
+        ingest_result = self.get_ingest_job_result(status.jobID)
+        item = mapper.item_from_json(requests.get(ingest_result.item_location).content)
         self.check_result(item, assets, archive, check_epsg, data_key, check_secondary_id=check_secondary_id)
+        self.assertEqual(ingest_result.error, "", "Expected no error, got: " + str(ingest_result.error))
+        if enrichments:
+            ingest_result = self.get_ingest_job_result(status.jobID)
+            self.assertEqual(len(ingest_result.sub_jobs), 1, f"Expected one sub-job, got {len(ingest_result.sub_jobs)}")
+            enrich_status = self.get_job_status(ingest_result.sub_jobs[0])
+            enrich_status = self.wait_for(enrich_status)
+            self.assertEqual(enrich_status.status, StatusCode.successful, enrich_status.model_dump_json())
+            item = mapper.item_from_json(requests.get(ingest_result.item_location).content)
+            for enrichment in enrichments:
+                if enrichment == AssetFormat.cog.value:
+                    self.check_cog(item, AssetFormat.cog.value.lower(), COG_MAX_SIZE)
+                elif enrichment == AssetFormat.overview_cog.value:
+                    self.check_cog(item, AssetFormat.overview_cog.value.lower(), COG_OVERVIEW_MAX_SIZE)
+                elif enrichment == AssetFormat.all_bands_cog.value:
+                    self.check_cog(item, AssetFormat.all_bands_cog.value.lower(), COG_ALL_BANDS_MAX_SIZE)
+            self.assertEqual(enrich_status.status, callback_job_status[enrich_status.jobID])
+
         return status
 
     def test_processes_list(self):
@@ -178,6 +215,25 @@ class IngestTests(AprocTests):
         self.assertIsNotNone(item.properties.main_asset_name)
         if check_epsg:
             self.assertIsNotNone(item.properties.proj__epsg)
+
+    def check_cog(self, item: Item, asset_type: str, max_size: int):
+        self.assertIsNotNone(item.assets.get(asset_type), f"{asset_type} asset exists")
+        self.assertGreater(item.assets.get(asset_type).size, 0, f"{asset_type} size greater than 0")
+        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, f"format is cog")
+        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, f"projection is 3857")
+        from osgeo import gdal
+        with gdal.Open(item.assets.get(asset_type).href) as ds:
+            src_width = ds.RasterXSize
+            src_height = ds.RasterYSize
+            self.assertLessEqual(src_width, max_size, f"{asset_type} width less than {max_size}")
+            self.assertLessEqual(src_height, max_size, f"{asset_type} height less than {max_size}")
+            self.assertGreater(src_width, 0, f"{asset_type} width greater than 0")
+            self.assertGreater(src_height, 0, f"{asset_type} height greater than 0")
+            self.assertIsNotNone(src_width, f"{asset_type} width is not None")
+            self.assertIsNotNone(src_height, f"{asset_type} height is not None")
+        info = gdal.Info(item.assets.get(asset_type).href, options=gdal.InfoOptions(format="json"))
+        self.assertEqual(info.get("metadata").get("IMAGE_STRUCTURE", {}).get("LAYOUT", None), "COG", "layout is COG")
+
 
     def test_landing_page(self):
         landing_page = json.loads(requests.get(APROC_ENDPOINT).content)

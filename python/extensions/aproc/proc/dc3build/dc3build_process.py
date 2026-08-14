@@ -23,6 +23,7 @@ from extensions.aproc.proc.drivers.exceptions import (APROCException, DriverExce
                                                       RegisterException)
 from extensions.aproc.proc.processes.arlas_services_helper import \
     ARLASServicesHelper
+from extensions.aproc.proc.processes.process_model import OutputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              CUBE_FAILED_MSG, EVENT_ACTION,
@@ -37,7 +38,7 @@ DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.get_logger()
 
 
-class OutputDC3BuildProcess(BaseModel):
+class OutputDC3BuildProcess(OutputProcess):
     item_location: str = Field(title="Item location", description="Location of the Item on the ARLAS Item Registration Service")
     id: str = Field(title="Identifier", description="Identifier of the cube item within the collection")
     collection: str = Field(title="Collection", description="Collection that contains the item")
@@ -172,7 +173,7 @@ class AprocProcess(Process):
                     LOGGER.warning("Asset {} is not managed. Its content ({}) will not be copied and could be lost.".format(asset_name, asset.href))
             AprocProcess.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": item.id})
             item: Item = ARLASServicesHelper.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
-            return OutputDC3BuildProcess(collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id])).model_dump(exclude_none=True, exclude_unset=True)
+            return OutputDC3BuildProcess(process="dc3build", collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id]), message="", error="").model_dump(exclude_none=True, exclude_unset=True)
         except Exception as e:
             error_msg = "Failed to build the cube. ({})".format(e.args)
             LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build"})

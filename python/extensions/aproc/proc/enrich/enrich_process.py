@@ -22,7 +22,7 @@ from extensions.aproc.proc.enrich.settings import \
     Configuration as EnrichConfiguration
 from extensions.aproc.proc.processes.arlas_services_helper import \
     ARLASServicesHelper
-from extensions.aproc.proc.processes.process_model import InputProcess
+from extensions.aproc.proc.processes.process_model import InputProcess, OutputProcess
 from extensions.aproc.proc.variables import (ARLAS_COLLECTION_KEY,
                                              ARLAS_ITEM_ID_KEY,
                                              ENRICHMENT_FAILED_MSG,
@@ -41,7 +41,7 @@ class InputEnrichProcess(InputProcess):
     requests: list[dict[str, str]] = Field(default=[], title="The list of items (collection, item_id) to enrich")
     enrichments: list[str] = Field(default=[], title="The list of assets for enriching the item")
 
-class OutputEnrichProcess(BaseModel):
+class OutputEnrichProcess(OutputProcess):
     item_locations: list[str] = Field(title="Items locations", description="Locations of the Item on the ARLAS Item Registration Service")
 
 
@@ -87,7 +87,7 @@ class AprocProcess(Process):
         return summary
 
     @staticmethod
-    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict[str, str]:
+    def before_execute(headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = [], cascade_subscriber: bool = False) -> dict[str, str]:
         return {}
 
     @staticmethod
@@ -97,7 +97,7 @@ class AprocProcess(Process):
         return hash_object.hexdigest()
 
     @shared_task(bind=True, track_started=True)
-    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = []) -> dict:
+    def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = [], cascade_subscriber: bool = False) -> dict:
         item_locations = []
         for request in requests:
             collection: str = request.get("collection")
@@ -154,7 +154,7 @@ class AprocProcess(Process):
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 raise DriverException(error_msg)
-        return OutputEnrichProcess(item_locations=item_locations).model_dump(exclude_none=True, exclude_unset=True)
+        return OutputEnrichProcess(process="enrich", item_locations=item_locations, message="", error="").model_dump(exclude_none=True, exclude_unset=True)
 
     @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):
