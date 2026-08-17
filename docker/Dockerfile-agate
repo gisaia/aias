@@ -9,6 +9,12 @@ LABEL description="This container serves ARLAS AGATE"
 
 RUN apk update && apk add  --no-cache --upgrade libexpat curl gcc python3-dev musl-dev linux-headers libcrypto3 libssl3
 
+#Clean SBOM pip to fix false positive CVE CVE-2025-47273 about setuptools
+#pip show setuptools → “not found” (because it is not installed via pip).
+#apk info py3-setuptools → 82.0.1 (system version).
+#SBOM bom.cdx.json → setuptools@70.3.0 (version documented at the time pip was built but not really instaled).
+RUN rm -f /usr/local/lib/python3.14/site-packages/pip/_vendor/bom.cdx.json
+
 RUN addgroup -g 1000 arlasgroup && \
     adduser -D -u 1000 -G arlasgroup arlasuser
 USER 1000
@@ -23,6 +29,7 @@ COPY ./python/agate /app/agate
 COPY ./python/aias_common /app/aias_common
 COPY ./conf/agate.yaml /app/conf/
 COPY ./docker/materials/scripts/agate/start.sh /app/
+
 
 EXPOSE 8004
 ENTRYPOINT ["./start.sh"]
