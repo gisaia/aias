@@ -29,8 +29,9 @@ class Fam:
                 lm = datetime.datetime.fromtimestamp(lm)
             if cd:
                 cd = datetime.datetime.fromtimestamp(cd)
+            path = path.removesuffix("/")
             archive = Archive(id=driver.get_item_id(path),
-                              name=os.path.basename(path.removesuffix("/")),
+                              name=os.path.basename(path),
                               driver_name=driver.name,
                               path=path,
                               is_dir=AccessManager.is_dir(path),
