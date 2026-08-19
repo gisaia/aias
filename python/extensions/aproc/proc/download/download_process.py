@@ -139,7 +139,7 @@ class AprocProcess(Process):
         if len(inputs.requests) == 1:
             hash_object = inputs.requests[0]["item_id"]
         else:
-            hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode()).hexdigest()
+            hash_object = hashlib.sha256("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode()).hexdigest()
         return hash_object
 
     @shared_task(bind=True, track_started=True)
