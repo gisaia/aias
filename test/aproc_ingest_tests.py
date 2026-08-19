@@ -133,6 +133,8 @@ class IngestTests(AprocTests):
 
     def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments)
+
+        resource_id = self.get_job_status(status.jobID).resourceID
         ingest_result = self.get_ingest_job_result(status.jobID)
         item = mapper.item_from_json(requests.get(ingest_result.item_location).content)
         self.check_result(item, assets, archive, check_epsg, data_key, check_secondary_id=check_secondary_id)
@@ -141,6 +143,7 @@ class IngestTests(AprocTests):
             ingest_result = self.get_ingest_job_result(status.jobID)
             self.assertEqual(len(ingest_result.sub_jobs), 1, f"Expected one sub-job, got {len(ingest_result.sub_jobs)}")
             enrich_status = self.get_job_status(ingest_result.sub_jobs[0])
+            self.assertEqual(enrich_status.resourceID, resource_id, f"Expected resourceID {resource_id}, got {enrich_status.resourceID}")
             enrich_status = self.wait_for(enrich_status)
             self.assertEqual(enrich_status.status, StatusCode.successful, enrich_status.model_dump_json())
             item = mapper.item_from_json(requests.get(ingest_result.item_location).content)

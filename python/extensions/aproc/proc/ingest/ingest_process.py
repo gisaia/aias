@@ -96,7 +96,6 @@ class AprocProcess(Process):
             return driver.get_item_id(url)
         raise DriverException("No driver found for  {}".format(url))
 
-
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], subscriber: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], cascade_subscriber: bool = False) -> dict:
         # self is a celery task because bind=True
