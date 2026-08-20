@@ -166,13 +166,17 @@ class Driver(IngestDriver):
             assets.append(thumbnail)
         elif self.data_format == AssetFormat.h5:
             from osgeo import gdal
+            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
 
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.PNG, AssetFormat.png)
             metadata = self.load_metadata(url)
 
             with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
+                Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from scenes tiffs {tiffs}")
                 # Because of the multiple scenes, the image is wider than high, so only contrain the height
                 gdal.Warp(quicklook.href, tiffs, format="PNG", height=Driver.OVERVIEW_SIZE)
+                if not AccessManager.exists(quicklook.href):
+                    raise DriverException(f"Failed to create quicklook {quicklook.href} from scenes tiffs {tiffs}")
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 assets.append(quicklook)
 

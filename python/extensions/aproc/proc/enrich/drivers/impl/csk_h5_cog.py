@@ -49,6 +49,7 @@ class Driver(EnrichDriver):
     # Implements drivers method
     def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         from osgeo import gdal
+        gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
 
         data_asset = item.assets.get(Role.data.value)
         if not data_asset or not data_asset.href:
@@ -63,8 +64,8 @@ class Driver(EnrichDriver):
 
         metadata = self.__load_metadata(source)
 
+        merged_tif = tempfile.NamedTemporaryFile("w+", suffix=".tif", delete=False).name
         with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
-            merged_tif = tempfile.NamedTemporaryFile("w+", suffix=".tif", delete=False).name
             gdal.Warp(merged_tif, tiffs, format="GTiff")
 
         helper_build_cog(merged_tif, target, max_px_width_or_height=cog_max_width_or_height)
