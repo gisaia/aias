@@ -93,7 +93,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_csk_h5(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False)  # TODO: COG ENRICHEMENT DOES NOT WORK WITH H5 source. See issue https://github.com/gisaia/aias/issues/513
+        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_csk_tif(self):  # Driver CSK geotiff
         url = os.path.join(ROOT, CSK2)
@@ -198,6 +198,7 @@ class Tests(IngestTests):
     def test_async_ingest_superview3_4_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_PAN")
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
-import json
 import os
-from pathlib import Path
+import tempfile
 import xml.etree.ElementTree as ET
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Literal
 
@@ -16,6 +16,84 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, geotiff_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+
+
+def get_value_by_prefix_suffix_or_none(dictionary: dict, prefixes: list[str], suffix: str):
+    for key, value in dictionary.items():
+        if key.endswith(suffix) and (not prefixes or any(key.startswith(p) for p in prefixes)):
+            return value
+    return None
+
+
+@contextmanager
+def csk_h5_scenes_to_geotiffs(h5_path: str, metadata: dict):
+    import h5py
+    import numpy as np
+    import rasterio
+    from rasterio.control import GroundControlPoint
+    from rasterio.transform import from_gcps
+
+    # Parse the QLK scenes to get their values
+    with AccessManager.make_local(h5_path) as f:
+        with h5py.File(f) as h5f:
+            values = []
+
+            for v in h5f.values():
+                if isinstance(v, h5py.Dataset) and v.name.endswith("QLK"):
+                    data: np.ndarray = v[()]
+                    values.append(data)
+                elif isinstance(v, h5py.Group):
+                    for vv in v.values():
+                        if isinstance(vv, h5py.Dataset) and vv.name.endswith("QLK"):
+                            data: np.ndarray = vv[()]
+                            values.append(data)
+
+    tiffs = []
+    for idx, data in enumerate(values):
+        # For each scene, get the GCPs to compute its transform
+        if idx + 1 < 10:
+            scene = f"S0{idx + 1}_SBI"
+        else:
+            scene = f"S{idx + 1}_SBI"
+
+        ul = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [scene], "Top_Left_Geodetic_Coordinates")
+        ur = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [scene], "Top_Right_Geodetic_Coordinates")
+        lr = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [scene], "Bottom_Right_Geodetic_Coordinates")
+        ll = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [scene], "Bottom_Left_Geodetic_Coordinates")
+
+        gcps = [
+            GroundControlPoint(0, 0, float(ul.split(" ")[1]), float(ul.split(" ")[0])),
+            GroundControlPoint(0, data.shape[1], float(ur.split(" ")[1]), float(ur.split(" ")[0])),
+            GroundControlPoint(data.shape[0], data.shape[1], float(lr.split(" ")[1]), float(lr.split(" ")[0])),
+            GroundControlPoint(data.shape[0], 0, float(ll.split(" ")[1]), float(ll.split(" ")[0]))
+        ]
+
+        width = data.shape[1]
+        height = data.shape[0]
+
+        transform = from_gcps(gcps)
+        profile = {
+            "driver": "GTiff",
+            "dtype": data.dtype,
+            "width": width,
+            "height": height,
+            "count": 1,
+            "crs": "EPSG:4326",
+            "transform": transform
+        }
+
+        # Create a tif from the h5 scene data in EPSG:4326
+        tmp_tif = tempfile.NamedTemporaryFile("w+", suffix=".tif", delete=False).name
+        with rasterio.open(tmp_tif, "w", **profile) as dst:
+            dst.write(data, indexes=1)
+        tiffs.append(tmp_tif)
+
+    # Handle clean-up of created files
+    try:
+        yield tiffs
+    finally:
+        for tif in tiffs:
+            os.remove(tif)  # !DELETE!
 
 
 class Driver(IngestDriver):
@@ -87,41 +165,24 @@ class Driver(IngestDriver):
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         elif self.data_format == AssetFormat.h5:
-            import h5py
-            import numpy as np
-            from PIL import Image
+            from osgeo import gdal
+            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
 
-            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.PNG, AssetFormat.png)
+            metadata = self.load_metadata(url)
 
-            with AccessManager.make_local(self.data_path) as f:
-                with h5py.File(f) as h5f:
-                    max_height = -np.inf
-                    values = []
-
-                    for v in h5f.values():
-                        if isinstance(v, h5py.Dataset) and v.name.endswith("QLK"):
-                            data: np.ndarray = v[()]
-                            max_height = max(max_height, data.shape[0])
-                            values.append(data)
-                        elif isinstance(v, h5py.Group):
-                            for vv in v.values():
-                                if isinstance(vv, h5py.Dataset) and vv.name.endswith("QLK"):
-                                    data: np.ndarray = vv[()]
-                                    max_height = max(max_height, data.shape[0])
-                                    values.append(data)
-
-                    for idx, data in enumerate(values):
-                        if data.shape[0] < max_height:
-                            values[idx] = np.pad(data, pad_width=(max_height - data.shape[0], 0), mode='edge')
-
-                    img = Image.fromarray(np.concatenate(values, axis=1))
-                    img.save(quicklook.href)
-            quicklook.size = AccessManager.get_size(quicklook.href)
-            assets.append(quicklook)
+            with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
+                Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from scenes tiffs {tiffs}")
+                # Because of the multiple scenes, the image is wider than high, so only contrain the height
+                gdal.Warp(quicklook.href, tiffs, format="PNG", height=Driver.OVERVIEW_SIZE)
+                if not AccessManager.exists(quicklook.href):
+                    raise DriverException(f"Failed to create quicklook {quicklook.href} from scenes tiffs {tiffs}")
+                quicklook.size = AccessManager.get_size(quicklook.href)
+                assets.append(quicklook)
 
             # Downsample quicklook for thumbnail
-            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE)
+            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.PNG, AssetFormat.png)
+            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
 
@@ -161,7 +222,7 @@ class Driver(IngestDriver):
     def add_major_metadata(self, url: str, item: Item, metadata: dict) -> Item:
         gsd = metadata["metadata"].get("", {}).get("Ground_Range_Geometric_Resolution", None)
         if gsd is None:
-            gsd = metadata["metadata"].get("", {}).get("S01_Ground_Range_Instrument_Geometric_Resolution", None)                                                
+            gsd = metadata["metadata"].get("", {}).get("S01_Ground_Range_Instrument_Geometric_Resolution", None)
         if gsd is not None:
             item.properties.gsd = float(gsd)
         item.properties.satellite = metadata["metadata"].get("", {}).get("Satellite_ID", None)
@@ -251,31 +312,28 @@ class Driver(IngestDriver):
             except Exception:
                 return None
 
-    def __get_value_by_prefix_suffix_or_none(self, dictionary: dict, prefixes: list[str], suffix: str):
-        for key, value in dictionary.items():
-            if key.endswith(suffix) and (not prefixes or any(key.startswith(p) for p in prefixes)):
-                return value
-        return None
-
     def __get_geometries__(self, metadata: dict):
+        return get_geom_bbox_centroid_from_corners(*self.__get_corners__(metadata))
+
+    def __get_corners__(self, metadata: dict) -> tuple[float, float, float, float, float, float, float, float]:
         coords = metadata.get("wgs84Extent", {}).get("coordinates", None)
         if coords:
-            return get_geom_bbox_centroid_from_corners(coords[0][0][0], coords[0][0][1], coords[0][1][0], coords[0][1][1], coords[0][2][0], coords[0][2][1], coords[0][3][0], coords[0][3][1],)
+            return (coords[0][0][0], coords[0][0][1], coords[0][1][0], coords[0][1][1], coords[0][2][0], coords[0][2][1], coords[0][3][0], coords[0][3][1])
 
-        ul = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Left_Geodetic_Coordinates")
-        ur = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Right_Geodetic_Coordinates")
-        lr = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Right_Geodetic_Coordinates")
-        ll = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Left_Geodetic_Coordinates")
+        ul = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Left_Geodetic_Coordinates")
+        ur = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Top_Right_Geodetic_Coordinates")
+        lr = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Right_Geodetic_Coordinates")
+        ll = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["MBI", "IMG"], "Bottom_Left_Geodetic_Coordinates")
         if (ul is None or ur is None or lr is None or ll is None) and metadata["metadata"].get("SUBDATASETS") is not None:
             # Not all products have those coordinates in this format
             # Some have their measures split up in multiple scenes
 
             # 2 datasets per scene, with each a name and description
             last_scene = int(len(metadata["metadata"]["SUBDATASETS"]) / 4)
-            ul = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Top_Left_Geodetic_Coordinates")
-            ur = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Top_Right_Geodetic_Coordinates")
-            lr = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Bottom_Right_Geodetic_Coordinates")
-            ll = self.__get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Bottom_Left_Geodetic_Coordinates")
+            ul = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Top_Left_Geodetic_Coordinates")
+            ur = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Top_Right_Geodetic_Coordinates")
+            lr = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], [f"S0{last_scene}_SBI"], "Bottom_Right_Geodetic_Coordinates")
+            ll = get_value_by_prefix_suffix_or_none(metadata["metadata"][""], ["S01_SBI"], "Bottom_Left_Geodetic_Coordinates")
 
         if ul and ur and lr and ll:
             ul_lat = float(ul.split(" ")[0])
@@ -286,6 +344,6 @@ class Driver(IngestDriver):
             lr_lon = float(lr.split(" ")[1])
             ll_lat = float(ll.split(" ")[0])
             ll_lon = float(ll.split(" ")[1])
-            return get_geom_bbox_centroid_from_corners(ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
+            return (ul_lon, ul_lat, ur_lon, ur_lat, lr_lon, lr_lat, ll_lon, ll_lat)
         else:
             raise DriverException("Geodetic Coordinates not found in the metadata")

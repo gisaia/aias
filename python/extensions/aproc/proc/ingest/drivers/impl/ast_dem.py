@@ -39,7 +39,6 @@ class Driver(IngestDriver):
         self.tif_path = None
         self.tfw_path = None
 
-
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
