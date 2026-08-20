@@ -37,9 +37,11 @@ LOGGER = Logger.get_logger()
 
 supported_assets_for_enrichment = set()
 
+
 class InputEnrichProcess(InputProcess):
-    requests: list[dict[str, str]] = Field(default=[], title="The list of items (collection, item_id) to enrich")
-    enrichments: list[str] = Field(default=[], title="The list of assets for enriching the item")
+    requests: list[dict[str, str]] = Field(title="The list of items (collection, item_id) to enrich")
+    enrichments: list[str] = Field(title="The list of assets for enriching the item")
+
 
 class OutputEnrichProcess(OutputProcess):
     item_locations: list[str] = Field(title="Items locations", description="Locations of the Item on the ARLAS Item Registration Service")

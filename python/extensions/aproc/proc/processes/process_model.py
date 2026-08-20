@@ -1,5 +1,4 @@
 from pydantic import Field
-from aproc.core.models.ogc.execute import Subscriber
 from aproc.core.processes.process import InputProcess as _InputProcess
 
 
@@ -10,7 +9,7 @@ class InputProcess(_InputProcess):
 
 
 class OutputProcess(_InputProcess):
-    sub_jobs: list[str] = Field(default=[], title="Sub jobs", description="List of sub jobs that have been created for the process", minOccurs=0, maxOccurs=-1)
-    message: str = Field(default="", title="Message", description="Message that can be returned by the process", minOccurs=0, maxOccurs=1)
-    error: str = Field(default="", title="Error", description="Error that can be returned by the process", minOccurs=0, maxOccurs=1)
-    process: str = Field(title="Process", description="Name of the process that has been executed", minOccurs=0, maxOccurs=1)
+    sub_jobs: list[str] = Field(default=[], title="Sub jobs", description="List of sub jobs that have been created for the process")
+    message: str = Field(default="", title="Message", description="Message that can be returned by the process")
+    error: str = Field(default="", title="Error", description="Error that can be returned by the process")
+    process: str = Field(title="Process", description="Name of the process that has been executed")

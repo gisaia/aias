@@ -14,28 +14,36 @@ def base_model2description(model: type[BaseModel]) \
         copy_v = {**v}
 
         # Keep all the attributes of inputDescription and outputDescription
-        if "title" in copy_v.keys():
+        keys = copy_v.keys()
+        if "title" in keys:
             result["title"] = copy_v["title"]
             del copy_v["title"]
-        if "description" in copy_v.keys():
+        if "description" in keys:
             result["description"] = copy_v["description"]
             del copy_v["description"]
-        if "keywords" in copy_v.keys():
+        if "keywords" in keys:
             result["keywords"] = copy_v["keywords"]
             del copy_v["keywords"]
-        if "metadata" in copy_v.keys():
+        if "metadata" in keys:
             result["metadata"] = copy_v["metadata"]
             del copy_v["metadata"]
-        if "additionalParameters" in copy_v.keys():
+        if "additionalParameters" in keys:
             result["additionalParameters"] = copy_v["additionalParameters"]
             del copy_v["additionalParameters"]
-        # Keep all the attributes of inputDescription
-        if "minOccurs" in copy_v.keys():
-            result["minOccurs"] = copy_v["minOccurs"]
-            del copy_v["minOccurs"]
-        if "maxOccurs" in copy_v.keys():
-            result["maxOccurs"] = copy_v["maxOccurs"]
-            del copy_v["maxOccurs"]
+
+        # If there is a default value, then the value is NOT required
+        if "default" in keys:
+            result["minOccurs"] = 0
+        else:
+            result["minOccurs"] = 1
+        # Only one of each paramater. Otherwise it would be a list
+        result["maxOccurs"] = 1
+
+        # Parameters associated with a list input
+        if "min_length" in copy_v.keys():
+            result["minItems"] = copy_v["min_length"]
+        if "max_length" in keys:
+            result["maxItems"] = copy_v["max_length"]
 
         result["schema"] = copy_v
         description[k] = {**result}
