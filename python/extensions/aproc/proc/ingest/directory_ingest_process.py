@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import json
 import os
 
@@ -83,7 +84,9 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
-        return InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
+        directory = InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
+        storage = AccessManager.resolve_storage(directory)
+        return hashlib.sha256((storage.to_string() + directory).encode("utf-8")).hexdigest()
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], subscriber: dict[str, str], directory: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], cascade_subscriber: bool = False) -> dict:

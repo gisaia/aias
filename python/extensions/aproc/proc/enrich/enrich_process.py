@@ -93,8 +93,11 @@ class AprocProcess(Process):
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
         inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
-        hash_object = hashlib.sha1("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode())
-        return hash_object.hexdigest()
+        if len(inputs.requests) == 1:
+            hash_object = inputs.requests[0]["item_id"]
+        else:
+            hash_object = hashlib.sha256("/".join(list(map(lambda r: r["collection"] + r["item_id"], inputs.requests))).encode()).hexdigest()
+        return hash_object
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], subscriber: dict[str, str], requests: list[dict[str, str]], enrichments: list[str], include_drivers: list[str] = [], exclude_drivers: list[str] = [], cascade_subscriber: bool = False) -> dict:

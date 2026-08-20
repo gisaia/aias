@@ -195,7 +195,8 @@ class Tests(AprocTests):
 
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for_success(status)
-
+        if len(ids) == 1:
+            self.assertEqual(status.resourceID, ids[0], "Resource ID is not the same as the item ID")
         result = self.get_result(status)
 
         # FILE MUST EXIST
