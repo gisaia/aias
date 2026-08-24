@@ -25,10 +25,12 @@
   height: calc(100% - sizes.$sectionTitleHeight);
   .file {
     .name {
-      padding: 10px 5px;
+      font-size: 14px;
+      padding: 10px 8px;
       border: none;
       background-color: white;
       cursor: auto;
+      min-width: unset;
 
       &--folder {
         cursor: pointer;
