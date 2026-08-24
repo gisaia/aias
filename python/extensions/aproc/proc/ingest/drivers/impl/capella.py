@@ -30,7 +30,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
@@ -64,14 +64,14 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.quicklook_path is None:
             tif_for_overview = self.big_preview_path if self.big_preview_path else self.tif_path
-            if AccessManager.is_local(tif_for_overview) and Driver.configuration.get('build_overview_when_local', True):
+            if tif_for_overview and AccessManager.is_local(tif_for_overview) and Driver.configuration.get('build_overview_when_local', True):
                 Driver.LOGGER.debug(f"Building overview for local {tif_for_overview}")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.quicklook_path = overview.href
                 assets.append(overview)
-            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            elif tif_for_overview and Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
                 Driver.LOGGER.debug(f"Building overview for remote {tif_for_overview}")
                 overview_folder = self.assets_dir + '/capella/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)

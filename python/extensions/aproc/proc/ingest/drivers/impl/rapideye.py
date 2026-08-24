@@ -33,7 +33,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -145,7 +145,7 @@ class Driver(IngestDriver):
                 if not file.is_dir:
                     if file.name.endswith("_browse.tif"):
                         self.browse_path = file.path
-                    if file.name.endswith(".tif") and file.name.find("browse") < 0 and file.name.find("_udm") < 0:
+                    if file.name.endswith(".tif") and file.name.lower().find("_re") > 0 and file.name.find("browse") < 0 and file.name.find("_udm") < 0:
                         self.tif_path = file.path
                         tfw_path = os.path.splitext(self.tif_path)[0] + ".tfw"
                         if AccessManager.exists(tfw_path):

@@ -11,6 +11,7 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Driver(IngestDriver):
+    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -25,6 +26,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:

@@ -25,7 +25,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     def identify_assets(self, url: str):
         assets: list[Asset] = []

@@ -46,7 +46,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -160,7 +160,7 @@ class Driver(IngestDriver):
                 if asset.name == Role.overview.value:
                     self._crop_black_borders(url, asset)
                     break
-        elif AccessManager.is_local(self.toa_path):
+        elif self.toa_path and ((AccessManager.is_local(self.toa_path) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(self.toa_path) and Driver.configuration.get('build_overview_when_remote', False))):
             # Fallback: generate overview from TOA data if no preview PNG
             tif_path = self.visual_path if self.visual_path else self.toa_path
             bands = [1, 2, 3] if self.visual_path else [3, 2, 1]
