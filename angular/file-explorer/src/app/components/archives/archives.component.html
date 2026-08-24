@@ -16,9 +16,12 @@
           <div mat-line class="label">
             {{archive.name}}
           </div>
+          @if (archive.last_modification_date) {
           <div mat-line class="detail">
-            <span>{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short') || '--'} }}</span>
+            <span>{{ 'last update:' | translate : {date: (archive.last_modification_date | date:'short') || '--'}
+              }}</span>
           </div>
+          }
 
           <div mat-line class="detail detail-id">
             <span>{{ 'id:' | translate:{id: archive.id} }}</span>
