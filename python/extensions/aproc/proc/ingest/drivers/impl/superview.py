@@ -149,14 +149,14 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.overview_path is None:
-            if self.overview_path and AccessManager.is_local(self.overview_path) and Driver.configuration.get('build_overview_when_local', True):
+            if self.overview_path and IngestDriver.must_build_preview(Driver.configuration, self.overview_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Use {self.overview_path} for quicklook")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(self.overview_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', False))
                 overview.size = AccessManager.get_size(overview.href)
                 self.overview_path = overview.href
                 assets.append(overview)
-            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            elif IngestDriver.must_build_preview(Driver.configuration, self.overview_path, local_remote_both="remote"):
                 Driver.LOGGER.debug(f"Building overview for remote {self.overview_path}")
                 overview_folder = self.assets_dir + '/superview/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)

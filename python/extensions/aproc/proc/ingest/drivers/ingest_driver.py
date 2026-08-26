@@ -35,6 +35,19 @@ class IngestDriver(AbstractDriver):
     def init(configuration: dict):
         return
 
+    @staticmethod
+    def must_build_preview(configuration: dict, data_path: str, local_remote_both: str = "both") -> bool:
+        if configuration is None or data_path is None:
+            return False
+        if local_remote_both == "both":
+            return (AccessManager.is_local(data_path) and configuration.get('build_overview_when_local', True)) or (data_path and not AccessManager.is_local(data_path) and configuration.get('build_overview_when_remote', False))
+        elif local_remote_both == "local":
+            return AccessManager.is_local(data_path) and configuration.get('build_overview_when_local', True)
+        elif local_remote_both == "remote":
+            return not AccessManager.is_local(data_path) and configuration.get('build_overview_when_remote', False)
+        else:
+            return False
+
     def get_assets_dir(self, url: str) -> str:
         """Provides the directory for storing the assets
 

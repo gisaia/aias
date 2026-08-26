@@ -57,7 +57,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if (AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_remote', False)):
+        if IngestDriver.must_build_preview(Driver.configuration, url):
             from osgeo import gdal
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             # Minify all the tiffs

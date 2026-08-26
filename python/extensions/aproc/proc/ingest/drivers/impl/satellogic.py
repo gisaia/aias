@@ -160,7 +160,7 @@ class Driver(IngestDriver):
                 if asset.name == Role.overview.value:
                     self._crop_black_borders(url, asset)
                     break
-        elif self.toa_path and ((AccessManager.is_local(self.toa_path) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(self.toa_path) and Driver.configuration.get('build_overview_when_remote', False))):
+        elif self.toa_path and IngestDriver.must_build_preview(Driver.configuration, self.toa_path, local_remote_both="both"):
             # Fallback: generate overview from TOA data if no preview PNG
             tif_path = self.visual_path if self.visual_path else self.toa_path
             bands = [1, 2, 3] if self.visual_path else [3, 2, 1]

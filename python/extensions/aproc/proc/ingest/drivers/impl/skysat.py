@@ -70,7 +70,7 @@ class Driver(IngestDriver):
             tif_path = self.sr_path
             stretch = Driver.configuration.get('overview_stretch', True)
         quicklook = None
-        if tif_path and ((AccessManager.is_local(tif_path) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(tif_path) and Driver.configuration.get('build_overview_when_remote', False))):
+        if tif_path and IngestDriver.must_build_preview(Driver.configuration, tif_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
             quicklook.size = AccessManager.get_size(quicklook.href)

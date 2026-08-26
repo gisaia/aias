@@ -47,14 +47,14 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]):
         if self.quicklook_path is None:
-            if AccessManager.is_local(self.tif_path) and Driver.configuration.get('build_overview_when_local', True):
+            if IngestDriver.must_build_preview(Driver.configuration, self.tif_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Building overview for local TIFF {self.tif_path}")
                 quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT/5, Driver.OVERVIEW_FROM_TIFF_PCT/5, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
-            elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            elif IngestDriver.must_build_preview(Driver.configuration, self.tif_path, local_remote_both="remote"):
                 Driver.LOGGER.debug(f"Building overview for remote TIFF {self.tif_path}")
                 overview_folder = self.assets_dir + '/umbra_stac/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)

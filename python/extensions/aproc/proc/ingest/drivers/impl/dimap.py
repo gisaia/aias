@@ -85,7 +85,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.quicklook_path is None and self.image_path and ((AccessManager.is_local(self.image_path) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(self.image_path) and Driver.configuration.get('build_overview_when_remote', False))):
+        if self.quicklook_path is None and IngestDriver.must_build_preview(Driver.configuration, self.image_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.image_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)

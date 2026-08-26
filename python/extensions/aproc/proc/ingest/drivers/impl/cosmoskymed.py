@@ -165,7 +165,7 @@ class Driver(IngestDriver):
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         else:
-            if (AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_local', True)) or (not AccessManager.is_local(url) and Driver.configuration.get('build_overview_when_remote', False)):
+            if IngestDriver.must_build_preview(Driver.configuration, url):
                 if self.data_format == AssetFormat.h5:
                     from osgeo import gdal
                     gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())

@@ -82,14 +82,14 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]):
         if self.tci_path is not None:
-            if AccessManager.is_local(self.tci_path) and Driver.configuration.get('build_overview_when_local', True):
+            if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Building overview for local TIFF {self.tci_path}")
                 quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
-            elif not AccessManager.is_local(self.tci_path) and Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+            elif IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="remote"):
                 Driver.LOGGER.debug(f"Building overview for remote TIFF {self.tci_path}")
                 overview_folder = self.assets_dir + '/opencosmos/' + self.get_item_id(url) + '/overview'
                 AccessManager.makedir(overview_folder)
