@@ -284,7 +284,7 @@ class Processes:
             query_str = query_str + " @status:{'" + status + "'}"
         if (not process_id) and (not status):
             query_str = "*"
-        q = Query(query_str).paging(offset=offset, num=limit).sort_by("modification_date", asc=False)
+        q = Query(query_str).paging(offset=offset, num=limit).sort_by("creation_date", asc=False)
         r = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX).search(q)
         return StatusInfoList(total=r.total, status_list=list(map(lambda d: Processes.__to_status_info__(json.loads(d.json)), r.docs)))
 

@@ -24,8 +24,7 @@ class Driver(EnrichDriver):
     @staticmethod
     def init(configuration: dict):
         EnrichDriver.init(configuration)
-        if configuration:
-            Driver.configuration = configuration
+        Driver.configuration = configuration or {}
         supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
         Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
         Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
