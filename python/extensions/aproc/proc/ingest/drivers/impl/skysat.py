@@ -29,7 +29,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -69,17 +69,14 @@ class Driver(IngestDriver):
             bands = [3, 2, 1]
             tif_path = self.sr_path
             stretch = Driver.configuration.get('overview_stretch', True)
+        quicklook = None
+        if tif_path and IngestDriver.must_build_preview(Driver.configuration, tif_path, local_remote_both="both"):
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            assets.append(quicklook)
 
-        # Skip generation if tif is not local
-        if not AccessManager.is_local(tif_path):
-            return assets
-
-        quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
-        quicklook.size = AccessManager.get_size(quicklook.href)
-        assets.append(quicklook)
-
-        if self.thumbnail_path is None:
+        if self.thumbnail_path is None and quicklook is not None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)

@@ -20,7 +20,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -33,7 +33,7 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if AccessManager.is_local(url):
+        if IngestDriver.must_build_preview(Driver.configuration, url, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(url, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', True))
             quicklook.size = AccessManager.get_size(quicklook.href)

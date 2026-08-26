@@ -117,7 +117,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -164,27 +164,29 @@ class Driver(IngestDriver):
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
-        elif self.data_format == AssetFormat.h5:
-            from osgeo import gdal
-            gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
+        else:
+            if IngestDriver.must_build_preview(Driver.configuration, url):
+                if self.data_format == AssetFormat.h5:
+                    from osgeo import gdal
+                    gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
 
-            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.PNG, AssetFormat.png)
-            metadata = self.load_metadata(url)
+                    quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.PNG, AssetFormat.png)
+                    metadata = self.load_metadata(url)
 
-            with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
-                Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from scenes tiffs {tiffs}")
-                # Because of the multiple scenes, the image is wider than high, so only contrain the height
-                gdal.Warp(quicklook.href, tiffs, format="PNG", height=Driver.OVERVIEW_SIZE)
-                if not AccessManager.exists(quicklook.href):
-                    raise DriverException(f"Failed to create quicklook {quicklook.href} from scenes tiffs {tiffs}")
-                quicklook.size = AccessManager.get_size(quicklook.href)
-                assets.append(quicklook)
+                    with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
+                        Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from scenes tiffs {tiffs}")
+                        # Because of the multiple scenes, the image is wider than high, so only contrain the height
+                        gdal.Warp(quicklook.href, tiffs, format="PNG", height=Driver.OVERVIEW_SIZE)
+                        if not AccessManager.exists(quicklook.href):
+                            raise DriverException(f"Failed to create quicklook {quicklook.href} from scenes tiffs {tiffs}")
+                        quicklook.size = AccessManager.get_size(quicklook.href)
+                        assets.append(quicklook)
 
-            # Downsample quicklook for thumbnail
-            thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.PNG, AssetFormat.png)
-            downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
-            thumbnail.size = AccessManager.get_size(thumbnail.href)
-            assets.append(thumbnail)
+                    # Downsample quicklook for thumbnail
+                    thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.PNG, AssetFormat.png)
+                    downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
+                    thumbnail.size = AccessManager.get_size(thumbnail.href)
+                    assets.append(thumbnail)
 
         return assets
 

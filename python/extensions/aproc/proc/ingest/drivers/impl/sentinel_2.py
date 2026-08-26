@@ -45,7 +45,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
-        Driver.configuration = configuration
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -78,13 +78,13 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if AccessManager.is_local(self.tci_path) and Driver.configuration.get('build_overview_when_local', True):
+        if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
             Driver.LOGGER.debug(f"Building overview for local TCI {self.tci_path}")
             overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
             overview.size = AccessManager.get_size(overview.href)
             assets.append(overview)
-        elif Driver.configuration and Driver.configuration.get('build_overview_when_remote', False):
+        elif IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="remote"):
             Driver.LOGGER.debug(f"Building overview for remote TCI {self.tci_path}")
             overview_folder = self.assets_dir + '/sentinel2/' + self.get_item_id(url) + '/overview'
             AccessManager.makedir(overview_folder)

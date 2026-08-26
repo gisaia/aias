@@ -104,6 +104,8 @@ def get_product_values(filename):
 
 
 class Driver(IngestDriver):
+    configuration: dict = {}
+
     ns = {
         "xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "gml": "http://www.opengis.net/gml",
@@ -129,6 +131,7 @@ class Driver(IngestDriver):
     @staticmethod
     def init(configuration: dict):
         IngestDriver.init(configuration)
+        Driver.configuration = configuration or {}
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
