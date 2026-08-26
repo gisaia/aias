@@ -10,5 +10,4 @@ else
     EXTRA_OPT="-b "`echo $BROKER | sed 's/pyamqp:\/\//amqp:\/\//'`
 fi
 
-. aproc/bin/activate
 celery $EXTRA_OPT inspect ping --destination worker@$HOSTNAME

@@ -136,7 +136,9 @@ class AprocProcess(Process):
                         item.properties.keywords = []
                     for asset in assets:
                         item.assets[asset.name] = asset
-                        item.properties.keywords.append("has_{}".format(asset.name))
+                        k = "has_{}".format(asset.name)
+                        if k not in item.properties.keywords:
+                            item.properties.keywords.append("has_{}".format(asset.name))
 
                         Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'upload', 'current': 1, 'asset': asset.name, 'total': len(item.assets), "ACTION": "ENRICH", "TARGET": item_id})
                         start = time()
