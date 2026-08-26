@@ -5,8 +5,12 @@ from extensions.aproc.proc.drivers.driver_configuration import DriverConfigurati
 from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
+class IngestDriverConfiguration(DriverConfiguration, extra='allow'):
+    enrichments: list[str] = Field([], title="The list of assets for enriching the item")
+
+
 class Settings(BaseModel, extra='allow'):
-    drivers: list[DriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the ingestion drivers.")
+    drivers: list[IngestDriverConfiguration] = Field(title="Drivers configuration", description="Configuration of the ingestion drivers.")
     inputs_directory: str = Field(title="Archive tree root location", description="Location of the archives tree that can be explored and ingested.")
     max_number_of_archive_for_ingest: int = Field(default=1000000, title="Max number of archive for ingestion", description="Maximum number of archives to ingest when ingesting a directory")
     aproc_endpoint: str = Field(title="APROC endpoint", description="APROC endpoint for submitting sub tasks")

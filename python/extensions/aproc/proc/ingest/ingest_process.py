@@ -22,7 +22,7 @@ from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
 from extensions.aproc.proc.enrich.enrich_process import InputEnrichProcess
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.ingest.settings import \
-    Configuration as IngestConfiguration
+    Configuration as IngestConfiguration, IngestDriverConfiguration
 from extensions.aproc.proc.processes.arlas_services_helper import (
     JSON_HEADER, ARLASServicesHelper)
 from extensions.aproc.proc.processes.process_model import InputProcess, OutputProcess
@@ -95,6 +95,10 @@ class AprocProcess(Process):
         if driver is not None:
             return driver.get_item_id(url)
         raise DriverException("No driver found for  {}".format(url))
+
+    @staticmethod
+    def __get_driver_configuration(driver_name: str) -> IngestDriverConfiguration:
+        return next((d for d in IngestConfiguration.settings.drivers if d.name == driver_name))
 
     @shared_task(bind=True, track_started=True)
     def execute(self, headers: dict[str, str], subscriber: dict[str, str], url: str, collection: str, catalog: str, annotations: str, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], cascade_subscriber: bool = False) -> dict:
@@ -170,6 +174,7 @@ class AprocProcess(Process):
                 Process.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": url})
                 item: Item = ARLASServicesHelper.insert_or_update_item(item, Configuration.settings.airs_endpoint)
                 sub_jobs: list[str] = []
+                enrichments = enrichments or AprocProcess.__get_driver_configuration(driver.name).enrichments
                 if enrichments:
                     try:
                         inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": item.collection, "item_id": item.id}], enrichments=enrichments, cascade_subscriber=cascade_subscriber)
