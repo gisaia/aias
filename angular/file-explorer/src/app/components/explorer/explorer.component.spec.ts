@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
 import { provideToastr } from 'ngx-toastr';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ExplorerComponent } from './explorer.component';
 
 describe('ExplorerComponent', () => {
@@ -26,6 +26,7 @@ describe('ExplorerComponent', () => {
 
         fixture = TestBed.createComponent(ExplorerComponent);
         component = fixture.componentInstance;
+        fixture.componentRef.setInput('currentCollection', 'test');
         fixture.detectChanges();
     });
 

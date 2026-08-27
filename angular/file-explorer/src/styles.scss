@@ -100,6 +100,8 @@ body {
   min-height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  --mat-dialog-supporting-text-tracking: 0;
 }
 
 .toast-container {

@@ -66,14 +66,15 @@ export class JobService {
     });
   }
 
-  public ingestArchive(archive: Archive, annotations: string, drivers: string[] = []): Observable<any> {
+  public ingestArchive(archive: Archive, annotations: string, drivers: string[] = [], createOverviewCOG = false): Observable<any> {
     const payload: IngestPayload = {
       inputs: {
         url: archive.path,
         collection: this.getCollection(),
         catalog: this.jobSettings?.catalog || 'catalog',
         annotations,
-        include_drivers: drivers
+        include_drivers: drivers,
+        enrichments: createOverviewCOG ? ['overview_cog'] : []
       },
       outputs: null,
       response: 'raw',
@@ -82,14 +83,15 @@ export class JobService {
     return this.http.post(this.jobSettings?.url + '/processes/ingest/execution', payload, this.options);
   }
 
-  public ingestDirectory(node: DynamicFileNode, annotations: string, drivers: string[] = []) {
+  public ingestDirectory(node: DynamicFileNode, annotations: string, drivers: string[] = [], createOverviewCOG = false) {
     const payload: IngestPayload = {
       inputs: {
         catalog: this.jobSettings?.catalog || 'catalog',
         collection: this.getCollection(),
         directory: node.path,
         annotations,
-        include_drivers: drivers
+        include_drivers: drivers,
+        enrichments: createOverviewCOG ? ['overview_cog'] : []
       },
       outputs: null,
       response: 'raw',

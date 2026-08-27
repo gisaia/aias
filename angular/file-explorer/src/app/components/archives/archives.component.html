@@ -56,12 +56,12 @@
           </span>
           } @else if (!archive.status) {
           <span class="material-symbols-outlined no-pointer not-activated"
-            [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection}">
+            [matTooltip]="'Not activated in collection' | translate:{collection: currentCollection()}">
             unpublished
           </span>
 
           <span class="material-symbols-outlined pointer" (keydown)="activate(archive)" (click)="activate(archive)"
-            [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection}">
+            [matTooltip]="'Activate this file in collection' | translate:{collection: currentCollection()}">
             add_circle
           </span>
           }
@@ -77,7 +77,7 @@
   </div>
   } @else if (archives.length === 0) {
   <div class="no-archive">
-    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath}}
+    {{'Unable to find valid archive in this path: ' | translate}} <br /> {{archivesPath()}}
   </div>
   }
   <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" [name]="'archives'" size="default" color="#fff" type="line-scale"

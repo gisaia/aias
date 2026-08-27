@@ -23,7 +23,7 @@
           collapse_all
         </span>
       </div>
-      @if(currentCollection !== ''){
+      @if (currentCollection) {
         <app-explorer [collapseAllSubject]="collapseEvent" [currentCollection]="currentCollection" (archivePath)="archivesPath = $event"></app-explorer>
       }
     </div>
@@ -36,7 +36,7 @@
             (selectedValueChange)="collectionChange($event)"></app-collection-list>
         </div>
       </div>
-      @if(currentCollection !== ''){
+      @if (currentCollection) {
         <app-archives [archivesPath]="archivesPath" [currentCollection]="currentCollection"></app-archives>
       }
     </div>

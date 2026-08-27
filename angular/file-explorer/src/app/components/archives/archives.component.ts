@@ -19,9 +19,10 @@
 
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChip, MatChipListbox, MatChipOption, MatChipSet } from '@angular/material/chips';
+import { MatChip, MatChipSet } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatList, MatListItem } from '@angular/material/list';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -35,7 +36,7 @@ import { emitErrors } from '@tools/errors';
 import { Archive, ARLAS_AIAS_DRIVERS_ACTIVATED, ProcessStatus } from '@tools/interface';
 import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, forkJoin, map, mergeMap, of, Subject, takeUntil, zip } from 'rxjs';
+import { catchError, finalize, forkJoin, map, mergeMap, of, zip } from 'rxjs';
 import { CopyIdComponent } from '../copy-id/copy-id.component';
 
 @Component({
@@ -47,15 +48,15 @@ import { CopyIdComponent } from '../copy-id/copy-id.component';
     MatChip, MatTooltip, NgxSpinnerComponent, DatePipe, TranslatePipe
   ]
 })
-export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
+export class ArchivesComponent implements OnChanges, OnInit {
 
-  protected onDestroy = new Subject<void>();
+  public archivesPath = input.required<string>();
+  public currentCollection = input.required<string>();
 
-  @Input() public archivesPath = '';
-  @Input() public currentCollection: string;
-  public archives: Archive[] | undefined = undefined;
-  public selectedDrivers = [];
+  public archives: Archive[] | undefined;
+  public selectedDrivers: string[] = [];
 
+  private readonly destroyRef = inject(DestroyRef);
   public constructor(
     private readonly famService: FamService,
     private readonly jobService: JobService,
@@ -66,7 +67,6 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
     private readonly toastr: ToastrService
   ) { }
 
-
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['archivesPath'] && changes['archivesPath'].currentValue !== '') {
       this.spinner.show('archives');
@@ -75,26 +75,21 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.famService.refreshArchives$.pipe(takeUntil(this.onDestroy)).subscribe({
+    this.famService.refreshArchives$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: refresh => {
-        if (!!refresh && !!this.archivesPath && this.archivesPath !== '') {
+        if (!!refresh && this.archivesPath()) {
           this.spinner.show('archives');
-          this.getArchives(this.archivesPath);
+          this.getArchives(this.archivesPath());
         }
       }
     });
-    this.famService.refreshArchivesFromTasks$.pipe(takeUntil(this.onDestroy)).subscribe({
+    this.famService.refreshArchivesFromTasks$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: refresh => {
-        if (!!refresh && !!this.archivesPath && this.archivesPath !== '') {
-          this.getArchives(this.archivesPath);
+        if (!!refresh && this.archivesPath()) {
+          this.getArchives(this.archivesPath());
         }
       }
     });
-  }
-
-  public ngOnDestroy(): void {
-    this.onDestroy.next();
-    this.onDestroy.complete();
   }
 
   public getArchives(path: string) {
@@ -147,7 +142,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (confirm.status) {
-          this.jobService.ingestArchive(archive, confirm.annotations, confirm.drivers).subscribe({
+          this.jobService.ingestArchive(archive, confirm.annotations, confirm.drivers, confirm.createOverviewCOG).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'));
@@ -178,7 +173,7 @@ export class ArchivesComponent implements OnChanges, OnInit, OnDestroy {
           this.statusService.dereferenceArchive(archive.id).subscribe({
             next: () => {
               this.spinner.show('archives');
-              this.getArchives(this.archivesPath);
+              this.getArchives(this.archivesPath());
               this.toastr.success(this.translate.instant('Archive dereferenced'));
             },
             error: (err: HttpErrorResponse) => {

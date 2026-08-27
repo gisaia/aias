@@ -1,8 +1,10 @@
-<h2 mat-dialog-title class="title">{{title}}</h2>
+<h2 mat-dialog-title class="title">{{ title | translate }}</h2>
 <mat-dialog-content class="content">
+  @if (message) {
   <div>
-    {{message}}
+    {{ message | translate }}
   </div>
+  }
 
   @if(showActivationInfos){
   <mat-form-field class="annotations" appearance="fill">
@@ -12,10 +14,16 @@
   </mat-form-field>
 
   <div>{{'In collection' | translate}} <strong>{{currentCollection}}</strong></div>
-  <br />
-  <div>{{'Enabled drivers' | translate}}</div>
-  <app-drivers-list class="drivers-list" (selectedDrivers)="updateSelectedDrivers($event)"></app-drivers-list>
 
+  <mat-slide-toggle [checked]="createOverviewCOG()" (change)="toggleOverviewCOGCreation($event)" labelPosition="before"
+      [matTooltip]="'COG generation is triggered once the archive has been ingested' | translate">
+    {{ 'Generate overview COG' | translate }}
+  </mat-slide-toggle>
+
+  <div>
+    {{'Enabled drivers' | translate}}
+    <app-drivers-list class="drivers-list" (selectedDrivers)="updateSelectedDrivers($event)"></app-drivers-list>
+  </div>
   }
 
 </mat-dialog-content>
@@ -25,7 +33,7 @@
     {{'Cancel' | translate}}
   </button>
   <button matButton="filled" color="primary"
-    [mat-dialog-close]="{status: true, annotations: annotation, drivers: selectedDrivers()}">
+    [mat-dialog-close]="{ status: true, annotations: annotation, drivers: selectedDrivers(), createOverviewCOG: createOverviewCOG() }">
     {{action | translate}}
   </button>
 </mat-dialog-actions>

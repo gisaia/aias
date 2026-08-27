@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-translate/core';
+import { OAuthModule } from 'angular-oauth2-oidc';
 import { ArlasStartupService, CONFIG_UPDATER, FETCH_OPTIONS, GET_OPTIONS } from 'arlas-wui-toolkit';
 import { provideToastr } from 'ngx-toastr';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { StartupService } from './startup.service';
 
 describe('StartupService', () => {
@@ -31,7 +32,8 @@ describe('StartupService', () => {
             imports: [
                 TranslateModule.forRoot({
                     loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader }
-                })
+                }),
+                OAuthModule.forRoot()
             ]
         });
         service = TestBed.inject(StartupService);

@@ -67,7 +67,7 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(MatPaginator) public paginator: MatPaginator;
+  @ViewChild(MatPaginator) public paginator?: MatPaginator;
   public allTasksEnded = output<boolean>();
 
   public tasks: Process[] = [];
@@ -104,7 +104,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
         if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
-          this.paginator.firstPage();
+          this.paginator?.firstPage();
           this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
             this.getTasks();
           });
@@ -117,7 +117,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
         if (refresh) {
           this.unsubscribeRefreshTasks.next(true);
           this.pageIndex = 0;
-          this.paginator.firstPage();
+          this.paginator?.firstPage();
           this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
             this.getTasks();
             this.famService.refreshArchivesFromTasks$.next(true);
@@ -163,7 +163,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  public cancelJob(task, jobId: string) {
+  public cancelJob(task: Process, jobId: string) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, { minWidth: '400px' });
     dialogRef.componentInstance.title = this.translate.instant('Confirmation');
     dialogRef.componentInstance.message = this.translate.instant('Would you like to cancel this job ?');

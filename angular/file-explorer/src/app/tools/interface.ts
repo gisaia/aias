@@ -19,6 +19,8 @@
 
 export const ARLAS_AIAS_ACTIVE_COLLECTION = 'ARLAS_AIAS_ACTIVE_COLLECTION';
 export const ARLAS_AIAS_DRIVERS_ACTIVATED = 'driversActivated';
+/** Token used in the local storage to store user preferences for COG generation */
+export const ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION = 'ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION';
 
 export interface IngestPayload {
   inputs: {
@@ -28,6 +30,7 @@ export interface IngestPayload {
     directory?: string;
     annotations: string;
     include_drivers: string[];
+    enrichments?: string[];
   };
   outputs: any;
   response: 'raw';
