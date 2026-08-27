@@ -4,6 +4,7 @@ import { TranslateLoader, TranslateModule, TranslateNoOpLoader } from '@ngx-tran
 import { StatusService } from '@services/status/status.service';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { provideToastr } from 'ngx-toastr';
+import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HomeComponent } from './home.component';
 
@@ -27,7 +28,9 @@ describe('HomeComponent', () => {
                     provide: StatusService,
                     useValue: {
                         existingCollections: [],
-                        fetchExistingCollections: vi.fn(() => {}),
+                        fetchExistingCollections: vi.fn(() => of({
+                            collections: []
+                        })),
                         statusSettings: {
                             collection: ''
                         }

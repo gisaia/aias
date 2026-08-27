@@ -18,15 +18,17 @@
  */
 
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltip } from '@angular/material/tooltip';
 import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ARLAS_AIAS_ACTIVE_COLLECTION } from '@tools/interface';
+import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION } from '@tools/interface';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -35,10 +37,18 @@ import { ARLAS_AIAS_ACTIVE_COLLECTION } from '@tools/interface';
   imports: [
     MatDialogModule, DriversListComponent, MatFormFieldModule,
     MatButtonModule, TranslatePipe, TextFieldModule, MatInputModule,
-    MatChipsModule
+    MatChipsModule, MatSlideToggleModule, MatTooltip
+  ],
+  providers: [
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: {
+        subscriptSizing: 'dynamic'
+      }
+    }
   ]
 })
-export class ConfirmDialogComponent implements OnInit {
+export class ConfirmDialogComponent {
 
   public title = '';
   public message = '';
@@ -46,10 +56,14 @@ export class ConfirmDialogComponent implements OnInit {
   public showActivationInfos = true;
   public selectedDrivers = signal<string[]>([]);
   public annotation = '';
-  public currentCollection = '';
 
-  public ngOnInit(): void {
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION);
+  public currentCollection;
+  /** Whether to create an overview COG when ingesting the selected archive */
+  public createOverviewCOG;
+
+  public constructor() {
+    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) as string;
+    this.createOverviewCOG = signal(localStorage.getItem(ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION) === 'true');
   }
 
   public onAnnotationChange(text: string) {
@@ -58,6 +72,11 @@ export class ConfirmDialogComponent implements OnInit {
 
   public updateSelectedDrivers(drivers: string[]): void {
     this.selectedDrivers.set(drivers);
+  }
+
+  public toggleOverviewCOGCreation(event: MatSlideToggleChange) {
+    this.createOverviewCOG.set(event.checked);
+    localStorage.setItem(ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION, event.checked + '');
   }
 }
 

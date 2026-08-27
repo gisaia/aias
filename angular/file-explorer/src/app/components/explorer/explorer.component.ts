@@ -19,7 +19,8 @@
 
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, input, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -48,11 +49,10 @@ import { Subject } from 'rxjs';
 })
 export class ExplorerComponent implements OnInit {
 
-
   @Output() public archivePath: EventEmitter<string> = new EventEmitter();
 
   @Input() public collapseAllSubject: Subject<boolean> = new Subject();
-  @Input() public currentCollection: string;
+  public currentCollection = input.required<string>();
 
   public treeControl: FlatTreeControl<DynamicFileNode>;
   public dataSource: DynamicDataSource;
@@ -65,6 +65,7 @@ export class ExplorerComponent implements OnInit {
 
   public hasChild = (_: number, nodeData: DynamicFileNode) => nodeData.is_dir;
 
+  private readonly destroyRef = inject(DestroyRef);
   public constructor(
     private readonly famService: FamService,
     private readonly jobService: JobService,
@@ -77,28 +78,35 @@ export class ExplorerComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.famService.dataChange.subscribe(data => {
-      this.dataSource.data = data;
-    });
-    this.famService.getRoot().subscribe({
-      next: (resp: any) => {
-        this.famService.initializeFiles(resp.path);
-      },
-      error: (err: Response) => {
-        if (err.status === 404) {
-          this.toastr.error(this.translate.instant('Unable to retrieve files'));
-        } else if (err.status === 403) {
-          this.toastr.warning(this.translate.instant('You are not allowed to access this feature'));
+    this.famService.dataChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
+        this.dataSource.data = data;
+      });
+
+    this.famService.getRoot()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resp: any) => {
+          this.famService.initializeFiles(resp.path);
+        },
+        error: (err: Response) => {
+          if (err.status === 404) {
+            this.toastr.error(this.translate.instant('Unable to retrieve files'));
+          } else if (err.status === 403) {
+            this.toastr.warning(this.translate.instant('You are not allowed to access this feature'));
+          }
         }
-      }
-    });
-    this.collapseAllSubject.subscribe({
-      next: (ok) => {
-        if (ok) {
-          this.treeControl.collapseAll();
+      });
+    this.collapseAllSubject
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (ok) => {
+          if (ok) {
+            this.treeControl.collapseAll();
+          }
         }
-      }
-    });
+      });
   }
 
   public listArchives(path: string) {
@@ -113,7 +121,7 @@ export class ExplorerComponent implements OnInit {
     dialogRef.afterClosed().subscribe({
       next: (confirm) => {
         if (confirm?.status) {
-          this.jobService.ingestDirectory(node, confirm.annotations, confirm.drivers).subscribe({
+          this.jobService.ingestDirectory(node, confirm.annotations, confirm.drivers, confirm.createOverviewCOG).subscribe({
             next: () => {
               this.jobService.refreshTasks.next(true);
               this.toastr.success(this.translate.instant('Activation started'));

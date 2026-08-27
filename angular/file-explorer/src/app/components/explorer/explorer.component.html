@@ -14,7 +14,7 @@
         [class.name--folder]="node.is_dir" [class.active]="selectedFilePath === node.path">{{node.name}}</button>
       @if (node.is_dir) {
         <button mat-icon-button class="activate-btn" (click)="activate(node)"
-            [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection}" [matTooltipPosition]="'right'">
+            [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection()}" [matTooltipPosition]="'right'">
           <span class="material-symbols-outlined">add_circle</span>
         </button>
       }

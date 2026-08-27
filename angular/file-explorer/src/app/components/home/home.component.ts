@@ -128,7 +128,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  public collectionChange(event) {
+  public collectionChange(event: string) {
     if (event !== '') {
       localStorage.setItem(ARLAS_AIAS_ACTIVE_COLLECTION, event);
       this.currentCollection = event;
@@ -138,7 +138,7 @@ export class HomeComponent implements OnInit {
 
   public addCurrentCollectionIfMissing() {
     const newCollections = this.collections;
-    if (this.currentCollection !== '' && !this.collections.includes(this.currentCollection)) {
+    if (this.currentCollection && !this.collections.includes(this.currentCollection)) {
       newCollections.push(this.currentCollection);
     }
     this.collections = [...newCollections];
