@@ -1,4 +1,3 @@
-from importlib import metadata
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime

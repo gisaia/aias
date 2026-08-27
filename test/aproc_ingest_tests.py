@@ -1,7 +1,6 @@
 import json
 import threading
 import unittest
-from unittest import result
 from extensions.aproc.proc.enrich.enrich_process import OutputEnrichProcess
 from test.aproc_tests import AprocTests
 from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS
@@ -37,6 +36,7 @@ SENTINEL1_SLC = "sentinel1/S1C_IW_SLC__1SDV_20251201T074918_20251201T074945_0052
 SATELLOGIC = "satellogic/SYNTHETIC_20260101_120000_000_SN01_L1D_SR_MS_999999"
 SENTINEL2 = "sentinel2/S2A_MSIL1C_20240827T105021_N0511_R051_T30TYN_20240827T132431.SAFE"
 SKYSAT = "skysat/"
+SOACOM = "soacom/S1A_OPER_SAR_EOSSP__CORE_L1D_OLVF_20190814T135724/"
 SPOT5 = "spot5/"
 PNEOMS = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_MS-FS/"
 PNEOPAN = "pneo/WO_000194876_1_1_SAL24178537-1_ACQ_PNEO4_03432708887687/000194876_1_1_STD_A/IMG_01_PNEO4_PAN/"
@@ -222,8 +222,8 @@ class IngestTests(AprocTests):
     def check_cog(self, item: Item, asset_type: str, max_size: int):
         self.assertIsNotNone(item.assets.get(asset_type), f"{asset_type} asset exists")
         self.assertGreater(item.assets.get(asset_type).size, 0, f"{asset_type} size greater than 0")
-        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, f"format is cog")
-        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, f"projection is 3857")
+        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, "format is cog")
+        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, "projection is 3857")
         from osgeo import gdal
         with gdal.Open(item.assets.get(asset_type).href) as ds:
             src_width = ds.RasterXSize
@@ -236,7 +236,6 @@ class IngestTests(AprocTests):
             self.assertIsNotNone(src_height, f"{asset_type} height is not None")
         info = gdal.Info(item.assets.get(asset_type).href, options=gdal.InfoOptions(format="json"))
         self.assertEqual(info.get("metadata").get("IMAGE_STRUCTURE", {}).get("LAYOUT", None), "COG", "layout is COG")
-
 
     def test_landing_page(self):
         landing_page = json.loads(requests.get(APROC_ENDPOINT).content)

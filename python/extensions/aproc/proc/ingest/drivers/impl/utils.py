@@ -55,7 +55,7 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
     return geometry, bbox, get_centroid(geometry)
 
 
-def compute_simplified_polygon(gcp_list)->list[list[float]]:
+def compute_simplified_polygon(gcp_list) -> list[list[float]]:
     from scipy.spatial import ConvexHull
     import numpy as np
     # Extract (x, y) coordinates
