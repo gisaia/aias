@@ -1,13 +1,14 @@
 import os
 import unittest
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK,
+                                     CSK2, ICEYE, JP2000, RADARSAT2,
+                                     SENTINEL1_GRDH, SENTINEL1_SLC, SOACOM,
+                                     TERRASARX, TERRASARX_PAZ, TIF, UMBRA_STAC,
+                                     IngestTests)
+from test.utils import CATALOG, COLLECTION
+
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
-
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, ICEYE, JP2000,
-                                     RADARSAT2, SENTINEL1_GRDH,
-                                     SENTINEL1_SLC, 
-                                     TERRASARX, TERRASARX_PAZ, TIF, UMBRA_STAC, IngestTests)
-from test.utils import CATALOG, COLLECTION
 
 ROOT = "gs://gisaia-public/test-aias"
 
@@ -86,6 +87,10 @@ class Tests(IngestTests):
     def test_async_ingest_capella3(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA3)
         self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+
+    def test_async_ingest_soacom(self):  # Driver SOACOM
+        url = os.path.join(ROOT, SOACOM)
+        self.async_ingest(url, ["thumbnail", "overview", *[f"{pol}" for pol in ["hh", "hv", "vh", "vv"]], *[f"{pol}_metadata" for pol in ["hh", "hv", "vh", "vv"]]], data_key=None, check_secondary_id=False)  # No visual data for cog generation.
 
 
 if __name__ == '__main__':
