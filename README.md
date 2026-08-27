@@ -46,6 +46,13 @@ Health checks are available for all non-third party services:
 - [AGATE](http://localhost:8004/arlas/agate/healthcheck)
 - [FAM](http://localhost:8005/arlas/fam/healthcheck)
 
+## Building docker image
+
+To build the docker images for the services of AIAS, the following environment variables are used:
+
+| Variable               | Default value          |
+|------------------------|------------------------|
+| AIAS_DOCKER_BASE_IMAGE | python:3.14-alpine3.24 |
 
 ## Tests
 
