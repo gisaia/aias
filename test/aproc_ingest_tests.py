@@ -1,7 +1,6 @@
 import json
 import threading
 import unittest
-from unittest import result
 from extensions.aproc.proc.enrich.enrich_process import OutputEnrichProcess
 from test.aproc_tests import AprocTests
 from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS
@@ -30,6 +29,7 @@ ICEYE = "iceye/ICEYE-Scan-mode/2631255"
 IKONOS = "geoeye/IK2_OPER_OSA_GEO_1P_20080715T105300_N43-318_E003-351_0001.SIP/20081014210521_po_2624415_0000000/po_2624415_blu_0000000.tif"
 JP2000 = "images/jpeg2000.jpg2"
 GEOSAT = "geosat/DE01_SL6_22S_1R_20220829T063018_20220829T063109_DMI_0_bb31/"
+GEOSAT_JP2 = "geosat/DE01_SL6_22S_1R_20220829T063018_20220829T063109_DMI_0_bb31_jp2"
 RADARSAT2 = "radarsat2/RS2_OK153952_PK1408404_DK1372523_F21F_20231123_052042_HH_SGF"
 RAPID_EYE = "rapideye/3159120_2020-03-11_RE1_3A/"
 SENTINEL1_GRDH = "sentinel1/S1C_IW_GRDH_1SDV_20251118T052605_20251118T052630_005064_00A084_DD79.SAFE"
@@ -222,8 +222,8 @@ class IngestTests(AprocTests):
     def check_cog(self, item: Item, asset_type: str, max_size: int):
         self.assertIsNotNone(item.assets.get(asset_type), f"{asset_type} asset exists")
         self.assertGreater(item.assets.get(asset_type).size, 0, f"{asset_type} size greater than 0")
-        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, f"format is cog")
-        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, f"projection is 3857")
+        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, "format is cog")
+        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, "projection is 3857")
         from osgeo import gdal
         with gdal.Open(item.assets.get(asset_type).href) as ds:
             src_width = ds.RasterXSize
@@ -236,7 +236,6 @@ class IngestTests(AprocTests):
             self.assertIsNotNone(src_height, f"{asset_type} height is not None")
         info = gdal.Info(item.assets.get(asset_type).href, options=gdal.InfoOptions(format="json"))
         self.assertEqual(info.get("metadata").get("IMAGE_STRUCTURE", {}).get("LAYOUT", None), "COG", "layout is COG")
-
 
     def test_landing_page(self):
         landing_page = json.loads(requests.get(APROC_ENDPOINT).content)

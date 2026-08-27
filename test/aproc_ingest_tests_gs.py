@@ -3,7 +3,7 @@ import unittest
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TERRASARX_PAZ, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -14,77 +14,77 @@ ROOT = "gs://gisaia-public/test-aias"
 
 class Tests(IngestTests):
 
-    def test_async_ingest_invalid_tif_cloud(self):  # Test Driver error handling
+    def test_async_ingest_invalid_tif(self):  # Test Driver error handling
         url = os.path.join(ROOT, "images/empty.tiff")
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
         self.assertGreaterEqual(status.message.find("Exception while ingesting"), 0)
 
-    def test_async_ingest_nogeo_tif_cloud(self):  # Test Driver error handling
+    def test_async_ingest_nogeo_tif(self):  # Test Driver error handling
         url = os.path.join(ROOT, "images/nogeo.tiff")
         status = self.ingest(url, COLLECTION, CATALOG, StatusCode.failed)
         self.assertGreaterEqual(status.message.find("Exception while ingesting"), 0)
 
-    def test_async_ingest_spot6_cloud(self):  # Driver DIMAP
+    def test_async_ingest_spot6(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], check_epsg=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_pneoms_cloud(self):  # Driver DIMAP
+    def test_async_ingest_pneoms(self):  # Driver DIMAP
         url = os.path.join(ROOT, PNEOMS)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
 
-    def test_async_ingest_pneopan_cloud(self):  # Driver DIMAP
+    def test_async_ingest_pneopan(self):  # Driver DIMAP
         url = os.path.join(ROOT, PNEOPAN)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
 
-    def test_async_ingest_dimap_driver_include_cloud(self):  # Driver DIMAP
+    def test_async_ingest_dimap_driver_include(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["dimap"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_dimap_driver_include_fail_cloud(self):  # Driver DIMAP
+    def test_async_ingest_dimap_driver_include_fail(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["spot5"], expected=StatusCode.failed)
 
-    def test_async_ingest_dimap_driver_exclude_cloud(self):  # Driver DIMAP
+    def test_async_ingest_dimap_driver_exclude(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["spot5"])
 
-    def test_async_ingest_dimap_driver_exclude_fail_cloud(self):  # Driver DIMAP
+    def test_async_ingest_dimap_driver_exclude_fail(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, exclude_drivers=["dimap"], expected=StatusCode.failed)
 
-    def test_async_ingest_ikonos_cloud(self):  # Driver GEOEYE
+    def test_async_ingest_ikonos(self):  # Driver GEOEYE
         url = os.path.join(ROOT, IKONOS)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_wv_cloud(self):  # Driver DIGITALGLOBE
+    def test_async_ingest_wv(self):  # Driver DIGITALGLOBE
         url = os.path.join(ROOT, WORLDVIEW)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_ast_cloud(self):  # Driver AST
+    def test_async_ingest_ast(self):  # Driver AST
         url = os.path.join(ROOT, AST)
         self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_terrasarx_cloud(self):  # Driver TERRASRX
+    def test_async_ingest_terrasarx(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX)
         self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_terrasarx_paz_cloud(self):  # Driver TERRASRX
+    def test_async_ingest_terrasarx_paz(self):  # Driver TERRASRX
         url = os.path.join(ROOT, TERRASARX_PAZ)
         self.async_ingest(url, ["data", "metadata", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_rapideye_cloud(self):  # Driver RAPIDEYE - No thumbnail nor overview.
+    def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
         url = os.path.join(ROOT, RAPID_EYE)
         self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_tif_cloud(self):  # Driver TIF
+    def test_async_ingest_tif(self):  # Driver TIF
         url = os.path.join(ROOT, TIF)
         self.async_ingest(url, ["data", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_jpg2000_cloud(self):  # Driver JPEG2000
+    def test_async_ingest_jpg2000(self):  # Driver JPEG2000
         url = os.path.join(ROOT, JP2000)
         self.async_ingest(url, ["data", "airs_item"], archive=False)  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
 
-    def test_ingest_directory_cloud(self):  # Test Folder in cloud ingestion
+    def test_ingest_directory(self):  # Test Folder in cloud ingestion
         self.ingest_directory(ROOT + "/spacewill/", collection=COLLECTION, catalog=CATALOG)
 
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
@@ -123,9 +123,13 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SPOT5)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_geosat_cloud(self):  # Driver Geosat
+    def test_async_ingest_geosat(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT)
         self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+
+    def test_async_ingest_geosat_jp2(self):  # Driver Geosat
+        url = os.path.join(ROOT, GEOSAT_JP2)
+        self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"])  # TODO: COG ENRICHEMENT DOES NOT WORK WITH JPEG2000 source. See issue https://github.com/gisaia/aias/issues/507
 
     def test_async_ingest_wyvern(self):  # Driver Wyvern
         url = os.path.join(ROOT, WYVERN)
