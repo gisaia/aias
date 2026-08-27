@@ -55,7 +55,7 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
     return geometry, bbox, get_centroid(geometry)
 
 
-def compute_simplified_polygon(gcp_list)->list[list[float]]:
+def compute_simplified_polygon(gcp_list) -> list[list[float]]:
     from scipy.spatial import ConvexHull
     import numpy as np
     # Extract (x, y) coordinates
@@ -103,7 +103,7 @@ def get_hash_url(url: str) -> str:
 
 def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
     """
-    Converts a GeoTIFF to a JPG. Compatible with all AccessManager compatible object storages
+    Converts a GeoTIFF or Jpeg2000 to a JPG. Compatible with all AccessManager compatible object storages
     """
     from osgeo import gdal
     gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())

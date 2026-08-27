@@ -1,4 +1,3 @@
-from importlib import metadata
 import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -27,7 +26,8 @@ class Driver(IngestDriver):
         self.thumbnail_path = None
         self.quicklook_path = None
         self.dim_path = None
-        self.tif_path = None
+        self.data_path = None
+        self.data_format = None
 
     # Implements drivers method
     @staticmethod
@@ -40,8 +40,9 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        ImageDriverHelper.add_asset(assets, self.tif_path, Role.data,
-                                    MimeType.TIFF, AssetFormat.geotiff, ResourceType.gridded)
+        ImageDriverHelper.add_asset(assets, self.data_path, Role.data,
+                                    MimeType.GEOTIFF if self.data_format == AssetFormat.geotiff else MimeType.JPEG2000,
+                                    self.data_format, ResourceType.gridded)
         ImageDriverHelper.add_asset(assets, self.dim_path, Role.metadata,
                                     MimeType.JSON, AssetFormat.json, ResourceType.other)
 
@@ -61,9 +62,9 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
-        if self.quicklook_path is None and IngestDriver.must_build_preview(Driver.configuration, self.tif_path, local_remote_both="both"):
+        if self.quicklook_path is None and IngestDriver.must_build_preview(Driver.configuration, self.data_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
+            geotiff_to_jpg(self.data_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, bands_list=[1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
@@ -125,7 +126,7 @@ class Driver(IngestDriver):
                 sensor_type=SensorType.OPTIC.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.geosat.value,
-                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_format=self.data_format.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
             ),
@@ -140,10 +141,10 @@ class Driver(IngestDriver):
         return item
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.tif_path)
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.data_path)
         item.properties.gsd = find_or_none(root, "./Dataset_Sources/Source_Information/Scene_Source/THEORETICAL_RESOLUTION", lambda x: float(x), Driver.ns)
         item.properties.processing__level = find_or_none(root, "./Production/PRODUCT_TYPE", Driver.ns)
-        item.properties.secondary_id = self.tif_path.removesuffix(".tif")
+        item.properties.secondary_id = self.data_path.removesuffix(".tif").removesuffix(".jp2")
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
@@ -175,16 +176,21 @@ class Driver(IngestDriver):
             if file.name.endswith(".dim"):
                 self.dim_path = file.path
             elif file.name.endswith(".tif"):
-                self.tif_path = file.path
+                self.data_path = file.path
+                self.data_format = AssetFormat.geotiff
+            elif file.name.endswith(".jp2"):
+                self.data_path = file.path
+                self.data_format = AssetFormat.jpg2000
             elif file.name.endswith(".jpg"):
                 self.thumbnail_path = file.path
             elif file.name.endswith("_QL.png"):
                 self.quicklook_path = file.path
 
         return self.dim_path is not None \
-            and self.tif_path is not None \
-            and os.path.basename(self.dim_path).split(".")[0] \
-            == os.path.basename(self.tif_path).split(".")[0] \
+            and self.data_path is not None \
+            and self.data_format is not None \
+            and (os.path.basename(self.dim_path).split(".")[0]
+                 == os.path.basename(self.data_path).split(".")[0]) \
             and (self.thumbnail_path is not None
                  or self.quicklook_path is not None)
 
