@@ -3,7 +3,7 @@ import unittest
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SOACOM, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TERRASARX_PAZ, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -194,6 +194,10 @@ class Tests(IngestTests):
     def test_async_ingest_superview3_4_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_PAN")
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+
+    def test_async_ingest_soacom(self):  # Driver SOACOM
+        url = os.path.join(ROOT, SOACOM)
+        self.async_ingest(url, ["thumbnail", "overview", *[f"{pol}" for pol in ["hh", "hv", "vh", "vv"]], *[f"{pol}_metadata" for pol in ["hh", "hv", "vh", "vv"]]], data_key=None, check_secondary_id=False)  # No visual data for cog generation.
 
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ class Driver(IngestDriver):
           "re": "http://schemas.rapideye.de/products/productMetadataGeocorrected",
           "eop": "http://earth.esa.int/eop",
           "opt": "http://earth.esa.int/opt"}
-    
+
     configuration: dict = {}
 
     def __init__(self):
@@ -105,7 +105,7 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.rapideye.value,
-                sensor_type = SensorType.OPTIC.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
