@@ -5,7 +5,6 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
-from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -104,11 +103,7 @@ class Driver(IngestDriver):
         return metadata
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
-        geometry = ImageDriverHelper.gdal_geometry(self, self.tif_path)
-        Driver.LOGGER.debug(f"Extracted geometry for item {url}: {geometry}")
-        if geometry is None:
-            Driver.LOGGER.warning(f"No geometry found for item {url}")
-            raise DriverException(f"Missing required 'geometry' for {url}")
+        geometry = ImageDriverHelper.gdal_geometry(self, self.tif_path, url)
 
         bbox = get_bbox(geometry["coordinates"][0])
 

@@ -9,7 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, get_bbox, get_centroid, get_epsg, get_epsg_from_gdal_info_gcps)
+    downsample_image, find_or_none, get_bbox, get_centroid, get_epsg,
+    get_epsg_from_gdal_info_gcps)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -69,19 +70,15 @@ class Driver(IngestDriver):
         return assets
 
     def load_metadata(self, url: str) -> ET.Element:
-        with AccessManager.make_local(self.polarizations[0]['metadata']) as local_dim_path:
-            tree = ET.parse(local_dim_path)
+        with AccessManager.make_local(self.polarizations[0]['metadata']) as local_metadata_path:
+            tree = ET.parse(local_metadata_path)
             root = tree.getroot()
 
         return root
 
     def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
-        from osgeo import gdal
+        geometry = ImageDriverHelper.gdal_geometry(self, self.polarizations[0]["data"], url)
 
-        options = gdal.InfoOptions(format="json")
-        info = AccessManager.get_gdal_info(self.polarizations[0]["data"], options)
-
-        geometry = info["wgs84Extent"]
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
