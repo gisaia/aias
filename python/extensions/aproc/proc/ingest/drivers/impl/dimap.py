@@ -8,7 +8,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, geotiff_to_jpg, get_epsg,
+    downsample_image, find_or_none, raster_to_jpg, get_epsg,
     get_geom_bbox_centroid_from_coordinates, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from airs.core.models.model import SensorType
@@ -87,7 +87,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.quicklook_path is None and IngestDriver.must_build_preview(Driver.configuration, self.image_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.image_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.image_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
@@ -216,7 +216,7 @@ class Driver(IngestDriver):
         # We calculate the GSD as the mean of GSD_ACROSS_TRACK and  GSD_ALONG_TRACK
         if "GSD_ACROSS_TRACK" in metadata and "GSD_ALONG_TRACK" in metadata:
             item.properties.gsd = (float(metadata["GSD_ACROSS_TRACK"]) + float(metadata["GSD_ALONG_TRACK"])) / 2
-        
+
         item.properties.processing__level = find_or_none(root, "PROCESSING_LEVEL")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.dim_path))
         item.properties.secondary_id = root.find("Dataset_Identification/DATASET_NAME").text

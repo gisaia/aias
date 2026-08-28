@@ -11,7 +11,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg,
+                                                             raster_to_jpg,
                                                              get_epsg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -85,7 +85,7 @@ class Driver(IngestDriver):
             if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Building overview for local TIFF {self.tci_path}")
                 quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+                raster_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
@@ -96,7 +96,7 @@ class Driver(IngestDriver):
                 overview_path = overview_folder + '/overview.jpg'
                 with AccessManager.make_local(self.tci_path) as local_tci_path:
                     quicklook = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+                    raster_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
                     quicklook.size = AccessManager.get_size(quicklook.href)
                     self.quicklook_path = quicklook.href
                     assets.append(quicklook)
@@ -141,7 +141,7 @@ class Driver(IngestDriver):
             return datetime.fromisoformat(dt_str).replace(tzinfo=None)
 
         props = metadata.get("properties", {})
-        
+
         start_dt_str = props.get("start_datetime")
         if start_dt_str is not None:
             start_datetime = dateutil.parser.parse(start_dt_str)
@@ -207,7 +207,7 @@ class Driver(IngestDriver):
                 if result is not None:
                     return result
         return None
-        
+
     def __check_path__(self, path: str):
         self.__init__()
         data_path = None

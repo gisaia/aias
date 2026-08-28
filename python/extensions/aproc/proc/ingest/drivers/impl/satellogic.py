@@ -12,7 +12,7 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg)
+    downsample_image, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 
@@ -167,7 +167,7 @@ class Driver(IngestDriver):
             quicklook = ImageDriverHelper.prepare_preview_asset(
                 self, url, Role.overview, MimeType.JPG, AssetFormat.jpg
             )
-            geotiff_to_jpg(
+            raster_to_jpg(
                 tif_path,
                 Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
                 Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,

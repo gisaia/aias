@@ -283,6 +283,7 @@ class IngestDriver(AbstractDriver):
             - resolution
             - processing level
             - projection
+            - secondary id
 
         Args:
             url (str): archive's url
