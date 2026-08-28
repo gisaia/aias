@@ -13,19 +13,13 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
 class IngestDriver(AbstractDriver):
     # Factor to apply when downsampling an overview
     THUMBNAIL_DOWNSAMPLE_FACTOR = int(1024 / 256)
-    # Factor to apply when downsampling a large overview
-    THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE = 8
-    # When generating an overview from a browse, keep the whole image
-    OVERVIEW_FROM_BROWSE_PCT = 100
-    # When generating an overview from a tiff, reduce the tiff resolution
-    OVERVIEW_FROM_TIFF_PCT = 25
-    # When generating an overview from a large tiff, reduce the tiff resolution
-    OVERVIEW_FROM_LARGE_TIFF_PCT = 10
 
     # Size of a thumbnail
     THUMBNAIL_SIZE = 256
     # Size of an overview
     OVERVIEW_SIZE = 1024
+
+    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -40,7 +34,7 @@ class IngestDriver(AbstractDriver):
         if configuration is None or data_path is None:
             return False
         if local_remote_both == "both":
-            return (AccessManager.is_local(data_path) and configuration.get('build_overview_when_local', True)) or (data_path and not AccessManager.is_local(data_path) and configuration.get('build_overview_when_remote', False))
+            return IngestDriver.must_build_preview(configuration, data_path, "local") or IngestDriver.must_build_preview(configuration, data_path, "remote")
         elif local_remote_both == "local":
             return AccessManager.is_local(data_path) and configuration.get('build_overview_when_local', True)
         elif local_remote_both == "remote":

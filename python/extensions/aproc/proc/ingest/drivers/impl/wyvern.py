@@ -7,11 +7,9 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.drivers.exceptions import DriverException
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -25,8 +23,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -86,7 +83,6 @@ class Driver(IngestDriver):
             ImageDriverHelper.add_asset(assets, href=self.data_mask_path, role=Role.data_mask, type=MimeType.TIFF, asset_format=AssetFormat.geotiff, asset_type=ResourceType.gridded)
 
         return assets
-
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -162,10 +158,10 @@ class Driver(IngestDriver):
         gsd = properties.get("gsd", None)
         proj__epsg = properties.get("proj:epsg", None)
         satellite = properties.get("platform", None)
-        item.properties.gsd=gsd
-        item.properties.processing__level=processing__level
-        item.properties.proj__epsg=proj__epsg
-        item.properties.satellite=satellite
+        item.properties.gsd = gsd
+        item.properties.processing__level = processing__level
+        item.properties.proj__epsg = proj__epsg
+        item.properties.satellite = satellite
         item.properties.secondary_id = metadata.get("id", None)
         return item
 
@@ -204,9 +200,9 @@ class Driver(IngestDriver):
         item.properties.processing__version = processing__version
         item.properties.license = license
         item.properties.instrument = instrument
-        item.properties.platform= platform
-        item.properties.created =  created
-        item.properties.updated =  updated
+        item.properties.platform = platform
+        item.properties.created = created
+        item.properties.updated = updated
         item.properties.view__off_nadir = view__off_nadir
         item.properties.view__incidence_angle = view__incidence_angle
         item.properties.view__azimuth = view__azimuth
@@ -214,7 +210,7 @@ class Driver(IngestDriver):
         item.properties.view__sun_elevation = view__sun_elevation
         item.properties.proj__shape = proj__shape
         item.properties.eo__cloud_cover = eo__cloud_cover
-        item.properties.sensor_mode= sensor_mode
+        item.properties.sensor_mode = sensor_mode
         item.properties.sensor = platform
         item.properties.product_type = product_type
         return item
@@ -239,5 +235,5 @@ class Driver(IngestDriver):
                     elif file.name.endswith(".json"):
                         self.md_path = file.path
             return self.tif_path is not None \
-                and self.md_path is not None 
+                and self.md_path is not None
         return False
