@@ -40,7 +40,7 @@ class ImageDriverHelper:
         return assets
 
     @staticmethod
-    def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False, eo_bands=None):
+    def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False, eo_bands: list[Band] = None):
         asset = Asset(href=href, size=AccessManager.get_size(href),
                       roles=[role.value], name=role.value, type=type.value,
                       description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value, eo__bands=eo_bands)
@@ -84,21 +84,31 @@ class ImageDriverHelper:
         return gdal_info
 
     @staticmethod
-    def gdal_geometry(driver: IngestDriver, url: str) -> object:
+    def gdal_geometry(driver: IngestDriver, data_path: str, archive_path: str) -> object:
+        """
+        Gets the geometry of the product from the GDAL info
+
+        If no geometry is found, then a DriverException is raised
+        """
         from osgeo import gdal
+
         options = gdal.InfoOptions(format="json")
-        gdal_info = AccessManager.get_gdal_info(url, options)
+        gdal_info = AccessManager.get_gdal_info(data_path, options)
         geometry = gdal_info.get("wgs84Extent", None)
         gcps = gdal_info.get("gcps", {}).get("gcpList", [])
+
         if geometry is None:
             if gcps:
-                LOGGER.debug("No geometry found for {}, trying to compute it from gcps".format(url))
+                LOGGER.debug("No geometry found for {}, trying to compute it from gcps".format(data_path))
                 geometry = {
                     "type": "Polygon",
                     "coordinates": [compute_simplified_polygon(gcps)]
                 }
-            else:
-                LOGGER.warning("No geometry found for {} and no gcps to compute it from".format(url))
+
+        LOGGER.debug(f"Extracted geometry for item {archive_path}: {geometry}")
+        if geometry is None:
+            raise DriverException(f"Missing required 'geometry' for {archive_path}")
+
         return geometry
 
     @staticmethod
@@ -182,4 +192,3 @@ class ImageDriverHelper:
             item.properties.datetime = AccessManager.get_creation_time(url)
 
         return item
-

@@ -101,9 +101,9 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
+def raster_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
     """
-    Converts a GeoTIFF or Jpeg2000 to a JPG. Compatible with all AccessManager compatible object storages
+    Converts a raster that GDAL can open to a JPG. Compatible with all AccessManager compatible object storages
     """
     from osgeo import gdal
     gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
@@ -182,4 +182,15 @@ def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[
             return process(value.text)
         return value.text
 
+    return None
+
+
+def find_attrib(root: ET.Element, key: str, attrib: str, value: str, ns: dict[str, str] = {}):
+    """
+    Tries to find the key in the given element that has the desired attribute value
+    """
+    candidates = root.findall(key, ns)
+    for candidate in candidates:
+        if candidate.attrib and candidate.attrib[attrib] == value:
+            return candidate
     return None
