@@ -101,7 +101,7 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def raster_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
+def raster_to_jpg(input_path: str, width: float, height: float, output_path=None, bands_list=None, stretch=False):
     """
     Converts a raster that GDAL can open to a JPG. Compatible with all AccessManager compatible object storages
     """
@@ -124,7 +124,7 @@ def raster_to_jpg(input_path: str, width_pct: float, height_pct: float, output_p
             scale_params.append([band_min, band_max])
 
     # Define output format and options
-    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
+    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, width=width, height=height, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0], scaleParams=scale_params)
     # Translate to JPEG
     if output_path is not None:

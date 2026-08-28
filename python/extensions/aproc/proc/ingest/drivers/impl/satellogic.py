@@ -30,8 +30,6 @@ class Driver(IngestDriver):
     - Preview PNG (*_preview.png) - optional
     """
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -45,8 +43,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -169,8 +166,8 @@ class Driver(IngestDriver):
             )
             raster_to_jpg(
                 tif_path,
-                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
-                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
+                Driver.OVERVIEW_SIZE,
+                Driver.OVERVIEW_SIZE,
                 output_path=quicklook.href,
                 bands_list=bands,
                 stretch=False if self.visual_path else Driver.configuration.get('overview_stretch', True)

@@ -16,8 +16,6 @@ from airs.core.models.model import SensorType
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.quicklook_path = None
@@ -30,8 +28,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -87,7 +84,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.quicklook_path is None and IngestDriver.must_build_preview(Driver.configuration, self.image_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.image_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.image_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)
@@ -242,8 +239,7 @@ class Driver(IngestDriver):
         # To fit the case of PNEO 30 cm with no instrument metadata
         item.properties.instrument = metadata.get("INSTRUMENT", metadata.get("MISSION", None))
         if item.properties.instrument:
-                    item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", "?"))
-
+            item.properties.instrument = item.properties.instrument + "-" + metadata.get("INSTRUMENT_INDEX", metadata.get("MISSION_INDEX", "?"))
 
         return item
 

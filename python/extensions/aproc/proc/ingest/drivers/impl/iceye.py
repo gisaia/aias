@@ -14,7 +14,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -26,8 +25,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -58,7 +56,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.thumbnail_path is None:
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
-            downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR_LARGE)
+            downsample_image(self.quicklook_path, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
             assets.append(thumbnail)
         return assets

@@ -16,7 +16,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -27,8 +26,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -62,19 +60,19 @@ class Driver(IngestDriver):
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             # Minify all the tiffs
             minified_tiffs = []
-            options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], widthPct=Driver.OVERVIEW_FROM_TIFF_PCT, heightPct=Driver.OVERVIEW_FROM_TIFF_PCT)
+            options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], width=Driver.OVERVIEW_SIZE, height=Driver.OVERVIEW_SIZE)
             for tif in self.tif_paths:
                 mini_tif = os.path.join(AccessManager.tmp_dir, os.path.basename(tif))
-                Driver.LOGGER.debug(f"Minifying {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
+                Driver.LOGGER.debug(f"Minifying {tif} to {Driver.OVERVIEW_SIZE}px in dir {AccessManager.tmp_dir}")
                 gdal.Translate(mini_tif, AccessManager.get_gdal_src(tif), options=options)
                 if not AccessManager.exists(mini_tif):
-                    raise DriverException(f"Failed to minify {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
+                    raise DriverException(f"Failed to minify {tif} to {Driver.OVERVIEW_SIZE}px in dir {AccessManager.tmp_dir}")
                 minified_tiffs.append(mini_tif)
 
             # Create quicklook
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
-            gdal.Warp(quicklook.href, minified_tiffs, format="JPEG")
+            gdal.Warp(quicklook.href, minified_tiffs, format="JPEG", width=Driver.OVERVIEW_SIZE, height=Driver.OVERVIEW_SIZE)
             if not AccessManager.exists(quicklook.href):
                 raise DriverException(f"Failed to create quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
             quicklook.size = AccessManager.get_size(quicklook.href)

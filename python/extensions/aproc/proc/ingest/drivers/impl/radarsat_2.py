@@ -16,8 +16,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 class Driver(IngestDriver):
     ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -34,8 +32,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -61,16 +58,14 @@ class Driver(IngestDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         image_path = None
-        quicklook_pct = Driver.OVERVIEW_FROM_BROWSE_PCT
         if self.browse_path:
             image_path = self.browse_path
         elif AccessManager.is_local(self.polarizations[0]['path']):
             image_path = self.polarizations[0]['path']
-            quicklook_pct = Driver.OVERVIEW_FROM_TIFF_PCT
 
         if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(image_path, quicklook_pct, quicklook_pct, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(image_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 

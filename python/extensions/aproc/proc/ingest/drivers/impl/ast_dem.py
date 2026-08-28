@@ -25,13 +25,10 @@ class Driver(IngestDriver):
         "LOWERLEFTCORNERLONGITUDE": "WESTBOUNDINGCOORDINATE",
     }
 
-    configuration: dict = {}
-
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     def __init__(self):
         super().__init__()
@@ -59,7 +56,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if IngestDriver.must_build_preview(Driver.configuration, self.tif_path):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.tif_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 

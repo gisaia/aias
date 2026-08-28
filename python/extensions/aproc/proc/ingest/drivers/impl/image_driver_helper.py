@@ -6,15 +6,31 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role)
-from extensions.aproc.proc.drivers.exceptions import DriverException
-from extensions.aproc.proc.ingest.drivers.impl.utils import compute_simplified_polygon
-from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from aproc.core.logger import Logger
+from extensions.aproc.proc.drivers.exceptions import DriverException
+from extensions.aproc.proc.ingest.drivers.impl.utils import \
+    compute_simplified_polygon
+from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 LOGGER = Logger.get_logger()
 
 
 class ImageDriverHelper:
+    @staticmethod
+    def init(driver: type[IngestDriver], configuration: dict):
+        IngestDriver.init(configuration)
+        driver.configuration = configuration or {}
+
+        configured_overview_size = driver.configuration.get("overview_size")
+        if configured_overview_size:
+            driver.OVERVIEW_SIZE = configured_overview_size
+
+        configured_thumbnail_size = driver.configuration.get("thumbnail_size")
+        if configured_thumbnail_size:
+            driver.THUMBNAIL_SIZE = configured_thumbnail_size
+
+        driver.THUMBNAIL_DOWNSAMPLE_FACTOR = int(driver.OVERVIEW_SIZE / driver.THUMBNAIL_SIZE)
+
     @staticmethod
     def identify_assets(driver: IngestDriver, type: MimeType, format: AssetFormat, url: str) -> list[Asset]:
         assets = []

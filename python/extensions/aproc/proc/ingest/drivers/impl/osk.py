@@ -20,8 +20,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.hsi_path = None
@@ -30,8 +28,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -62,7 +59,7 @@ class Driver(IngestDriver):
         if IngestDriver.must_build_preview(Driver.configuration, self.hsi_path, local_remote_both="both"):
             Driver.LOGGER.debug(f"Building overview for local TIFF {self.hsi_path}")
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.hsi_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT,
+            raster_to_jpg(self.hsi_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE,
                           output_path=quicklook.href, stretch=True, bands_list=self.__find_rgb_bands(url))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)

@@ -20,8 +20,6 @@ class Driver(IngestDriver):
           "eop": "http://earth.esa.int/eop",
           "opt": "http://earth.esa.int/opt"}
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.browse_path = None
@@ -32,8 +30,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -63,7 +60,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.browse_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_BROWSE_PCT, Driver.OVERVIEW_FROM_BROWSE_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.browse_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 

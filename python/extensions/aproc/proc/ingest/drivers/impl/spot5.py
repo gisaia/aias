@@ -16,7 +16,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 class Driver(IngestDriver):
     ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}  # NOSONAR
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -29,8 +28,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -67,7 +65,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.quicklook_path is None and self.tif_path and IngestDriver.must_build_preview(Driver.configuration, self.tif_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.tif_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.tif_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             self.quicklook_path = quicklook.href
             assets.append(quicklook)

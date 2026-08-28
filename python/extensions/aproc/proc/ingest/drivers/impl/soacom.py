@@ -15,8 +15,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.polarizations = []
@@ -33,8 +31,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:

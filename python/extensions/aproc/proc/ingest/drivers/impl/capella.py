@@ -15,8 +15,6 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.tif_path = None
@@ -28,8 +26,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
@@ -66,7 +63,7 @@ class Driver(IngestDriver):
             if IngestDriver.must_build_preview(Driver.configuration, tif_for_overview, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Building overview for local {tif_for_overview}")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                raster_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                raster_to_jpg(tif_for_overview, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.quicklook_path = overview.href
                 assets.append(overview)
@@ -78,7 +75,7 @@ class Driver(IngestDriver):
                 # File is processed locally as it significantly speeds up processing time
                 with AccessManager.make_local(tif_for_overview) as local_big_preview_path:
                     overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    raster_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                    raster_to_jpg(local_big_preview_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                     overview.size = AccessManager.get_size(overview.href)
                     self.quicklook_path = overview.href
                     assets.append(overview)
