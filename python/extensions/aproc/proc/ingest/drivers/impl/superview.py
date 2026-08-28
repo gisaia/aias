@@ -181,12 +181,7 @@ class Driver(IngestDriver):
         return root
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: ET.Element) -> Item:
-
-        geometry = ImageDriverHelper.gdal_geometry(self, self.data_path)
-        Driver.LOGGER.debug(f"Extracted geometry for item {url}: {geometry}")
-        if geometry is None:
-            Driver.LOGGER.error(f"No geometry found for item {url}")
-            raise DriverException(f"Missing required 'geometry' for {url}")
+        geometry = ImageDriverHelper.gdal_geometry(self, self.data_path, url)
 
         bbox = get_bbox(geometry["coordinates"][0])
 
