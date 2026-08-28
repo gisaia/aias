@@ -125,6 +125,8 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
       build_overview_when_remote: true
       build_overview_when_local: true
+      overview_size: 2048
+      thumbnail_size: 256
     priority: 13
 
   -
@@ -145,6 +147,8 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
       build_overview_when_remote: true
       build_overview_when_local: true
+      overview_size: 2048
+      thumbnail_size: 256
     priority: 15
 
   -
@@ -193,6 +197,8 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
       build_overview_when_remote: true
       build_overview_when_local: true
+      overview_size: 2048
+      thumbnail_size: 256
     priority: 20
 
   - name: capella
@@ -202,6 +208,8 @@ drivers:
       tmp_directory: $TMP_FOLDER|/tmp
       build_overview_when_remote: true
       build_overview_when_local: true
+      overview_size: 2048
+      thumbnail_size: 256
     priority: 21
 
   - name: superview

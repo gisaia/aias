@@ -104,7 +104,6 @@ def get_product_values(filename):
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     ns = {
         "xsi": "http://www.w3.org/2001/XMLSchema-instance",
@@ -130,8 +129,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
