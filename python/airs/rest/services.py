@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse, Response
 from airs.core.models.stacapi import CollectionDescriptionListResponse
 import airs.core.product_registration as rs
 from airs.core import exceptions
-from airs.core.models.mapper import to_json, to_dict
+from airs.core.models.mapper import to_dict
 from airs.core.models.model import Item
 from aias_common.rest.exception import BadRequest, Conflict, NotFound
 
