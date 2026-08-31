@@ -80,24 +80,13 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]):
         if self.tci_path is not None:
-            if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
-                Driver.LOGGER.debug(f"Building overview for local TIFF {self.tci_path}")
+            if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="both"):
+                Driver.LOGGER.debug(f"Building overview for TIFF {self.tci_path}")
                 quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
                 quicklook.size = AccessManager.get_size(quicklook.href)
                 self.quicklook_path = quicklook.href
                 assets.append(quicklook)
-            elif IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="remote"):
-                Driver.LOGGER.debug(f"Building overview for remote TIFF {self.tci_path}")
-                overview_folder = self.assets_dir + '/opencosmos/' + self.get_item_id(url) + '/overview'
-                AccessManager.makedir(overview_folder)
-                overview_path = overview_folder + '/overview.jpg'
-                with AccessManager.make_local(self.tci_path) as local_tci_path:
-                    quicklook = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-                    quicklook.size = AccessManager.get_size(quicklook.href)
-                    self.quicklook_path = quicklook.href
-                    assets.append(quicklook)
 
         if self.quicklook_path is not None and self.thumbnail_path is None:
             thumbnail_type = MimeType.JPG
