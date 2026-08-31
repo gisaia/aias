@@ -11,7 +11,7 @@ from aproc.core.logger import Logger
 from aproc.core.models.ogc import ProcessDescription, ProcessSummary
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
 from aproc.core.models.ogc.execute import Execute
-from aproc.core.processes.process import Process, Subscriber
+from aproc.core.processes.process import Process
 from aproc.core.models.ogc.execute import Subscriber as OGCSubscriber
 from aproc.core.utils import add_msg_to_text, base_model2description
 from aias_common.access.manager import AccessManager

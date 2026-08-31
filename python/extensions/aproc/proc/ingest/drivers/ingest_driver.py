@@ -9,15 +9,17 @@ from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.utils import get_hash_url
 
+THUMBNAIL_SIZE = int(os.getenv("APROC_GENERATED_THUMBNAIL_SIZE", 256))
+OVERVIEW_SIZE = int(os.getenv("APROC_GENERATED_OVERVIEW_SIZE", 1024))
+
 
 class IngestDriver(AbstractDriver):
     # Factor to apply when downsampling an overview
-    THUMBNAIL_DOWNSAMPLE_FACTOR = int(1024 / 256)
-
+    THUMBNAIL_DOWNSAMPLE_FACTOR = int(OVERVIEW_SIZE / THUMBNAIL_SIZE)
     # Size of a thumbnail
-    THUMBNAIL_SIZE = 256
+    THUMBNAIL_SIZE = THUMBNAIL_SIZE
     # Size of an overview
-    OVERVIEW_SIZE = 1024
+    OVERVIEW_SIZE = OVERVIEW_SIZE
 
     configuration: dict = {}
 
