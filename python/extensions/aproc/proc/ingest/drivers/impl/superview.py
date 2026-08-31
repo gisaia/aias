@@ -149,10 +149,19 @@ class Driver(IngestDriver):
 
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.overview_path is None:
-            if IngestDriver.must_build_preview(Driver.configuration, self.data_path, local_remote_both="both"):
+            if IngestDriver.must_build_preview(Driver.configuration, self.data_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Use {self.data_path} for quicklook")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 geotiff_to_jpg(self.data_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', False))
+                overview.size = AccessManager.get_size(overview.href)
+                self.overview_path = overview.href
+                assets.append(overview)
+            elif IngestDriver.must_build_preview(Driver.configuration, self.data_path, local_remote_both="remote"):
+                Driver.LOGGER.debug(f"Use {self.data_path} for quicklook")
+                overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+                # File is processed locally as it significantly speeds up processing time
+                with AccessManager.make_local(self.data_path) as local_data_path:
+                    geotiff_to_jpg(local_data_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.overview_path = overview.href
                 assets.append(overview)
