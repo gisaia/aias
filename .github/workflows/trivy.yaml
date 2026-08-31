@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image_name: [agate, airs, aproc-proc, aproc-service, stac-geodes, fam, arlas-fam-wui]
+        image_name: [agate, airs, aproc-proc, aproc-service, fam, arlas-fam-wui]
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

@@ -1,0 +1,7 @@
+{
+    "index_name": "arlas_eo",
+    "id_path": "id",
+    "timestamp_path": "properties.datetime",
+    "centroid_path": "centroid",
+    "geometry_path": "geometry"
+}
