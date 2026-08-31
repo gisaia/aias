@@ -79,14 +79,13 @@ class Driver(IngestDriver):
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
-        if self.tci_path is not None:
-            if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="both"):
-                Driver.LOGGER.debug(f"Building overview for TIFF {self.tci_path}")
-                quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-                quicklook.size = AccessManager.get_size(quicklook.href)
-                self.quicklook_path = quicklook.href
-                assets.append(quicklook)
+        if self.tci_path is not None and IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="both"):
+            Driver.LOGGER.debug(f"Building overview for TIFF {self.tci_path}")
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
 
         if self.quicklook_path is not None and self.thumbnail_path is None:
             thumbnail_type = MimeType.JPG

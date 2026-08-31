@@ -58,9 +58,15 @@ class Driver(IngestDriver):
 
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
+        image_path = None
         if self.browse_path:
+            image_path = self.browse_path
+        elif IngestDriver.must_build_preview(Driver.configuration, self.tif_path, "both"):
+            image_path = self.tif_path
+
+        if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            geotiff_to_jpg(image_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
@@ -102,7 +108,7 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.rapideye.value,
-                sensor_type = SensorType.OPTIC.value,
+                sensor_type=SensorType.OPTIC.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value
