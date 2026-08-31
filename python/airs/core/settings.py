@@ -28,7 +28,7 @@ class Index(BaseModel, extra="allow"):
 class Settings(BaseModel, extra="allow"):
     s3: S3 = Field(title="S3 Configuration", description="Configuration of the S3 bucket that will contain the STAC items and assets.")
     index: Index = Field(title="", description="")
-    arlaseo_mapping_url: str = "https://raw.githubusercontent.com/gisaia/aias/refs/tags/0.16.1/conf/mapping.json"
+    arlaseo_mapping_url: str = Field(default="https://raw.githubusercontent.com/gisaia/aias/refs/heads/develop/conf/mapping.json")
 
 
 class Configuration:
