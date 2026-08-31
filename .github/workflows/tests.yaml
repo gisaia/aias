@@ -48,12 +48,6 @@ on:
         required: true
         default: false
         type: boolean
-      run_geodes_stac:
-        description: 'Run Geodes STAC tests?'
-        required: true
-        default: false
-        type: boolean
-
 
 jobs:
  
