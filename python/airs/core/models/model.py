@@ -1,7 +1,6 @@
-from datetime import datetime as Datetime
-from enum import Enum
-from typing import Annotated, Any, Dict, List, Literal
 from datetime import datetime
+from enum import Enum
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Extra, Field
 
@@ -345,7 +344,7 @@ class ItemReference(BaseModel):
 
 class ItemGroup(BaseModel):
     dc3__references: list[ItemReference] = Field(title="[ARLAS, extension dc3] The rasters of this group.", min_length=1)
-    dc3__datetime: Datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
+    dc3__datetime: datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
     dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
     model_config = ConfigDict(json_encoders=json_encoders)
 
@@ -386,11 +385,11 @@ class Asset(BaseModel, extra=Extra.allow):
     title: str | None = Field(default=None, title="[STAC] Optional displayed title for clients and users.", max_length=300)
     description: str | None = Field(default=None, title="[STAC] A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
     type: str | None = Field(default=None, title="[STAC] Optional description of the media type. Registered Media Types are preferred. See MimeType for common media types.", max_length=300)
-    roles: List[str] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
-    extra_fields: Dict[str, Any] | None = Field(default=None, title="[ARLAS] Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.")
+    roles: list[str] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
+    extra_fields: dict[str, Any] | None = Field(default=None, title="[ARLAS] Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.")
     gsd: float | None = Field(default=None, title="[deprecated, use eo:gsd instead] Ground Sampling Distance (resolution) of the asset")
     eo__gsd: float | None = Field(default=None, title="[STAC, extension eo] Ground Sampling Distance (resolution)")
-    eo__bands: List[Band] | None = Field(default=None, title="[STAC, extension eo] An array of available bands where each object is a Band Object. If given, requires at least one band.", )
+    eo__bands: list[Band] | None = Field(default=None, title="[STAC, extension eo] An array of available bands where each object is a Band Object. If given, requires at least one band.", )
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
     sar__frequency_band: str | None = Field(default=None, title="[STAC, extension sar] The common name for the frequency band to make it easier to search for bands across instruments. See section \"Common Frequency Band Names\" for a list of accepted names.")
     sar__center_frequency: float | None = Field(default=None, title="[STAC, extension sar] The center frequency of the instrument, in gigahertz (GHz).")
@@ -407,26 +406,26 @@ class Asset(BaseModel, extra=Extra.allow):
     proj__epsg: int | None = Field(default=None, title="[STAC, extension proj] EPSG code of the datasource.")
     proj__wkt2: str | None = Field(default=None, title="[STAC, extension proj] PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.")
     proj__geometry: Any | None = Field(default=None, title="[STAC, extension proj] Defines the footprint of this Item.")
-    proj__bbox: List[float] | None = Field(default=None, title="[STAC, extension proj] Bounding box of the Item in the asset CRS in 2 or 3 dimensions.")
+    proj__bbox: list[float] | None = Field(default=None, title="[STAC, extension proj] Bounding box of the Item in the asset CRS in 2 or 3 dimensions.")
     proj__centroid: Any | None = Field(default=None, title="[STAC, extension proj] Coordinates representing the centroid of the Item (in lat/long).")
-    proj__shape: List[float] | None = Field(default=None, title="[STAC, extension proj] Number of pixels in Y and X directions for the default grid.")
-    proj__transform: List[float] | None = Field(default=None, title="[STAC, extension proj] The affine transformation coefficients for the default grid.")
+    proj__shape: list[float] | None = Field(default=None, title="[STAC, extension proj] Number of pixels in Y and X directions for the default grid.")
+    proj__transform: list[float] | None = Field(default=None, title="[STAC, extension proj] The affine transformation coefficients for the default grid.")
 
 
 class Lifecycle(BaseModel, extra=Extra.allow):
-    add_datetime: Datetime = Field(title="Datetime of the item addition to the catalog")
-    update_datetime: Datetime | None = Field(default=None, title="Datetime of the item update in the catalog")
-    delete_datetime: Datetime | None = Field(default=None, title="Datetime of the item deletion from the catalog")
+    add_datetime: datetime = Field(title="Datetime of the item addition to the catalog")
+    update_datetime: datetime | None = Field(default=None, title="Datetime of the item update in the catalog")
+    delete_datetime: datetime | None = Field(default=None, title="Datetime of the item deletion from the catalog")
     deleted: bool = Field(default=False, title="Whether the item has been deleted from the catalog or not")
     visible: bool = Field(default=True, title="Whether the item is visible in the catalog or not")
     version: int = Field(default=1, title="Version of the item in the catalog")
 
 
 class Properties(BaseModel, extra=Extra.allow):
-    datetime: Datetime | None = Field(default=None, title="[STAC] datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
-    start_datetime: Datetime | None = Field(default=None, title="[STAC] Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
-    end_datetime: Datetime | None = Field(default=None, title="[STAC] Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
-    keywords: List[str] | None = Field(default=None, title="STAC] A list of keywords")
+    datetime: datetime | None = Field(default=None, title="[STAC] datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
+    start_datetime: datetime | None = Field(default=None, title="[STAC] Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
+    end_datetime: datetime | None = Field(default=None, title="[STAC] Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
+    keywords: list[str] | None = Field(default=None, title="[STAC] A list of keywords")
     programme: str | None = Field(default=None, title="[ARLAS] Name of the programme")
     constellation: str | None = Field(default=None, title="[ARLAS] Name of the constellation")
     satellite: str | None = Field(default=None, title="[ARLAS] Name of the satellite")
@@ -447,50 +446,58 @@ class Properties(BaseModel, extra=Extra.allow):
     observation_type: str | None = Field(default=None, title="[ARLAS] Type of observation (ObservationType)")
     data_coverage: float | None = Field(default=None, title="[ARLAS] Estimate of data cover")
     water_coverage: float | None = Field(default=None, title="[ARLAS] Estimate of water cover")
-    locations: List[str] | None = Field(default=None, title="[ARLAS] List of locations covered by the item")
+    locations: list[str] | None = Field(default=None, title="[ARLAS] List of locations covered by the item")
     create_datetime: int | None = Field(default=None, title="[ARLAS, AIRS]Date of item creation in the catalog, managed by the ARLAS Item Registration Service")
     update_datetime: int | None = Field(default=None, title="[ARLAS, AIRS]Update date of the item in the catalog, managed by the ARLAS Item Registration Service")
-    created: int | None = Field(default=None, title="[STAC] Creation date and time of the corresponding STAC entity or Asset (see below), in UTC.")
-    updated: int | None = Field(default=None, title="[STAC] Date and time the corresponding STAC entity or Asset (see below) was updated last, in UTC.")
+    created: int | None = Field(default=None, title="[STAC] Creation date and time of the corresponding STAC entity or Asset, in UTC.")
+    updated: int | None = Field(default=None, title="[STAC] Date and time the corresponding STAC entity or Asset was updated last, in UTC.")
+
     view__off_nadir: float | None = Field(default=None, title="[STAC, extension view] The angle from the sensor between nadir (straight down) and the scene center. Measured in degrees (0-90).")
     view__incidence_angle: float | None = Field(default=None, title="[STAC, extension view] The incidence angle is the angle between the vertical (normal) to the intercepting surface and the line of sight back to the satellite at the scene center. Measured in degrees (0-90).")
     view__azimuth: float | None = Field(default=None, title="[STAC, extension view] Viewing azimuth angle. The angle measured from the sub-satellite point (point on the ground below the platform) between the scene center and true north. Measured clockwise from north in degrees (0-360).")
     view__sun_azimuth: float | None = Field(default=None, title="[STAC, extension view] Sun azimuth angle. From the scene center point on the ground, this is the angle between truth north and the sun. Measured clockwise in degrees (0-360).")
     view__sun_elevation: float | None = Field(default=None, title="[STAC, extension view] Sun elevation angle. The angle from the tangent of the scene center point to the sun. Measured from the horizon in degrees (-90-90). Negative values indicate the sun is below the horizon, e.g. sun elevation of -10° means the data was captured during nautical twilight.")
+
     storage__requester_pays: bool | None = Field(default=None, title="[STAC, extension storage] Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets")
     storage__tier: str | None = Field(default=None, title="[STAC, extension storage] Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
     storage__platform: str | None = Field(default=None, title="[STAC, extension storage] PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
     storage__region: str | None = Field(default=None, title="[STAC, extension storage] The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)")
+
     eo__cloud_cover: float | None = Field(default=None, title="[STAC, extension eo] Estimate of cloud cover.")
     eo__snow_cover: float | None = Field(default=None, title="[STAC, extension eo] Estimate of snow and ice cover.")
-    eo__bands: List[Band] | None = Field(default=None, title="[STAC, extension eo] An array of available bands where each object is a Band Object. If given, requires at least one band.")
+    eo__bands: list[Band] | None = Field(default=None, title="[STAC, extension eo] An array of available bands where each object is a Band Object. If given, requires at least one band.")
+
     processing__expression: str | None = Field(default=None, title="[STAC, extension processing] An expression or processing chain that describes how the data has been processed. Alternatively, you can also link to a processing chain with the relation type processing-expression (see below).")
     processing__lineage: str | None = Field(default=None, title="[STAC, extension processing] Lineage Information provided as free text information about the how observations were processed or models that were used to create the resource being described NASA ISO.")
     processing__level: str | None = Field(default=None, title="[STAC, extension processing] The name commonly used to refer to the processing level to make it easier to search for product level across collections or items. The short name must be used (only L, not Level).")
     processing__facility: str | None = Field(default=None, title="[STAC, extension processing] The name of the facility that produced the data. For example, Copernicus S1 Core Ground Segment - DPA for product of Sentinel-1 satellites.")
-    processing__software: Dict[str, str] | None = Field(default=None, title="[STAC, extension processing] A dictionary with name/version for key/value describing one or more softwares that produced the data.")
+    processing__software: dict[str, str] | None = Field(default=None, title="[STAC, extension processing] A dictionary with name/version for key/value describing one or more softwares that produced the data.")
+
     dc3__quality_indicators: Indicators | None = Field(default=None, title="[STAC, extension dc3] Set of indicators for estimating the quality of the datacube based on the composition. The indicators are group based. A cube indicator is the product of its corresponding group indicator.")
-    dc3__composition: List[ItemGroup] | None = Field(default=None, title="[STAC, extension dc3] List of item groups used for elaborating the cube temporal slices.")
+    dc3__composition: list[ItemGroup] | None = Field(default=None, title="[STAC, extension dc3] List of item groups used for elaborating the cube temporal slices.")
     dc3__number_of_chunks: int | None = Field(default=None, title="[STAC, extension dc3] Number of chunks (if zarr or similar partitioned format) within the cube.")
     dc3__chunk_weight: int | None = Field(default=None, title="[STAC, extension dc3] Weight of a chunk (number of bytes).")
     dc3__fill_ratio: float | None = Field(default=None, title="[STAC, extension dc3] 1: the cube is full, 0 the cube is empty, in between the cube is partially filled.")
     dc3__overview: dict[str, str] | dict[RGB, str] | None = Field(default=None, title="[STAC, extension dc3] Parameters used to generate the preview. Either contains the matplotlib colormap and the band used, or the mapping between RGB bands and the datacube's bands used.")
-    cube__dimensions: Dict[str, Dimension] | None = Field(default=None, title="[STAC, extension cube] Uniquely named dimensions of the datacube.")
-    cube__variables: Dict[str, Variable] | None = Field(default=None, title="[STAC, extension cube] Uniquely named variables of the datacube.")
+
+    cube__dimensions: dict[str, Dimension] | None = Field(default=None, title="[STAC, extension cube] Uniquely named dimensions of the datacube.")
+    cube__variables: dict[str, Variable] | None = Field(default=None, title="[STAC, extension cube] Uniquely named variables of the datacube.")
+
     acq__acquisition_mode: str | None = Field(default=None, title="[STAC, extension acq] The name of the acquisition mode.")
     acq__acquisition_orbit_direction: str | None = Field(default=None, title="[STAC, extension acq] Acquisition orbit direction (ASCENDING or DESCENDING).")
     acq__acquisition_type: str | None = Field(default=None, title="[STAC, extension acq] Acquisition type (STRIP)")
     acq__acquisition_orbit: float | None = Field(default=None, title="[STAC, extension acq] Acquisition orbit")
     acq__across_track: float | None = Field(default=None, title="[STAC, extension acq] Across track angle")
     acq__along_track: float | None = Field(default=None, title="[STAC, extension acq] Along track angle")
-    acq__archiving_date: Datetime | None = Field(default=None, title="[STAC, extension acq] Archiving date")
+    acq__archiving_date: datetime | None = Field(default=None, title="[STAC, extension acq] Archiving date")
     acq__download_orbit: float | None = Field(default=None, title="[STAC, extension acq] Download orbit")
     acq__request_id: str | None = Field(default=None, title="[STAC, extension acq] Original request identifier")
     acq__quality_average: float | None = Field(default=None, title="[STAC, extension acq] Quality average")
     acq__quality_computation: str | None = Field(default=None, title="[STAC, extension acq] Quality computation")
     acq__receiving_station: str | None = Field(default=None, title="[STAC, extension acq] Receiving station")
-    acq__reception_date: Datetime | None = Field(default=None, title="[STAC, extension acq] Reception date")
+    acq__reception_date: datetime | None = Field(default=None, title="[STAC, extension acq] Reception date")
     acq__spectral_mode: str | None = Field(default=None, title="[STAC, extension acq] Spectral mode")
+
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
     sar__frequency_band: str | None = Field(default=None, title="[STAC, extension sar] The common name for the frequency band to make it easier to search for bands across instruments. See section \"Common Frequency Band Names\" for a list of accepted names.")
     sar__center_frequency: float | None = Field(default=None, title="[STAC, extension sar] The center frequency of the instrument, in gigahertz (GHz).")
@@ -504,13 +511,24 @@ class Properties(BaseModel, extra=Extra.allow):
     sar__looks_azimuth: float | None = Field(default=None, title="[STAC, extension sar] Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.")
     sar__looks_equivalent_number: float | None = Field(default=None, title="[STAC, extension sar] The equivalent number of looks (ENL).")
     sar__observation_direction: str | None = Field(default=None, title="[STAC, extension sar] Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.")
+
     proj__epsg: int | None = Field(default=None, title="[STAC, extension proj] EPSG code of the datasource.")
     proj__wkt2: str | None = Field(default=None, title="[STAC, extension proj] PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.")
     proj__geometry: Any | None = Field(default=None, title="[STAC, extension proj] Defines the footprint of this Item.")
-    proj__bbox: List[float] | None = Field(default=None, title="[STAC, extension proj] Bounding box of the Item in the asset CRS in 2 or 3 dimensions.")
+    proj__bbox: list[float] | None = Field(default=None, title="[STAC, extension proj] Bounding box of the Item in the asset CRS in 2 or 3 dimensions.")
     proj__centroid: Any | None = Field(default=None, title="[STAC, extension proj] Coordinates representing the centroid of the Item (in lat/long).")
-    proj__shape: List[float] | None = Field(default=None, title="[STAC, extension proj] Number of pixels in Y and X directions for the default grid.")
-    proj__transform: List[float] | None = Field(default=None, title="[STAC, extension proj] The affine transformation coefficients for the default grid.")
+    proj__shape: list[float] | None = Field(default=None, title="[STAC, extension proj] Number of pixels in Y and X directions for the default grid.")
+    proj__transform: list[float] | None = Field(default=None, title="[STAC, extension proj] The affine transformation coefficients for the default grid.")
+
+    sat__platform_international_designator: str | None = Field(default=None, title="[STAC, extension sat] The International Designator, also known as COSPAR ID, and NSSDCA ID")
+    sat__orbit_state: str | None = Field(default=None, title="[STAC, extension sat] The state of the orbit. Either ascending or descending for polar orbiting satellites, geostationary for geosynchronous satellites, or crossing when the acquisition spans a polar crossing.")
+    sat__absolute_orbit: int | None = Field(default=None, title="[STAC, extension sat] The absolute orbit number at the start of acquisition.")
+    sat__relative_orbit: int | None = Field(default=None, title="[STAC, extension sat] The relative orbit number at the start of acquisition.")
+    sat__orbit_cycle: int | None = Field(default=None, title="[STAC, extension sat] The number of repeat cycle done by the satellite at the time of the acquisition. Repeat cycle is the time between two successive identical orbits.")
+    sat__orbit_state_vectors: dict[str, list[float]] | None = Field(default=None, title="[STAC, extension sat] The state vectors of the satellite at the time of acquisition.")
+    sat__anx_datetime: str | None = Field(default=None, title="[STAC, extension sat] The Ascending Node Crossing (ANX) time, in UTC. It is formatted according to RFC 3339, section 5.6.")
+    sat__acquisition_station: str | None = Field(default=None, title="[STAC, extension sat] The acquisition station (ground station) where the satellite data was downlinked. Equivalent to eop:acquisition_station in OGC 10-157r4 and OGC 17-003r2.")
+
     generated__has_overview: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has an overview or not.")
     generated__has_thumbnail: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has a thumbnail or not.")
     generated__has_metadata: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has a metadata file or not.")
@@ -520,7 +538,7 @@ class Properties(BaseModel, extra=Extra.allow):
     generated__has_all_bands_cog: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has a cog for all its bands, or not.")
     generated__has_cog: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has a cog or not.")
     generated__has_zarr: bool | None = Field(default=False, title="[ARLAS, AIRS] Whether the item has a zarr or not.")
-    generated__date_keywords: List[str] | None = Field(default=None, title="[ARLAS, AIRS] A list of keywords indicating clues on the date")
+    generated__date_keywords: list[str] | None = Field(default=None, title="[ARLAS, AIRS] A list of keywords indicating clues on the date")
     generated__day_of_week: int | None = Field(default=None, title="[ARLAS, AIRS] Day of week.")
     generated__day_of_year: int | None = Field(default=None, title="[ARLAS, AIRS] Day of year.")
     generated__hour_of_day: int | None = Field(default=None, title="[ARLAS, AIRS] Hour of day.")
@@ -528,13 +546,14 @@ class Properties(BaseModel, extra=Extra.allow):
     generated__month: int | None = Field(default=None, title="[ARLAS, AIRS] Month")
     generated__year: int | None = Field(default=None, title="[ARLAS, AIRS] Year")
     generated__season: str | None = Field(default=None, title="[ARLAS, AIRS] Season")
-    generated__tltrbrbl: List[List[float]] | None = Field(default=None, title="[ARLAS, AIRS] The coordinates of the top left, top right, bottom right, bottom left corners of the item.")
-    generated__band_common_names: List[str] | None = Field(default=None, title="[ARLAS, AIRS] List of the band common names.")
-    generated__band_names: List[str] | None = Field(default=None, title="[ARLAS, AIRS] List of the band names.")
+    generated__tltrbrbl: list[list[float]] | None = Field(default=None, title="[ARLAS, AIRS] The coordinates of the top left, top right, bottom right, bottom left corners of the item.")
+    generated__band_common_names: list[str] | None = Field(default=None, title="[ARLAS, AIRS] List of the band common names.")
+    generated__band_names: list[str] | None = Field(default=None, title="[ARLAS, AIRS] List of the band names.")
     generated__geohash2: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first two characters.")
     generated__geohash3: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first three characters.")
     generated__geohash4: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first four characters.")
     generated__geohash5: str | None = Field(default=None, title="[ARLAS, AIRS] Geohash on the first five characters.")
+
     model_config = ConfigDict(json_encoders=json_encoders)
 
 
@@ -543,8 +562,8 @@ class Item(BaseModel, extra=Extra.allow):
     collection: str | None = Field(default=None, title="[STAC] Name of the collection the item belongs to.", max_length=300)
     catalog: str | None = Field(default=None, title="Name of the catalog the item belongs to.", max_length=300)
     id: str | None = Field(default=None, title="[STAC] Unique item identifier. Must be unique within the collection.", max_length=300)
-    geometry: Dict[str, Any] | None = Field(default=None, title="[STAC] Defines the full footprint of the asset represented by this item, formatted according to `RFC 7946, section 3.1 (GeoJSON) <https://tools.ietf.org/html/rfc7946>`_")
-    bbox: List[float] | None = Field(default=None, title="[STAC] Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2*n where n is the number of dimensions. Could also be None in the case of a null geometry.")
-    centroid: List[float] | None = Field(default=None, title="Coordinates (lon/lat) of the geometry's centroid.")
-    assets: Dict[str, Asset] = Field(default={}, title="[STAC] A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item.")
+    geometry: dict[str, Any] | None = Field(default=None, title="[STAC] Defines the full footprint of the asset represented by this item, formatted according to `RFC 7946, section 3.1 (GeoJSON) <https://tools.ietf.org/html/rfc7946>`_")
+    bbox: list[float] | None = Field(default=None, title="[STAC] Bounding Box of the asset represented by this item using either 2D or 3D geometries. The length of the array must be 2*n where n is the number of dimensions. Could also be None in the case of a null geometry.")
+    centroid: list[float] | None = Field(default=None, title="Coordinates (lon/lat) of the geometry's centroid.")
+    assets: dict[str, Asset] = Field(default={}, title="[STAC] A dictionary mapping string keys to Asset objects. All Asset values in the dictionary will have their owner attribute set to the created Item.")
     properties: Properties | None = Field(default=None, title="[STAC] Item properties")
