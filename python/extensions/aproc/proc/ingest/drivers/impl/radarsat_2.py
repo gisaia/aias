@@ -60,8 +60,8 @@ class Driver(IngestDriver):
         image_path = None
         if self.browse_path:
             image_path = self.browse_path
-        elif AccessManager.is_local(self.polarizations[0]['path']):
-            image_path = self.polarizations[0]['path']
+        elif IngestDriver.must_build_preview(Driver.configuration, self.polarizations[0]["path"], "local"):
+            image_path = self.polarizations[0]["path"]
 
         if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
