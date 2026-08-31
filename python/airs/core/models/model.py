@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import datetime as Datetime  # Alias is needed for pydantic
 from enum import Enum
 from typing import Annotated, Any, Literal
 
@@ -344,7 +345,7 @@ class ItemReference(BaseModel):
 
 class ItemGroup(BaseModel):
     dc3__references: list[ItemReference] = Field(title="[ARLAS, extension dc3] The rasters of this group.", min_length=1)
-    dc3__datetime: datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
+    dc3__datetime: Datetime = Field(title="[ARLAS, extension dc3] The date time of this temporal group.")
     dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube group. The indicators are group based.")
     model_config = ConfigDict(json_encoders=json_encoders)
 
@@ -413,18 +414,19 @@ class Asset(BaseModel, extra=Extra.allow):
 
 
 class Lifecycle(BaseModel, extra=Extra.allow):
-    add_datetime: datetime = Field(title="Datetime of the item addition to the catalog")
-    update_datetime: datetime | None = Field(default=None, title="Datetime of the item update in the catalog")
-    delete_datetime: datetime | None = Field(default=None, title="Datetime of the item deletion from the catalog")
+    add_datetime: Datetime = Field(title="Datetime of the item addition to the catalog")
+    update_datetime: Datetime | None = Field(default=None, title="Datetime of the item update in the catalog")
+    delete_datetime: Datetime | None = Field(default=None, title="Datetime of the item deletion from the catalog")
     deleted: bool = Field(default=False, title="Whether the item has been deleted from the catalog or not")
     visible: bool = Field(default=True, title="Whether the item is visible in the catalog or not")
     version: int = Field(default=1, title="Version of the item in the catalog")
+    model_config = ConfigDict(json_encoders=json_encoders)
 
 
 class Properties(BaseModel, extra=Extra.allow):
-    datetime: datetime | None = Field(default=None, title="[STAC] datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
-    start_datetime: datetime | None = Field(default=None, title="[STAC] Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
-    end_datetime: datetime | None = Field(default=None, title="[STAC] Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
+    datetime: Datetime | None = Field(default=None, title="[STAC] datetime associated with this item. If None, a start_datetime and end_datetime must be supplied.")
+    start_datetime: Datetime | None = Field(default=None, title="[STAC] Optional start datetime, part of common metadata. This value will override any start_datetime key in properties.")
+    end_datetime: Datetime | None = Field(default=None, title="[STAC] Optional end datetime, part of common metadata. This value will override any end_datetime key in properties.")
     keywords: list[str] | None = Field(default=None, title="[STAC] A list of keywords")
     programme: str | None = Field(default=None, title="[ARLAS] Name of the programme")
     constellation: str | None = Field(default=None, title="[ARLAS] Name of the constellation")
@@ -489,13 +491,13 @@ class Properties(BaseModel, extra=Extra.allow):
     acq__acquisition_orbit: float | None = Field(default=None, title="[STAC, extension acq] Acquisition orbit")
     acq__across_track: float | None = Field(default=None, title="[STAC, extension acq] Across track angle")
     acq__along_track: float | None = Field(default=None, title="[STAC, extension acq] Along track angle")
-    acq__archiving_date: datetime | None = Field(default=None, title="[STAC, extension acq] Archiving date")
+    acq__archiving_date: Datetime | None = Field(default=None, title="[STAC, extension acq] Archiving date")
     acq__download_orbit: float | None = Field(default=None, title="[STAC, extension acq] Download orbit")
     acq__request_id: str | None = Field(default=None, title="[STAC, extension acq] Original request identifier")
     acq__quality_average: float | None = Field(default=None, title="[STAC, extension acq] Quality average")
     acq__quality_computation: str | None = Field(default=None, title="[STAC, extension acq] Quality computation")
     acq__receiving_station: str | None = Field(default=None, title="[STAC, extension acq] Receiving station")
-    acq__reception_date: datetime | None = Field(default=None, title="[STAC, extension acq] Reception date")
+    acq__reception_date: Datetime | None = Field(default=None, title="[STAC, extension acq] Reception date")
     acq__spectral_mode: str | None = Field(default=None, title="[STAC, extension acq] Spectral mode")
 
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
