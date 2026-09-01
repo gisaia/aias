@@ -59,15 +59,13 @@ class CogBuilderHelper:
             else:
                 kwargs['resolution'] = "highest"
 
-            info = gdal.Info(source, options=gdal.InfoOptions(format="json"))
-            # If the input image has no georeferencing or GCPS, then there shouldn't be any COG build
-            if info.get("coordinateSystem", None) is None and info.get("gcps", None) is None:
-                raise DriverException(f"Can't build a COG from {source}: the source is not georeferenced")
-
             kwargs.update(options)
             LOGGER.info(f"Building COG from {source} to {target} with parameters={kwargs}")
             start = time()
             gdal.Warp(target, source, **kwargs)
+
+            if not AccessManager.exists(target):
+                raise DriverException(f"Failed to build a COG from {source}")
             LOGGER.info("Creating COG took {} s".format(time() - start))
 
     @staticmethod

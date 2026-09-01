@@ -50,10 +50,14 @@ class Driver(EnrichDriver):
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
         # There is an issue when trying to create the COG directly from remote storage:
-        # - the jpeg2000 file can be not georeferenced, failing the creation of the VRT file
-        # - reading the data fails to build the COG
-        with AccessManager.make_local(source) as local_source:
+        # - the jpeg2000 file's georeference can be in a .aux.xml file, failing the creation of the COG
+        # - If the file is pulled alone, reading the data fails to build the COG
+        files_to_pull = [source]
+        if AccessManager.exists(source + ".aux.xml"):
+            files_to_pull.append(source + ".aux.xml")
+
+        with AccessManager.make_local_list(files_to_pull) as local_files:
             self.LOGGER.info("Building cog from {}".format(source))
-            CogBuilderHelper.build(local_source, target, max_px_width_or_height=cog_max_width_or_height)
+            CogBuilderHelper.build(local_files[0], target, max_px_width_or_height=cog_max_width_or_height)
 
         return [CogBuilderHelper.create_asset(item, enrichment, target)]
