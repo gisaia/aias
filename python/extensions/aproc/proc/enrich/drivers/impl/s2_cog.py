@@ -2,24 +2,22 @@ import io
 import os
 import re
 import tempfile
-from typing import Any
 import zipfile
 from time import time
+from typing import Any
 
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
-                                    MimeType, ResourceType, Role)
 from aias_common.access.manager import AccessManager
+from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+                                    MimeType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_constants import ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT, COG_MAX_WIDTH_OR_HEIGHT, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT
-from extensions.aproc.proc.enrich.enrich_process import supported_assets_for_enrichment
-from extensions.aproc.proc.utils.cog_helper import helper_build_cog
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
+    CogBuilderHelper
 
 
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower(), AssetFormat.all_bands_cog.value.lower()]
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -27,12 +25,7 @@ class Driver(EnrichDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        EnrichDriver.init(configuration)
-        Driver.configuration = configuration or {}
-        supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
-        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
-        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
-        Driver.configuration['all_bands_cog_max_width_or_height'] = Driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
+        CogBuilderHelper.init(Driver, configuration)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
@@ -70,24 +63,10 @@ class Driver(EnrichDriver):
         cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
         if enrichment == AssetFormat.overview_cog.value.lower():
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
-        asset = Asset(
-            name=enrichment,
-            size=0,     # set once asset created
-            href=None,  # set below
-            asset_type=ResourceType.gridded.value,
-            asset_format=AssetFormat.cog.value,
-            roles=[enrichment],
-            type=MimeType.TIFF.value,
-            title="{} for {}/{}".format(enrichment, item.collection, item.id),
-            description="{} for {}/{}".format(enrichment, item.collection, item.id),
-            proj__epsg=3857,
-            airs__managed=True
-        )
-        target_asset_location = self.get_target_asset_filepath(item.id, asset.name)
-        asset.href = target_asset_location
+
+        target_asset_location = self.get_target_asset_filepath(item.id, enrichment)
         self.__build_TCI_COG(item, target_asset_location, cog_max_width_or_height)
-        asset.size = AccessManager.get_size(target_asset_location)
-        return asset
+        return CogBuilderHelper.create_asset(item, enrichment, target_asset_location)
 
     def __build_TCI_COG(self, item: Item, target_asset_location: str, cog_max_width_or_height: int):
         href = self.get_asset_href(item)
@@ -96,7 +75,7 @@ class Driver(EnrichDriver):
 
             from osgeo import gdal
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
-            
+
             is_asset_zip = item.assets.get(Role.data.value).type == MimeType.ZIP.value
             if is_asset_zip:
                 start = time()
@@ -108,7 +87,7 @@ class Driver(EnrichDriver):
                 AccessManager.pull(href, tci_file_path)
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-            helper_build_cog(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height)
+            CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height)
             os.remove(tci_file_path)  # !DELETE!
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
@@ -150,25 +129,10 @@ class Driver(EnrichDriver):
         return tci_file_path
 
     def __create_all_bands_asset(self, item: Item):
-        asset = Asset(
-            name='all_bands_cog',
-            size=0,     # set once asset created
-            href=None,  # set below
-            asset_type=ResourceType.gridded.value,
-            asset_format=AssetFormat.cog.value,
-            roles=[Role.cog.value],
-            type=MimeType.TIFF.value,
-            title="all bands COG for {}/{}".format(item.collection, item.id),
-            description="all bands COG for {}/{}".format(item.collection, item.id),
-            proj__epsg=3857,
-            airs__managed=True
-        )
-        target_asset_location = self.get_target_asset_filepath(item.id, asset.name)
-        asset.href = target_asset_location
+        target_asset_location = self.get_target_asset_filepath(item.id, AssetFormat.all_bands_cog.value)
         self.__build_all_bands_COG(item, target_asset_location)
-        asset.size = AccessManager.get_size(target_asset_location)
 
-        return asset
+        return CogBuilderHelper.create_asset(item, AssetFormat.all_bands_cog.value.lower(), target_asset_location)
 
     def __build_all_bands_COG(self, item: Item, target_asset_location: str):
         band_assets = list(filter(lambda a: Role.data.value in a.roles and a.name != Role.data.value, item.assets.values()))
@@ -187,7 +151,7 @@ class Driver(EnrichDriver):
                 kwargs = {"separate": True, "resolution": "highest"}
                 gdal.BuildVRT(source_files_vrt, local_assets, **kwargs)
                 all_bands_cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
-                helper_build_cog(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
+                CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
 
             AccessManager.clean(source_files_vrt)  # !DELETE!
         else:
