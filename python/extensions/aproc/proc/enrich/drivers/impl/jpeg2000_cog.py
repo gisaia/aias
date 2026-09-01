@@ -7,11 +7,7 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
     CogBuilderHelper
-
-
-# TODO: move that to utils
-def includes_case_insensitive(value: str, allowed_values: list[str]) -> bool:
-    return any(s.lower() == value.lower() for s in allowed_values)
+from extensions.aproc.proc.utils.compare import includes_case_insensitive
 
 
 class Driver(EnrichDriver):

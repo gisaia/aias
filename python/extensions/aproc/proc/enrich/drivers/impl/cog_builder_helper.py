@@ -4,6 +4,7 @@ from time import time
 from aias_common.access.manager import AccessManager, AnyStorage
 from airs.core.models.model import (Asset, AssetFormat, Item, MimeType,
                                     ResourceType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.enrich.enrich_process import \
     supported_assets_for_enrichment
@@ -57,6 +58,12 @@ class CogBuilderHelper:
                 kwargs['height'] = str(target_height)
             else:
                 kwargs['resolution'] = "highest"
+
+            info = gdal.Info(source, options=gdal.InfoOptions(format="json"))
+            # If the input image has no georeferencing or GCPS, then there shouldn't be any COG build
+            if info.get("coordinateSystem", None) is None and info.get("gcps", None) is None:
+                raise DriverException(f"Can't build a COG from {source}: the source is not georeferenced")
+
             kwargs.update(options)
             LOGGER.info(f"Building COG from {source} to {target} with parameters={kwargs}")
             start = time()
