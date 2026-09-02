@@ -8,6 +8,14 @@ drivers:
       cog_overview_max_width_or_height: 200
     priority: 1
   -
+    name: jpeg2000
+    class_name: extensions.aproc.proc.enrich.drivers.impl.jpeg2000_cog
+    assets_dir: /tmp/aproc/jpeg2000_cog
+    configuration:
+      cog_max_width_or_height: 500
+      cog_overview_max_width_or_height: 200
+    priority: 2
+  -
     name: sentinel2
     class_name: extensions.aproc.proc.enrich.drivers.impl.s2_cog
     assets_dir: /tmp/aproc/s2_cog
@@ -15,7 +23,7 @@ drivers:
       cog_max_width_or_height: 500
       cog_overview_max_width_or_height: 200
       all_bands_cog_max_width_or_height: 300
-    priority: 2
+    priority: 3
   -
     name: landsat
     class_name: extensions.aproc.proc.enrich.drivers.impl.landsat_cog
@@ -24,7 +32,7 @@ drivers:
       cog_max_width_or_height: 500
       cog_overview_max_width_or_height: 200
       all_bands_cog_max_width_or_height: 300
-    priority: 3
+    priority: 4
   -
     name: csk_h5
     class_name: extensions.aproc.proc.enrich.drivers.impl.csk_h5_cog
@@ -32,4 +40,4 @@ drivers:
     configuration:
       cog_max_width_or_height: 500
       cog_overview_max_width_or_height: 200
-    priority: 4
+    priority: 5

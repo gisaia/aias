@@ -28,14 +28,6 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, SPOT6)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], check_epsg=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_pneoms(self):  # Driver DIMAP
-        url = os.path.join(ROOT, PNEOMS)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
-
-    def test_async_ingest_pneopan(self):  # Driver DIMAP
-        url = os.path.join(ROOT, PNEOPAN)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"])  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
-
     def test_async_ingest_dimap_driver_include(self):  # Driver DIMAP
         url = os.path.join(ROOT, SPOT6)
         self.ingest(url, COLLECTION, CATALOG, include_drivers=["dimap"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
@@ -82,7 +74,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_jpg2000(self):  # Driver JPEG2000
         url = os.path.join(ROOT, JP2000)
-        self.async_ingest(url, ["data", "airs_item"], archive=False)  # NO COG Driver for JPEG2000 data file See issue https://github.com/gisaia/aias/issues/507
+        self.async_ingest(url, ["data", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_ingest_directory(self):  # Test Folder in cloud ingestion
         self.ingest_directory(ROOT + "/spacewill/", collection=COLLECTION, catalog=CATALOG)
@@ -129,7 +121,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_geosat_jp2(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT_JP2)
-        self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"])  # TODO: COG ENRICHEMENT DOES NOT WORK WITH JPEG2000 source. See issue https://github.com/gisaia/aias/issues/507
+        self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_wyvern(self):  # Driver Wyvern
         url = os.path.join(ROOT, WYVERN)
@@ -149,11 +141,11 @@ class Tests(IngestTests):
 
     def test_async_ingest_pneo_ms(self):  # Driver DIMAP for PNEO MS
         url = os.path.join(ROOT, PNEOMS)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])  # TODO: COG ENRICHEMENT DOES NOT WORK WITH JPEG2000 source. See issue https://github.com/gisaia/aias/issues/507
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_pneo_pan(self):  # Driver DIMAP for PNEO PAN
         url = os.path.join(ROOT, PNEOPAN)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"])  # TODO: COG ENRICHEMENT DOES NOT WORK WITH JPEG2000 source. See issue https://github.com/gisaia/aias/issues/507
+        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_capella1(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA1)

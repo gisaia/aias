@@ -8,11 +8,12 @@ from extensions.aproc.proc.drivers.abstract_driver import AbstractDriver
 
 
 class EnrichDriver(AbstractDriver):
+    configuration: dict = {}
+
+    SUPPORTED_ASSET_TYPES: list[str] = []
 
     def __init__(self):
         super().__init__()
-        self.thumbnail_size = 256
-        self.overview_size = 1024
 
     def supports_format(self, resource: Item, extra_params: dict[str, Any], supported_assets: list[str]) -> bool:
         return extra_params.get("enrichments", []) and set([e.lower() for e in extra_params.get("enrichments", [])]).issubset(set(supported_assets))

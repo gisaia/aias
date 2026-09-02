@@ -7,20 +7,15 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_constants import (
-    COG_MAX_WIDTH_OR_HEIGHT, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
-from extensions.aproc.proc.enrich.enrich_process import \
-    supported_assets_for_enrichment
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
+    CogBuilderHelper
 from extensions.aproc.proc.ingest.drivers.impl.cosmoskymed import \
     csk_h5_scenes_to_geotiffs
-from extensions.aproc.proc.utils.cog_helper import (
-    helper_build_cog, helper_create_asset_from_location)
 
 
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower()]
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -28,11 +23,7 @@ class Driver(EnrichDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        EnrichDriver.init(configuration)
-        Driver.configuration = configuration or {}
-        supported_assets_for_enrichment.update(Driver.SUPPORTED_ASSET_TYPES)
-        Driver.configuration['cog_overview_max_width_or_height'] = Driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
-        Driver.configuration['cog_max_width_or_height'] = Driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
+        CogBuilderHelper.init(Driver, configuration)
 
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
@@ -67,10 +58,10 @@ class Driver(EnrichDriver):
         with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
             gdal.Warp(merged_tif, tiffs, format="GTiff")
 
-        helper_build_cog(merged_tif, target, max_px_width_or_height=cog_max_width_or_height)
+        CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height)
         os.remove(merged_tif)  # !DELETE!
 
-        return [helper_create_asset_from_location(item, enrichment, target)]
+        return [CogBuilderHelper.create_asset(item, enrichment, target)]
 
     def __load_metadata(self, data_path: str) -> dict:
         from osgeo import gdal

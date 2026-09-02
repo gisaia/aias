@@ -1,5 +1,7 @@
+import tempfile
 from typing import Any
 
+from aias_common.access.manager import AccessManager
 from airs.core.models.model import Asset, AssetFormat, Item, MimeType, Role
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
@@ -11,8 +13,8 @@ from extensions.aproc.proc.utils.compare import includes_case_insensitive
 class Driver(EnrichDriver):
 
     SUPPORTED_ASSET_TYPES = [AssetFormat.cog.value.lower(), AssetFormat.overview_cog.value.lower()]
-    SUPPORTED_SOURCE_MIME_TYPES = [MimeType.TIFF.value, MimeType.COG.value]
-    SUPPORTED_SOURCE_ASSET_FORMAT = [AssetFormat.geotiff.value, AssetFormat.cog.value]
+    SUPPORTED_SOURCE_MIME_TYPES = [MimeType.JPEG2000.value]
+    SUPPORTED_SOURCE_ASSET_FORMAT = [AssetFormat.jpg2000.value]
 
     def __init__(self):
         super().__init__()
@@ -33,15 +35,29 @@ class Driver(EnrichDriver):
 
     # Implements drivers method
     def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
+        from osgeo import gdal
+        gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
+
         data_asset = item.assets.get(Role.data.value)
         if not data_asset or not data_asset.href:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
 
         source = data_asset.href
         target = self.get_target_asset_filepath(item.id, enrichment)
+
         cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
         if enrichment == AssetFormat.overview_cog.value.lower():
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
-        CogBuilderHelper.build(source, target, max_px_width_or_height=cog_max_width_or_height)
+        # There is an issue when trying to create the COG directly from remote storage:
+        # - the jpeg2000 file's georeference can be in a .aux.xml file, failing the creation of the COG
+        # - If the file is pulled alone, reading the data fails to build the COG
+        files_to_pull = [source]
+        if AccessManager.exists(source + ".aux.xml"):
+            files_to_pull.append(source + ".aux.xml")
+
+        with AccessManager.make_local_list(files_to_pull) as local_files:
+            self.LOGGER.info("Building cog from {}".format(source))
+            CogBuilderHelper.build(local_files[0], target, max_px_width_or_height=cog_max_width_or_height)
+
         return [CogBuilderHelper.create_asset(item, enrichment, target)]
