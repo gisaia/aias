@@ -1,6 +1,6 @@
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from dateutil import parser
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -81,10 +81,8 @@ class Driver(IngestDriver):
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
 
-        start_time = root.find("./Channel/SwathInfo/AcquisitionStartTime").text[:-6]
-        if start_time[-6:] == '000000':
-            start_time = start_time[:-6]
-        start_time = datetime.strptime(start_time, "%d-%b-%Y %H:%M:%S.%f")
+        start_time = root.find("./Channel/SwathInfo/AcquisitionStartTime").text
+        start_time = parser.parse(start_time)
 
         item = Item(
             geometry=geometry,
