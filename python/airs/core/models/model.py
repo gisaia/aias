@@ -107,6 +107,7 @@ class MimeType(Enum):
     KML = "application/vnd.google-earth.kml+xml"
     MARKDOWN = "text/markdown"
     NETCDF = "application/netcdf"  # https://github.com/Unidata/netcdf/issues/42#issuecomment-1007618822
+    OCTET_STREAM = "application/octet-stream"
     PARQUET = "application/x-parquet"  # https://github.com/opengeospatial/geoparquet/issues/115#issuecomment-1181549523
     PDF = "application/pdf"
     PNG = "image/png"
@@ -130,14 +131,15 @@ class ProcessingLevel(Enum):
 
 class ObservationType(Enum):
     dem = "DEM"
-    optic = "OPTIC"
+    hyperspectral = "HYPERSPECTRAL"
     infrared = "INFRARED"
     lidar = "LIDAR"
+    optic = "OPTIC"
+    other = "OTHER"
     radar = "RADAR"
     sonar = "SONAR"
     thermal = "THERMAL"
     ultrasound = "ULTRASOUND"
-    other = "OTHER"
 
 
 class ResourceType(Enum):
@@ -162,6 +164,7 @@ class ItemFormat(Enum):
     iceye = "ICEYE"
     jpeg2000 = "JPEG2000"
     landsat = "landsat"
+    osk = "OSK"
     other = "OTHER"
     opencosmos = "OPENCOSMOS"
     radarsat2 = "RADARSAT-2",
@@ -170,6 +173,7 @@ class ItemFormat(Enum):
     satellogic = "SATELLOGIC"
     shape = "SHAPE"
     skysat = "SKYSAT"
+    soacom = "SOACOM"
     spot5 = "SPOT5"
     spot6_7 = "SPOT6_7"
     superview = "SUPERVIEW"
@@ -189,6 +193,7 @@ class AssetFormat(Enum):
     geotiff = "GEOTIFF"
     gif = "GIF"
     gml = "GML"
+    hsi = "HSI"
     h5 = "H5"
     j2w = "J2W"
     jpg = "JPG"
@@ -212,8 +217,9 @@ class AssetFormat(Enum):
 
 
 class SensorType(str, Enum):
-    SAR = "SAR"
+    HYPERSPECTRAL = "HYPERSPECTRAL"
     OPTIC = "OPTIC"
+    SAR = "SAR"
 
 
 class Role(Enum):

@@ -5,11 +5,10 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
-from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg, get_bbox, get_centroid,
+                                                             raster_to_jpg, get_bbox, get_centroid,
                                                              get_epsg, get_epsg_from_gdal_info_gcps)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
@@ -67,7 +66,7 @@ class Driver(IngestDriver):
             if IngestDriver.must_build_preview(Driver.configuration, tif_for_overview, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Building overview for local {tif_for_overview}")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                raster_to_jpg(tif_for_overview, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.quicklook_path = overview.href
                 assets.append(overview)
@@ -79,7 +78,7 @@ class Driver(IngestDriver):
                 # File is processed locally as it significantly speeds up processing time
                 with AccessManager.make_local(tif_for_overview) as local_big_preview_path:
                     overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    geotiff_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
+                    raster_to_jpg(local_big_preview_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                     overview.size = AccessManager.get_size(overview.href)
                     self.quicklook_path = overview.href
                     assets.append(overview)
@@ -107,11 +106,7 @@ class Driver(IngestDriver):
         return metadata
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
-        geometry = ImageDriverHelper.gdal_geometry(self, self.tif_path)
-        Driver.LOGGER.debug(f"Extracted geometry for item {url}: {geometry}")
-        if geometry is None:
-            Driver.LOGGER.warning(f"No geometry found for item {url}")
-            raise DriverException(f"Missing required 'geometry' for {url}")
+        geometry = ImageDriverHelper.gdal_geometry(self, self.tif_path, url)
 
         bbox = get_bbox(geometry["coordinates"][0])
 
