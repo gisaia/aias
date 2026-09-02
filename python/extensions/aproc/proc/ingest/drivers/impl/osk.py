@@ -1,6 +1,6 @@
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from dateutil import parser
 from typing import Callable
 
 from aias_common.access.manager import AccessManager
@@ -88,7 +88,7 @@ class Driver(IngestDriver):
 
         metadata = find_attrib(root, "./Metadata", "domain", "ENVI")
         acquisition_time = self.__get_metadata(metadata, "acquisition_time",
-                                               lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ"))
+                                               lambda x: parser.parse(x))
 
         item = Item(
             geometry=geometry,
