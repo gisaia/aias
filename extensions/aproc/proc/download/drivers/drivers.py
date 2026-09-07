@@ -7,7 +7,7 @@ from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import \
     Configuration as DownloadSettings
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 class Drivers():
     drivers: list[Driver] = None

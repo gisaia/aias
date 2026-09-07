@@ -3,7 +3,7 @@ import unittest
 import os
 import elasticsearch
 from airs.core.models import mapper as mapper
-from utils import setUpTest, index_endpoint_url, ITEM_PATH, AIRS_URL, COLLECTION, ID, ASSET, ASSET_PATH, \
+from test.utils import setUpTest, index_endpoint_url, ITEM_PATH, AIRS_URL, COLLECTION, ID, ASSET, ASSET_PATH, \
     index_collection_prefix
 
 
@@ -80,7 +80,7 @@ class Tests(unittest.TestCase):
         # FILE FOUND FOR THE MANAGED ASSET
         r=requests.get(url=os.path.join(AIRS_URL,"collections",COLLECTION, "items", ID))
         item=mapper.item_from_json(r.content)
-        location = item.assets["data"].href.replace("minio", "localhost")
+        location = item.assets["data"].href
         r=requests.head(url=location)
         self.assertTrue(r.ok, str(r.status_code)+str(r.content))
 

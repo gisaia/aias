@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from envyaml import EnvYAML
 from aproc.core.logger import Logger
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class ProcessSettings(BaseModel, extra='allow'):

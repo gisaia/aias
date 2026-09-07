@@ -9,7 +9,7 @@ class Driver(ABC):
     """
     priority: int = 0
     name: str = None
-    LOGGER = Logger.logger
+    LOGGER = Logger.get_logger()
 
     @staticmethod
     @abstractmethod

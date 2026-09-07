@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from agate.logger import Logger
 from agate.settings import Configuration
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 ROUTER = APIRouter()
 
 

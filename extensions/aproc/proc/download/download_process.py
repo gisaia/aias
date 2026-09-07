@@ -25,7 +25,7 @@ from extensions.aproc.proc.download.notifications import Notifications
 from extensions.aproc.proc.download.settings import Configuration
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 def __update_status__(task: Task, state: str, meta: dict = None):

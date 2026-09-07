@@ -1,0 +1,14 @@
+FROM python:3.10.18-alpine3.22
+RUN pip3 install --no-cache-dir --upgrade pip setuptools
+
+RUN apk update && apk add --upgrade libexpat
+RUN apk --no-cache add curl gcc python3-dev musl-dev linux-headers
+
+
+COPY ./test/requirements.tests.txt /app/
+
+ENV PYTHONPATH=/app/python/
+
+WORKDIR /app
+
+RUN pip install -r requirements.tests.txt

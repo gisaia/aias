@@ -13,7 +13,7 @@ from aproc.core.logger import Logger
 from extensions.aproc.proc.download.drivers.exceptions import DriverException
 from extensions.aproc.proc.download.settings import Configuration
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class Notifications:
