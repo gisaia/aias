@@ -13,7 +13,7 @@ from aproc.core.processes.process import Process
 from aproc.core.processes.processes import Processes
 from common.exception import OGCException, RESTException
 
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 ROUTER = APIRouter()
 ROOT_CONFORMANCE = "http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf"

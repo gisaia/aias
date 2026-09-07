@@ -21,7 +21,7 @@ from airs.core.logger import Logger
 
 ASSETS_NOT_FOUND="Asset(s) not found"
 ITEM_ARLAS_SUFFIX=".airs.json"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 def get_asset_relative_path(collection:str, item_id:str, asset_name:str)->str:

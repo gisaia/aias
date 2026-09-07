@@ -9,7 +9,7 @@ class Driver(ABC):
     priority: int = 0
     name: str = None
     __assets_dir__: str = None
-    LOGGER = Logger.logger
+    LOGGER = Logger.get_logger()
 
     def get_assets_dir(self, url:str)->str:
         """Provides the directory for storing the assets

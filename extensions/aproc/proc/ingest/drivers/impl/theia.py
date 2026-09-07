@@ -11,7 +11,7 @@ from airs.core.models.model import Asset, Band, Item, ObservationType, Propertie
 from aproc.core.settings import Configuration
 from extensions.aproc.proc.ingest.drivers.driver import Driver as ProcDriver
 from extensions.aproc.proc.ingest.drivers.exceptions import ConnectionException
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class Driver(ProcDriver):

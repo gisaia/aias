@@ -20,7 +20,7 @@ from extensions.aproc.proc.ingest.model import Archive
 from extensions.aproc.proc.ingest.settings import Configuration
 
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
-LOGGER = Logger.logger
+LOGGER = Logger.get_logger()
 
 
 class InputDirectoryIngestProcess(BaseModel):
