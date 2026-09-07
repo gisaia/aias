@@ -1,23 +1,33 @@
-FROM python:3.12.12-slim-trixie
+ARG AIAS_DOCKER_BASE_IMAGE="python:3.14-alpine3.24"
+FROM $AIAS_DOCKER_BASE_IMAGE
 
+ARG version="0.0"
+ENV AIAS_VERSION=${version}
+
+LABEL io.arlas.airs.version=${version}
+LABEL vendor="Gisaïa"
+LABEL description="This container serves ARLAS AIRS"
+
+RUN apk update && apk add --no-cache --upgrade libexpat curl gcc python3-dev musl-dev linux-headers libcrypto3 libssl3 libuuid
+
+#Clean SBOM pip to fix false positive CVE CVE-2025-47273 about setuptools
+#pip show setuptools → “not found” (because it is not installed via pip).
+#apk info py3-setuptools → 82.0.1 (system version).
+#SBOM bom.cdx.json → setuptools@70.3.0 (version documented at the time pip was built but not really instaled).
+RUN rm -f /usr/local/lib/python3.14/site-packages/pip/_vendor/bom.cdx.json
+
+RUN addgroup -g 1000 arlasgroup && \
+    adduser -D -u 1000 -G arlasgroup arlasuser
+USER 1000
+WORKDIR /app
 COPY ./airs/requirements.txt /app/requirements.txt
 
-WORKDIR /app
-
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./airs /app/airs
 COPY ./common /app/common
 COPY ./conf /app/conf
 COPY ./scripts/airs/start.sh /app/
-
-ADD "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/mapping.json" ./conf/mapping.json
-ADD "https://raw.githubusercontent.com/gisaia/ARLAS-EO/v0.0.6/collection.json" ./conf/collection.json
 
 EXPOSE 8000
 ENTRYPOINT ["./start.sh"]
