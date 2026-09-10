@@ -73,8 +73,12 @@ class Driver(IngestDriver):
 
             # Create quicklook
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
-            gdal.Warp(quicklook.href, minified_tiffs, format="JPEG")
+            overview_warp_options = {'format': 'JPEG'}
+            driver_configuration_overview_warp_options = Driver.configuration.get('overview_warp_options', {})
+            overview_warp_options.update(driver_configuration_overview_warp_options)
+
+            Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from minified tiffs {minified_tiffs} with warp options {overview_warp_options}")
+            gdal.Warp(quicklook.href, minified_tiffs, **overview_warp_options)
             if not AccessManager.exists(quicklook.href):
                 raise DriverException(f"Failed to create quicklook {quicklook.href} from minified tiffs {minified_tiffs}")
             quicklook.size = AccessManager.get_size(quicklook.href)
