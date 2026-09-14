@@ -20,40 +20,77 @@
 @use "styles/colors.scss" as colors;
 @use "styles/sizes.scss" as sizes;
 
+:host {
+  --mat-tree-node-min-height: 36px;
+  --mat-icon-button-state-layer-size: 24px;
+  --mat-icon-button-icon-size: 20px;
+  --mat-icon-button-touch-target-display: none;
+  --mat-button-container-height: 32px;
+  --mat-button-touch-target-display: none;
+}
+
 .files-tree {
   overflow: auto;
   height: calc(100% - sizes.$sectionTitleHeight);
+
   .file {
+    min-height: 36px;
+
+    ::ng-deep .mat-mdc-button-touch-target {
+      display: none;
+    }
+
+    button.mat-mdc-icon-button,
+    button[mat-icon-button] {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon,
+      .material-symbols-outlined {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+      }
+    }
+
     .name {
       font-size: 14px;
-      padding: 10px 8px;
       border: none;
-      background-color: white;
+      background-color: transparent;
       cursor: auto;
       min-width: unset;
+      min-height: unset;
+      height: 32px;
+      line-height: 36px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
 
       &--folder {
         cursor: pointer;
       }
     }
+
     .active {
       background-color: colors.$primaryColor;
       color: white;
+      border-radius: 4px;
     }
-    .activate-btn {
-      padding: 0;
-      margin-left: 10px;
-      --mat-icon-button-state-layer-size: 20px;
-      --mat-icon-button-touch-target-size: 20px;
 
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
+    .activate-btn {
+      margin-left: 6px;
     }
+
     .loader {
-      margin-left: 10px;
+      margin-left: 6px;
     }
   }
 }

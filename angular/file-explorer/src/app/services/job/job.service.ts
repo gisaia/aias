@@ -108,7 +108,7 @@ export class JobService {
     return this.http.get(this.jobSettings.url + '/jobs/' + jobId + '/cancel', this.options) as Observable<Process>;
   }
 
-  private getCollection(): string {
+  public getCollection(): string {
     return localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.jobSettings.collection;
   }
 }

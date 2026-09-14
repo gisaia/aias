@@ -1,11 +1,11 @@
 <div class="files-tree">
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="file">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [matTreeNodePaddingIndent]="24" class="file">
       <button mat-icon-button disabled></button>
       <span class="name">{{node.name}}</span>
     </mat-tree-node>
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding class="file">
-      <button mat-icon-button [attr.aria-label]="'Toggle ' + node.name" matTreeNodeToggle>
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding [matTreeNodePaddingIndent]="24" class="file">
+      <button mat-icon-button [attr.aria-label]="'Toggle ' + node.name" matTreeNodeToggle class="toggle-btn">
         <mat-icon>
           {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
         </mat-icon>
