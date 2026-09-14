@@ -13,7 +13,7 @@ ROUTER = APIRouter()
 MISSING_MSG = "{} missing"
 
 
-@ROUTER.get("/url-role-based-authorization")
+@ROUTER.api_route("/url-role-based-authorization", methods=["GET", "POST"])
 async def urbac(request: Request):
     LOGGER.debug(request.headers)
 
@@ -63,7 +63,7 @@ async def urbac(request: Request):
     return Response(status_code=status.HTTP_403_FORBIDDEN)
 
 
-@ROUTER.get("/authorization/{service}")
+@ROUTER.api_route("/authorization/{service}", methods=["GET", "POST"])
 async def authorization(request: Request, service: str):
     service_conf: Service = Configuration.settings.services.get(service)
     if not service_conf:
