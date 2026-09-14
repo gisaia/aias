@@ -60,14 +60,14 @@ class Driver(IngestDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if IngestDriver.must_build_preview(Driver.configuration, self.hsi_path, local_remote_both="both"):
-            Driver.LOGGER.debug(f"Building overview for local TIFF {self.hsi_path}")
+            Driver.LOGGER.debug(f"Building overview for TIFF {self.hsi_path}")
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
             raster_to_jpg(self.hsi_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT,
                           output_path=quicklook.href, stretch=True, bands_list=self.__find_rgb_bands(url))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
-            Driver.LOGGER.debug(f"Building thumbnail for local TIFF {self.hsi_path}")
+            Driver.LOGGER.debug(f"Building thumbnail for TIFF {self.hsi_path}")
             thumbnail = ImageDriverHelper.prepare_preview_asset(self, url, Role.thumbnail, MimeType.JPG, AssetFormat.jpg)
             downsample_image(quicklook.href, thumbnail.href, Driver.THUMBNAIL_DOWNSAMPLE_FACTOR)
             thumbnail.size = AccessManager.get_size(thumbnail.href)
