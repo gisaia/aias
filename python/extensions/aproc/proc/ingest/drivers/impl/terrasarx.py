@@ -129,13 +129,30 @@ class Driver(IngestDriver):
         item.properties.secondary_id = find_or_none(root, "productComponents/annotation/file/location/filename")
         item.properties.processing__level = find_or_none(root, "setup/orderInfo/orderType")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
+        item.properties.satellite = item.properties.constellation
 
         return item
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
-        item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
-        item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
+        item.properties.instrument = item.properties.constellation
+        item.properties.sensor = item.properties.constellation
         item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
+
+        item.properties.acq__acquisition_orbit = find_or_none(root, "productInfo/missionInfo/absOrbit", lambda x: float(x))
+        item.properties.sat__absolute_orbit = find_or_none(root, "productInfo/missionInfo/absOrbit", lambda x: float(x))
+        item.properties.sat__relative_orbit = find_or_none(root, "productInfo/missionInfo/relOrbit", lambda x: float(x))
+        item.properties.acq__acquisition_orbit_direction = find_or_none(root, "productInfo/missionInfo/orbitDirection")
+
+        item.properties.sensor_mode = find_or_none(root, "productInfo/acquisitionInfo/imagingMode")
+        item.properties.sar__observation_direction = find_or_none(root, "productInfo/acquisitionInfo/lookDirection")
+
+        item.properties.sar__polarizations = []
+        polarizations = root.find("setup/orderInfo/polList")
+        if polarizations:
+            for pol in polarizations.findall("polLayer"):
+                if pol.text:
+                    item.properties.sar__polarizations.append(pol.text)
+
         return item
 
     def __check_path__(self, path: str):
