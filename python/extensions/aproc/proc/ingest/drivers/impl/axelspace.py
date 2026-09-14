@@ -166,7 +166,7 @@ class Driver(IngestDriver):
                     gsd = asset.eo__gsd
                 elif asset.eo__gsd is not None:
                     gsd = min(asset.eo__gsd, gsd)
-
+        item.properties.gsd = gsd
         item.properties.satellite = metadata.get("EOMetadata", {}).get("satelliteName", None)
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite

@@ -3,7 +3,7 @@ import unittest
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AST, AXELGLOBE, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
                                      RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
                                      SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
                                      TERRASARX, TERRASARX_PAZ, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
@@ -81,119 +81,123 @@ class Tests(IngestTests):
 
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)
-        self.async_ingest(url, ["metadata", "data", "airs_item", *SENTINEL2_BANDS], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
+        self.async_ingest(url, [Role.data.value, Role.metadata.value, Role.airs_item.value, *SENTINEL2_BANDS], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
 
     def test_async_ingest_csk_h5(self):  # Driver CSK h5
         url = os.path.join(ROOT, CSK)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.airs_item.value], check_epsg=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_csk_tif(self):  # Driver CSK geotiff
         url = os.path.join(ROOT, CSK2)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "airs_item"], check_epsg=False, check_secondary_id=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.airs_item.value], check_epsg=False, check_secondary_id=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)
-        self.async_ingest(url, ["thumbnail", "overview", "iw_grd_vh", "iw_grd_vv", "metadata", "airs_item"], data_key=None)  # No visual data for cog generation.
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, "iw_grd_vh", "iw_grd_vv", Role.metadata.value, Role.airs_item.value], data_key=None)  # No visual data for cog generation.
 
     def test_async_ingest_sentinel1_slc(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_SLC)
-        self.async_ingest(url, ["thumbnail", "overview", *[f"iw{i}_slc_{pol}" for i in range(1, 4) for pol in ["vh", "vv"]], "metadata", "airs_item"], data_key=None)  # No visual data for cog generation.
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, *[f"iw{i}_slc_{pol}" for i in range(1, 4) for pol in ["vh", "vv"]], Role.metadata.value, Role.airs_item.value], data_key=None)  # No visual data for cog generation.
 
     def test_async_ingest_iceye(self):  # Driver ICEYE
         url = os.path.join(ROOT, ICEYE)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_radarsat2(self):  # Driver RADARSAT 2
         url = os.path.join(ROOT, RADARSAT2)
-        self.async_ingest(url, ["Polarization HH", "metadata", "airs_item"], data_key="Polarization HH")   # NO default visual data for cog generation.
+        self.async_ingest(url, ["Polarization HH", Role.overview.value, Role.metadata.value, Role.airs_item.value], data_key=Role.polarization.value)   # NO default visual data for cog generation.
 
     def test_async_ingest_skysat(self):  # Driver SKYSAT
         url = os.path.join(ROOT, SKYSAT)
-        self.async_ingest(url, ["thumbnail", "data", "UDM2", "visual", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.data.value, "UDM2", "visual", Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_spot5(self):  # Driver SPOT5
         url = os.path.join(ROOT, SPOT5)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_geosat(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT)
-        self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_geosat_jp2(self):  # Driver Geosat
         url = os.path.join(ROOT, GEOSAT_JP2)
-        self.async_ingest(url, ["thumbnail", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_wyvern(self):  # Driver Wyvern
         url = os.path.join(ROOT, WYVERN)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_landsat9(self):  # Driver Landsat for landsat9 product
         url = os.path.join(ROOT, LANDSAT9)
-        self.async_ingest(url, ["thumbnail", "overview", "pan", "metadata", "airs_item"], data_key="pan", enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.pan.value, Role.metadata.value, Role.airs_item.value], data_key=Role.pan.value, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
 
     def test_async_ingest_umbra_stac(self):  # Driver Umbra Stac
         url = os.path.join(ROOT, UMBRA_STAC)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_satellogic(self):  # Driver SATELLOGIC
         url = os.path.join(ROOT, SATELLOGIC)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "visual", "cloud", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.visual.value, Role.cloud.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_pneo_ms(self):  # Driver DIMAP for PNEO MS
         url = os.path.join(ROOT, PNEOMS)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_pneo_pan(self):  # Driver DIMAP for PNEO PAN
         url = os.path.join(ROOT, PNEOPAN)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_capella1(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA1)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_capella2(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA2)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_capella3(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA3)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW)
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview_mux(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW + "_MUX/")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview_mux_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW + "_MUX_PAN")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.pan.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux", Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.multispectral.value, Role.pan.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux", Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW + "_PAN")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview_psh(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW + "_PSH")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan_sharpened.value, Role.overview.value + "-psh", Role.rpc.value + "-psh", Role.metadata.value + "-psh"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.pan_sharpened.value, Role.overview.value + "-psh", Role.rpc.value + "-psh", Role.metadata.value + "-psh"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview_product_info(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW + "_MUX_ProductInfo")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview3_4_mux(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_MUX/")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.multispectral.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview3_4_mux_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_MUX_PAN")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.multispectral.value, Role.pan.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux", Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.multispectral.value, Role.pan.value, Role.overview.value + "-mux", Role.rpc.value + "-mux", Role.metadata.value + "-mux", Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_superview3_4_pan(self):  # Driver SUPERVIEW
         url = os.path.join(ROOT, SUPERVIEW3_4 + "_PAN")
-        self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "airs_item", Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value, Role.archive.value, Role.pan.value, Role.overview.value + "-pan", Role.rpc.value + "-pan", Role.metadata.value + "-pan"], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+
+    def test_async_ingest_axelglobe(self):  # Driver SUPERVIEW
+        url = os.path.join(ROOT, AXELGLOBE)
+        self.async_ingest(url, ["data_00000000-0000-4000-8000-000000000000", "data_00000000-0000-4000-8000-000000000011", Role.airs_item.value, Role.archive.value, Role.overview.value, Role.metadata.value, Role.thumbnail.value], data_key=None, check_secondary_id=False)  # No visual data for cog generation.
 
 
 if __name__ == '__main__':
