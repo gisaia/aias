@@ -125,6 +125,7 @@ class Driver(IngestDriver):
             x_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/columnSpacing", lambda x: float(x))
             y_pixel_size = find_or_none(root, "productInfo/imageDataInfo/imageRaster/rowSpacing", lambda x: float(x))
         item.properties.gsd = (x_pixel_size + y_pixel_size) / 2
+        item.properties.satellite = item.properties.constellation
         item.properties.secondary_id = find_or_none(root, "productComponents/annotation/file/location/filename")
         item.properties.processing__level = find_or_none(root, "setup/orderInfo/orderType")
         item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.tif_path))
@@ -135,7 +136,6 @@ class Driver(IngestDriver):
         item.properties.instrument = find_or_none(root, "productInfo/missionInfo/mission")
         item.properties.sensor = find_or_none(root, "productInfo/missionInfo/mission")
         item.properties.view__incidence_angle = find_or_none(root, "productInfo/sceneInfo/sceneCenterCoord/incidenceAngle", lambda x: float(x))
-
         return item
 
     def __check_path__(self, path: str):
