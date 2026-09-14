@@ -174,7 +174,7 @@ jobs:
       if: always()
   
 
-  aias-tests-ingest-gs:
+  aias-tests-ingest-gs-optic:
     if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_gs || inputs.run_all))
     runs-on: runner-8core-32gb
     steps:
@@ -187,8 +187,33 @@ jobs:
         pip install -r test/requirements.tests.txt
     - name: Start stack gs
       run: test/start_stack.sh gs
-    - name: Run ingest tests on google storage
-      run: test/tests_ingest_gs.sh
+    - name: Run ingest tests on google storage for optic data
+      run: test/tests_ingest_gs_optic.sh
+    - name: Logs dockers aproc-service
+      run: test/logs.sh aproc-service 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-1
+      run: test/logs.sh compose-aproc-processes-fast-1 
+      if: always()
+    - name: Logs dockers compose-aproc-processes-fast-medium-large-1
+      run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
+      if: always()
+  
+  aias-tests-ingest-gs-other:
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_gs || inputs.run_all))
+    runs-on: runner-8core-32gb
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install test/requirements
+      run: |
+        pip install -r test/requirements.tests.txt
+    - name: Start stack gs
+      run: test/start_stack.sh gs
+    - name: Run ingest tests on google storage for other data
+      run: test/tests_ingest_gs_other.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()
