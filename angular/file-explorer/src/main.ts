@@ -22,7 +22,7 @@ import { enableProdMode, forwardRef, importProvidersFrom, inject, provideAppInit
 import { MAT_TOOLTIP_DEFAULT_OPTIONS } from '@angular/material/tooltip';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ArlasTranslateLoader } from '@tools/customLoader';
 import { OAuthModule } from 'angular-oauth2-oidc';
@@ -34,7 +34,7 @@ import {
 import { ClipboardModule } from 'ngx-clipboard';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
-import { AppRoutingModule } from './app/app-routing.module';
+import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { StartupService } from './app/services/startup.service';
 import { environment } from './environments/environment';
@@ -46,12 +46,11 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
     providers: [
         provideAnimations(),
+        provideRouter(routes, withComponentInputBinding()),
         importProvidersFrom(
-            AppRoutingModule,
             ArlasToolkitSharedModule,
             NgxSpinnerModule,
             ClipboardModule,
-            RouterModule,
             ToastrModule.forRoot({
                 disableTimeOut: true,
                 positionClass: 'toast-bottom-right',
