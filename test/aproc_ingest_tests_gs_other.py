@@ -3,11 +3,11 @@ import unittest
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AST, AXELGLOBE, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, GEOSAT_JP2, SPOT6, GEOSAT, ICEYE, IKONOS, JP2000, PNEOMS, PNEOPAN,
-                                     RADARSAT2, RAPID_EYE, SATELLOGIC, SENTINEL1_GRDH, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
-                                     SENTINEL1_SLC, SENTINEL2, SKYSAT, SPOT5,
-                                     TERRASARX, TERRASARX_PAZ, TIF, WORLDVIEW, UMBRA_STAC, IngestTests)
-from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
+from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK, CSK2, ICEYE, JP2000,
+                                     RADARSAT2, SENTINEL1_GRDH,
+                                     SENTINEL1_SLC, 
+                                     TERRASARX, TERRASARX_PAZ, TIF, UMBRA_STAC, IngestTests)
+from test.utils import CATALOG, COLLECTION
 
 ROOT = "gs://gisaia-public/test-aias"
 
@@ -69,7 +69,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_radarsat2(self):  # Driver RADARSAT 2
         url = os.path.join(ROOT, RADARSAT2)
-        self.async_ingest(url, ["Polarization HH", Role.overview.value, Role.metadata.value, Role.airs_item.value], data_key=Role.polarization.value)   # NO default visual data for cog generation.
+        self.async_ingest(url, ["Polarization HH", Role.overview.value, Role.metadata.value, Role.airs_item.value], data_key="Polarization HH")   # NO default visual data for cog generation.
 
     def test_async_ingest_umbra_stac(self):  # Driver Umbra Stac
         url = os.path.join(ROOT, UMBRA_STAC)
