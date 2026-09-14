@@ -151,7 +151,7 @@ class Driver(EnrichDriver):
                 kwargs = {"separate": True, "resolution": "highest"}
                 gdal.BuildVRT(source_files_vrt, local_assets, **kwargs)
                 all_bands_cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
-                helper_build_cog(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
+                CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
 
             AccessManager.clean(source_files_vrt)  # !DELETE!
         else:
