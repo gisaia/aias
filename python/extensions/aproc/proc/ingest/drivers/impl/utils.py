@@ -101,7 +101,7 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def geotiff_to_jpg(input_path: str, width: float, height: float, output_path=None, bands_list=None, stretch=False):
+def raster_to_jpg(input_path: str, width: float, height: float, output_path=None, bands_list=None, stretch=False):
     """
     Converts a raster that GDAL can open to a JPG. Compatible with all AccessManager compatible object storages
     """
