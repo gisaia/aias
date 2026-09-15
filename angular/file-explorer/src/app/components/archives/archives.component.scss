@@ -21,8 +21,14 @@
 @use "styles/sizes.scss" as sizes;
 @use "styles/mixins.scss" as mixins;
 
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
 .archives-content {
-  height: calc(100% - sizes.$sectionTitleHeight);
+  height: 100%;
   overflow: auto;
   position: relative;
   .archives-list {

@@ -21,6 +21,9 @@
 @use "styles/sizes.scss" as sizes;
 
 :host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
   --mat-tree-node-min-height: 36px;
   --mat-icon-button-state-layer-size: 24px;
   --mat-icon-button-icon-size: #{sizes.$fontSizeXLarge};
@@ -31,7 +34,7 @@
 
 .files-tree {
   overflow: auto;
-  height: calc(100% - sizes.$sectionTitleHeight);
+  height: 100%;
 
   .file {
     min-height: 36px;

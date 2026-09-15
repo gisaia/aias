@@ -18,7 +18,7 @@
  */
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -30,7 +30,7 @@ import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { StatusService } from '@services/status/status.service';
 import { emitErrors } from '@tools/errors';
-import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED, Collection } from '@tools/interface';
+import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_DRIVERS_ACTIVATED, ARLAS_AIAS_TASKS_PANEL_HEIGHT, Collection } from '@tools/interface';
 import { TopMenuComponent } from 'arlas-wui-toolkit';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
@@ -48,14 +48,19 @@ import { TasksComponent } from '../tasks/tasks.component';
     CollectionListComponent, ArchivesComponent, TasksComponent, TranslatePipe
   ]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   public archivesPath = '';
   public collapseEvent: Subject<boolean> = new Subject();
   public refreshTasks: Subject<boolean> = new Subject();
   public showTasks = true;
+  public tasksHeight = 400;
+  public isResizing = false;
   public collections: string[] = [];
   public currentCollection = '';
+
+  private startY = 0;
+  private startHeight = 0;
 
   public constructor(
     private readonly famService: FamService,
@@ -67,6 +72,14 @@ export class HomeComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
+    const savedHeight = localStorage.getItem(ARLAS_AIAS_TASKS_PANEL_HEIGHT);
+    if (savedHeight) {
+      const parsed = parseInt(savedHeight, 10);
+      if (!isNaN(parsed) && parsed >= 120) {
+        this.tasksHeight = parsed;
+      }
+    }
+
     this.jobsService.fetchAvailableDrivers();
     this.statusService.fetchExistingCollections().subscribe({
       next: (data: any) => {
@@ -87,8 +100,47 @@ export class HomeComponent implements OnInit {
         );
       }
     });
+  }
 
+  public ngOnDestroy(): void {
+    this.removeResizeListeners();
+  }
 
+  public onResizeStart(event: MouseEvent) {
+    event.preventDefault();
+    this.isResizing = true;
+    this.startY = event.clientY;
+    this.startHeight = this.tasksHeight;
+
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'row-resize';
+  }
+
+  private onMouseMove = (event: MouseEvent) => {
+    if (!this.isResizing) {
+      return;
+    }
+    const deltaY = this.startY - event.clientY;
+    const minHeight = 120;
+    const maxHeight = window.innerHeight - 150;
+    this.tasksHeight = Math.min(Math.max(this.startHeight + deltaY, minHeight), maxHeight);
+  };
+
+  private onMouseUp = () => {
+    if (this.isResizing) {
+      this.isResizing = false;
+      this.removeResizeListeners();
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      localStorage.setItem(ARLAS_AIAS_TASKS_PANEL_HEIGHT, this.tasksHeight.toString());
+    }
+  };
+
+  private removeResizeListeners() {
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
   }
 
   public openCatalogSelection() {
