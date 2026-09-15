@@ -1,3 +1,5 @@
+import os
+
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, Role)
@@ -6,7 +8,6 @@ from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
                                                              raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-import os
 
 
 class Driver(IngestDriver):

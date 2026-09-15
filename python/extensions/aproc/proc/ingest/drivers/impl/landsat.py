@@ -1,10 +1,11 @@
 import json
 import re
 from datetime import datetime
+
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role, SensorType, Band)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
@@ -18,10 +19,9 @@ class Driver(IngestDriver):
         self.bands_path = []
         self.quicklook_path = None
         self.thumbnail_path = None
-        self.tif_pattern  = re.compile(r'_B([1-9]|1[01])\.TIF$', re.IGNORECASE)
+        self.tif_pattern = re.compile(r'_B([1-9]|1[01])\.TIF$', re.IGNORECASE)
         self.main_asset_name = None
         self.gsd = None
-
 
     # Implements drivers method
     @staticmethod
@@ -91,7 +91,6 @@ class Driver(IngestDriver):
         )
 
         return assets
-
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -180,7 +179,7 @@ class Driver(IngestDriver):
                     elif file.name.endswith("_stac.json"):
                         self.md_path = file.path
             return self.md_path is not None \
-                   and self.quicklook_path is not None \
-                   and self.thumbnail_path is not None \
-                   and len(self.bands_path) > 0
+                and self.quicklook_path is not None \
+                and self.thumbnail_path is not None \
+                and len(self.bands_path) > 0
         return False

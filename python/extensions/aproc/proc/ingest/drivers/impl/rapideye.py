@@ -9,8 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, raster_to_jpg, get_epsg,
-    get_geom_bbox_centroid_from_corners)
+    downsample_image, find_or_none, get_epsg,
+    get_geom_bbox_centroid_from_corners, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 

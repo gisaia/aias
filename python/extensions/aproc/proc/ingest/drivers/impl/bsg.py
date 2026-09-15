@@ -4,15 +4,15 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from dateutil import parser
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             raster_to_jpg,
                                                              get_bbox,
                                                              get_centroid,
-                                                             get_epsg)
+                                                             get_epsg,
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from dateutil import parser
 
 
 class Driver(IngestDriver):

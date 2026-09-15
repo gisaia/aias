@@ -9,7 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    find_or_none, raster_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
+    find_or_none, get_epsg, get_geom_bbox_centroid_from_coordinates,
+    raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 RED_EDGE = "Vegetation red edge"

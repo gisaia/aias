@@ -1,8 +1,8 @@
 import json
 import os
+import tempfile
 from datetime import datetime
 from math import sqrt
-import tempfile
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -11,7 +11,7 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image)
+from extensions.aproc.proc.ingest.drivers.impl.utils import downsample_image
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -108,7 +108,7 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         from pyproj import Transformer
-        from shapely import union_all, Polygon, to_geojson
+        from shapely import Polygon, to_geojson, union_all
 
         try:
             # The extent of the archive is the union of all extents

@@ -1,8 +1,8 @@
 import hashlib
 import os
+import tempfile
 import xml.etree.ElementTree as ET
 from typing import Callable
-import tempfile
 
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
@@ -56,8 +56,9 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
 
 
 def compute_simplified_polygon(gcp_list) -> list[list[float]]:
-    from scipy.spatial import ConvexHull
     import numpy as np
+    from scipy.spatial import ConvexHull
+
     # Extract (x, y) coordinates
     points = np.array([[gcp["x"], gcp["y"]] for gcp in gcp_list])
 

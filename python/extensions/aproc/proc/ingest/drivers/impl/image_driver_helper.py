@@ -198,4 +198,3 @@ class ImageDriverHelper:
             item.properties.datetime = AccessManager.get_creation_time(url)
 
         return item
-
