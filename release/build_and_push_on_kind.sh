@@ -3,7 +3,7 @@ set -o errexit
 
 if [ "$#" -lt 2 ]; then
     echo "You must provide at least the version as first argument and a list of images (e.g. agate)."
-    echo "Usage: ./test/build_and_push_on_kind.sh <version> <image1> [ <image2> ...]"
+    echo "Usage: ./release/build_and_push_on_kind.sh <version> <image1> [ <image2> ...]"
     exit 1
 fi
 VERSION=$1

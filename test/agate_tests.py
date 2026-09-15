@@ -31,30 +31,49 @@ class Tests(AprocTests):
         }))
         self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
 
+    def _request(self, method, endpoint, uri):
+        return requests.request(method, "/".join([AGATE_ENDPOINT, endpoint]), headers={"X-Forwarded-Uri": uri})
+
     def test_airs_access(self):
-        # TEST OK for non public
-        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertEqual(r.status_code, 200, str(r.status_code) + " " + str(r.content))
-        # TEST KO for non public with wrong prefix
-        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])})
-        self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
-        # TEST KO for non public
-        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET])})
-        self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
-        # TEST OK for public
-        r = requests.get("/".join([AGATE_ENDPOINT, "airs"]), headers={"X-Forwarded-Uri": "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotworkbutpublic", "assets", "thumbnail"])})
-        self.assertEqual(r.status_code, 200, str(r.status_code) + " " + str(r.content))
+        for method in ("get", "post"):
+            with self.subTest(method=method):
+                # TEST OK for non public
+                uri = "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])
+                r = self._request(method, "airs", uri)
+                self.assertEqual(r.status_code, 200, str(r.status_code) + " " + str(r.content))
+
+                # TEST KO for non public with wrong prefix
+                uri = "/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET])
+                r = self._request(method, "airs", uri)
+                self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
+
+                # TEST KO for non public
+                uri = "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET])
+                r = self._request(method, "airs", uri)
+                self.assertEqual(r.status_code, 403, str(r.status_code) + " " + str(r.content))
+
+                # TEST OK for public
+                uri = "/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotworkbutpublic", "assets", "thumbnail"])
+                r = self._request(method, "airs", uri)
+                self.assertEqual(r.status_code, 200, str(r.status_code) + " " + str(r.content))
 
     def test_titiler_access(self):
-        # TEST OK for non public
-        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))})
-        self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
-        # TEST KO for non public with wrong prefix
-        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))})
-        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
-        # TEST KO for non public
-        r = requests.get("/".join([AGATE_ENDPOINT, "titiler"]), headers={"X-Forwarded-Uri": "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET]))})
-        self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
+        for method in ("get", "post"):
+            with self.subTest(method=method):
+                # TEST OK for non public
+                uri = "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))
+                r = self._request(method, "titiler", uri)
+                self.assertTrue(r.ok, str(r.status_code) + " " + str(r.content))
+
+                # TEST KO for non public with wrong prefix
+                uri = "?url=" + parse.quote("http://something.org/" + "/".join(["wrongprefix", "collections", ARLAS_COLLECTION, "items", ID, "assets", ASSET]))
+                r = self._request(method, "titiler", uri)
+                self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
+
+                # TEST KO for non public
+                uri = "?url=" + parse.quote("http://something.org/" + "/".join(["object", "collections", ARLAS_COLLECTION, "items", ID + "shouldnotwork", "assets", ASSET]))
+                r = self._request(method, "titiler", uri)
+                self.assertFalse(r.ok, str(r.status_code) + " " + str(r.content))
 
     def __add_item__(self) -> Item:
         # UPLOAD ASSET
