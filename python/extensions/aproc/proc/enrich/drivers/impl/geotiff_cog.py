@@ -43,5 +43,5 @@ class Driver(EnrichDriver):
         if enrichment == AssetFormat.overview_cog.value.lower():
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
-        CogBuilderHelper.build(source, target, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}))
+        CogBuilderHelper.build(source, target, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         return [CogBuilderHelper.create_asset(item, enrichment, target)]

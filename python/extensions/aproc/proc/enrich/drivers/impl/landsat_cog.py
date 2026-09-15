@@ -71,7 +71,7 @@ class Driver(EnrichDriver):
             # Build VRT to facilitate COG built
             kwargs = {"separate": True, "resolution": "highest"}
             gdal.BuildVRT(source_files_vrt, band_files, **kwargs)
-            CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}))
+            CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         # AccessManager.clean(source_files_vrt)  # !DELETE!
 
         return CogBuilderHelper.create_asset(item, enrichment, target_asset_location)

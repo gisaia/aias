@@ -28,7 +28,7 @@ class CogBuilderHelper:
         driver.configuration['all_bands_cog_max_width_or_height'] = driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
 
     @staticmethod
-    def build(source: str, target: str, max_px_width_or_height: int = 2000, options: dict = {}):
+    def build(source: str, target: str, max_px_width_or_height: int = 2000, options: dict = {}, visual: bool = False):
         """ Generate a COG from a source file and store it in the target location.
 
         Args:
@@ -36,7 +36,7 @@ class CogBuilderHelper:
             target (str): target file location
             max_px_width_or_height (int, optional): maximum width or height for the COG.
             options (dict, optional): additional GDAL options provided to WARP. See osgeo.gdal.WarpOptions in https://gdal.org/en/stable/api/python/utilities.html
-        stretch (bool, optional): whether to stretch the band 1 of the image (if nb bands != 3).
+            visual (bool, optional): whether the generated COG is for direct visualization purposes.
         """
         from osgeo import gdal
         import numpy as np
@@ -52,10 +52,11 @@ class CogBuilderHelper:
                     src_width = ds.RasterXSize
                     src_height = ds.RasterYSize
                     raster_count = ds.RasterCount
+                    # If it is a visual COG, then:
                     # If the raster has 3 bands, we assume it is RGB.
                     # If the raster has 4 bands, we assume it is RGBAlpha.
                     # otherwise, we assume it is grayscale and we stretch the first band to 0-255, we ignore the others.
-                    if (raster_count != 3 and raster_count != 4) or (raster_count == 4 and ds.GetRasterBand(4).GetColorInterpretation() != gdal.GCI_AlphaBand):
+                    if visual and ((raster_count != 3 and raster_count != 4) or (raster_count == 4 and ds.GetRasterBand(4).GetColorInterpretation() != gdal.GCI_AlphaBand)):
                         warp_params['srcBands'] = [1]  # type: ignore
 
                         scale_params = []
