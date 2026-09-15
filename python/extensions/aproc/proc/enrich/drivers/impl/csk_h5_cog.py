@@ -55,10 +55,13 @@ class Driver(EnrichDriver):
         metadata = self.__load_metadata(source)
 
         merged_tif = tempfile.NamedTemporaryFile("w+", suffix=".tif", delete=False).name
-        with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
-            gdal.Warp(merged_tif, tiffs, format="GTiff")
 
-        CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height)
+        cog_warp_options = {'format': 'GTiff'}
+
+        with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
+            gdal.Warp(merged_tif, tiffs, **cog_warp_options)
+
+        CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         os.remove(merged_tif)  # !DELETE!
 
         return [CogBuilderHelper.create_asset(item, enrichment, target)]

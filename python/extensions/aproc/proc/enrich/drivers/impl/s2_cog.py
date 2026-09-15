@@ -87,7 +87,7 @@ class Driver(EnrichDriver):
                 AccessManager.pull(href, tci_file_path)
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-            CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height)
+            CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=True)
             os.remove(tci_file_path)  # !DELETE!
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))

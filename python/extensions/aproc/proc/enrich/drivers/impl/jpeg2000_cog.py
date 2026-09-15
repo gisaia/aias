@@ -58,6 +58,6 @@ class Driver(EnrichDriver):
 
         with AccessManager.make_local_list(files_to_pull) as local_files:
             self.LOGGER.info("Building cog from {}".format(source))
-            CogBuilderHelper.build(local_files[0], target, max_px_width_or_height=cog_max_width_or_height)
+            CogBuilderHelper.build(local_files[0], target, max_px_width_or_height=cog_max_width_or_height, visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
 
         return [CogBuilderHelper.create_asset(item, enrichment, target)]
