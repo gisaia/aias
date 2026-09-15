@@ -176,11 +176,11 @@ class Driver(IngestDriver):
                     with csk_h5_scenes_to_geotiffs(self.data_path, metadata) as tiffs:
                         Driver.LOGGER.debug(f"Creating quicklook {quicklook.href} from scenes tiffs {tiffs}")
 
+                        # Because of the multiple scenes, the image is wider than high, so only constrain the height
                         overview_warp_options = {'format': 'PNG', 'height': Driver.OVERVIEW_SIZE}
                         driver_configuration_overview_warp_options = Driver.configuration.get('overview_warp_options', {})
                         overview_warp_options.update(driver_configuration_overview_warp_options)
 
-                        # Because of the multiple scenes, the image is wider than high, so only constrain the height
                         gdal.Warp(quicklook.href, tiffs, **overview_warp_options)
                         if not AccessManager.exists(quicklook.href):
                             raise DriverException(f"Failed to create quicklook {quicklook.href} from scenes tiffs {tiffs}")
