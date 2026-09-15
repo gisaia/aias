@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const savedHeight = localStorage.getItem(ARLAS_AIAS_TASKS_PANEL_HEIGHT);
     if (savedHeight) {
       const parsed = Number.parseInt(savedHeight, 10);
-      if (!isNaN(parsed) && parsed >= 120) {
+      if (!Number.isNaN(parsed) && parsed >= 120) {
         this.tasksHeight = parsed;
       }
     }
@@ -118,7 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.body.style.cursor = 'row-resize';
   }
 
-  private onMouseMove = (event: MouseEvent) => {
+  private readonly onMouseMove = (event: MouseEvent) => {
     if (!this.isResizing) {
       return;
     }
@@ -128,7 +128,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.tasksHeight = Math.min(Math.max(this.startHeight + deltaY, minHeight), maxHeight);
   };
 
-  private onMouseUp = () => {
+  private readonly onMouseUp = () => {
     if (this.isResizing) {
       this.isResizing = false;
       this.removeResizeListeners();

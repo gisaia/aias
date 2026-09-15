@@ -62,7 +62,7 @@ export class ConfirmDialogComponent {
   /** Whether to create an overview COG when ingesting the selected archive */
   public createOverviewCOG;
 
-  private jobService = inject(JobService);
+  private readonly jobService = inject(JobService);
 
   public constructor() {
     this.currentCollection = this.jobService.getCollection();
