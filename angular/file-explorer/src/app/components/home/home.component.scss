@@ -76,7 +76,7 @@
     .archives {
       flex: 1;
       width: 50%;
-      height: 100%;
+      height: calc(100% - 1px);
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -115,7 +115,7 @@
     .explorer {
       flex: 1;
       width: 50%;
-      height: 100%;
+      height: calc(100% - 1px);
       border-right: 1px solid colors.$borderColor;
       display: flex;
       flex-direction: column;

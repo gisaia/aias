@@ -51,6 +51,7 @@ set_default_env_variable "FAM_DEFAULT_PATH" ""
 set_default_env_variable "FAM_COLLECTION" "digitalearth.africa"
 set_default_env_variable "FAM_ARCHIVES_PAGES_SIZE" "20"
 set_default_env_variable "FAM_FILES_PAGES_SIZE" "50"
+set_default_env_variable "FAM_TASKS_PAGES_SIZE" "20"
 set_default_env_variable "APROC_SERVER_URL" "https://localhost:81/aproc"
 set_default_env_variable "APROC_CATALOG" "catalog"
 set_default_env_variable "APROC_COLLECTION" "digitalearth.africa"
@@ -97,6 +98,7 @@ SETTINGS_VARS="FAM_WUI_APP_PATH
     FAM_COLLECTION
     FAM_ARCHIVES_PAGES_SIZE
     FAM_FILES_PAGES_SIZE
+    FAM_TASKS_PAGES_SIZE
     APROC_SERVER_URL
     APROC_CATALOG
     APROC_COLLECTION

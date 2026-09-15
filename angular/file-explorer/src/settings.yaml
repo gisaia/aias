@@ -45,6 +45,7 @@ jobs:
   url: http://localhost:8001/arlas/aproc
   collection: "catalogue"
   catalog: "catalogue"
+  tasks_page_size: 20
 status:
   url: http://localhost:8000/arlas/airs
   collection: "catalogue"

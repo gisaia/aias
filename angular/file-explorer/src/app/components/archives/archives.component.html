@@ -1,4 +1,5 @@
 <div class="archives-content">
+  @if(archives && archives.length > 0){
   <mat-list class="archives-list">
     @for (archive of archives; track archive) {
     <mat-list-item class="archive">
@@ -70,6 +71,7 @@
     </mat-list-item>
     }
   </mat-list>
+  }
 
   @if (!archives) {
   <div class="no-archive">

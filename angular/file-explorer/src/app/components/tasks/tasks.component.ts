@@ -76,7 +76,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
   public expandedTask!: Process | null;
 
   public pageIndex = 0;
-  public pageSize = 20;
+  public pageSize;
   public totalProcess = 0;
 
 
@@ -94,6 +94,7 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   public ngOnInit(): void {
+    this.pageSize = this.jobService.getTasksPageSize();
     this.executionObservable = timer(0, 5000);
     this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
       this.getTasks();

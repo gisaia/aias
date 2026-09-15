@@ -38,6 +38,7 @@ jobs:
   url: ${APROC_SERVER_URL}
   collection: ${APROC_COLLECTION}
   catalog: ${APROC_CATALOG}
+  tasks_page_size: ${FAM_TASKS_PAGES_SIZE}
 status:
   url: ${AIRS_SERVER_URL}
   collection: ${AIRS_COLLECTION}

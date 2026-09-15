@@ -24,43 +24,59 @@
   display: block;
   height: 100%;
   overflow: hidden;
-  --mat-tree-node-min-height: 36px;
-  --mat-icon-button-state-layer-size: 24px;
-  --mat-icon-button-icon-size: #{sizes.$fontSizeXLarge};
+  --mat-tree-node-min-height: 24px;
+  --mat-icon-button-state-layer-size: 20px;
+  --mat-icon-button-icon-size: #{sizes.$fontSizeLarge};
   --mat-icon-button-touch-target-display: none;
-  --mat-button-container-height: 32px;
+  --mat-button-container-height: 22px;
   --mat-button-touch-target-display: none;
 }
 
 .files-tree {
   overflow: auto;
   height: 100%;
+  padding: 4px 0;
 
   .file {
-    min-height: 36px;
+    min-height: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    cursor: default;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
 
     ::ng-deep .mat-mdc-button-touch-target {
       display: none;
     }
 
-    button.mat-mdc-icon-button,
-    button[mat-icon-button] {
-      width: 24px;
-      height: 24px;
-      min-width: 24px;
-      min-height: 24px;
+    .chevron-spacer {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    button.toggle-btn {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      min-height: 20px;
       padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
 
-      mat-icon,
-      .material-symbols-outlined {
-        font-size: sizes.$fontSizeXLarge;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
+      .chevron-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        color: #64748b;
       }
     }
 
@@ -68,14 +84,18 @@
       font-size: sizes.$fontSizeDefault;
       border: none;
       background-color: transparent;
-      cursor: auto;
+      cursor: default;
       min-width: unset;
       min-height: unset;
-      height: 32px;
-      line-height: 36px;
-      padding: 0 6px;
+      height: 22px;
+      line-height: 22px;
+      padding: 0 4px;
       display: inline-flex;
       align-items: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 3px;
 
       &--folder {
         cursor: pointer;
@@ -83,13 +103,28 @@
     }
 
     .active {
-      background-color: colors.$primaryColor;
-      color: white;
-      border-radius: 4px;
+      background-color: colors.$primaryColor !important;
+      color: white !important;
     }
 
-    .activate-btn {
+    button.activate-btn {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      min-height: 20px;
+      padding: 0;
       margin-left: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .material-symbols-outlined {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+      }
     }
 
     .loader {
