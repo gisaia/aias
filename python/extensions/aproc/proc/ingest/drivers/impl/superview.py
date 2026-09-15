@@ -1,7 +1,7 @@
+import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import os
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -11,7 +11,8 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, raster_to_jpg, get_bbox, get_centroid, get_epsg, get_epsg_from_gdal_info_gcps)
+    downsample_image, find_or_none, get_bbox, get_centroid, get_epsg,
+    get_epsg_from_gdal_info_gcps, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 

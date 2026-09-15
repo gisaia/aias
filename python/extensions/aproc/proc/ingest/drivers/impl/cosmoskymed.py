@@ -13,8 +13,8 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, raster_to_jpg, get_epsg,
-    get_geom_bbox_centroid_from_corners)
+    downsample_image, get_epsg, get_geom_bbox_centroid_from_corners,
+    raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 

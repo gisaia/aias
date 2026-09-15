@@ -3,18 +3,17 @@ import os
 from datetime import datetime
 from typing import Any
 
-from PIL import Image as PILImage
-
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, raster_to_jpg)
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.drivers.exceptions import DriverException
+from PIL import Image as PILImage
 
 
 class Driver(IngestDriver):

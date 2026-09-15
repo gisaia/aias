@@ -1,9 +1,10 @@
 import json
 from datetime import datetime
+
 from aias_common.access.manager import AccessManager
-from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
+from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role, SensorType, Band)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver

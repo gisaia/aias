@@ -9,8 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, raster_to_jpg, get_epsg,
-    get_geom_bbox_centroid_from_corners, setup_gdal)
+    downsample_image, find_or_none, get_epsg,
+    get_geom_bbox_centroid_from_corners, raster_to_jpg, setup_gdal)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -87,6 +87,7 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: ET.Element) -> Item:
         from osgeo import ogr
+
         # Calculate bbox for all tiles
         tiles = metadata.findall("./TIL/TILE")
         all_lats = []
