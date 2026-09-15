@@ -5,18 +5,16 @@ from datetime import datetime
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
-                                    ResourceType, Role)
+                                    ResourceType, Role, SensorType)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_corners)
+    downsample_image, find_or_none, get_epsg,
+    get_geom_bbox_centroid_from_corners, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from airs.core.models.model import SensorType
 
 
 class Driver(IngestDriver):
-
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -28,8 +26,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -56,7 +53,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-        geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_BROWSE_PCT, Driver.OVERVIEW_FROM_BROWSE_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+        raster_to_jpg(self.browse_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
         quicklook.size = AccessManager.get_size(quicklook.href)
         assets.append(quicklook)
 

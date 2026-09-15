@@ -9,7 +9,8 @@ from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    find_or_none, geotiff_to_jpg, get_epsg, get_geom_bbox_centroid_from_coordinates)
+    find_or_none, get_epsg, get_geom_bbox_centroid_from_coordinates,
+    raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 RED_EDGE = "Vegetation red edge"
@@ -32,8 +33,6 @@ BANDS_NAME = {
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -44,8 +43,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -81,7 +79,7 @@ class Driver(IngestDriver):
         if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
             Driver.LOGGER.debug(f"Building overview for local TCI {self.tci_path}")
             overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
             overview.size = AccessManager.get_size(overview.href)
             assets.append(overview)
         elif IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="remote"):
@@ -92,7 +90,7 @@ class Driver(IngestDriver):
             # File is processed locally as it significantly speeds up processing time
             with AccessManager.make_local(self.tci_path) as local_tci_path:
                 overview = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
+                raster_to_jpg(local_tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, [1, 2, 3], stretch=Driver.configuration.get('overview_stretch', False))
                 overview.size = AccessManager.get_size(overview.href)
                 assets.append(overview)
         else:

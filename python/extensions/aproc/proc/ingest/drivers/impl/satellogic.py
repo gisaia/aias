@@ -3,18 +3,17 @@ import os
 from datetime import datetime
 from typing import Any
 
-from PIL import Image as PILImage
-
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg)
+from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-from extensions.aproc.proc.drivers.exceptions import DriverException
+from PIL import Image as PILImage
 
 
 class Driver(IngestDriver):
@@ -30,8 +29,6 @@ class Driver(IngestDriver):
     - Preview PNG (*_preview.png) - optional
     """
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.md_path = None
@@ -45,8 +42,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -167,10 +163,10 @@ class Driver(IngestDriver):
             quicklook = ImageDriverHelper.prepare_preview_asset(
                 self, url, Role.overview, MimeType.JPG, AssetFormat.jpg
             )
-            geotiff_to_jpg(
+            raster_to_jpg(
                 tif_path,
-                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
-                Driver.OVERVIEW_FROM_LARGE_TIFF_PCT,
+                Driver.OVERVIEW_SIZE,
+                Driver.OVERVIEW_SIZE,
                 output_path=quicklook.href,
                 bands_list=bands,
                 stretch=False if self.visual_path else Driver.configuration.get('overview_stretch', True)

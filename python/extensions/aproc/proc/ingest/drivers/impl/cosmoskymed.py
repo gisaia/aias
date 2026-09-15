@@ -13,8 +13,8 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, geotiff_to_jpg, get_epsg,
-    get_geom_bbox_centroid_from_corners)
+    downsample_image, get_epsg, get_geom_bbox_centroid_from_corners,
+    raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
@@ -98,8 +98,6 @@ def csk_h5_scenes_to_geotiffs(h5_path: str, metadata: dict):
 
 class Driver(IngestDriver):
 
-    configuration: dict = {}
-
     def __init__(self):
         super().__init__()
         self.data_path = None
@@ -116,8 +114,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -156,7 +153,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if self.browse_path is not None:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(self.browse_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(self.browse_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 

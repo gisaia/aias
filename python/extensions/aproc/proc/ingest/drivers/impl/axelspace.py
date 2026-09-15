@@ -1,8 +1,8 @@
 import json
 import os
+import tempfile
 from datetime import datetime
 from math import sqrt
-import tempfile
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -11,12 +11,11 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
-from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image)
+from extensions.aproc.proc.ingest.drivers.impl.utils import downsample_image
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -27,8 +26,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -62,18 +60,18 @@ class Driver(IngestDriver):
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             # Minify all the tiffs
             minified_tiffs = []
-            options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], widthPct=Driver.OVERVIEW_FROM_TIFF_PCT, heightPct=Driver.OVERVIEW_FROM_TIFF_PCT)
+            options = gdal.TranslateOptions(format="GTiff", bandList=[1, 2, 3], width=Driver.OVERVIEW_SIZE, height=Driver.OVERVIEW_SIZE)
             for tif in self.tif_paths:
                 mini_tif = os.path.join(AccessManager.tmp_dir, os.path.basename(tif))
-                Driver.LOGGER.debug(f"Minifying {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
+                Driver.LOGGER.debug(f"Minifying {tif} to {Driver.OVERVIEW_SIZE}px in dir {AccessManager.tmp_dir}")
                 gdal.Translate(mini_tif, AccessManager.get_gdal_src(tif), options=options)
                 if not AccessManager.exists(mini_tif):
-                    raise DriverException(f"Failed to minify {tif} to {Driver.OVERVIEW_FROM_TIFF_PCT}% in dir {AccessManager.tmp_dir}")
+                    raise DriverException(f"Failed to minify {tif} to {Driver.OVERVIEW_SIZE}px in dir {AccessManager.tmp_dir}")
                 minified_tiffs.append(mini_tif)
 
             # Create quicklook
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            overview_warp_options = {'format': 'JPEG'}
+            overview_warp_options = {'format': 'JPEG', 'width': Driver.OVERVIEW_SIZE, 'height': Driver.OVERVIEW_SIZE}
             driver_configuration_overview_warp_options = Driver.configuration.get('overview_warp_options', {})
             overview_warp_options.update(driver_configuration_overview_warp_options)
 
@@ -110,7 +108,7 @@ class Driver(IngestDriver):
 
     def build_core_item(self, url: str, assets: list[Asset], metadata: dict) -> Item:
         from pyproj import Transformer
-        from shapely import union_all, Polygon, to_geojson
+        from shapely import Polygon, to_geojson, union_all
 
         try:
             # The extent of the archive is the union of all extents

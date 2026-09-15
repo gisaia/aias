@@ -1,8 +1,8 @@
 import hashlib
 import os
+import tempfile
 import xml.etree.ElementTree as ET
 from typing import Callable
-import tempfile
 
 from aias_common.access.manager import AccessManager
 from extensions.aproc.proc.ingest.settings import Configuration
@@ -56,8 +56,9 @@ def get_geom_bbox_centroid_from_corners(ul_lon: float, ul_lat: float, ur_lon: fl
 
 
 def compute_simplified_polygon(gcp_list) -> list[list[float]]:
-    from scipy.spatial import ConvexHull
     import numpy as np
+    from scipy.spatial import ConvexHull
+
     # Extract (x, y) coordinates
     points = np.array([[gcp["x"], gcp["y"]] for gcp in gcp_list])
 
@@ -101,9 +102,9 @@ def get_hash_url(url: str) -> str:
     return hashlib.sha256(tohash.encode("utf-8")).hexdigest()
 
 
-def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_path=None, bands_list=None, stretch=False):
+def raster_to_jpg(input_path: str, width: float, height: float, output_path=None, bands_list=None, stretch=False):
     """
-    Converts a GeoTIFF or Jpeg2000 to a JPG. Compatible with all AccessManager compatible object storages
+    Converts a raster that GDAL can open to a JPG. Compatible with all AccessManager compatible object storages
     """
     from osgeo import gdal
     gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
@@ -124,7 +125,7 @@ def geotiff_to_jpg(input_path: str, width_pct: float, height_pct: float, output_
             scale_params.append([band_min, band_max])
 
     # Define output format and options
-    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, widthPct=width_pct, heightPct=height_pct, creationOptions=['WORLDFILE=YES'],
+    options = gdal.TranslateOptions(format='JPEG', bandList=bands_list, width=width, height=height, creationOptions=['WORLDFILE=YES'],
                                     outputType=output_types[0], scaleParams=scale_params)
     # Translate to JPEG
     if output_path is not None:

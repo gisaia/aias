@@ -1,17 +1,16 @@
+import os
+
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, Role)
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg)
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
-import os
 
 
 class Driver(IngestDriver):
-
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -19,8 +18,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -35,7 +33,7 @@ class Driver(IngestDriver):
     def transform_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
         if IngestDriver.must_build_preview(Driver.configuration, url, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(url, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, quicklook.href, stretch=Driver.configuration.get('overview_stretch', True))
+            raster_to_jpg(url, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, quicklook.href, stretch=Driver.configuration.get('overview_stretch', True))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 

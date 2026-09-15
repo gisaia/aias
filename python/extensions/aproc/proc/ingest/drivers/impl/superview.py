@@ -1,7 +1,7 @@
+import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import os
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -11,13 +11,12 @@ from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
-    downsample_image, find_or_none, geotiff_to_jpg, get_bbox, get_centroid, get_epsg, get_epsg_from_gdal_info_gcps)
+    downsample_image, find_or_none, get_bbox, get_centroid, get_epsg,
+    get_epsg_from_gdal_info_gcps, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -48,8 +47,7 @@ class Driver(IngestDriver):
 
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     def identify_assets(self, url: str) -> list[Asset]:
         assets = []
@@ -152,7 +150,7 @@ class Driver(IngestDriver):
             if IngestDriver.must_build_preview(Driver.configuration, self.data_path, local_remote_both="local"):
                 Driver.LOGGER.debug(f"Use {self.data_path} for quicklook")
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(self.data_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', False))
+                raster_to_jpg(self.overview_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, stretch=Driver.configuration.get('overview_stretch', False))
                 overview.size = AccessManager.get_size(overview.href)
                 self.overview_path = overview.href
                 assets.append(overview)
@@ -161,7 +159,7 @@ class Driver(IngestDriver):
                 overview = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
                 # File is processed locally as it significantly speeds up processing time
                 with AccessManager.make_local(self.data_path) as local_data_path:
-                    geotiff_to_jpg(local_data_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, overview.href, stretch=Driver.configuration.get('overview_stretch', True))
+                    raster_to_jpg(local_data_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, overview.href, [1, 1, 1], Driver.configuration.get('overview_stretch', True))
                 overview.size = AccessManager.get_size(overview.href)
                 self.overview_path = overview.href
                 assets.append(overview)

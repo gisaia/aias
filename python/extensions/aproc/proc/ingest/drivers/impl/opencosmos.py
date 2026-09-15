@@ -1,9 +1,8 @@
 import json
-from datetime import datetime
 import os
+from datetime import datetime
 
 import dateutil
-
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
@@ -11,13 +10,12 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg,
-                                                             get_epsg)
+                                                             get_epsg,
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -35,8 +33,7 @@ class Driver(IngestDriver):
 
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     def identify_assets(self, url: str):
         assets: list[Asset] = []
@@ -81,25 +78,13 @@ class Driver(IngestDriver):
         return assets
 
     def transform_assets(self, url: str, assets: list[Asset]):
-        if self.tci_path is not None:
-            if IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="local"):
-                Driver.LOGGER.debug(f"Building overview for local TIFF {self.tci_path}")
-                quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                geotiff_to_jpg(self.tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-                quicklook.size = AccessManager.get_size(quicklook.href)
-                self.quicklook_path = quicklook.href
-                assets.append(quicklook)
-            elif IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="remote"):
-                Driver.LOGGER.debug(f"Building overview for remote TIFF {self.tci_path}")
-                overview_folder = self.assets_dir + '/opencosmos/' + self.get_item_id(url) + '/overview'
-                AccessManager.makedir(overview_folder)
-                overview_path = overview_folder + '/overview.jpg'
-                with AccessManager.make_local(self.tci_path) as local_tci_path:
-                    quicklook = ImageDriverHelper.prepare_preview_asset(self, overview_path, Role.overview, MimeType.JPG, AssetFormat.jpg)
-                    geotiff_to_jpg(local_tci_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
-                    quicklook.size = AccessManager.get_size(quicklook.href)
-                    self.quicklook_path = quicklook.href
-                    assets.append(quicklook)
+        if self.tci_path is not None and IngestDriver.must_build_preview(Driver.configuration, self.tci_path, local_remote_both="both"):
+            Driver.LOGGER.debug(f"Building overview for TIFF {self.tci_path}")
+            quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
+            raster_to_jpg(self.tci_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            quicklook.size = AccessManager.get_size(quicklook.href)
+            self.quicklook_path = quicklook.href
+            assets.append(quicklook)
 
         if self.quicklook_path is not None and self.thumbnail_path is None:
             thumbnail_type = MimeType.JPG
@@ -141,7 +126,7 @@ class Driver(IngestDriver):
             return datetime.fromisoformat(dt_str).replace(tzinfo=None)
 
         props = metadata.get("properties", {})
-        
+
         start_dt_str = props.get("start_datetime")
         if start_dt_str is not None:
             start_datetime = dateutil.parser.parse(start_dt_str)
@@ -207,7 +192,7 @@ class Driver(IngestDriver):
                 if result is not None:
                     return result
         return None
-        
+
     def __check_path__(self, path: str):
         self.__init__()
         data_path = None

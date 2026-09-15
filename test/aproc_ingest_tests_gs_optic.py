@@ -42,9 +42,9 @@ class Tests(IngestTests):
         url = os.path.join(ROOT, WORLDVIEW)
         self.async_ingest(url, ["thumbnail", "overview", "data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
-    def test_async_ingest_rapideye(self):  # Driver RAPIDEYE - No thumbnail nor overview.
+    def test_async_ingest_rapideye(self):  # Driver RAPIDEYE
         url = os.path.join(ROOT, RAPID_EYE)
-        self.async_ingest(url, ["data", "metadata", "extent", "airs_item"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
+        self.async_ingest(url, ["data", "metadata", "extent", "airs_item", "thumbnail", "overview"], archive=False, enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
 
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)

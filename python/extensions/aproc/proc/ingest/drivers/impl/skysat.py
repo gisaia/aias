@@ -1,4 +1,5 @@
 import json
+
 import dateutil.parser
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
@@ -7,14 +8,14 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
-                                                             geotiff_to_jpg, get_bbox, get_centroid,
-                                                             get_epsg)
+                                                             get_bbox,
+                                                             get_centroid,
+                                                             get_epsg,
+                                                             raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 
 
 class Driver(IngestDriver):
-
-    configuration: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -28,8 +29,7 @@ class Driver(IngestDriver):
     # Implements drivers method
     @staticmethod
     def init(configuration: dict):
-        IngestDriver.init(configuration)
-        Driver.configuration = configuration or {}
+        ImageDriverHelper.init(Driver, configuration)
 
     # Implements drivers method
     def identify_assets(self, url: str) -> list[Asset]:
@@ -72,7 +72,7 @@ class Driver(IngestDriver):
         quicklook = None
         if tif_path and IngestDriver.must_build_preview(Driver.configuration, tif_path, local_remote_both="both"):
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            geotiff_to_jpg(tif_path, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, Driver.OVERVIEW_FROM_LARGE_TIFF_PCT, output_path=quicklook.href, bands_list=bands, stretch=stretch)
+            raster_to_jpg(tif_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, bands_list=bands, stretch=stretch)
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
