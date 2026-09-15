@@ -99,8 +99,6 @@ class CogBuilderHelper:
                     target_height = int(src_height * factor)
                     warp_params['width'] = str(target_width)  # type: ignore
                     warp_params['height'] = str(target_height)  # type: ignore
-                else:
-                    warp_params['resolution'] = "highest"
                 warp_params.update(options)
                 LOGGER.info(f"Building COG from {source} to {target} with parameters={warp_params}")
                 start = time()
