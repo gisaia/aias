@@ -74,7 +74,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const savedHeight = localStorage.getItem(ARLAS_AIAS_TASKS_PANEL_HEIGHT);
     if (savedHeight) {
-      const parsed = parseInt(savedHeight, 10);
+      const parsed = Number.parseInt(savedHeight, 10);
       if (!isNaN(parsed) && parsed >= 120) {
         this.tasksHeight = parsed;
       }

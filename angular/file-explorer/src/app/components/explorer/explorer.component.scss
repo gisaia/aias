@@ -60,7 +60,8 @@
       display: inline-block;
     }
 
-    button.toggle-btn {
+    button.toggle-btn,
+    button.activate-btn {
       width: 20px;
       height: 20px;
       min-width: 20px;
@@ -77,6 +78,13 @@
         height: 18px;
         line-height: 18px;
         color: #64748b;
+      }
+
+      .material-symbols-outlined {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
       }
     }
 
@@ -105,26 +113,6 @@
     .active {
       background-color: colors.$primaryColor !important;
       color: white !important;
-    }
-
-    button.activate-btn {
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      min-height: 20px;
-      padding: 0;
-      margin-left: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-
-      .material-symbols-outlined {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        line-height: 18px;
-      }
     }
 
     .loader {

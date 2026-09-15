@@ -53,17 +53,17 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss'],
   animations: [
-      trigger('detailExpand', [
-          state('collapsed', style({ height: '0px', minHeight: '0' })),
-          state('expanded', style({ height: '*' })),
-          transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-      ]),
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
   ],
   imports: [
     MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatChipSet, MatChip, MatTooltip,
     MatIconButton, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe, TranslatePipe,
     MatChip
-]
+  ]
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -90,11 +90,12 @@ export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly translate: TranslateService,
     private readonly famService: FamService,
     private readonly dialog: MatDialog
-  ) { }
+  ) {
+    this.pageSize = this.jobService.getTasksPageSize();
+  }
 
 
   public ngOnInit(): void {
-    this.pageSize = this.jobService.getTasksPageSize();
     this.executionObservable = timer(0, 5000);
     this.refreshSub = this.executionObservable.pipe(takeUntil(this.unsubscribeRefreshTasks)).subscribe(() => {
       this.getTasks();
