@@ -21,8 +21,14 @@
 @use "styles/sizes.scss" as sizes;
 @use "styles/mixins.scss" as mixins;
 
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
 .archives-content {
-  height: calc(100% - sizes.$sectionTitleHeight);
+  height: 100%;
   overflow: auto;
   position: relative;
   .archives-list {
@@ -39,7 +45,7 @@
       .list-icon {
         width: 20px;
         height: 20px;
-        font-size: 20px;
+        font-size: sizes.$fontSizeXLarge;
       }
       .item-content {
         display: flex;
@@ -52,12 +58,12 @@
           flex-direction: column;
 
           .label {
-            font-size: 14px;
+            font-size: sizes.$fontSizeDefault;
             font-weight: 500;
           }
           .detail {
             color: rgba(0, 0, 0, 0.58);
-            font-size: 12px;
+            font-size: sizes.$fontSizeSmall;
 
             overflow-wrap: anywhere;
             white-space: pre-wrap;
@@ -139,6 +145,6 @@
     border: 1px solid colors.$infoBorderColor;
     color: colors.$infoColor;
     background-color: colors.$infoBackgroundColor;
-    font-size: 14px;
+    font-size: sizes.$fontSizeDefault;
   }
 }

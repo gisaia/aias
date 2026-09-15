@@ -30,7 +30,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class JobService {
   private options = { headers: new HttpHeaders().set('Content-Type', 'application/json') };
-  private jobSettings: { url?: string; collection?: string; catalog?: string; } = {};
+  private jobSettings: { url?: string; collection?: string; catalog?: string; tasks_page_size?: number; } = {};
 
   public refreshTasks: Subject<boolean> = new Subject();
   public refreshTasksAndArchives: Subject<boolean> = new Subject();
@@ -49,6 +49,10 @@ export class JobService {
 
   public setSettings(settings: any) {
     this.jobSettings = settings;
+  }
+
+  public getTasksPageSize(): number {
+    return this.jobSettings.tasks_page_size || 20;
   }
 
   public fetchAvailableDrivers() {
@@ -108,7 +112,7 @@ export class JobService {
     return this.http.get(this.jobSettings.url + '/jobs/' + jobId + '/cancel', this.options) as Observable<Process>;
   }
 
-  private getCollection(): string {
+  public getCollection(): string {
     return localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) ?? this.jobSettings.collection;
   }
 }

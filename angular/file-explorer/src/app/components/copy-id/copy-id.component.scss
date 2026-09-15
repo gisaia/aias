@@ -18,6 +18,7 @@
  */
 
 @use "styles/colors.scss" as colors;
+@use "styles/sizes.scss" as sizes;
 
 .copy-btn {
   border: none;
@@ -28,7 +29,7 @@
   border-radius: 10px;
 
   mat-icon {
-    font-size: 16px;
+    font-size: sizes.$fontSizeMedium;
     width: 16px;
     height: 16px;
   }

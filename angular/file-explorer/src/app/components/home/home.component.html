@@ -41,7 +41,12 @@
       }
     </div>
   </div>
-  <div class="jobs" [class.reduce]="!showTasks">
+  @if (showTasks) {
+    <div class="resizer" [class.dragging]="isResizing" (mousedown)="onResizeStart($event)">
+      <div class="resizer-line"></div>
+    </div>
+  }
+  <div class="jobs" [class.reduce]="!showTasks" [style.height.px]="showTasks ? tasksHeight : null">
     <div class="section-title">
       {{'Tasks' | translate}}
       <span class="material-symbols-outlined" [class.rotate]="!showTasks" [matTooltip]="'Toggle task panel' | translate"

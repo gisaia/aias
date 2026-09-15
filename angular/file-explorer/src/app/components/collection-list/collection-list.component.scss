@@ -17,6 +17,8 @@
  * under the License.
  */
 
+@use "styles/sizes.scss" as sizes;
+
 .collection-list-field {
   width: 100%;
 }
@@ -37,7 +39,7 @@
     .search-icon {
       color: rgba(0, 0, 0, 0.54);
       margin-right: 12px;
-      font-size: 20px;
+      font-size: sizes.$fontSizeXLarge;
       height: 20px;
       width: 20px;
     }
@@ -46,14 +48,14 @@
       border: none;
       outline: none;
       width: 100%;
-      font-size: 14px;
+      font-size: sizes.$fontSizeDefault;
       background: transparent;
       font-family: inherit;
     }
 
     .clear-btn {
       .mat-icon {
-        font-size: 18px;
+        font-size: sizes.$fontSizeLarge;
         width: 18px;
         height: 18px;
       }
@@ -63,7 +65,7 @@
 
 .no-results-msg {
   padding: 16px;
-  font-size: 13px;
+  font-size: sizes.$fontSizeDefault;
   color: rgba(0, 0, 0, 0.54);
   text-align: center;
 }

@@ -1,17 +1,18 @@
 <div class="files-tree">
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="file">
-      <button mat-icon-button disabled></button>
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [matTreeNodePaddingIndent]="20" class="file">
+      <span class="chevron-spacer"></span>
       <span class="name">{{node.name}}</span>
     </mat-tree-node>
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding class="file">
-      <button mat-icon-button [attr.aria-label]="'Toggle ' + node.name" matTreeNodeToggle>
-        <mat-icon>
+
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding [matTreeNodePaddingIndent]="20" class="file">
+      <button mat-icon-button [attr.aria-label]="'Toggle ' + node.name" matTreeNodeToggle class="toggle-btn">
+        <mat-icon class="chevron-icon">
           {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
         </mat-icon>
       </button>
-      <button matButton (click)="listArchives(node.path)" class="name"
-        [class.name--folder]="node.is_dir" [class.active]="selectedFilePath === node.path">{{node.name}}</button>
+      <button matButton (click)="listArchives(node.path)" class="name name--folder"
+        [class.active]="selectedFilePath === node.path">{{node.name}}</button>
       @if (node.is_dir) {
         <button mat-icon-button class="activate-btn" (click)="activate(node)"
             [matTooltip]="'Activate this folder in collection'| translate:{collection: currentCollection()}" [matTooltipPosition]="'right'">
@@ -19,7 +20,7 @@
         </button>
       }
       @if (node.isLoading) {
-        <mat-progress-spinner class="loader" [diameter]="20" [strokeWidth]="2" [color]="'primary'"
+        <mat-progress-spinner class="loader" [diameter]="16" [strokeWidth]="2" [color]="'primary'"
           mode="indeterminate"></mat-progress-spinner>
       }
     </mat-tree-node>

@@ -17,6 +17,15 @@
  * under the License.
  */
 
+// Layout sizes
 $tasksHeight: 400px;
 $topMenuHeight: 40px;
 $sectionTitleHeight: 45px;
+
+// Font sizes (CSS Custom Properties with fallbacks)
+$fontSizeSmall: var(--arlas-sys-minor-font-size, 12px);
+$fontSizeDefault: var(--arlas-sys-content-font-size, 14px);
+$fontSizeMedium: var(--arlas-sys-subtitle-font-size, 16px);
+$fontSizeLarge: var(--arlas-sys-title-font-size, 18px);
+$fontSizeXLarge: var(--arlas-sys-dialog-title-font-size, 20px);
+$fontSizeXXLarge: var(--aias-font-size-xxl, 24px);

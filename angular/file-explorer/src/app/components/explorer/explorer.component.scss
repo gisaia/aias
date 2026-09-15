@@ -20,40 +20,103 @@
 @use "styles/colors.scss" as colors;
 @use "styles/sizes.scss" as sizes;
 
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  --mat-tree-node-min-height: 24px;
+  --mat-icon-button-state-layer-size: 20px;
+  --mat-icon-button-icon-size: #{sizes.$fontSizeLarge};
+  --mat-icon-button-touch-target-display: none;
+  --mat-button-container-height: 22px;
+  --mat-button-touch-target-display: none;
+}
+
 .files-tree {
   overflow: auto;
-  height: calc(100% - sizes.$sectionTitleHeight);
+  height: 100%;
+  padding: 4px 0;
+
   .file {
+    min-height: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    cursor: default;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+
+    ::ng-deep .mat-mdc-button-touch-target {
+      display: none;
+    }
+
+    .chevron-spacer {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    button.toggle-btn,
+    button.activate-btn {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      min-height: 20px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .chevron-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        color: #64748b;
+      }
+
+      .material-symbols-outlined {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+      }
+    }
+
     .name {
-      font-size: 14px;
-      padding: 10px 8px;
+      font-size: sizes.$fontSizeDefault;
       border: none;
-      background-color: white;
-      cursor: auto;
+      background-color: transparent;
+      cursor: default;
       min-width: unset;
+      min-height: unset;
+      height: 22px;
+      line-height: 22px;
+      padding: 0 4px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 3px;
 
       &--folder {
         cursor: pointer;
       }
     }
-    .active {
-      background-color: colors.$primaryColor;
-      color: white;
-    }
-    .activate-btn {
-      padding: 0;
-      margin-left: 10px;
-      --mat-icon-button-state-layer-size: 20px;
-      --mat-icon-button-touch-target-size: 20px;
 
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
+    .active {
+      background-color: colors.$primaryColor !important;
+      color: white !important;
     }
+
     .loader {
-      margin-left: 10px;
+      margin-left: 6px;
     }
   }
 }

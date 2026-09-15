@@ -18,7 +18,7 @@
  */
 
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -28,7 +28,8 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { MatTooltip } from '@angular/material/tooltip';
 import { DriversListComponent } from '@components/drivers-list/drivers-list.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ARLAS_AIAS_ACTIVE_COLLECTION, ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION } from '@tools/interface';
+import { JobService } from '@services/job/job.service';
+import { ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION } from '@tools/interface';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -61,8 +62,10 @@ export class ConfirmDialogComponent {
   /** Whether to create an overview COG when ingesting the selected archive */
   public createOverviewCOG;
 
+  private readonly jobService = inject(JobService);
+
   public constructor() {
-    this.currentCollection = localStorage.getItem(ARLAS_AIAS_ACTIVE_COLLECTION) as string;
+    this.currentCollection = this.jobService.getCollection();
     this.createOverviewCOG = signal(localStorage.getItem(ARLAS_AIAS_GENERATE_COG_AFTER_INGESTION) === 'true');
   }
 

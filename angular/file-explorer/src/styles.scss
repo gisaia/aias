@@ -18,6 +18,18 @@
  */
 
 /* You can add global styles to this file, and also import other style files */
+@use "styles/sizes.scss" as sizes;
+
+:root {
+  --arlas-sys-minor-font-size: 12px;
+  --arlas-sys-content-font-size: 14px;
+  --arlas-sys-subtitle-font-size: 16px;
+  --arlas-sys-title-font-size: 18px;
+  --arlas-sys-dialog-title-font-size: 20px;
+
+  --aias-font-size-xxl: 24px;
+}
+
 @font-face {
   font-family: "Material Icons";
   font-display: auto;
@@ -90,7 +102,7 @@
 }
 
 .aias-tooltip {
-  font-size: 12px;
+  font-size: sizes.$fontSizeSmall;
 }
 
 html,
@@ -116,5 +128,3 @@ body {
     position: unset;
   }
 }
-
-
