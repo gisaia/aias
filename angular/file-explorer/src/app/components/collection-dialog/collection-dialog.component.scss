@@ -17,6 +17,8 @@
  * under the License.
  */
 
+@use "styles/sizes.scss" as sizes;
+
 .content {
   .collections {
     &.hide{
@@ -31,7 +33,7 @@
 
   .new-collection {
     &-add {
-      font-size: 12px;
+      font-size: sizes.$fontSizeSmall;
       color: darkgray;
       cursor: pointer;
       &:hover {

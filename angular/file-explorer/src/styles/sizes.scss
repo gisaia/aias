@@ -17,6 +17,16 @@
  * under the License.
  */
 
+// Layout sizes
 $tasksHeight: 400px;
 $topMenuHeight: 40px;
 $sectionTitleHeight: 45px;
+
+// Font sizes (CSS Custom Properties with fallbacks)
+$fontSizeXSmall: var(--aias-font-size-xs, 11px);
+$fontSizeSmall: var(--aias-font-size-sm, 12px);
+$fontSizeDefault: var(--aias-font-size-default, 14px);
+$fontSizeMedium: var(--aias-font-size-md, 16px);
+$fontSizeLarge: var(--aias-font-size-lg, 18px);
+$fontSizeXLarge: var(--aias-font-size-xl, 20px);
+$fontSizeXXLarge: var(--aias-font-size-xxl, 24px);

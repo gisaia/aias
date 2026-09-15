@@ -18,6 +18,18 @@
  */
 
 /* You can add global styles to this file, and also import other style files */
+@use "styles/sizes.scss" as sizes;
+
+:root {
+  --aias-font-size-xs: 11px;
+  --aias-font-size-sm: 12px;
+  --aias-font-size-default: 14px;
+  --aias-font-size-md: 16px;
+  --aias-font-size-lg: 18px;
+  --aias-font-size-xl: 20px;
+  --aias-font-size-xxl: 24px;
+}
+
 @font-face {
   font-family: "Material Icons";
   font-display: auto;
@@ -33,7 +45,7 @@
   font-family: "Material Icons";
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
+  font-size: sizes.$fontSizeXXLarge;
   /* Preferred icon size */
   display: inline-block;
   line-height: 1;
@@ -64,7 +76,7 @@
   font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
+  font-size: sizes.$fontSizeXXLarge;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -90,7 +102,7 @@
 }
 
 .aias-tooltip {
-  font-size: 12px;
+  font-size: sizes.$fontSizeSmall;
 }
 
 html,
@@ -116,5 +128,3 @@ body {
     position: unset;
   }
 }
-
-

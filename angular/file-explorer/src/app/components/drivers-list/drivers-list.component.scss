@@ -17,9 +17,11 @@
  * under the License.
  */
 
+@use "styles/sizes.scss" as sizes;
+
 :host {
   .drivers .mat-mdc-chip-option {
-    --mat-chip-label-text-size: 12px;
+    --mat-chip-label-text-size: #{sizes.$fontSizeSmall};
     --mat-chip-container-shape-radius: 4px;
     --mat-chip-elevated-selected-container-color: rgba(76, 175, 80, 0.6);
     --mat-chip-with-avatar-avatar-size: 0px;

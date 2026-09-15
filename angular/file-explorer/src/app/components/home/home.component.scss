@@ -21,7 +21,7 @@
 @use "styles/sizes.scss" as sizes;
 
 @mixin section-title() {
-  font-size: 20px;
+  font-size: sizes.$fontSizeXLarge;
   border-bottom: 1px solid colors.$borderColor;
   padding: 10px;
   display: flex;
@@ -85,7 +85,7 @@
           display: flex;
           align-items: center;
           gap: 0 10px;
-          font-size: 14px;
+          font-size: sizes.$fontSizeDefault;
           ::ng-deep mat-form-field {
             height: 36px;
             .mat-mdc-text-field-wrapper {

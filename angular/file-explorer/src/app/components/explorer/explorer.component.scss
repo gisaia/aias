@@ -23,7 +23,7 @@
 :host {
   --mat-tree-node-min-height: 36px;
   --mat-icon-button-state-layer-size: 24px;
-  --mat-icon-button-icon-size: 20px;
+  --mat-icon-button-icon-size: #{sizes.$fontSizeXLarge};
   --mat-icon-button-touch-target-display: none;
   --mat-button-container-height: 32px;
   --mat-button-touch-target-display: none;
@@ -54,7 +54,7 @@
 
       mat-icon,
       .material-symbols-outlined {
-        font-size: 20px;
+        font-size: sizes.$fontSizeXLarge;
         width: 20px;
         height: 20px;
         line-height: 20px;
@@ -62,7 +62,7 @@
     }
 
     .name {
-      font-size: 14px;
+      font-size: sizes.$fontSizeDefault;
       border: none;
       background-color: transparent;
       cursor: auto;
