@@ -73,7 +73,7 @@ class Processes:
                             Processes.__notify(subscriber.successUri.replace("{jobID}", task_id), json.dumps(result, default=serialize_datetime, indent=2))
                         if new_status == states.FAILURE and subscriber.failedUri:
                             result = Processes.result(task_id)
-                            Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True, exclude_unset=True))
+                            Processes.__notify(subscriber.failedUri.replace("{jobID}", task_id), status_info.model_dump_json(exclude_none=True))
                     LOGGER.debug(f"Status after update of {task_id}: {Processes.__retrieve_status_info__(task_id).model_dump_json()}")
                 else:
                     LOGGER.debug(f"Status of {task_id} is already final ({status_info.status}). No update to {new_status} performed.")
@@ -216,7 +216,7 @@ class Processes:
     def execute(process_name, headers: dict[str, str], input: InputProcess = None) -> StatusInfo | BaseModel:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
-        kwargs = input.model_dump(exclude_none=True, exclude_unset=True)
+        kwargs = input.model_dump(exclude_none=True)
         kwargs["headers"] = headers
         LOGGER.debug("before_execute {}".format(process_name))
         extra = process.before_execute(**kwargs)

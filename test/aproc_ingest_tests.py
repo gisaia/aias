@@ -116,15 +116,15 @@ class IngestTests(AprocTests):
 
     def ingest_no_wait(self, url: str, collection: str, catalog: str, expected=StatusCode.successful, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = []):
         inputs = InputIngestProcess(url=url, collection=collection, catalog=catalog, annotations="", include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments, cascade_subscriber=True)
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True), subscriber=SUBSCRIBER)
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         return r
 
     def ingest_directory(self, url: str, collection: str, catalog: str):
         inputs = InputDirectoryIngestProcess(directory=url, collection=collection, catalog=catalog, annotations="")
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=SUBSCRIBER)
-        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers={"Content-Type": "application/json"})
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True), subscriber=SUBSCRIBER)
+        r = requests.post("/".join([APROC_ENDPOINT, "processes/directory_ingest/execution"]), data=json.dumps(execute.model_dump(exclude_none=True)), headers={"Content-Type": "application/json"})
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
         status: StatusInfo = StatusInfo(**json.loads(r.content))
         status = self.wait_for(status)

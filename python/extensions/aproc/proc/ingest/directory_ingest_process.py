@@ -55,7 +55,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(exclude_none=True, exclude_unset=True),
+    **summary.model_dump(exclude_none=True),
     inputs=base_model2description(InputDirectoryIngestProcess),
     outputs=base_model2description(OutputDirectoryIngestProcess)
 )
@@ -84,7 +84,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
-        directory = InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).directory
+        directory = InputDirectoryIngestProcess(**inputs.model_dump(exclude_none=True)).directory
         storage = AccessManager.resolve_storage(directory)
         return hashlib.sha256((storage.to_string() + directory).encode("utf-8")).hexdigest()
 
@@ -111,10 +111,10 @@ class AprocProcess(Process):
         sub_jobs: list[str] = []
         message = ""
         for archive in archives:
-            LOGGER.info(archive.model_dump_json(exclude_none=True, exclude_unset=True))
+            LOGGER.info(archive.model_dump_json(exclude_none=True))
             try:
                 inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments, cascade_subscriber=cascade_subscriber)
-                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_unset=True, exclude_none=True)), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
+                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_none=True)), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
                 r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                 if not r.ok:
                     msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))
@@ -130,7 +130,7 @@ class AprocProcess(Process):
                 LOGGER.error(msg)
                 LOGGER.exception(e)
                 raise Exception(msg)
-        return OutputDirectoryIngestProcess(process="directory_ingest", archives=[a.path for a in archives], sub_jobs=sub_jobs, message=message, error="").model_dump(exclude_none=True, exclude_unset=True)
+        return OutputDirectoryIngestProcess(process="directory_ingest", archives=[a.path for a in archives], sub_jobs=sub_jobs, message=message, error="").model_dump(exclude_none=True)
 
     @staticmethod
     def list_archives(path: str, size: int = 0, max_size: int = 10) -> list[Archive]:

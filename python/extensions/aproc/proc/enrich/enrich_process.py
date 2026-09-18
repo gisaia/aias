@@ -60,7 +60,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(exclude_none=True, exclude_unset=True),
+    **summary.model_dump(exclude_none=True),
     inputs=base_model2description(InputEnrichProcess),
     outputs=base_model2description(OutputEnrichProcess)
 )
@@ -94,7 +94,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
-        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
+        inputs: InputEnrichProcess = InputEnrichProcess(**inputs.model_dump(exclude_none=True))
         if len(inputs.requests) == 1:
             hash_object = inputs.requests[0]["item_id"]
         else:
@@ -161,7 +161,7 @@ class AprocProcess(Process):
                 LOGGER.info(ENRICHMENT_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-enrich", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                 LOGGER.error(error_msg)
                 raise DriverException(error_msg)
-        return OutputEnrichProcess(process="enrich", item_locations=item_locations, message="", error="").model_dump(exclude_none=True, exclude_unset=True)
+        return OutputEnrichProcess(process="enrich", item_locations=item_locations, message="", error="").model_dump(exclude_none=True)
 
     @staticmethod
     def __get_item_from_airs__(collection: str, item_id: str):

@@ -160,7 +160,7 @@ class Driver(DC3Driver):
 
         # Generate and add metadata to the datacube
         properties = create_datacube_metadata(dc3_request, items, datacube, lon_step, lat_step)
-        datacube.attrs = properties.model_dump(exclude_none=True, exclude_unset=True, mode="json")
+        datacube.attrs = properties.model_dump(exclude_none=True, mode="json")
         datacube.attrs.update({
             "title": dc3_request.title,
             "description": dc3_request.description

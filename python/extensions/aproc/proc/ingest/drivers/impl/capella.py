@@ -188,7 +188,7 @@ class Driver(IngestDriver):
         item.properties.sar__looks_azimuth = item.properties.view__azimuth
         item.properties.sar__pixel_spacing_range = props.get("image", {}).get("pixel_spacing_row", None)
         item.properties.sar__product_type = metadata.get("product_type", None)
-        Driver.LOGGER.debug(f"Extracted metadata for item {item.model_dump_json(exclude_none=True, exclude_unset=True, indent=2)}")
+        Driver.LOGGER.debug(f"Extracted metadata for item {item.model_dump_json(exclude_none=True, indent=2)}")
         return item
 
     def __check_path__(self, path: str):

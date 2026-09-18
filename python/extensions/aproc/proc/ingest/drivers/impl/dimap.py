@@ -37,7 +37,7 @@ class Driver(IngestDriver):
         if self.thumbnail_path is not None:
             assets.append(Asset(href=self.thumbnail_path,
                                 roles=[Role.thumbnail.value], name=Role.thumbnail.value, type=MimeType.JPG.value,
-                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value))
+                                description=Role.thumbnail.value, size=AccessManager.get_size(self.thumbnail_path), asset_format=AssetFormat.jpg.value, airs__managed=True))
 
         assets.append(Asset(href=self.dim_path, size=AccessManager.get_size(self.dim_path),
                             roles=[Role.metadata.value], name=Role.metadata.value, type=MimeType.XML.value,

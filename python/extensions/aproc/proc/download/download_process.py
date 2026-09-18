@@ -63,7 +63,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(exclude_none=True, exclude_unset=True),
+    **summary.model_dump(exclude_none=True),
     inputs=base_model2description(InputDownloadProcess),
     outputs=base_model2description(OutputDownloadProcess)
 )
@@ -135,7 +135,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
-        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True))
+        inputs: InputDownloadProcess = InputDownloadProcess(**inputs.model_dump(exclude_none=True))
         if len(inputs.requests) == 1:
             hash_object = inputs.requests[0]["item_id"]
         else:
@@ -217,7 +217,7 @@ class AprocProcess(Process):
                 mail_context["error"] = error_msg
                 Notifications.report(item, DownloadConfiguration.settings.email_subject_error_download, DownloadConfiguration.settings.email_content_error_download, DownloadConfiguration.settings.notification_admin_emails.split(","), context=mail_context, outcome="failure")
                 raise DriverException(error_msg)
-        return OutputDownloadProcess(process="download", download_locations=download_locations, message="", error="").model_dump(exclude_none=True, exclude_unset=True)
+        return OutputDownloadProcess(process="download", download_locations=download_locations, message="", error="").model_dump(exclude_none=True)
 
     @staticmethod
     def __update_paths__(mail_context: dict[str, str]):

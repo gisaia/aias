@@ -380,7 +380,7 @@ class Asset(BaseModel, extra=Extra.allow):
     storage__tier: str | None = Field(default=None, title="[STAC, extension storage]Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
     storage__platform: str | None = Field(default=None, title="[STAC, extension storage]PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
     storage__region: str | None = Field(default=None, title="[STAC, extension storage]The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)")
-    airs__managed: bool | None = Field(default=True, title="[ARLAS, extension AIRS] Whether the asset is managed by AIRS or not.")
+    airs__managed: bool | None = Field(default=False, title="[ARLAS, extension AIRS] Whether the asset is managed by AIRS or not.")
     airs__object_store_bucket: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store bucket for the asset object.")
     airs__object_store_key: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store key of the asset object.")
     title: str | None = Field(default=None, title="[STAC] Optional displayed title for clients and users.", max_length=300)

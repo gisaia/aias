@@ -60,7 +60,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(exclude_none=True, exclude_unset=True),
+    **summary.model_dump(exclude_none=True),
     inputs=base_model2description(InputIngestProcess),
     outputs=base_model2description(OutputIngestProcess)
 )
@@ -90,7 +90,7 @@ class AprocProcess(Process):
 
     @staticmethod
     def get_resource_id(inputs: BaseModel) -> str:
-        url = InputIngestProcess(**inputs.model_dump(exclude_none=True, exclude_unset=True)).url
+        url = InputIngestProcess(**inputs.model_dump(exclude_none=True)).url
         driver: IngestDriver = DriverManager.solve(summary.id, url)
         if driver is not None:
             return driver.get_item_id(url)
@@ -178,7 +178,7 @@ class AprocProcess(Process):
                 if enrichments:
                     try:
                         inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": item.collection, "item_id": item.id}], enrichments=enrichments, cascade_subscriber=cascade_subscriber)
-                        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
+                        execute = Execute(inputs=inputs.model_dump(exclude_none=True), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
                         r: requests.Response = requests.post("/".join([IngestConfiguration.settings.aproc_endpoint, "processes", "enrich", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
                         if not r.ok:
                             msg = "Failed to submit the enrich request for {} ({}): {}".format(url, item.id, str(r.status_code) + ":" + str(r.content))
@@ -194,7 +194,7 @@ class AprocProcess(Process):
                         error = add_msg_to_text(msg, error)
                         LOGGER.error(msg)
                         LOGGER.exception(err)
-                return OutputIngestProcess(process="ingest", collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs, message=message, error=error).model_dump(exclude_none=True, exclude_unset=True)
+                return OutputIngestProcess(process="ingest", collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs, message=message, error=error).model_dump(exclude_none=True)
             except Exception as err:
                 msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)

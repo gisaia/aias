@@ -58,7 +58,7 @@ summary: ProcessSummary = ProcessSummary(
 )
 
 description: ProcessDescription = ProcessDescription(
-    **summary.model_dump(exclude_none=True, exclude_unset=True),
+    **summary.model_dump(exclude_none=True),
     inputs=base_model2description(InputDC3BuildProcess),
     outputs=base_model2description(OutputDC3BuildProcess)
 )
@@ -173,7 +173,7 @@ class AprocProcess(Process):
                     LOGGER.warning("Asset {} is not managed. Its content ({}) will not be copied and could be lost.".format(asset_name, asset.href))
             AprocProcess.update_task_status(LOGGER, self, state='PROGRESS', meta={'step': 'register_item', "ACTION": "INGEST", "TARGET": item.id})
             item: Item = ARLASServicesHelper.insert_or_update_item(item, AprocConfiguration.settings.airs_endpoint)
-            return OutputDC3BuildProcess(process="dc3build", collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id]), message="", error="").model_dump(exclude_none=True, exclude_unset=True)
+            return OutputDC3BuildProcess(process="dc3build", collection=item.collection, catalog=item.catalog, id=item.id, item_location="/".join([AprocConfiguration.settings.airs_endpoint, "collections", item.collection, "items", item.id]), message="", error="").model_dump(exclude_none=True)
         except Exception as e:
             error_msg = "Failed to build the cube. ({})".format(e.args)
             LOGGER.info(CUBE_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "enrich", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, EVENT_MODULE_KEY: "aproc-dc3build"})
