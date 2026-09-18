@@ -114,8 +114,8 @@ class AprocProcess(Process):
             LOGGER.info(archive.model_dump_json(exclude_none=True))
             try:
                 inputs = InputIngestProcess(url=archive.path, collection=collection, catalog=catalog, annotations=annotations, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments, cascade_subscriber=cascade_subscriber)
-                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_none=True)), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
-                r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
+                execute = Execute(inputs=json.loads(inputs.model_dump_json(exclude_none=True, exclude_unset=True)), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
+                r: requests.Response = requests.post("/".join([Configuration.settings.aproc_endpoint, "processes", "ingest", "execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers=headers)
                 if not r.ok:
                     msg = "Failed to submit the ingest request for {} ({}): {}".format(archive.path, archive.id, str(r.status_code) + ":" + str(r.content))
                     LOGGER.error(msg)

@@ -178,8 +178,8 @@ class AprocProcess(Process):
                 if enrichments:
                     try:
                         inputs: InputEnrichProcess = InputEnrichProcess(requests=[{"collection": item.collection, "item_id": item.id}], enrichments=enrichments, cascade_subscriber=cascade_subscriber)
-                        execute = Execute(inputs=inputs.model_dump(exclude_none=True), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
-                        r: requests.Response = requests.post("/".join([IngestConfiguration.settings.aproc_endpoint, "processes", "enrich", "execution"]), data=json.dumps(execute.model_dump()), headers=headers)
+                        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True), subscriber=OGCSubscriber(**subscriber) if cascade_subscriber else None)
+                        r: requests.Response = requests.post("/".join([IngestConfiguration.settings.aproc_endpoint, "processes", "enrich", "execution"]), data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True)), headers=headers)
                         if not r.ok:
                             msg = "Failed to submit the enrich request for {} ({}): {}".format(url, item.id, str(r.status_code) + ":" + str(r.content))
                             LOGGER.error(msg)
@@ -194,7 +194,7 @@ class AprocProcess(Process):
                         error = add_msg_to_text(msg, error)
                         LOGGER.error(msg)
                         LOGGER.exception(err)
-                return OutputIngestProcess(process="ingest", collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs, message=message, error=error).model_dump(exclude_none=True)
+                return OutputIngestProcess(process="ingest", collection=collection, catalog=catalog, archive_url=url, item_location=os.path.join(Configuration.settings.airs_endpoint, "collections", item.collection, "items", item.id), sub_jobs=sub_jobs, message=message, error=error).model_dump(exclude_none=True, exclude_unset=True)
             except Exception as err:
                 msg = "Exception while ingesting {}: {}".format(url, str(err))
                 LOGGER.error(msg)
