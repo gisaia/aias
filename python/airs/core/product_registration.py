@@ -118,7 +118,7 @@ def delete_asset(collection: str, item_id: str, asset_name: str):
     return __delete_file(key)
 
 
-def upload_item(item: Item):
+def upload_item(item: Item) -> str:
     """upload the item to the configured S3
 
     Args:
@@ -323,12 +323,12 @@ def register_item(item: Item) -> Item:
     if item.assets:
         for asset in item.assets.values():
             if asset.airs__managed is None:
-                asset.airs__managed = True
+                asset.airs__managed = False
     not_found = __not_found_assets(item)
     if len(not_found) > 0:
         raise exceptions.InvalidAssetsException(not_found, ASSETS_NOT_FOUND)
-    __set_assets_links(item)
-    __index_item(item)
+    item = __set_assets_links(item)
+    item = __index_item(item)
     try:
         upload_item(item)
         return item
@@ -343,9 +343,9 @@ def register_item(item: Item) -> Item:
 
 def __index_item(item: Item) -> Item:
     LOGGER.debug("Indexing {} in ARLAS".format(item.id))
-    __dates_to_times(item)
-    __collect_bands(item)
-    __add_generated_fields(item)
+    item = __dates_to_times(item)
+    item = __collect_bands(item)
+    item = __add_generated_fields(item)
     init_collection(item.collection)
     resp = __getES().index(
         index=__get_es_index_name(item.collection),

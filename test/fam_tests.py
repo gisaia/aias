@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND, r.content)
 
     def test_dot_dot_not_authorized(self):
-        r = requests.post(url="/".join([Tests.URL, "files"]), data=PathRequest(path="toto/../titi").model_dump_json(exclude_none=True, exclude_unset=True), headers={"Content-Type": "application/json"})
+        r = requests.post(url="/".join([Tests.URL, "files"]), data=PathRequest(path="toto/../titi").model_dump_json(exclude_none=True), headers={"Content-Type": "application/json"})
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST, r.content)
 
     def test_directory(self):

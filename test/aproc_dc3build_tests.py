@@ -81,10 +81,10 @@ class Tests(AprocTests):
             keywords=["cube", "sentinel 2", "3 slices"],
         )
 
-        execute = Execute(inputs=inputs.model_dump(exclude_none=True, exclude_unset=True))
+        execute = Execute(inputs=inputs.model_dump(exclude_none=True))
         r = requests.post(
             "/".join([APROC_ENDPOINT, "processes/dc3build/execution"]),
-            data=json.dumps(execute.model_dump(exclude_none=True, exclude_unset=True), default=mapper.serialize_datetime),
+            data=json.dumps(execute.model_dump(exclude_none=True), default=mapper.serialize_datetime),
             headers={"Content-Type": MimeType.JSON.value, "Authorization": TOKEN}
         )
         self.assertTrue(r.ok)

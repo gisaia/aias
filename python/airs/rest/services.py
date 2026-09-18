@@ -1,3 +1,5 @@
+from airs.core.logger import Logger
+
 from fastapi import APIRouter, File, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
 
@@ -13,12 +15,14 @@ ROUTER = APIRouter()
 __INVALID_COLLECTION_MSG__ = "Invalid collection"
 __INVALID_ASSET_MSG__ = "Invalid asset {}: {}"
 __INVALID_ITEM_MSG__ = "Invalid items {}: {}"
+LOGGER = Logger.get_logger()
 
 
 @ROUTER.post('/collections/{collection}/_init', description="Init a collection.",
              response_model_exclude_none=True)
 async def init_collection(collection: str, request: Request) -> JSONResponse:
     if not collection:
+        LOGGER.error("Invalid collection")
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
     return JSONResponse(content={"created": rs.init_collection(collection)},
                         status_code=status.HTTP_201_CREATED)
@@ -47,20 +51,27 @@ async def create_item(collection: str, item: Item, request: Request) -> Item:
             May return the content of the newly added resource for a successful operation.
     """
     if not item.id:
+        LOGGER.error("Invalid identifier")
         raise BadRequest(detail="Invalid identifier")
     if not item.catalog:
+        LOGGER.error("Invalid catalog")
         raise BadRequest(detail="Invalid catalog")
     if not item.collection:
+        LOGGER.error("Invalid collection")  
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
     if item.collection != collection:
+        LOGGER.error(f"Invalid collection in the item, must be the same as the one provided in the url: {item.collection} != {collection}")
         raise BadRequest(detail="Invalid collection in the item, must be the same as the one provided in the url")
     if rs.item_exists(item.collection, item.id):
+        LOGGER.error(f"Item {item.collection}/{item.id} already exists")
         raise Conflict(detail="Item already exists")
     try:
         return rs.register_item(item=item)
     except exceptions.InvalidAssetsException as e:
+        LOGGER.error(f"Invalid asset {e.assets}: {e.reason}")
         raise NotFound(detail=__INVALID_ASSET_MSG__.format(e.assets, e.reason))
     except exceptions.InvalidItemsException as e:
+        LOGGER.error(f"Invalid items {e.items}: {e.reason}")
         raise NotFound(detail=__INVALID_ITEM_MSG__.format(e.items, e.reason))
 
 
@@ -76,24 +87,32 @@ async def update_item(collection: str, id: str, item: Item, request: Request) ->
         If the id or collection fields are different from those in the URI, status code 400 shall be returned.
     """
     if not item.id:
+        LOGGER.error("Invalid identifier")
         raise BadRequest(detail="Invalid identifier")
     if id != item.id:
+        LOGGER.error(f"Invalid identifier, must be equal in the body and the URI: {id} != {item.id}")
         raise BadRequest(detail="Invalid identifier, must be equal in the body and the URI")
     if not item.catalog:
+        LOGGER.error("Invalid catalog")
         raise BadRequest(detail="Invalid catalog")
     if not item.collection:
+        LOGGER.error("Invalid collection")
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
     if item.collection != collection:
+        LOGGER.error(f"Invalid collection in the item, must be the same as the one provided in the url: {item.collection} != {collection}")
         raise BadRequest(detail="Invalid collection in the item, must be the same as the one provided in the url")
     if not rs.item_exists(collection, item.id):
+        LOGGER.error(f"Item {item.collection}/{item.id} does not exist, can not update")
         raise BadRequest(detail="Item does not exist, can not update")
     try:
         return JSONResponse(content=to_dict(rs.register_item(item=item)),
                             status_code=status.HTTP_200_OK,
                             headers={"Location": request.base_url.path + "/" + rs.get_item_relative_path(collection, item.id)})
     except exceptions.InvalidAssetsException as e:
+        LOGGER.error(f"Invalid asset {e.assets}: {e.reason}")
         raise NotFound(detail=__INVALID_ASSET_MSG__.format(e.assets, e.reason))
     except exceptions.InvalidItemsException as e:
+        LOGGER.error(f"Invalid items {e.items}: {e.reason}")
         raise NotFound(detail=__INVALID_ITEM_MSG__.format(e.items, e.reason))
 
 
@@ -106,25 +125,31 @@ async def delete_item(collection: str, id: str) -> Response:
         May return a 404 if no Item existed prior to the delete operation. Returning a 200 or 204 is also valid in this situation.
     """
     if not rs.item_exists(collection, id):
+        LOGGER.error(f"Item {collection}/{id} does not exist, can not update")
         raise NotFound(detail="Item does not exist, can not update")
     try:
         rs.delete_item(collection, id)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except exceptions.InvalidAssetsException as e:
+        LOGGER.error(f"Invalid asset {e.assets}: {e.reason}")
         raise NotFound(detail=__INVALID_ASSET_MSG__.format(e.assets, e.reason))
     except exceptions.InvalidItemsException as e:
+        LOGGER.error(f"Invalid items {e.items}: {e.reason}")
         raise NotFound(detail=__INVALID_ITEM_MSG__.format(e.items, e.reason))
 
 
 @ROUTER.get('/collections/{collection}/items/{id}', description="Retrieve an item")
 async def get_item(collection: str, id: str) -> JSONResponse:
     if not rs.item_exists(collection, id):
+        LOGGER.error(f"Item {collection}/{id} does not exist")
         raise NotFound(detail="Item does not exist")
     try:
         return JSONResponse(content=to_dict(rs.get_item(collection, id)), status_code=status.HTTP_200_OK)
     except exceptions.InvalidAssetsException as e:
+        LOGGER.error(f"Invalid asset {e.assets}: {e.reason}")
         raise NotFound(detail=__INVALID_ASSET_MSG__.format(e.assets, e.reason))
     except exceptions.InvalidItemsException as e:
+        LOGGER.error(f"Invalid items {e.items}: {e.reason}")
         raise NotFound(detail=__INVALID_ITEM_MSG__.format(e.items, e.reason))
 
 
@@ -140,6 +165,7 @@ async def retrieve_asset(collection: str, item_id: str, asset_name: str) -> Resp
     if rs.asset_exists(collection=collection, item_id=item_id, asset_name=asset_name):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
+        LOGGER.error(f"Asset {collection}/{item_id}/{asset_name} not found")
         raise NotFound(detail="Asset not found")
 
 
@@ -149,6 +175,7 @@ async def delete_asset(collection: str, item_id: str, asset_name: str) -> Respon
         rs.delete_asset(collection, item_id, asset_name)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
+        LOGGER.error(f"Asset {collection}/{item_id}/{asset_name} not found")
         raise NotFound(detail="Asset not found")
 
 
