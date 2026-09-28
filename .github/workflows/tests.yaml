@@ -48,7 +48,11 @@ on:
         required: true
         default: false
         type: boolean
-
+      run_aias_ingest_s3_local:
+        description: 'Run AIAS Ingest tests with local S3?'
+        required: true
+        default: false
+        type: boolean
 jobs:
  
   aias-tests-am:
@@ -224,8 +228,8 @@ jobs:
       run: test/logs.sh compose-aproc-processes-fast-medium-large-1 
       if: always()
   
-  aias-tests-ingest-minio:
-    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_minio || inputs.run_all))
+  aias-tests-ingest-local-s3:
+    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && (inputs.run_aias_ingest_s3_local || inputs.run_all))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -235,10 +239,10 @@ jobs:
     - name: Install test/requirements
       run: |
         pip install -r test/requirements.tests.txt
-    - name: Start stack minio
-      run: test/start_stack.sh minio
-    - name: Run ingest tests on minio
-      run: test/tests_ingest_minio.sh
+    - name: Start stack local S3
+      run: test/start_stack.sh seaweedfs
+    - name: Run ingest tests on seaweedFS
+      run: test/tests_ingest_s3_local.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh aproc-service 
       if: always()

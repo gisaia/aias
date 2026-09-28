@@ -1,0 +1,1 @@
+export INGESTED_FOLDER=http://seaweedfs:8333

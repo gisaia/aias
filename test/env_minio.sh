@@ -1,1 +1,0 @@
-export INGESTED_FOLDER=http://minio:9000

@@ -17,9 +17,9 @@ export AIRS_S3_BUCKET=airstest
 export AIRS_S3_ACCESS_KEY_ID=airs
 export AIRS_S3_SECRET_ACCESS_KEY=airssecret
 export AIRS_S3_TIER=Standard
-export AIRS_S3_PLATFORM=minio
-export AIRS_S3_ENDPOINT_URL=http://minio:9000
-export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://minio:9000/{}/{}
+export AIRS_S3_PLATFORM=seaweedfs
+export AIRS_S3_ENDPOINT_URL=http://seaweedfs:8333
+export AIRS_S3_ASSET_HTTP_ENDPOINT_URL=http://seaweedfs:8333/{}/{}
 export ARLASEO_MAPPING_URL=/app/conf/mapping.json
 export AIRS_LOGGER_LEVEL=DEBUG
 
@@ -61,8 +61,8 @@ export DOWNLOAD_S3_BUCKET=downloads
 #export DOWNLOAD_S3_BUCKET=
 export DOWNLOAD_S3_ACCESS_KEY_ID=airs
 export DOWNLOAD_S3_SECRET_ACCESS_KEY=airssecret
-export DOWNLOAD_S3_ENDPOINT_URL=http://minio:9000
-export DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=http://minio:9000/{}/{}
+export DOWNLOAD_S3_ENDPOINT_URL=http://seaweedfs:8333
+export DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=http://seaweedfs:8333/{}/{}
 export CLEAN_DOWNLOAD_OUTBOX_DIR=False
 
 export APROC_EMAIL_PATH_PREFIX_ADD="Y://DISK1"
@@ -100,3 +100,6 @@ export PLATFORM='amd64'
 # AUTH
 
 export VERIFY_JWT=false
+
+# SEAWEEDFS
+export SEAWEEDFS_VERSION=chrislusf/seaweedfs:4.47

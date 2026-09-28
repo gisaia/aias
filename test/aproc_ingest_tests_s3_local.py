@@ -4,12 +4,12 @@ import unittest
 from test.aproc_ingest_tests import (TIF, IngestTests)
 from test.utils import CATALOG, COLLECTION
 
-ROOT = "http://minio:9000/archives/inputs"  # NOSONAR
+ROOT = "http://seaweedfs:8333/archives/inputs"  # NOSONAR
 
 
 class Tests(IngestTests):
 
-    def test_async_ingest_tif_minio(self):  # Driver TIF
+    def test_async_ingest_tif_s3_local(self):  # Driver TIF
         url = os.path.join(ROOT, TIF)
         self.async_ingest(url, ["data", "airs_item"], archive=False)
 

@@ -4,7 +4,7 @@ import unittest
 from test.aproc_tests import AprocTests
 from test.utils import (APROC_ENDPOINT, ASSET_NAME, BBOX, CLOUD_ID, CLOUD_ITEM,
                         COLLECTION, EPSG_27572, ID, ITEM_PATH, MAX_ITERATIONS,
-                        MINIO_ID, MINIO_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM, SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM,
+                        S3_LOCAL_ID, S3_LOCAL_ITEM, SENTINEL_2_ID, SENTINEL_2_ITEM, SENTINEL_2_ZIP_ID, SENTINEL_2_ZIP_ITEM,
                         SMTP_SERVER, TOKEN, add_item, create_arlas_collection)
 from time import sleep
 
@@ -78,10 +78,10 @@ class Tests(AprocTests):
         sleep(2)
         self.__download_project_native_format_native_crop(CLOUD_ID)
 
-    def test_download_project_native_format_native_crop_minio(self):
-        add_item(self, MINIO_ITEM, MINIO_ID)
+    def test_download_project_native_format_native_crop_s3_local(self):
+        add_item(self, S3_LOCAL_ITEM, S3_LOCAL_ID)
         sleep(2)
-        self.__download_project_native_format_native_crop(MINIO_ID)
+        self.__download_project_native_format_native_crop(S3_LOCAL_ID)
 
     def __download_archive_geotiff(self, id: str):
         self.download_and_check_result(ids=[id], crop_wkt="", target_format="native",
@@ -96,10 +96,10 @@ class Tests(AprocTests):
         sleep(2)
         self.__download_archive_geotiff(CLOUD_ID)
 
-    def test_download_archive_geotiff_minio(self):
-        add_item(self, MINIO_ITEM, MINIO_ID)
+    def test_download_archive_geotiff_s3_local(self):
+        add_item(self, S3_LOCAL_ITEM, S3_LOCAL_ID)
         sleep(2)
-        self.__download_archive_geotiff(MINIO_ID)
+        self.__download_archive_geotiff(S3_LOCAL_ID)
 
     def __download_project_3857_format_jp2_crop(self, id: str):
         self.download_and_check_result(ids=[id], crop_wkt="", target_format=AssetFormat.jpg2000.value,
@@ -114,10 +114,10 @@ class Tests(AprocTests):
         sleep(2)
         self.__download_project_3857_format_jp2_crop(CLOUD_ID)
 
-    def test_download_project_3857_format_jp2_crop_minio(self):
-        add_item(self, MINIO_ITEM, MINIO_ID)
+    def test_download_project_3857_format_jp2_crop_s3_local(self):
+        add_item(self, S3_LOCAL_ITEM, S3_LOCAL_ID)
         sleep(2)
-        self.__download_project_3857_format_jp2_crop(MINIO_ID)
+        self.__download_project_3857_format_jp2_crop(S3_LOCAL_ID)
 
     def __download_zarr(self, id: str, item: str, output_name: str):
         add_item(self, item, id)

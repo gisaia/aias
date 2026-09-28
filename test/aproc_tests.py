@@ -24,7 +24,7 @@ class AprocTests(TimedTests):
                 region_name=s3_region)
         return session.client("s3", endpoint_url=s3_endpoint_url)
 
-    def setUpESandMinio(self):
+    def setUpESandLocalS3(self):
         import airs.core.product_registration as rs
         es = elasticsearch.Elasticsearch(index_endpoint_url)
         for collection in [COLLECTION, "collection1", "collection2", "collection3"]:
@@ -43,7 +43,7 @@ class AprocTests(TimedTests):
 
     def setUp(self):
         super().setUp()
-        self.setUpESandMinio()
+        self.setUpESandLocalS3()
 
     def tearDown(self):
         super().tearDown()

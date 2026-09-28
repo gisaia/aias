@@ -2,23 +2,58 @@ version: "3"
 networks:
   aias:
 services:
-  minio:
-    image: quay.io/minio/minio
-    container_name: minio
+  seaweedfs:
+    image: ${SEAWEEDFS_VERSION}
+    container_name: seaweedfs
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "8333:8333" # API S3 (applications)
     networks:
       - aias
-    environment:
-      - "MINIO_ACCESS_KEY=airs"
-      - "MINIO_SECRET_KEY=airssecret"
-    command: server /export --console-address ":9001"
+    command: server -dir=/data -master.telemetry=false -s3
+    volumes:
+      - seaweedfs-data:/data
     healthcheck:
-      test: "mc alias set myminio http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; mc ping -x myminio"
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9333/cluster/status"]
       interval: 5s
       timeout: 10s
-      retries: 3
+      retries: 10
+
+  seaweedfs-admin:
+    image: ${SEAWEEDFS_VERSION}
+    command: admin -master=seaweedfs:9333 -port=23646 -adminUser=airs -adminPassword=airssecret -ip=0.0.0.0 -dataDir=/data
+    depends_on:
+      seaweedfs:
+        condition: service_healthy
+    volumes:
+      - seaweedfs-admin-data:/data
+    ports:
+      - "23646:23646"
+    networks:
+      - aias
+
+  s3users:
+    image: ${SEAWEEDFS_VERSION}
+    depends_on:
+      seaweedfs:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      - LOGIN=${AIRS_S3_ACCESS_KEY_ID:-airs}
+      - PASSWORD=${AIRS_S3_SECRET_ACCESS_KEY:-airssecret}
+      - AIRS_S3_BUCKET=${AIRS_S3_BUCKET:-airstest}
+      - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}
+    networks:
+      - aias
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        weed shell -master=seaweedfs:9333 -filer=seaweedfs:8888 <<EOF
+        s3.configure -user=$$LOGIN -access_key=$$LOGIN -secret_key=$$PASSWORD -actions=Admin,Read,Write,List,Tagging -apply
+        s3.configure -user=anonymous -buckets=$$AIRS_S3_BUCKET,$$DOWNLOAD_S3_BUCKET,archives -actions=Read,List,Write -apply
+        s3.configure
+        EOF
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.9.2}
@@ -200,7 +235,7 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-      minio:
+      seaweedfs:
         condition: service_healthy
     environment:
       - AIRS_HOST=0.0.0.0
@@ -223,11 +258,11 @@ services:
       - ARLASEO_MAPPING_URL=${ARLASEO_MAPPING_URL:-/app/conf/mapping.json}
       - AIRS_LOGGER_LEVEL=${AIRS_LOGGER_LEVEL:-INFO}
       - ACCESS_LOGGER_LEVEL=${ACCESS_LOGGER_LEVEL:-INFO}
-      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://minio:9000}
+      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://seaweedfs:8333}
       - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}
       - DOWNLOAD_S3_ACCESS_KEY_ID=${DOWNLOAD_S3_ACCESS_KEY_ID:-airs}
       - DOWNLOAD_S3_SECRET_ACCESS_KEY=${DOWNLOAD_S3_SECRET_ACCESS_KEY:-airssecret}
-      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://minio:9000/{}/{}}
+      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://seaweedfs:8333/{}/{}}
     ports:
       - "8000:8000"
     healthcheck:
@@ -279,11 +314,11 @@ services:
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
       - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT:-3}
       - TMP_FOLDER=${TMP_FOLDER:-/tmp/aias}
-      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://minio:9000}
+      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://seaweedfs:8333}
       - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}
       - DOWNLOAD_S3_ACCESS_KEY_ID=${DOWNLOAD_S3_ACCESS_KEY_ID:-airs}
       - DOWNLOAD_S3_SECRET_ACCESS_KEY=${DOWNLOAD_S3_SECRET_ACCESS_KEY:-airssecret}
-      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://minio:9000/{}/{}}
+      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://seaweedfs:8333/{}/{}}
       - CLEAN_DOWNLOAD_OUTBOX_DIR=${CLEAN_DOWNLOAD_OUTBOX_DIR:-True}
       - APROC_INPUT_STORAGE_TYPE=${APROC_INPUT_STORAGE_TYPE}
       - APROC_INPUT_STORAGE_BUCKET=${APROC_INPUT_STORAGE_BUCKET}
@@ -345,11 +380,11 @@ services:
       - APROC_INDEX_PWD=${APROC_INDEX_PWD:-None}
       - APROC_RESOURCE_ID_HASH_STARTS_AT=${APROC_RESOURCE_ID_HASH_STARTS_AT:-3}
       - TMP_FOLDER=${TMP_FOLDER:-/tmp/aias}
-      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://minio:9000}
+      - DOWNLOAD_S3_ENDPOINT_URL=${DOWNLOAD_S3_ENDPOINT_URL:-http://seaweedfs:8333}
       - DOWNLOAD_S3_BUCKET=${DOWNLOAD_S3_BUCKET}
       - DOWNLOAD_S3_ACCESS_KEY_ID=${DOWNLOAD_S3_ACCESS_KEY_ID:-airs}
       - DOWNLOAD_S3_SECRET_ACCESS_KEY=${DOWNLOAD_S3_SECRET_ACCESS_KEY:-airssecret}
-      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://minio:9000/{}/{}}
+      - DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL=${DOWNLOAD_S3_ASSET_HTTP_ENDPOINT_URL:-http://seaweedfs:8333/{}/{}}
       - CLEAN_DOWNLOAD_OUTBOX_DIR=${CLEAN_DOWNLOAD_OUTBOX_DIR:-True}
       - APROC_INPUT_STORAGE_TYPE=${APROC_INPUT_STORAGE_TYPE}
       - APROC_INPUT_STORAGE_BUCKET=${APROC_INPUT_STORAGE_BUCKET}
@@ -490,7 +525,7 @@ services:
       dockerfile: docker/Dockerfile-fam
     container_name: 'fam-s3-service'
     environment:
-      - INGESTED_FOLDER=http://minio:9000/archives/inputs
+      - INGESTED_FOLDER=http://seaweedfs:8333/archives/inputs
       - FAM_PREFIX=${FAM_PREFIX:-/arlas/fam}
       - FAM_CORS_ORIGINS=${FAM_CORS_ORIGINS:-*}
       - FAM_CORS_METHODS=${FAM_CORS_METHODS:-*}
@@ -506,3 +541,5 @@ volumes:
   redis-master-data:
   redis-replica1-data:
   redis-replica2-data:
+  seaweedfs-data:
+  seaweedfs-admin-data:
