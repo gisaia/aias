@@ -73,7 +73,7 @@ routes:
     methods: ["GET"]
     upstream:
       nodes:
-        "minio:9000": 1
+        "seaweedfs:8333": 1
     plugins:
       forward-auth:
         uri: http://agate:8004/agate/authorization/myservice

@@ -1,7 +1,6 @@
 __pycache__
 private
 .vscode
-.minio
 .DS_Store
 target
 .idea/
@@ -22,6 +21,6 @@ env_aias/
 angular/file-explorer/node_modules
 angular/file-explorer/.angular
 angular/file-explorer/dist
-
+docker/compose/s3.json
 conf/roles.yaml
 test/env.sh

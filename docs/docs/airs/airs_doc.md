@@ -41,7 +41,7 @@ In the following examples, we will:
 
 ### Prerequisites
 
-- minio
+- seaweedfs
 - elasticsearch
 - docker
 

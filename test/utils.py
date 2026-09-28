@@ -22,7 +22,7 @@ s3_bucket = os.getenv("AIRS_S3_BUCKET", "airstest")
 s3_download_bucket = os.getenv("DOWNLOAD_S3_BUCKET", "downloads")
 
 index_endpoint_url = "http://elasticsearch:9200"
-s3_endpoint_url = "http://minio:9000"
+s3_endpoint_url = "http://seaweedfs:8333"
 AIRS_URL = "http://airs-server:8000/arlas/airs"
 FAM_URL = "http://fam-service:8005/arlas/fam"
 ARLAS_URL = "http://arlas-server:9999"
@@ -50,8 +50,8 @@ SENTINEL_2_ITEM = f"test/inputs/{SENTINEL_2_ID}.json"
 
 SENTINEL2_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
 
-MINIO_ID = "a250b154-5080-4939-be2f-3baf6a386dab"
-MINIO_ITEM = f"test/inputs/{MINIO_ID}.json"
+S3_LOCAL_ID = "a250b154-5080-4939-be2f-3baf6a386dab"
+S3_LOCAL_ITEM = f"test/inputs/{S3_LOCAL_ID}.json"
 
 CLOUD_ID = "619d7a94-c85e-4e6d-938c-50a043b51036"
 CLOUD_ITEM = f"test/inputs/{CLOUD_ID}.json"

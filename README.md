@@ -33,7 +33,7 @@ This stack relies on the docker compose configuration files. The available endpo
 - [APROC](http://localhost:8001/docs)
 - [AGATE](http://localhost:8004/docs)
 - [FAM](http://localhost:8005/docs)
-- [minio](http://localhost:9001/browser)
+- [seaweedfs](http://localhost:23646/)
 - [elasticsearch](http://localhost:8200)
 - [rabbitmq](http://localhost:15672/)
 - redis on port 6379

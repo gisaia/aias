@@ -8,5 +8,5 @@ docker build -f docker/Dockerfile-tests . -t pythontests
 
 docker network list
 
-echo "run test.aproc_ingest_tests_minio"
-docker run --name somewhere --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_minio
+echo "run test.aproc_ingest_tests_s3_local"
+docker run --name somewhere --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.aproc_ingest_tests_s3_local

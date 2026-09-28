@@ -9,8 +9,8 @@ import aias_common.access.storages.gs as gs
 from pathlib import Path
 import os.path as p
 
-MINIO_HOST = "minio"
-
+SEAWEEDFS_HOST = "seaweedfs"
+SEAWEEDFS_PORT = "8333"
 
 ###########################
 # FILES AND DIR VARIABLES
@@ -21,9 +21,9 @@ S3_RO_DIR_NO_SLASH = "https://storage.googleapis.com/gisaia-public/test-aias/ast
 S3_RO_FILE = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tfw"
 S3_RO_FILE2 = "https://storage.googleapis.com/gisaia-public/test-aias/ast/AST_L1B_00307242024224227_20240729075840_2355295.VNIR_Swath.ImageData3N.tif"
 S3_RO_SMALL_DIR = "https://storage.googleapis.com/gisaia-public/test-aias/spot6/PROD_SPOT6_001/LIBRARY"
-S3_RO_DIR = "http://" + MINIO_HOST + ":9000/downloads/readonly/"
-S3_RW_DIR = "http://" + MINIO_HOST + ":9000/downloads/readwrite/"
-S3_RW_FILE = "http://" + MINIO_HOST + ":9000/downloads/readwrite/a_file"
+S3_RO_DIR = "http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT +"/downloads/readonly/"
+S3_RW_DIR = "http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT +"/downloads/readwrite/"
+S3_RW_FILE = "http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT +"/downloads/readwrite/a_file"
 
 GS_RO_DIR_NO_SLASH = "gs://gisaia-public/test-aias/ast"
 GS_RO_DIR_SLASH = "gs://gisaia-public/test-aias/spot6/"
@@ -215,14 +215,14 @@ def fixture_am():
     Path(FS_RO_FILE).touch()
     Path(FS_RW_FILE).touch()
 
-    minios3conf = s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite", "readonly"])
-    minios3 = s3.S3Storage(minios3conf)
-    minios3.push(FS_RO_FILE, S3_RO_DIR + "a_file")
-    minios3.push(FS_RO_FILE, S3_RW_FILE)
+    locals3conf = s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT, readable_paths=["readwrite", "readonly"], writable_paths=["readwrite", "readonly"])
+    locals3 = s3.S3Storage(locals3conf)
+    locals3.push(FS_RO_FILE, S3_RO_DIR + "a_file")
+    locals3.push(FS_RO_FILE, S3_RW_FILE)
 
     manager.AccessManager.init(AccessManagerSettings(
         storages=[
-            s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]),
+            s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT, readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]),
             s3.S3StorageConfiguration(bucket="gisaia-public", endpoint="https://storage.googleapis.com", readable_paths=["/test-aias/ast", "test-aias/spot6"]),
             fs.FileStorageConfiguration(readable_paths=["/tmp/readonly"], writable_paths=["/tmp/readwrite"]),
             HttpsStorageConfiguration(domain="raw.githubusercontent.com", readable_paths=["/gisaia/ARLAS-Exploration-stack"], writable_paths=[]),
@@ -234,7 +234,7 @@ def fixture_am():
 
 @pytest.fixture(scope="class")
 def fixture_objectstore() -> s3.S3Storage:
-    return s3.S3Storage(s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + MINIO_HOST + ":9000", readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]))
+    return s3.S3Storage(s3.S3StorageConfiguration(bucket="downloads", endpoint="http://" + SEAWEEDFS_HOST + ":" + SEAWEEDFS_PORT, readable_paths=["readwrite", "readonly"], writable_paths=["readwrite"]))
 
 
 ###########################

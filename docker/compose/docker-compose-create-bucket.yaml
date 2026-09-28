@@ -3,24 +3,23 @@ networks:
   aias:
 services:
   createbuckets:
-    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    image: ${SEAWEEDFS_VERSION}
     depends_on:
-      minio:
+      seaweedfs:
         condition: service_healthy
     environment:
       - BUCKET_NAME=${BUCKET_NAME:-airstest}
-      - LOGIN=${LOGIN:-airs}
-      - PASSWORD=${PASSWORD:-airssecret}
     networks:
       - aias
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 $$LOGIN $$PASSWORD;
-      echo create bucket $$BUCKET_NAME;
-      /usr/bin/mc mb myminio/$$BUCKET_NAME;
-      /usr/bin/mc anonymous set public myminio/$$BUCKET_NAME;
-      if [[ $$BUCKET_NAME == "archives" ]]; then /usr/bin/mc cp --recursive /inputs myminio/archives/ ; fi;
-      exit 0;
-      "
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "create bucket $$BUCKET_NAME"
+        echo "s3.bucket.create -name $$BUCKET_NAME" | weed shell -master=seaweedfs:9333 -filer=seaweedfs:8888
+        if [ "$$BUCKET_NAME" = "archives" ]; then
+          weed filer.copy /inputs http://seaweedfs:8888/buckets/archives/       
+        fi
+        exit 0
     volumes:
       - ${PWD}/test/inputs:/inputs:ro
