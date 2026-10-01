@@ -362,7 +362,7 @@ class Band(BaseModel, extra=Extra.allow):
     path_within_asset: str = Field(default=None, title="[ARLAS] If the band is nested within a sub file of the asset (e.g. tgz, zip), then the path within the asset must be provided, undefined otherwise.")
     variable_value_alias: dict[float, str] = Field(default=None, title="[ARLAS] Dictionary of value->alias for bands encoding semantic tags (e.g land cover classification)")
     name: str = Field(title="[STAC] The name of the band (e.g., B01, B8, band2, red).", max_length=300)
-    eo__common_name: str = Field(default=None, title="[STAC, extension eo] The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names.")
+    eo__common_name: str | None = Field(default=None, title="[STAC, extension eo] The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names.")
     description: str = Field(default=None, title="[STAC] Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
     eo__center_wavelength: float = Field(default=None, title="[STAC, extension eo] The center wavelength of the band, in micrometers (μm).")
     eo__full_width_half_max: float = Field(default=None, title="[STAC, extension eo] Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).")
