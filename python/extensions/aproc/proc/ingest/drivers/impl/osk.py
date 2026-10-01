@@ -62,8 +62,8 @@ class Driver(IngestDriver):
         if IngestDriver.must_build_preview(Driver.configuration, self.hsi_path, local_remote_both="both"):
             Driver.LOGGER.debug(f"Building overview for TIFF {self.hsi_path}")
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(self.hsi_path, Driver.OVERVIEW_FROM_TIFF_PCT, Driver.OVERVIEW_FROM_TIFF_PCT,
-                          output_path=quicklook.href, stretch=True, bands_list=self.__find_rgb_bands(url))
+            raster_to_jpg(self.hsi_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE,
+                          output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', True), bands_list=self.__find_rgb_bands(url))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
@@ -96,7 +96,7 @@ class Driver(IngestDriver):
             centroid=centroid,
             properties=Properties(
                 datetime=acquisition_time,
-                constellation="OSK",
+                constellation="ghost",
                 sensor_type=SensorType.HYPERSPECTRAL.value,
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.osk.value,
