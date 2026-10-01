@@ -417,7 +417,7 @@ def __collect_bands(item: Item) -> Item:
         bands[band.name] = band
     if item.assets is not None:
         for asset in item.assets.values():
-            if asset.eo__bands is not None:
+            if asset.eo__bands is not None and Role.data.value in asset.roles:
                 for band in asset.eo__bands:
                     bands[band.name] = band
     item.properties.eo__bands = list(bands.values())
