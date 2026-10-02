@@ -9,16 +9,16 @@ docker build -f docker/Dockerfile-tests . -t pythontests
 docker network list
 
 echo "run test.airs_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.airs_tests
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.airs_tests
 
 echo "run test.agate_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.agate_tests
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.agate_tests
 
 echo "run test.fam_tests"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_tests
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.fam_tests
 
 echo "run test.fam_tests s3"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_s3_tests
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.fam_s3_tests
 
 echo "run test.fam_tests gs"
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.fam_gs_tests
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.fam_gs_tests
