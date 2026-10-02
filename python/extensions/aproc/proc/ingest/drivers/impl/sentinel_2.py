@@ -203,7 +203,8 @@ class Driver(IngestDriver):
                     asset=physical_band,
                     name=physical_band,
                     eo__common_name=BANDS_NAME.get(physical_band, None),
-                    eo__center_wavelength=find_or_none(band, 'Wavelength/CENTRAL')
+                    # In the metadata, it is in nm but should be in µm
+                    eo__center_wavelength=find_or_none(band, 'Wavelength/CENTRAL', process=lambda x: x / 1000)
                 ))
 
         if len(resolutions) > 0:
