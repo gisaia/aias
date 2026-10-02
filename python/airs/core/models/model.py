@@ -189,6 +189,7 @@ class AssetFormat(Enum):
     all_bands_cog = "ALL_BANDS_COG"
     overview_cog = "OVERVIEW_COG"
     csv = "CSV"
+    dat = "DAT"
     geojson = "GEOJSON"
     geotiff = "GEOTIFF"
     gif = "GIF"

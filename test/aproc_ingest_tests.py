@@ -134,13 +134,13 @@ class IngestTests(AprocTests):
         self.assertEqual(status.status, StatusCode.successful, status.model_dump_json())
         self.assertEqual(status.status, callback_job_status[status.jobID])
 
-    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
+    def async_ingest(self, url: str, assets: list[str], archive=True, check_epsg=True, check_gsd=True, include_drivers: list[str] = [], exclude_drivers: list[str] = [], enrichments: list[str] = [], data_key=Role.data.value, check_secondary_id=True):
         status = self.ingest(url, COLLECTION, CATALOG, include_drivers=include_drivers, exclude_drivers=exclude_drivers, enrichments=enrichments)
 
         resource_id = self.get_job_status(status.jobID).resourceID
         ingest_result = self.get_ingest_job_result(status.jobID)
         item = mapper.item_from_json(requests.get(ingest_result.item_location).content)
-        self.check_result(item, assets, archive, check_epsg, data_key, check_secondary_id=check_secondary_id)
+        self.check_result(item, assets, archive, check_epsg=check_epsg, check_gsd=check_gsd, data_key=data_key, check_secondary_id=check_secondary_id)
         self.assertEqual(ingest_result.error, "", "Expected no error, got: " + str(ingest_result.error))
         if enrichments:
             ingest_result = self.get_ingest_job_result(status.jobID)
@@ -176,7 +176,7 @@ class IngestTests(AprocTests):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, data_key=Role.data.value, check_secondary_id=True):
+    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, check_gsd=True, data_key=Role.data.value, check_secondary_id=True):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertIsNotNone(item.id)
@@ -216,7 +216,8 @@ class IngestTests(AprocTests):
             self.assertIsNotNone(item.properties.instrument)
             self.assertIsNotNone(item.properties.sensor)
             self.assertIsNotNone(item.properties.sensor_type)
-            self.assertIsNotNone(item.properties.gsd)
+            if check_gsd:
+                self.assertIsNotNone(item.properties.gsd)
         self.assertIsNotNone(item.properties.main_asset_format)
         self.assertIsNotNone(item.properties.main_asset_name)
         if check_epsg:

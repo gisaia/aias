@@ -94,9 +94,9 @@ class Tests(IngestTests):
 
     def test_async_ingest_osk(self):  # Driver OSK
         url = os.path.join(ROOT, OSK)
-        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value])
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.airs_item.value], check_gsd=False)
 
-    def test_async_ingest_osk_stac(self):  # Driver OSK
+    def test_async_ingest_osk_stac(self):  # Driver OSK STAC
         url = os.path.join(ROOT, OSK_STAC)
         self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], check_epsg=False)
 

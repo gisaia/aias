@@ -13,6 +13,7 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (downsample_image,
                                                              get_epsg,
                                                              raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.utils.find_rgb import find_rgb_bands
 
 
 class Driver(IngestDriver):
@@ -39,8 +40,8 @@ class Driver(IngestDriver):
         ImageDriverHelper.add_asset(assets, self.hsi_path, Role.data, MimeType.OCTET_STREAM,
                                     AssetFormat.hsi, ResourceType.gridded, eo_bands=self.__get_asset_bands(url, Role.data.value))
 
-        ImageDriverHelper.add_asset(assets, self.metadata_path, Role.metadata, MimeType.XML,
-                                    AssetFormat.xml, ResourceType.other)
+        ImageDriverHelper.add_asset(assets, self.metadata_path, Role.metadata, MimeType.JSON,
+                                    AssetFormat.json, ResourceType.other)
 
         if self.browse_path:
             ImageDriverHelper.add_asset(assets, self.browse_path, Role.visual, MimeType.TIFF,
@@ -59,7 +60,7 @@ class Driver(IngestDriver):
             data_path = self.browse_path
         elif IngestDriver.must_build_preview(Driver.configuration, self.hsi_path, local_remote_both="both"):
             data_path = self.hsi_path
-            bands_list = self.__find_rgb_bands(url)
+            bands_list = find_rgb_bands(self.__get_asset_bands(url, Role.data))
 
         if data_path is not None:
             Driver.LOGGER.debug(f"Building overview from {data_path} for {url}")
@@ -140,28 +141,6 @@ class Driver(IngestDriver):
             eo__full_width_half_max=b.get("eo:full_width_half_max", None),
             eo__common_name=b.get("eo:common_name", None)
         ) for b in bands]
-
-    def __find_rgb_bands(self, url: str):
-        def update_closest_band(band: Band, target_wavelength: float, closest_band):
-            if closest_band is None:
-                closest_band = {"idx": band.name[1:], "wavelength": band.eo__center_wavelength}
-            elif abs(band.eo__center_wavelength - target_wavelength) < abs(closest_band["wavelength"] - target_wavelength):
-                closest_band = {"idx": band.name[1:], "wavelength": band.eo__center_wavelength}
-            return closest_band
-
-        BLUE_BAND = 470
-        closest_blue_band = None
-        GREEN_BAND = 550
-        closest_green_band = None
-        RED_BAND = 660
-        closest_red_band = None
-
-        for band in self.__get_asset_bands(url, Role.data.value):
-            closest_blue_band = update_closest_band(band, BLUE_BAND, closest_blue_band)
-            closest_green_band = update_closest_band(band, GREEN_BAND, closest_green_band)
-            closest_red_band = update_closest_band(band, RED_BAND, closest_red_band)
-
-        return [closest_red_band["idx"], closest_green_band["idx"], closest_blue_band["idx"]]
 
     def __check_path__(self, path: str):
         self.__init__()
