@@ -129,11 +129,21 @@ class Driver(IngestDriver):
             common_name = b.get("common_name")
             if not (name or common_name):
                 continue
+
+            center_wavelength = b.get("center_wavelength", None)
+            if center_wavelength:
+                center_wavelength = center_wavelength / 1000
+
+            half_max = b.get("full_width_half_max", None)
+            if half_max:
+                half_max = half_max / 1000
+
             bands.append(Band(
                 name=name,
                 eo__common_name=common_name,
-                eo__center_wavelength=b.get("center_wavelength"),
-                eo__full_width_half_max=b.get("full_width_half_max")
+                # In the metadata, it is in nm but should be in µm
+                eo__center_wavelength=center_wavelength,
+                eo__full_width_half_max=half_max
             ))
 
         return bands if bands else []
