@@ -75,6 +75,9 @@ access_manager:
       readable_paths:
         - /inputs
       bucket: archives
+      api_key:
+        access_key: $AIRS_S3_ACCESS_KEY_ID
+        secret_key: $AIRS_S3_SECRET_ACCESS_KEY
       endpoint: "http://seaweedfs:8333"
     # -
     #   type: https
@@ -84,6 +87,9 @@ access_manager:
     -
       type: s3
       bucket: downloads
+      api_key:
+        access_key: $DOWNLOAD_S3_ACCESS_KEY_ID
+        secret_key: $DOWNLOAD_S3_SECRET_ACCESS_KEY
       endpoint: "http://seaweedfs:8333"
       readable_paths:
         - "/"

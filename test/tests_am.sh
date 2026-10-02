@@ -10,4 +10,4 @@ docker ps
 
 echo "run test/access_manager_tests"
 export PYTHONPATH=python
-docker run --rm -v `pwd`:/app/  --network compose_aias pythontests pytest -s "test/access_manager_tests.py"
+docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY -e DOWNLOAD_S3_ACCESS_KEY_ID -e DOWNLOAD_S3_SECRET_ACCESS_KEY --network compose_aias pythontests pytest -s "test/access_manager_tests.py"
