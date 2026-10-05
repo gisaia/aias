@@ -4,7 +4,7 @@ networks:
 services:
 
   smtp4dev:
-    image: rnwood/smtp4dev:linux-${PLATFORM}-3.2.0-ci20221023104
+    image: rnwood/smtp4dev:linux-${PLATFORM}-3.16.0-ci20260925100_pr2130
     platform: linux/${PLATFORM}
     container_name: smtp4dev
     networks:

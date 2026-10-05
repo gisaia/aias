@@ -9,7 +9,7 @@ docker build -f docker/Dockerfile-tests . -t pythontests
 docker network list
 
 echo "run test.airs_tests"
-docker run --rm -v `pwd`:/app/ -e AIRS_S3_ACCESS_KEY_ID -e AIRS_S3_SECRET_ACCESS_KEY -e DOWNLOAD_S3_ACCESS_KEY_ID -e DOWNLOAD_S3_SECRET_ACCESS_KEY  --network compose_aias pythontests python3 -m test.airs_tests
+docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.airs_tests
 
 echo "run test.agate_tests"
 docker run --rm -v `pwd`:/app/  --network compose_aias pythontests python3 -m test.agate_tests

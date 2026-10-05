@@ -75,6 +75,7 @@ FILES = [
     HTTPS_RO_FILE,
     FS_RO_FILE,
     FS_RW_FILE,
+    S3_RW_FILE
 ]
 
 
