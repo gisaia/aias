@@ -1,5 +1,5 @@
 # Builder stage
-FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.2 AS builder
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.3 AS builder
 
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
@@ -70,7 +70,7 @@ COPY ./docker/materials/scripts/aproc-proc/ping.sh /app/
 RUN chmod +x /app/start.sh /app/ping.sh
 
 # Runtime stage
-FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.2 AS runtime
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.3 AS runtime
 
 ARG version="0.0"
 ENV AIAS_VERSION=${version}
@@ -100,6 +100,9 @@ RUN apt-get update \
         python3.14-venv \
         imagemagick \
         netcdf-bin \
+        libssl3t64 \
+        openssl \
+        openssl-provider-legacy \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
