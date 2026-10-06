@@ -20,6 +20,9 @@ from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
 from extensions.aproc.proc.utils.find_rgb import find_rgb_bands
 
 
+METADATA_KEY = "./Metadata"
+
+
 class Driver(IngestDriver):
 
     configuration: dict = {}
@@ -94,8 +97,8 @@ class Driver(IngestDriver):
 
         xml_root = self.load_xml_metadata()
         if xml_root:
-            metadata = find_attrib(xml_root, "./Metadata", "domain", "ENVI")
-            acquisition_time = self.__get_metadata(metadata, "acquisition_time",
+            xml_metadata = find_attrib(xml_root, METADATA_KEY, "domain", "ENVI")
+            acquisition_time = self.__get_metadata(xml_metadata, "acquisition_time",
                                                    lambda x: parser.parse(x))
         else:
             try:
@@ -126,7 +129,7 @@ class Driver(IngestDriver):
         xml_root = self.load_xml_metadata()
 
         if xml_root:
-            xml_metadata = find_attrib(xml_root, "./Metadata", "domain", "ENVI")
+            xml_metadata = find_attrib(xml_root, METADATA_KEY, "domain", "ENVI")
             item.properties.satellite = self.__get_metadata(xml_metadata, "asset_name")
 
             along_scan_gsd = self.__get_metadata(xml_metadata, "along_scan_gsd")
@@ -150,7 +153,7 @@ class Driver(IngestDriver):
 
         xml_root = self.load_xml_metadata()
         if xml_root:
-            xml_metadata = find_attrib(xml_root, "./Metadata", "domain", "ENVI")
+            xml_metadata = find_attrib(xml_root, METADATA_KEY, "domain", "ENVI")
 
             item.properties.eo__cloud_cover = self.__get_metadata(xml_metadata, "cloud_cover", lambda x: float(x))
             item.properties.view__sun_azimuth = self.__get_metadata(xml_metadata, "sun_azimuth", lambda x: float(x))
