@@ -148,23 +148,24 @@ class Driver(IngestDriver):
         data_file_regex = re.compile(r"([hv][hv])-h$")
 
         for file in AccessManager.listdir(path):
-            if file.is_dir:
-                # Data folder
-                if file.name == 'Data':
-                    for data_file in AccessManager.listdir(file.path):
-                        data_file_match = data_file_regex.findall(data_file.name)
-                        Driver.LOGGER.warn(data_file_match)
-                        # If the file respects the pattern and has a metadata file
-                        if len(data_file_match) > 0 and AccessManager.exists(data_file.path + '.xml'):
-                            polarization = data_file_match[0]
-                            Driver.LOGGER.warn(polarization)
-                            self.__add_polarization(polarization, data_file.path)
+            if not file.is_dir:
+                continue
 
-                # Images folder
-                elif file.name == 'Images':
-                    for image_file in AccessManager.listdir(file.path):
-                        if image_file.name.endswith('.png'):
-                            self.quicklook_path = image_file.path
+            # Data folder
+            if file.name == 'Data':
+                for data_file in AccessManager.listdir(file.path):
+                    data_file_match = data_file_regex.findall(data_file.name)
+                    # If the file respects the pattern and has a metadata file
+                    if len(data_file_match) > 0 and AccessManager.exists(data_file.path + '.xml'):
+                        polarization = data_file_match[0]
+                        Driver.LOGGER.warn(polarization)
+                        self.__add_polarization(polarization, data_file.path)
+
+            # Images folder
+            elif file.name == 'Images':
+                for image_file in AccessManager.listdir(file.path):
+                    if image_file.name.endswith('.png'):
+                        self.quicklook_path = image_file.path
 
         return len(self.polarizations) > 0 \
             and self.quicklook_path is not None
