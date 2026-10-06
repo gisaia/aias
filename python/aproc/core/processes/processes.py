@@ -349,15 +349,12 @@ class Processes:
             TextField("$.message", as_name="message")
         )
         rs = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX)
-        try:
-            rs.create_index(schema,
-                            definition=IndexDefinition(
-                                prefix=[Processes.__REDIS_PREFIX__],
-                                index_type=IndexType.JSON
-                            )
-                            )
-        except Exception as e:
-            LOGGER.error("Index not created ({})".format(e))
+        rs.create_index(schema,
+                        definition=IndexDefinition(
+                            prefix=[Processes.__REDIS_PREFIX__],
+                            index_type=IndexType.JSON
+                        )
+                        )
 
     @staticmethod
     def __get_redis_client__() -> Redis:
