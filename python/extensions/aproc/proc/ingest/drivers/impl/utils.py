@@ -184,3 +184,14 @@ def find_or_none(root: ET.Element, key: str, process: Callable = None, ns: dict[
         return value.text
 
     return None
+
+
+def find_attrib(root: ET.Element, key: str, attrib: str, value: str, ns: dict[str, str] = {}):
+    """
+    Tries to find the key in the given element that has the desired attribute value
+    """
+    candidates = root.findall(key, ns)
+    for candidate in candidates:
+        if candidate.attrib and candidate.attrib[attrib] == value:
+            return candidate
+    return None
