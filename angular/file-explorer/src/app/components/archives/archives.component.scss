@@ -31,6 +31,7 @@
   height: 100%;
   overflow: auto;
   position: relative;
+
   .archives-list {
     .archive {
       height: fit-content;
@@ -47,20 +48,32 @@
         height: 20px;
         font-size: sizes.$fontSizeXLarge;
       }
+
       .item-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
 
+        @include mixins.small-screen {
+          gap: 5px;
+          align-items: start;
+        }
+
         .info {
           display: flex;
           flex-direction: column;
+          gap: 5px;
 
           .label {
             font-size: sizes.$fontSizeDefault;
             font-weight: 500;
+            white-space: normal;
+            overflow-wrap: anywhere;
+
+            @include mixins.large-screen {}
           }
+
           .detail {
             color: rgba(0, 0, 0, 0.58);
             font-size: sizes.$fontSizeSmall;
@@ -72,9 +85,15 @@
             gap: 0 10px;
 
             &.detail-id {
-              height: 18px;
+
+              height: unset;
+
               .copy {
                 display: none;
+              }
+
+              @include mixins.large-screen {
+                height: 18px;
               }
             }
           }
@@ -95,12 +114,20 @@
           justify-content: space-between;
           align-items: center;
           gap: 0 5px;
+
+          @include mixins.small-screen {
+            flex-direction: column;
+            align-items: end;
+          }
+
           .no-pointer {
             cursor: default;
           }
+
           .pointer {
             cursor: pointer;
           }
+
           .icon-spacer {
             width: 24px;
             height: 24px;

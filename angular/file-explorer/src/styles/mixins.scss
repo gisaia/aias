@@ -34,3 +34,21 @@
     )
   );
 }
+
+
+@mixin medium-screen {
+  @media only screen and (min-width: 901px) and (max-width: 1250px) {
+    @content;
+  }
+}
+@mixin small-screen {
+  @media only screen and (max-width: 900px) {
+    @content;
+  }
+}
+
+@mixin large-screen {
+  @media only screen and (min-width: 1251px) {
+    @content;
+  }
+}
