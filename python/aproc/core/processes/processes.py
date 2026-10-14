@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 from celery import Celery, states
 from celery.result import AsyncResult
 from pydantic import BaseModel
-from redis import Redis
+from redis import Redis, ResponseError
 from redis.sentinel import Sentinel
 from redis.commands.search.field import NumericField, TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
@@ -332,11 +332,6 @@ class Processes:
 
     @staticmethod
     def __init_redis__():
-        # At startup we clear and recreate the index.
-        try:
-            Processes.__get_redis_client__().ft(APROC_JOBS_INDEX).dropindex()
-        except Exception:
-            ...
         schema = (
             TagField("$.process_id", as_name="process_id"),
             TagField("$.job_id", as_name="job_id"),
@@ -348,13 +343,20 @@ class Processes:
             TagField("$.status", as_name="status"),
             TextField("$.message", as_name="message")
         )
+
         rs = Processes.__get_redis_client__().ft(APROC_JOBS_INDEX)
-        rs.create_index(schema,
-                        definition=IndexDefinition(
-                            prefix=[Processes.__REDIS_PREFIX__],
-                            index_type=IndexType.JSON
-                        )
-                        )
+        try:
+            rs.create_index(schema,
+                            definition=IndexDefinition(
+                                prefix=[Processes.__REDIS_PREFIX__],
+                                index_type=IndexType.JSON
+                            )
+                            )
+        except ResponseError as e:
+            if "Index already exists" in str(e):
+                ...
+            else:
+                raise Exception("Unable to initialize redis index")
 
     @staticmethod
     def __get_redis_client__() -> Redis:
