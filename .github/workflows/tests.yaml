@@ -2,6 +2,11 @@ name: Test AIAS
 
 on:
   pull_request:
+    paths:
+      - conf/**/*
+      - docker/**/*
+      - python/**/*
+      - test/**/*
     types: [opened, reopened, synchronize]
     branches:
       - develop

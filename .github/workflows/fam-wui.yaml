@@ -3,7 +3,7 @@ name: fam-wui CI
 on:
   push:
     paths:
-      - 'angular/file-explorer/**'
+      - 'angular/file-explorer/**/*'
 
 jobs:
   build:
