@@ -3,11 +3,11 @@ import unittest
 from airs.core.models.model import AssetFormat, Role
 from aproc.core.models.ogc.enums import StatusCode
 
-from test.aproc_ingest_tests import (AXELGLOBE, GEOSAT_JP2, SPOT6, GEOSAT, IKONOS, PNEOMS, PNEOPAN,
+from test.aproc_ingest_tests import (AXELGLOBE, GEOSAT_JP2, SENTINEL2_L2A, SPOT6, GEOSAT, IKONOS, PNEOMS, PNEOPAN,
                                      RAPID_EYE, SATELLOGIC, SUPERVIEW, SUPERVIEW3_4, WYVERN, LANDSAT9,
                                      SENTINEL2, SKYSAT, SPOT5,
                                      WORLDVIEW, IngestTests)
-from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS
+from test.utils import CATALOG, COLLECTION, SENTINEL2_BANDS, SENTINEL2_L2A_BANDS
 
 ROOT = "gs://gisaia-public/test-aias"
 
@@ -49,6 +49,10 @@ class Tests(IngestTests):
     def test_async_ingest_sentinel2(self):  # Driver Sentinel 2
         url = os.path.join(ROOT, SENTINEL2)
         self.async_ingest(url, [Role.data.value, Role.metadata.value, Role.airs_item.value, *SENTINEL2_BANDS], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
+
+    def test_async_ingest_sentinel2_l2a(self):  # Driver Sentinel 2
+        url = os.path.join(ROOT, SENTINEL2_L2A)
+        self.async_ingest(url, [Role.data.value, Role.metadata.value, Role.airs_item.value, *SENTINEL2_L2A_BANDS], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value, AssetFormat.all_bands_cog.value])
 
     def test_async_ingest_skysat(self):  # Driver SKYSAT
         url = os.path.join(ROOT, SKYSAT)

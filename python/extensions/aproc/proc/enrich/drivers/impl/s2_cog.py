@@ -52,10 +52,10 @@ class Driver(EnrichDriver):
             return [self.__create_TCI_asset(item, enrichment)]
         elif enrichment.lower() == AssetFormat.all_bands_cog.value.lower():
             # If the data asset is not zipped, create all bands COG
-            if item.assets.get(Role.data.value).type != MimeType.ZIP.value:
-                return [self.__create_all_bands_asset(item)]
-            else:
+            if item.assets.get(Role.data.value).type == MimeType.ZIP.value:
                 raise DriverException("Cannot create all bands COG from a zipped SAFE archive. Please provide a SAFE archive with unzipped data assets.")
+
+            return [self.__create_all_bands_asset(item)]
         else:
             raise DriverException("Unsupported asset type {}. Supported types are : {}".format(enrichment, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
 
@@ -116,7 +116,7 @@ class Driver(EnrichDriver):
     def __extract_TCI(self, zip_file: str | io.TextIOWrapper):
         with zipfile.ZipFile(zip_file) as raster_zip:
             file_names = raster_zip.namelist()
-            raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI.jp2", f), file_names))
+            raster_files = list(filter(lambda f: re.match(r".*/IMG_DATA/.*" + r"_TCI(_10m)?.jp2", f), file_names))
 
             if len(raster_files) == 0:
                 raise DriverException("No TCI file found in the SAFE archive.")
@@ -135,7 +135,12 @@ class Driver(EnrichDriver):
         return CogBuilderHelper.create_asset(item, AssetFormat.all_bands_cog.value.lower(), target_asset_location)
 
     def __build_all_bands_COG(self, item: Item, target_asset_location: str):
-        band_assets = list(filter(lambda a: Role.data.value in a.roles and a.name != Role.data.value, item.assets.values()))
+        band_assets = list(filter(
+            lambda a: (Role.data.value in a.roles  # is data
+                       and a.name.find("_") < 0  # is reference asset for this band (others have the resolution included)
+                       and a.name != Role.data.value  # is not the main TCI
+                       and Role.visual.value not in a.roles),  # is not a TCI
+            item.assets.values()))
         band_files = [a.href for a in band_assets]
 
         if band_files:

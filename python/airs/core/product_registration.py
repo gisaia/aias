@@ -412,7 +412,7 @@ def get_item_from_storage(collection: str, item_id: str) -> Item:
 
 def __collect_bands(item: Item) -> Item:
     bands: dict[str, Band] = {}
-    item.properties.eo__bands = item.properties.eo__bands or {}
+    item.properties.eo__bands = item.properties.eo__bands or []
     for band in item.properties.eo__bands:
         bands[band.name] = band
     if item.assets is not None:

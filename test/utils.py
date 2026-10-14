@@ -49,6 +49,12 @@ SENTINEL_2_ID = "a264f89a-aec2-4477-905f-dfbe5faa98c0"
 SENTINEL_2_ITEM = f"test/inputs/{SENTINEL_2_ID}.json"
 
 SENTINEL2_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10", "B11", "B12"]
+SENTINEL2_L2A_BANDS = [
+    *["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12"],  # There is no B10 in L2A
+    *[f"{band}_10m" for band in ["AOT", "WVP"]],
+    *[f"{band}_20m" for band in ["AOT", "SCL", "TCI", "WVP", "B02", "B03", "B04"]],
+    *[f"{band}_60m" for band in ["AOT", "SCL", "TCI", "WVP", "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B8A", "B11", "B12"]]
+]
 
 S3_LOCAL_ID = "a250b154-5080-4939-be2f-3baf6a386dab"
 S3_LOCAL_ITEM = f"test/inputs/{S3_LOCAL_ID}.json"
