@@ -70,8 +70,6 @@
             font-weight: 500;
             white-space: normal;
             overflow-wrap: anywhere;
-
-            @include mixins.large-screen {}
           }
 
           .detail {
