@@ -248,6 +248,8 @@ class Driver(IngestDriver):
                                         if len(tci_paths) > 0:
                                             sorted_tci_paths = sorted(tci_paths)
                                             self.tci_path = sorted_tci_paths[0]
+                                            # Remove from the list of bands to not declare it twice
+                                            tci_paths.remove(self.tci_path)
 
             return self.quicklook_path is not None \
                 and self.md_path is not None \
