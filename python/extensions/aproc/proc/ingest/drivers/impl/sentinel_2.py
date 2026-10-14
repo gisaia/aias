@@ -2,10 +2,12 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from aias_common.access.file import File
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Band, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
@@ -30,6 +32,8 @@ BANDS_NAME = {
     "B12": "SWIR"
 }
 
+DATA_ASSET_REGEX = r"_(.{3}(_\d{2}m)?)\.jp2$"
+
 
 class Driver(IngestDriver):
 
@@ -37,7 +41,8 @@ class Driver(IngestDriver):
         super().__init__()
         self.md_path = None
         self.quicklook_path = None
-        self.band_paths: list[str] = []
+        # Store bands per key (B01, B02, AOT, TCI, ...)
+        self.band_paths: dict[str, list[str]] = {}
         self.tci_path = None
 
     # Implements drivers method
@@ -55,19 +60,54 @@ class Driver(IngestDriver):
                                     MimeType.JPG, AssetFormat.jpg, ResourceType.other, airs__managed=True)
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
-        ImageDriverHelper.add_asset(assets, self.tci_path, Role.data,
-                                    MimeType.JPEG2000, AssetFormat.jpg2000, ResourceType.gridded)
+        tci_asset = ImageDriverHelper.add_asset(assets, self.tci_path, Role.data,
+                                                MimeType.JPEG2000, AssetFormat.jpg2000, ResourceType.gridded)
+        tci_asset.roles.append(Role.visual.data)
 
-        for band in self.band_paths:
-            matches = re.findall(r"_(B.{2})\.jp2$", band)
-            if len(matches) > 0:
-                name = matches[0]
+        for asset_type, bands in self.band_paths.items():
+            is_data_band = re.match(r"B.{2}", asset_type) is not None
 
-                assets.append(Asset(href=band, size=AccessManager.get_size(band), roles=[Role.data.value],
-                                    name=name, type=MimeType.JPEG2000.value, description=name,
-                                    airs__managed=False, asset_format=AssetFormat.jpg2000.value,
-                                    asset_type=ResourceType.gridded.value,
-                                    eo__bands=[Band(name=name, eo__common_name=BANDS_NAME[name])]))
+            # Lowest resolution is first in alphabetical order
+            sorted_bands = sorted(bands)
+            for idx, band in enumerate(sorted_bands):
+
+                # Single out the lowest resolution band as the reference for the band
+                if idx == 0 and is_data_band:
+                    name = asset_type
+                else:
+                    asset_type_with_resolution = re.findall(DATA_ASSET_REGEX, band)
+                    name = asset_type_with_resolution[0][0]
+
+                asset = Asset(href=band, size=AccessManager.get_size(band),
+                              name=name, type=MimeType.JPEG2000.value, description=name,
+                              airs__managed=False, asset_format=AssetFormat.jpg2000.value,
+                              asset_type=ResourceType.gridded.value)
+
+                if is_data_band:
+                    asset.roles = [Role.data.value]
+                    eo_band = Band(name=asset_type, eo__common_name=BANDS_NAME[asset_type])
+                    # Try to get resolution
+                    resolution_matches = re.findall(r"_(\d{2})m.jp2$", band)
+                    if len(resolution_matches) > 0:
+                        eo_band.eo__gsd = int(resolution_matches[0])
+
+                    asset.eo__bands = [eo_band]
+                elif asset_type == "TCI":
+                    asset.roles = [Role.data.value, Role.visual.value]
+                elif asset_type == "AOT":
+                    asset.roles = [Role.aerosol_optical_thickness.value]
+                elif asset_type == "CLD":
+                    asset.roles = [Role.cloud.value]
+                elif asset_type == "SCL":
+                    asset.roles = [Role.scene_classification.value]
+                elif asset_type == "SNW":
+                    asset.roles = [Role.snow_ice.value]
+                elif asset_type == "WVP":
+                    asset.roles = [Role.water_vapour.value]
+                else:
+                    raise DriverException(f"Unrecognised asset type found in Sentinel2 archive {asset_type}")
+                assets.append(asset)
+
         return assets
 
     # Implements drivers method
@@ -154,12 +194,15 @@ class Driver(IngestDriver):
         item.properties.eo__bands: list[Band] = []
         for bands in root.iter("Spectral_Information_List"):
             for band in bands.iter('Spectral_Information'):
-                band_id = band.get('bandId', None)
+                physical_band = band.get('physicalBand', None)
+                # If there is only 2 characters, then there is a 0 missing between B and the only digit
+                if physical_band is not None and len(physical_band) == 2:
+                    physical_band = physical_band[0] + "0" + physical_band[1]
                 resolutions.append(find_or_none(band, 'RESOLUTION'))
                 item.properties.eo__bands.append(Band(
-                    asset=band.get('physicalBand', None),
-                    name=band.get('physicalBand', None),
-                    eo__common_name=BANDS_NAME.get(band_id, ''),
+                    asset=physical_band,
+                    name=physical_band,
+                    eo__common_name=BANDS_NAME.get(physical_band, None),
                     eo__center_wavelength=find_or_none(band, 'Wavelength/CENTRAL')
                 ))
 
@@ -193,16 +236,42 @@ class Driver(IngestDriver):
                     if file.name.startswith('MTD_') and file.name.endswith('.xml'):
                         self.md_path = file.path
                 else:
-                    # Not too convinced by this, when things are in the MTD file
                     if file.name == 'GRANULE':
                         for granule in AccessManager.listdir(file.path):
                             if granule.is_dir:
                                 for data in AccessManager.listdir(granule.path):
                                     if data.is_dir and data.name == 'IMG_DATA':
-                                        for band in AccessManager.listdir(data.path):
-                                            if band.name.endswith('_TCI.jp2'):
-                                                self.tci_path = band.path
-                                            elif band.name.endswith('.jp2'):
-                                                self.band_paths.append(band.path)
-            return self.quicklook_path is not None and self.md_path is not None and self.tci_path is not None and len(self.band_paths) > 0
+                                        self.__find_bands(data)
+
+                                        # All bands have been detected, find the finest resolution TCI
+                                        tci_paths = self.band_paths.get("TCI", [])
+                                        if len(tci_paths) > 0:
+                                            sorted_tci_paths = sorted(tci_paths)
+                                            self.tci_path = sorted_tci_paths[0]
+
+            return self.quicklook_path is not None \
+                and self.md_path is not None \
+                and self.tci_path is not None \
+                and len(self.band_paths) > 0
         return False
+
+    def __find_bands(self, folder: File) -> None:
+        """
+        Browses the IMG_DATA folder and subfolders to find all the bands
+        """
+        for band in AccessManager.listdir(folder.path):
+            # Limit the allowed folders to limit recursivity
+            if band.is_dir:
+                if band.name in ["R10m", "R20m", "R60m"]:
+                    self.__find_bands(band)
+            # Keep all the jp2 files (bands but also AOT, TCI, ...)
+            elif band.name.endswith('.jp2'):
+                matches = re.findall(DATA_ASSET_REGEX, band.name)
+                if len(matches) > 0:
+                    if isinstance(matches[0], tuple):
+                        asset_type = matches[0][0].split("_")[0]
+                    else:
+                        asset_type = matches[0]
+                    asset_files = self.band_paths.get(asset_type, [])
+                    asset_files.append(band.path)
+                    self.band_paths[asset_type] = asset_files

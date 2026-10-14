@@ -217,6 +217,7 @@ class SensorType(str, Enum):
 
 
 class Role(Enum):
+    aerosol_optical_thickness = "aerosol-optical-thickness"
     airs_item = "airs_item"
     amplitude = "amplitude"
     archive = "archive"
@@ -255,6 +256,7 @@ class Role(Enum):
     reflectance = "reflectance"
     rpc = "rpc"
     saturation = "saturation"
+    scene_classification = "scene-classification"
     sigma0 = "sigma0"
     snow_ice = "snow-ice"
     sun_azimuth = "sun-azimuth"
@@ -267,6 +269,7 @@ class Role(Enum):
     thumbnail = "thumbnail"
     visual = "visual"
     water_mask = "water-mask"
+    water_vapour = "water-vapour"
     zarr = "zarr"
 
 
@@ -361,6 +364,7 @@ class Band(BaseModel, extra=Extra.allow):
     eo__center_wavelength: float = Field(default=None, title="[STAC, extension eo] The center wavelength of the band, in micrometers (μm).")
     eo__full_width_half_max: float = Field(default=None, title="[STAC, extension eo] Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).")
     eo__solar_illumination: float = Field(default=None, title="[STAC, extension eo] The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.")
+    eo__gsd: float | None = Field(default=None, title="[STAC, extension eo] Ground Sampling Distance (resolution)")
     dc3__quality_indicators: Indicators = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube variable (band).")
     dc3__expression: str = Field(default=None, description=EXPRESSION_DESCRIPTION)
     dc3__unit: str = Field(default=None, description=UNIT_DESCRIPTION)
