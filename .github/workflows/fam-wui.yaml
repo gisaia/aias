@@ -1,0 +1,41 @@
+name: fam-wui CI
+
+on:
+  push:
+    paths:
+      - 'angular/file-explorer/**/*'
+
+jobs:
+  build:
+    name: Lint, Build, Test & Documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./angular/file-explorer
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts && npm run postinstall
+      - name: Lint
+        run: npm run lint
+      - name: License check
+        run: npm run license-check
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
