@@ -106,6 +106,14 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Fix CVE-2026-92392
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends --only-upgrade \
+        libcurl4t64 \
+        libcurl3t64-gnutls \
+        curl && \
+    rm -rf /var/lib/apt/lists/*
+
 # Remove pebble from the final runtime image because it is not needed
 # by the application and was reported by the vulnerability scan
 RUN rm -f /usr/bin/pebble
