@@ -353,10 +353,8 @@ class Processes:
                             )
                             )
         except ResponseError as e:
-            if "Index already exists" in str(e):
-                ...
-            else:
-                raise Exception("Unable to initialize redis index")
+            if "Index already exists" not in str(e):
+                raise e
 
     @staticmethod
     def __get_redis_client__() -> Redis:
