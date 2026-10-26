@@ -10,6 +10,15 @@ The APROC Configuration is done in the following files:
 
 ## Framework Configuration
 
+APROC workers and APROC Services needs APROC_TASK_ENCRYPTION_KEYS environment variable set with a Fernet valid key.
+
+Example:
+```shell
+APROC_TASK_ENCRYPTION_KEYS=$(docker run --rm python:3.13-slim \
+  sh -c 'pip install --no-cache-dir cryptography >/dev/null && \
+  python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"')
+```
+
 The [`conf/aproc.yaml`](#aproc-configuration-reference-documentation) set the configuration of the APROC framework for:
 - framework's dependencies on celery and AIRS
 - the registration of the process drivers

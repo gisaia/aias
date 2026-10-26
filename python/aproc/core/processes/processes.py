@@ -26,20 +26,22 @@ from aproc.core.models.ogc.job import (JobType, StatusCode, StatusInfo,
 from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import InputProcess, Process, Subscriber
 from aproc.core.settings import DEFAULT_PROCESS_QUEUE_NAME, Configuration
+from aias_common.masking import mask
+from aproc.core.task_security import encrypt_headers
 
 LOGGER = Logger.get_logger()
-LOGGER.info("Loading configuration {}".format(os.environ.get("APROC_CONFIGURATION_FILE")))
 Configuration.init(os.environ.get("APROC_CONFIGURATION_FILE"))
 AccessManager.init(Configuration.settings.access_manager)
 
-LOGGER.debug("Celery broker: {}".format(Configuration.settings.celery_broker_url))
-LOGGER.debug("Celery backend: {}".format(Configuration.settings.celery_result_backend))
-LOGGER.debug("Celery backend transport options: {}".format(Configuration.settings.celery_result_backend_transport_options))
+LOGGER.debug("Celery broker: {}".format(mask(Configuration.settings.celery_broker_url)))
+LOGGER.debug("Celery backend: {}".format(mask(Configuration.settings.celery_result_backend)))
+LOGGER.debug("Celery backend transport options: {}".format(mask(Configuration.settings.celery_result_backend_transport_options)))
 
 APROC_CELERY_APP = Celery(
     name='aproc',
     broker=Configuration.settings.celery_broker_url,
     backend=Configuration.settings.celery_result_backend,
+    task_cls="aproc.core.task_security:EncryptHeadersTask",
     result_backend_transport_options=Configuration.settings.celery_result_backend_transport_options)
 
 APROC_JOBS_INDEX = "idx:aproc_jobs"
@@ -136,15 +138,16 @@ class Processes:
 
     @staticmethod
     def __notify(subscriber: str, result):
+        clean_subscriber = mask(subscriber)
         try:
-            LOGGER.debug(f"notify {subscriber} with result {result}")
+            LOGGER.debug(f"notify {clean_subscriber} with result {result}")
             r = requests.post(url=subscriber, data=result, timeout=Configuration.settings.subscriber_post_timeout)
             if r.status_code >= 200 and r.status_code < 300:
-                LOGGER.debug(f"notified {subscriber} successfully")
+                LOGGER.debug(f"notified {clean_subscriber} successfully")
             else:
-                LOGGER.warning(f"Notification post to {subscriber} returned status code {r.status_code}, response: {r.content}")
+                LOGGER.warning(f"Notification post to {clean_subscriber} returned status code {r.status_code}, response: {r.content}")
         except Exception as e:
-            LOGGER.error(f"can not notify {subscriber}")
+            LOGGER.error(f"can not notify {clean_subscriber}")
             LOGGER.exception(e)
 
     @staticmethod
@@ -217,7 +220,7 @@ class Processes:
         LOGGER.debug("received process request {}".format(process_name))
         process: Process = Processes.get_process(process_name=process_name)
         kwargs = input.model_dump(exclude_none=True)
-        kwargs["headers"] = headers
+        kwargs["headers"] = encrypt_headers(headers)
         LOGGER.debug("before_execute {}".format(process_name))
         extra = process.before_execute(**kwargs)
         kwargs.update(extra)

@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from aias_common.access.manager import AccessManager
+from aias_common.masking import mask
 from airs.core.models.model import Item
 from aproc.core.logger import Logger
 from aproc.core.models.ogc.enums import JobControlOptions, TransmissionMode
@@ -203,7 +204,7 @@ class AprocProcess(Process):
                     LOGGER.debug("Download success", extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "success", USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     download_locations.append(mail_context["target_directory"])
                 except Exception as e:
-                    error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, str(e))
+                    error_msg = "Failed to download the item {}/{} ({})".format(collection, item_id, mask(str(e)))
                     LOGGER.info(DOWNLOAD_FAILED_MSG, extra={EVENT_KIND_KEY: "event", EVENT_CATEGORY_KEY: "file", EVENT_TYPE_KEY: USER_ACTION_KEY, EVENT_ACTION: "download", EVENT_OUTCOME_KEY: "failure", EVENT_REASON: error_msg, USER_ID_KEY: user_id, USER_EMAIL_KEY: send_to, EVENT_MODULE_KEY: "aproc-download", ARLAS_COLLECTION_KEY: collection, ARLAS_ITEM_ID_KEY: item_id})
                     LOGGER.error(error_msg)
                     LOGGER.exception(e)

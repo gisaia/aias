@@ -11,7 +11,7 @@ from aproc.core.processes.process import Process
 from extensions.aproc.proc.drivers.exceptions import (ConnectionException,
                                                       RegisterException)
 from aias_common.access.storages.s3 import S3Storage
-
+from aias_common.masking import mask
 AIRS_CAN_NOT_BE_REACHED = "AIRS Service can not be reached ({})"
 JSON_HEADER = {"Content-Type": "application/json"}
 
@@ -22,7 +22,8 @@ class ARLASServicesHelper(ABC):
     def get_item_from_arlas(arlas_url_search: str, collection: str, item_id: str, headers: dict[str, str] = {}):
         try:
             url = arlas_url_search.format(collection=collection, item=item_id)
-            Process.LOGGER.debug("Get item from ARLAS with url {} and headers {}".format(url, headers))
+            Process.LOGGER.debug("Get item from ARLAS with url {} and headers {}".format(url, mask(headers)))
+
             r = requests.get(url=url, headers={"authorization": headers.get("authorization"), "arlas-org-filter": headers.get("arlas-org-filter")})
             if r.ok:
                 result = r.json()
@@ -72,11 +73,11 @@ class ARLASServicesHelper(ABC):
                 if token_content.get("email"):
                     send_to = token_content.get("email")
                 else:
-                    Process.LOGGER.error("email not found in token {}".format(token_content))
+                    Process.LOGGER.error("email not found in token (claims present: {})".format(", ".join(sorted(token_content.keys()))))
                 if token_content.get("sub"):
                     user_id = token_content.get("sub")
                 else:
-                    Process.LOGGER.error("subject not found in token {}".format(token_content))
+                    Process.LOGGER.error("subject not found in token (claims present: {})".format(", ".join(sorted(token_content.keys()))))
             else:
                 Process.LOGGER.error("no token in header")
         except Exception as e:

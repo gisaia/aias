@@ -7,15 +7,15 @@ from fastapi.responses import Response
 from agate.logger import Logger
 from agate.rest.authorizations import Authorizations
 from agate.settings import Configuration, ParamLocation, Service
+from aias_common.masking import mask
 
 LOGGER = Logger.get_logger()
 ROUTER = APIRouter()
 MISSING_MSG = "{} missing"
 
-
 @ROUTER.api_route("/url-role-based-authorization", methods=["GET", "POST"])
 async def urbac(request: Request):
-    LOGGER.debug(request.headers)
+    LOGGER.debug("Headers: {}".format(mask(request.headers)))
 
     authorization = request.headers.get(Configuration.settings.urbac.jwt_header)
     if not authorization:
@@ -31,14 +31,15 @@ async def urbac(request: Request):
     if not request_method:
         LOGGER.debug("{} not found in headers".format(Configuration.settings.method_header))
         return Response(status_code=status.HTTP_401_UNAUTHORIZED, content=MISSING_MSG.format(Configuration.settings.method_header))
-    LOGGER.debug("Incoming request: {} on {}".format(request_method, request_path))
+    LOGGER.debug("Incoming request: {} on {}".format(request_method, mask(request_path)))
+
 
     try:
         user_roles = Authorizations.get_user_roles(authorization)
     except Exception as e:
         msg = "Invalid authorization header value {}".format(e)
         LOGGER.error(msg)
-        LOGGER.debug(authorization)
+        LOGGER.debug("Rejected token ({} chars)".format(len(authorization)))
         return Response(status_code=status.HTTP_403_FORBIDDEN, content=msg)
 
     LOGGER.debug("User's roles {}".format(", ".join(user_roles)))
@@ -72,12 +73,12 @@ async def authorization(request: Request, service: str):
         return Response(status_code=status.HTTP_404_NOT_FOUND, content=msg)
 
     requested_path: str = request.headers[Configuration.settings.url_header]
-    LOGGER.debug("Incoming URI: {}".format(requested_path))
-
+    safe_path = mask(requested_path, service_conf.jwt_name)
+    LOGGER.debug("Incoming URI: {}".format(safe_path))
     if Authorizations.at_least_one_rule_match_on_path(service_conf.public, requested_path, arlas_control=False):
         return Response(status_code=status.HTTP_200_OK)
     else:
-        LOGGER.debug("No public rule matches {}".format(requested_path))
+        LOGGER.debug("No public rule matches {}".format(safe_path))
 
     headers: dict[str, str] = {}
     for h in Configuration.settings.headers_for_arlas:
@@ -88,11 +89,11 @@ async def authorization(request: Request, service: str):
             if len(v) > 0:
                 headers[service_conf.jwt_name] = v[0]
             else:
-                LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
+                LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, safe_path))
         except Exception:
-            LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, requested_path))
+            LOGGER.debug("Couldn't extract {} from {}".format(service_conf.jwt_name, safe_path))
     if Authorizations.at_least_one_rule_match_on_path(service_conf.private, requested_path, arlas_control=True, headers=headers):
         return Response(status_code=status.HTTP_200_OK)
     else:
-        LOGGER.debug("No private rule matches {}".format(requested_path))
+        LOGGER.debug("No private rule matches {}".format(safe_path))
     return Response(status_code=status.HTTP_403_FORBIDDEN)
