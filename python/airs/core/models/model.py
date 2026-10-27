@@ -149,7 +149,7 @@ class ResourceType(Enum):
     other = "OTHER"
 
 
-class ItemFormat(Enum):
+class ItemFormat(str, Enum):
     adc3 = "adc3"
     ast_dem = "AST_DEM"
     axelspace = "Axelspace"
@@ -183,7 +183,7 @@ class ItemFormat(Enum):
     wyvern = "wyvern"
 
 
-class AssetFormat(Enum):
+class AssetFormat(str, Enum):
     directory = "DIRECTORY"
     cog = "COG"
     all_bands_cog = "ALL_BANDS_COG"

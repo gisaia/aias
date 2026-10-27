@@ -11,23 +11,19 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, find_or_none, get_epsg_from_gdal_info_gcps,
     get_geom_bbox_centroid_from_corners, raster_to_jpg)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.utils.polarized import (DriverWithPolarizedAssets,
+                                                   PolarizedAsset)
 
 
-class Driver(IngestDriver):
+class Driver(IngestDriver, DriverWithPolarizedAssets):
     ns = {"rs2": "http://www.rsi.ca/rs2/prod/xml/schemas"}  # NOSONAR
 
     def __init__(self):
         super().__init__()
         self.md_path = None
-        self.polarizations = []
+        self.measurements: list[PolarizedAsset] = []
         self.browse_path = None
-
-    def _add_polarization(self, name: str, path: str):
-        self.polarizations.append({
-            'polarization': name,
-            'path': path,
-            'name': f'Polarization {name}'
-        })
+        self.main_asset_description = None
 
     # Implements drivers method
     @staticmethod
@@ -39,10 +35,10 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        for pol in self.polarizations:
-            assets.append(Asset(href=pol['path'], size=AccessManager.get_size(pol['path']), proj__epsg=get_epsg_from_gdal_info_gcps(pol['path']),
-                                roles=[Role.data.value], name=pol['name'], type=MimeType.GEOTIFF.value, sar__polarizations=[pol['polarization']],
-                                description=pol['name'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+        for measurement in self.measurements:
+            assets.append(Asset(href=measurement.path, size=AccessManager.get_size(measurement.path), proj__epsg=get_epsg_from_gdal_info_gcps(measurement.path),
+                                roles=[Role.data.value], name=measurement.name, type=MimeType.GEOTIFF.value, sar__polarizations=[measurement.polarization],
+                                description=measurement.description, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
 
         ImageDriverHelper.add_asset(assets, self.md_path, Role.metadata,
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
@@ -60,12 +56,12 @@ class Driver(IngestDriver):
         image_path = None
         if self.browse_path:
             image_path = self.browse_path
-        elif IngestDriver.must_build_preview(Driver.configuration, self.polarizations[0]["path"], "local"):
-            image_path = self.polarizations[0]["path"]
+        elif IngestDriver.must_build_preview(Driver.configuration, self.main_asset_description.path, "local"):
+            image_path = self.main_asset_description.path
 
         if image_path:
             quicklook = ImageDriverHelper.prepare_preview_asset(self, url, Role.overview, MimeType.JPG, AssetFormat.jpg)
-            raster_to_jpg(image_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get('overview_stretch', False))
+            raster_to_jpg(image_path, Driver.OVERVIEW_SIZE, Driver.OVERVIEW_SIZE, output_path=quicklook.href, stretch=Driver.configuration.get("overview_stretch", False))
             quicklook.size = AccessManager.get_size(quicklook.href)
             assets.append(quicklook)
 
@@ -122,9 +118,9 @@ class Driver(IngestDriver):
                 constellation=constellation,
                 sensor_type=SensorType.SAR.value,
                 item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.radarsat2,
-                main_asset_format=AssetFormat.geotiff,
-                main_asset_name=self.polarizations[0]['name'],
+                item_format=ItemFormat.radarsat2.value,
+                main_asset_format=AssetFormat.geotiff.value,
+                main_asset_name=self.main_asset_description.name,
                 observation_type=ObservationType.radar
             ),
             assets={asset.name: asset for asset in assets}
@@ -137,7 +133,7 @@ class Driver(IngestDriver):
         item.properties.processing__level = find_or_none(root, ".//rs2:productType", ns=Driver.ns)
         item.properties.secondary_id = find_or_none(root, ".//rs2:productId", ns=Driver.ns)
 
-        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.polarizations[0]['path'])
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.main_asset_description.path)
 
         pixel_spacing = find_or_none(root, ".//rs2:sampledPixelSpacing", ns=Driver.ns)
         line_spacing = find_or_none(root, ".//rs2:sampledLineSpacing", ns=Driver.ns)
@@ -148,9 +144,9 @@ class Driver(IngestDriver):
 
     def add_minor_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         item.properties.acq__acquisition_orbit_direction = find_or_none(root, ".//rs2:passDirection", ns=Driver.ns)
-        item.properties.acq__acquisition_orbit = find_or_none(root, ".//rs2:orbitDataFile", lambda x: x.split('_')[0], ns=Driver.ns)
+        item.properties.acq__acquisition_orbit = find_or_none(root, ".//rs2:orbitDataFile", lambda x: x.split("_")[0], ns=Driver.ns)
 
-        item.properties.sar__polarizations = [x['polarization'] for x in self.polarizations]
+        item.properties.sar__polarizations = [x.polarization for x in self.measurements]
         item.properties.instrument = item.properties.satellite
         item.properties.sensor = item.properties.satellite
 
@@ -165,7 +161,8 @@ class Driver(IngestDriver):
                 self.md_path = file.path
             elif file.name.startswith("imagery_") and file.name.endswith(".tif"):
                 pol = (file.name.split("_")[1].split(".")[0]).upper()  # HH, VV, HV, VH
-                self._add_polarization(pol, file.path)
+                self.add_measurement(self.measurements, pol, file.path)
             elif file.name == "BrowseImage.tif":
                 self.browse_path = file.path
-        return self.md_path is not None and len(self.polarizations) > 0
+        self.main_asset_description = self.pick_data_asset(self.measurements)
+        return self.md_path is not None and len(self.measurements) > 0

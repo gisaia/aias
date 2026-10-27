@@ -13,6 +13,8 @@ from extensions.aproc.proc.ingest.drivers.impl.utils import (
     find_or_none, get_epsg_from_gdal_info_gcps,
     get_geom_bbox_centroid_from_corners)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.utils.polarized import (DriverWithPolarizedAssets,
+                                                   PolarizedAsset)
 
 # Level-1 Product Family Summary Table Dictionary
 level1_summary = {
@@ -104,7 +106,7 @@ def get_product_values(filename):
     return result
 
 
-class Driver(IngestDriver):
+class Driver(IngestDriver, DriverWithPolarizedAssets):
 
     ns = {
         "xsi": "http://www.w3.org/2001/XMLSchema-instance",
@@ -119,13 +121,13 @@ class Driver(IngestDriver):
     }
 
     def __init__(self):
-        super().__init__()
+        super(Driver, self).__init__()
         self.file_name = None
         self.md_path = None
         self.quicklook_path = None
         self.thumbnail_path = None
-        self.measurements: list[str] = []
-        self.main_asset_path = None
+        self.measurements: list[PolarizedAsset] = []
+        self.main_asset_description = None
 
     # Implements drivers method
     @staticmethod
@@ -145,15 +147,11 @@ class Driver(IngestDriver):
                                     MimeType.XML, AssetFormat.xml, ResourceType.other)
 
         for measurement in self.measurements:
-            # Polarization of the measure is used as name
-            polarization = os.path.basename(measurement).split('-')[3]
-            name = self.__get_measurement_name__(measurement)
-
             # According to copernicus website, could end in .cog.tiff
-            assets.append(Asset(href=measurement, size=AccessManager.get_size(measurement), roles=[Role.data.value],
-                                name=name, type=MimeType.GEOTIFF.value, description=name,
+            assets.append(Asset(href=measurement.path, size=AccessManager.get_size(measurement.path), roles=[Role.data.value],
+                                name=measurement.name, type=MimeType.GEOTIFF.value, description=measurement.description,
                                 airs__managed=False, asset_format=AssetFormat.geotiff.value,
-                                asset_type=ResourceType.gridded.value, sar__polarizations=[polarization.upper()]))
+                                asset_type=ResourceType.gridded.value, sar__polarizations=[measurement.polarization]))
 
         return assets
 
@@ -197,7 +195,7 @@ class Driver(IngestDriver):
                 item_format=ItemFormat.safe,
                 item_type=ResourceType.gridded.value,
                 main_asset_format=AssetFormat.geotiff,
-                main_asset_name=self.__get_measurement_name__(self.measurements[0]),
+                main_asset_name=self.main_asset_description.name,
                 observation_type=ObservationType.radar
             ),
             assets={asset.name: asset for asset in assets}
@@ -207,7 +205,7 @@ class Driver(IngestDriver):
 
     def add_major_metadata(self, url: str, item: Item, root: ET.Element) -> Item:
         satellite_number = find_or_none(root, ".//safe:platform/safe:number", ns=Driver.ns)
-        item.properties.secondary_id = self.main_asset_path.removesuffix(".tiff")
+        item.properties.secondary_id = self.main_asset_description.path.removesuffix(".tiff")
         if satellite_number:
             item.properties.satellite = item.properties.constellation + satellite_number
 
@@ -217,7 +215,7 @@ class Driver(IngestDriver):
             if text_info:
                 item.properties.processing__level = text_info.split(" ")[2]
 
-        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.main_asset_path)
+        item.properties.proj__epsg = get_epsg_from_gdal_info_gcps(self.main_asset_description.path)
 
         product_values = get_product_values(self.file_name)
         if product_values and "max_pixel_spacing" in product_values:
@@ -259,16 +257,15 @@ class Driver(IngestDriver):
                     if file.name == "measurement":
                         for measurement in AccessManager.listdir(file.path):
                             if measurement.name.endswith(".tiff"):
-                                self.measurements.append(measurement.path)
+                                polarization = os.path.basename(measurement.path).split('-')[3]
+                                self.add_measurement(self.measurements, polarization, measurement.path,
+                                                     name=self.__get_measurement_name__(measurement.path))
 
-                                # Arbitrarily choose the main asset as the first one encountered
-                                if self.main_asset_path is None:
-                                    self.main_asset_path = measurement.path
-
+            self.main_asset_description = self.pick_data_asset(self.measurements)
             return self.md_path is not None \
                 and self.quicklook_path is not None \
                 and self.thumbnail_path is not None \
-                and self.main_asset_path is not None \
+                and self.main_asset_description is not None \
                 and len(self.measurements) > 0
 
         return False
