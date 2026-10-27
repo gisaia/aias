@@ -4,3 +4,6 @@ smart_open==7.5.0
 boto3==1.39.11
 aioboto3==15.1.0
 memory-profiler==0.61.0
+uvicorn==0.34.2
+ecs-logging==2.2.0
+fastapi-utilities==0.3.1
