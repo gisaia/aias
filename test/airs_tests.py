@@ -58,7 +58,7 @@ class Tests(AprocTests):
         # ITEM FOUND
         r = requests.get(url="/".join([AIRS_URL, "collections", collection, "items", ID_MANAGED]))
         self.assertTrue(r.ok, str(r.status_code) + str(r.content))
-        self.assertTrue(type(r.json().get("properties").get("datetime")), int) # check datetime is int (not str)
+        self.assertTrue(type(r.json().get("properties").get("datetime")), int)  # check datetime is int (not str)
 
     def test_update_item(self):
         # ADD ITEM
