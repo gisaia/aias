@@ -173,7 +173,7 @@ class ItemFormat(str, Enum):
     satellogic = "SATELLOGIC"
     shape = "SHAPE"
     skysat = "SKYSAT"
-    soacom = "SOACOM"
+    saocom = "SAOCOM"
     spot5 = "SPOT5"
     spot6_7 = "SPOT6_7"
     superview = "SUPERVIEW"
