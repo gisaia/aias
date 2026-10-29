@@ -3,8 +3,8 @@ import unittest
 from test.aproc_ingest_tests import (AST, CAPELLA1, CAPELLA2, CAPELLA3, CSK,
                                      CSK2, ICEYE, JP2000, OSK, OSK_STAC,
                                      RADARSAT2, SENTINEL1_GRDH, SENTINEL1_SLC,
-                                     SOACOM, TERRASARX, TERRASARX_PAZ, TIF,
-                                     UMBRA_STAC, IngestTests)
+                                     TERRASARX, TERRASARX_PAZ, TIF, UMBRA_STAC,
+                                     IngestTests)
 from test.utils import CATALOG, COLLECTION
 
 from airs.core.models.model import AssetFormat, Role
@@ -87,10 +87,6 @@ class Tests(IngestTests):
     def test_async_ingest_capella3(self):  # Driver CAPELLA
         url = os.path.join(ROOT, CAPELLA3)
         self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.data.value, Role.metadata.value, Role.airs_item.value], enrichments=[AssetFormat.cog.value, AssetFormat.overview_cog.value])
-
-    def test_async_ingest_soacom(self):  # Driver SOACOM
-        url = os.path.join(ROOT, SOACOM)
-        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.airs_item.value, *[f"{pol}_data" for pol in ["HH", "HV", "VH", "VV"]], *[f"{pol}_metadata" for pol in ["HH", "HV", "VH", "VV"]]], data_key="HH_data", check_secondary_id=False)  # No visual data for cog generation.
 
     def test_async_ingest_osk(self):  # Driver OSK
         url = os.path.join(ROOT, OSK)

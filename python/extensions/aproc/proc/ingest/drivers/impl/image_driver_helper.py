@@ -56,7 +56,7 @@ class ImageDriverHelper:
         return assets
 
     @staticmethod
-    def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False, eo_bands: list[Band] = None):
+    def add_asset(assets: list[Asset], href: str, role: Role, type: MimeType, asset_format: AssetFormat, asset_type: ResourceType, airs__managed=False, eo_bands: list[Band] = None) -> Asset:
         asset = Asset(href=href, size=AccessManager.get_size(href),
                       roles=[role.value], name=role.value, type=type.value,
                       description=role.value, airs__managed=airs__managed, asset_format=asset_format.value, asset_type=asset_type.value, eo__bands=eo_bands)

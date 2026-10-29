@@ -23,8 +23,8 @@ class Driver(IngestDriver, DriverWithPolarizedAssets):
     def __init__(self):
         super().__init__()
         self.measurements: list[PolarizedAsset] = []
-        self.quicklook_path = None
         self.main_asset_description = None
+        self.quicklook_path = None
 
     # Implements drivers method
     @staticmethod
@@ -80,18 +80,21 @@ class Driver(IngestDriver, DriverWithPolarizedAssets):
         start_time = root.find("./Channel/SwathInfo/AcquisitionStartTime").text
         start_time = parser.parse(start_time)
 
+        secondary_id = root.find("./Channel/RasterInfo/FileName").text
+
         item = Item(
             geometry=geometry,
             bbox=bbox,
             centroid=centroid,
             properties=Properties(
                 datetime=start_time,
-                constellation="SOACOM",
+                constellation="SAOCOM",
                 sensor_type=SensorType.SAR.value,
                 item_type=ResourceType.gridded.value,
-                item_format=ItemFormat.soacom.value,
+                item_format=ItemFormat.saocom.value,
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=self.main_asset_description.name,
+                secondary_id=secondary_id,
                 observation_type=ObservationType.radar.value
             ),
             assets={asset.name: asset for asset in assets}
@@ -140,7 +143,7 @@ class Driver(IngestDriver, DriverWithPolarizedAssets):
         if not AccessManager.is_dir(path):
             return False
 
-        data_file_regex = re.compile(r"([hv][hv])-h$")
+        data_file_regex = re.compile(r"([hv][hv])-[hm]$")
 
         for file in AccessManager.listdir(path):
             if not file.is_dir:
@@ -153,7 +156,6 @@ class Driver(IngestDriver, DriverWithPolarizedAssets):
                     # If the file respects the pattern and has a metadata file
                     if len(data_file_match) > 0 and AccessManager.exists(data_file.path + '.xml'):
                         polarization = data_file_match[0]
-                        Driver.LOGGER.warn(polarization)
                         self.add_measurement(self.measurements, polarization, data_file.path, metadata=data_file.path + ".xml")
 
             # Images folder
