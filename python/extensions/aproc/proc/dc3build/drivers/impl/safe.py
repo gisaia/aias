@@ -68,8 +68,6 @@ class Driver(DC3Driver):
             for e in group.dc3__references:
                 # Href of the zip containing all bands
                 a: Asset = items[e.dc3__collection][e.dc3__id].assets[Role.data.value]
-                # TODO: SRE or FRE ? => Products for GEODES
-                # band_regex = re.compile(rf".*/.*SRE_({'|'.join(bands_per_alias[e.dc3__alias])})\.tif")
                 band_regex = re.compile(rf".*/IMG_DATA/.*({'|'.join(bands_per_alias[e.dc3__alias])})\.jp2")
 
                 # TODO: should I use path_within_asset instead of regex ?
