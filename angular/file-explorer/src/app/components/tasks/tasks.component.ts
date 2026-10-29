@@ -22,7 +22,6 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
-import { MatChip, MatChipSet } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -45,6 +44,7 @@ import { FamService } from '@services/fam/fam.service';
 import { JobService } from '@services/job/job.service';
 import { emitErrors } from '@tools/errors';
 import { Process, ProcessResult, ProcessStatus } from '@tools/interface';
+import { TaskStatusComponent } from 'arlas-web-components';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
 
@@ -60,9 +60,8 @@ import { Observable, Subject, Subscription, takeUntil, timer } from 'rxjs';
     ]),
   ],
   imports: [
-    MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatChipSet, MatChip, MatTooltip,
-    MatIconButton, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe, TranslatePipe,
-    MatChip
+    MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatIconButton, MatIcon,
+    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe, TranslatePipe, TaskStatusComponent
   ]
 })
 export class TasksComponent implements OnInit, AfterViewInit, OnDestroy {
