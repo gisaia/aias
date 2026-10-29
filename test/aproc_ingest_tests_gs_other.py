@@ -58,11 +58,11 @@ class Tests(IngestTests):
 
     def test_async_ingest_sentinel1_grdh(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_GRDH)
-        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, "iw_grd_vh", "iw_grd_vv", Role.metadata.value, Role.airs_item.value], data_key=None)  # No visual data for cog generation.
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, "iw_grd_vh", "iw_grd_vv", Role.metadata.value, Role.airs_item.value], data_key="iw_grd_vv")  # No visual data for cog generation.
 
     def test_async_ingest_sentinel1_slc(self):  # Driver Sentinel 1
         url = os.path.join(ROOT, SENTINEL1_SLC)
-        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, *[f"iw{i}_slc_{pol}" for i in range(1, 4) for pol in ["vh", "vv"]], Role.metadata.value, Role.airs_item.value], data_key=None)  # No visual data for cog generation.
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, *[f"iw{i}_slc_{pol}" for i in range(1, 4) for pol in ["vh", "vv"]], Role.metadata.value, Role.airs_item.value], data_key="iw1_slc_vv")  # No visual data for cog generation.
 
     def test_async_ingest_iceye(self):  # Driver ICEYE
         url = os.path.join(ROOT, ICEYE)
@@ -70,7 +70,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_radarsat2(self):  # Driver RADARSAT 2
         url = os.path.join(ROOT, RADARSAT2)
-        self.async_ingest(url, ["Polarization HH", Role.overview.value, Role.metadata.value, Role.airs_item.value], data_key="Polarization HH")   # NO default visual data for cog generation.
+        self.async_ingest(url, ["HH_data", Role.overview.value, Role.metadata.value, Role.airs_item.value], data_key="HH_data")   # NO default visual data for cog generation.
 
     def test_async_ingest_umbra_stac(self):  # Driver Umbra Stac
         url = os.path.join(ROOT, UMBRA_STAC)
@@ -90,7 +90,7 @@ class Tests(IngestTests):
 
     def test_async_ingest_soacom(self):  # Driver SOACOM
         url = os.path.join(ROOT, SOACOM)
-        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.airs_item.value, *[f"{pol}" for pol in ["hh", "hv", "vh", "vv"]], *[f"{pol}_metadata" for pol in ["hh", "hv", "vh", "vv"]]], data_key=None, check_secondary_id=False)  # No visual data for cog generation.
+        self.async_ingest(url, [Role.thumbnail.value, Role.overview.value, Role.airs_item.value, *[f"{pol}_data" for pol in ["HH", "HV", "VH", "VV"]], *[f"{pol}_metadata" for pol in ["HH", "HV", "VH", "VV"]]], data_key="HH_data", check_secondary_id=False)  # No visual data for cog generation.
 
     def test_async_ingest_osk(self):  # Driver OSK
         url = os.path.join(ROOT, OSK)

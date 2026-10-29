@@ -1,35 +1,30 @@
 import re
 import xml.etree.ElementTree as ET
-from dateutil import parser
 
 from aias_common.access.manager import AccessManager
 from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, ObservationType, Properties,
                                     ResourceType, Role, SensorType)
+from dateutil import parser
 from extensions.aproc.proc.ingest.drivers.impl.image_driver_helper import \
     ImageDriverHelper
 from extensions.aproc.proc.ingest.drivers.impl.utils import (
     downsample_image, find_or_none, get_bbox, get_centroid, get_epsg,
     get_epsg_from_gdal_info_gcps)
 from extensions.aproc.proc.ingest.drivers.ingest_driver import IngestDriver
+from extensions.aproc.proc.utils.polarized import (DriverWithPolarizedAssets,
+                                                   PolarizedAsset)
 
 
-class Driver(IngestDriver):
+class Driver(IngestDriver, DriverWithPolarizedAssets):
 
     configuration: dict = {}
 
     def __init__(self):
         super().__init__()
-        self.polarizations = []
+        self.measurements: list[PolarizedAsset] = []
         self.quicklook_path = None
-
-    def __add_polarization(self, polarization: str, path: str):
-        self.polarizations.append({
-            'polarization': polarization,
-            'data': path,
-            'metadata': path + '.xml',
-            'description': f'Polarization {polarization}'
-        })
+        self.main_asset_description = None
 
     # Implements drivers method
     @staticmethod
@@ -42,13 +37,13 @@ class Driver(IngestDriver):
         assets = []
         ImageDriverHelper.add_archive(assets, url)
 
-        for pol in self.polarizations:
-            assets.append(Asset(href=pol['data'], size=AccessManager.get_size(pol['data']), proj__epsg=get_epsg_from_gdal_info_gcps(pol['data']),
-                                roles=[Role.data.value], name=pol['polarization'], type=MimeType.GEOTIFF.value, sar__polarizations=[pol['polarization'].upper()],
-                                description=pol['description'], airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
-            assets.append(Asset(href=pol['metadata'], size=AccessManager.get_size(pol['metadata']),
-                                roles=[Role.metadata.value], name=pol['polarization'] + '_metadata', type=MimeType.XML.value,
-                                description=pol['description'] + ' metadata', airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
+        for pol in self.measurements:
+            assets.append(Asset(href=pol.path, size=AccessManager.get_size(pol.path), proj__epsg=get_epsg_from_gdal_info_gcps(pol.path),
+                                roles=[Role.data.value], name=pol.name, type=MimeType.GEOTIFF.value, sar__polarizations=[pol.polarization],
+                                description=pol.description, airs__managed=False, asset_format=AssetFormat.geotiff.value, asset_type=ResourceType.gridded.value))
+            assets.append(Asset(href=pol.metadata, size=AccessManager.get_size(pol.metadata),
+                                roles=[Role.metadata.value], name=pol.polarization + '_metadata', type=MimeType.XML.value,
+                                description=pol.description + ' metadata', airs__managed=False, asset_format=AssetFormat.xml.value, asset_type=ResourceType.other.value))
 
         return assets
 
@@ -70,14 +65,14 @@ class Driver(IngestDriver):
         return assets
 
     def load_metadata(self, url: str) -> ET.Element:
-        with AccessManager.make_local(self.polarizations[0]['metadata']) as local_metadata_path:
+        with AccessManager.make_local(self.main_asset_description.metadata) as local_metadata_path:
             tree = ET.parse(local_metadata_path)
             root = tree.getroot()
 
         return root
 
     def build_core_item(self, url: str, assets: list[Asset], root: ET.Element) -> Item:
-        geometry = ImageDriverHelper.gdal_geometry(self, self.polarizations[0]["data"], url)
+        geometry = ImageDriverHelper.gdal_geometry(self, self.main_asset_description.path, url)
 
         centroid = get_centroid(geometry)
         bbox = get_bbox(geometry["coordinates"][0])
@@ -96,7 +91,7 @@ class Driver(IngestDriver):
                 item_type=ResourceType.gridded.value,
                 item_format=ItemFormat.soacom.value,
                 main_asset_format=AssetFormat.geotiff.value,
-                main_asset_name=self.polarizations[0]['polarization'],
+                main_asset_name=self.main_asset_description.name,
                 observation_type=ObservationType.radar.value
             ),
             assets={asset.name: asset for asset in assets}
@@ -118,7 +113,7 @@ class Driver(IngestDriver):
             if len(description_parts) > 2:
                 item.properties.processing__level = "L" + description_parts[1]
 
-        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.polarizations[0]["data"]))
+        item.properties.proj__epsg = get_epsg(AccessManager.get_gdal_proj(self.main_asset_description.path))
 
         return item
 
@@ -159,7 +154,7 @@ class Driver(IngestDriver):
                     if len(data_file_match) > 0 and AccessManager.exists(data_file.path + '.xml'):
                         polarization = data_file_match[0]
                         Driver.LOGGER.warn(polarization)
-                        self.__add_polarization(polarization, data_file.path)
+                        self.add_measurement(self.measurements, polarization, data_file.path, metadata=data_file.path + ".xml")
 
             # Images folder
             elif file.name == 'Images':
@@ -167,5 +162,6 @@ class Driver(IngestDriver):
                     if image_file.name.endswith('.png'):
                         self.quicklook_path = image_file.path
 
-        return len(self.polarizations) > 0 \
+        self.main_asset_description = self.pick_data_asset(self.measurements)
+        return len(self.measurements) > 0 \
             and self.quicklook_path is not None

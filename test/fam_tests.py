@@ -1,5 +1,4 @@
 import json
-import os
 import unittest
 from test.utils import FAM_URL
 
@@ -42,6 +41,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(archive.driver_name, "tiff")
         self.assertGreater(archive.last_modification_date.timestamp(), 0)
         self.assertGreater(archive.creation_date.timestamp(), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

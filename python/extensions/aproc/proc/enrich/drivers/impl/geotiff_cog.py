@@ -25,7 +25,7 @@ class Driver(EnrichDriver):
     # Implements drivers method
     def supports(self, resource: Item, extra_params: dict[str, Any] = {}) -> bool:
         if self.supports_format(resource, extra_params, Driver.SUPPORTED_ASSET_TYPES):
-            asset_source = resource.assets.get(Role.data.value)
+            asset_source = resource.assets.get(resource.properties.main_asset_name)
             if asset_source is not None and asset_source.href:
                 if includes_case_insensitive(asset_source.type, Driver.SUPPORTED_SOURCE_MIME_TYPES) or includes_case_insensitive(asset_source.asset_format, Driver.SUPPORTED_SOURCE_ASSET_FORMAT):
                     return True
@@ -33,7 +33,7 @@ class Driver(EnrichDriver):
 
     # Implements drivers method
     def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
-        data_asset = item.assets.get(Role.data.value)
+        data_asset = item.assets.get(item.properties.main_asset_name)
         if not data_asset or not data_asset.href:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
 
