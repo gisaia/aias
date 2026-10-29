@@ -63,7 +63,6 @@ class CogBuilderHelper:
                         else:
                             # otherwise, we assume it is grayscale and we stretch the first band to 0-255, we ignore the others.
                             src_bands = [1]
-                        LOGGER.warn(src_bands)
 
                         scale_params = []
                         # Stretch each band
