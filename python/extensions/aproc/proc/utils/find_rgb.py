@@ -1,17 +1,23 @@
 from airs.core.models.model import Band
+from aproc.core.logger import Logger
 
+LOGGER = Logger.get_logger()
 
-BLUE_BAND = 470
-GREEN_BAND = 550
-RED_BAND = 660
+# Wavelengths in eo__bands are in µm
+BLUE_BAND = 0.470
+GREEN_BAND = 0.550
+RED_BAND = 0.660
 
 
 def find_rgb_bands(bands: list[Band]):
+    # If no bands have an index, then take the first band
+    if len([band for band in bands if band.index is not None]) == 0:
+        LOGGER.warn("No indexes are defined for the given bands. Using the first band only")
+        return [1]
+
     def update_closest_band(band: Band, target_wavelength: float, closest_band):
 
-        if closest_band is None:
-            closest_band = {"idx": band.index, "wavelength": band.eo__center_wavelength}
-        elif abs(band.eo__center_wavelength - target_wavelength) < abs(closest_band["wavelength"] - target_wavelength):
+        if (closest_band is None or abs(band.eo__center_wavelength - target_wavelength) < abs(closest_band["wavelength"] - target_wavelength)):
             closest_band = {"idx": band.index, "wavelength": band.eo__center_wavelength}
         return closest_band
 

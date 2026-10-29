@@ -116,15 +116,16 @@ class Driver(IngestDriver):
 
     def _extract_bands(self, md: dict) -> list[Band]:
         """Extract band information from STAC metadata."""
-        bands = []
         stac_assets = md.get("assets", {})
         analytic_asset = stac_assets.get("analytic", {})
         eo_bands_raw = analytic_asset.get("eo:bands", [])
 
         if not eo_bands_raw:
             self.LOGGER.warning("No eo:bands found in STAC metadata analytic asset")
+            return []
 
-        for b in eo_bands_raw:
+        bands = []
+        for idx, b in enumerate(eo_bands_raw):
             name = b.get("name")
             common_name = b.get("common_name")
             if not (name or common_name):
@@ -132,6 +133,7 @@ class Driver(IngestDriver):
 
             center_wavelength = b.get("center_wavelength", None)
             if center_wavelength:
+                # In the metadata, it is in nm but should be in µm
                 center_wavelength = center_wavelength / 1000
 
             half_max = b.get("full_width_half_max", None)
@@ -140,13 +142,13 @@ class Driver(IngestDriver):
 
             bands.append(Band(
                 name=name,
+                index=idx + 1,
                 eo__common_name=common_name,
-                # In the metadata, it is in nm but should be in µm
                 eo__center_wavelength=center_wavelength,
                 eo__full_width_half_max=half_max
             ))
 
-        return bands if bands else []
+        return bands
 
     # Implements drivers method
     def fetch_assets(self, url: str, assets: list[Asset]) -> list[Asset]:
@@ -290,7 +292,7 @@ class Driver(IngestDriver):
                 main_asset_format=AssetFormat.geotiff.value,
                 main_asset_name=Role.data.value,
                 observation_type=ObservationType.optic.value,
-                eo__bands=eo_bands if eo_bands else None,
+                eo__bands=eo_bands,
             ),
             assets={asset.name: asset for asset in assets}
         )
