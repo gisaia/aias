@@ -21,7 +21,7 @@
 @use "styles/sizes.scss" as sizes;
 
 @mixin section-title() {
-  font-size: sizes.$fontSizeXLarge;
+  font-size: var(--arlas-sys-dialog-title-font-size);
   border-bottom: 1px solid colors.$borderColor;
   padding: 10px;
   display: flex;
@@ -90,7 +90,7 @@
           display: flex;
           align-items: center;
           gap: 0 10px;
-          font-size: sizes.$fontSizeDefault;
+          font-size: var(--arlas-sys-content-font-size);
           ::ng-deep mat-form-field {
             height: 36px;
             .mat-mdc-text-field-wrapper {

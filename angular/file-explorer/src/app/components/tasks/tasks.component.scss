@@ -32,13 +32,8 @@
     min-height: 22px;
     height: 22px;
 
-    .mdc-evolution-chip__action--primary {
-      padding-left: 8px;
-      padding-right: 8px;
-    }
-
     .mdc-evolution-chip__text-label {
-      font-size: sizes.$fontSizeSmall;
+      font-size: var(--arlas-sys-minor-font-size);
     }
   }
 }
@@ -61,7 +56,7 @@
       border-bottom: 1px solid colors.$borderColor;
 
       th.mat-mdc-header-cell {
-        font-size: sizes.$fontSizeDefault;
+        font-size: var(--arlas-sys-content-font-size);
         font-weight: 500;
         color: colors.$dismissedColor;
         padding: 0 10px;
@@ -76,7 +71,7 @@
 
       td.mat-mdc-cell {
         padding: 0 10px;
-        font-size: sizes.$fontSizeDefault;
+        font-size: var(--arlas-sys-content-font-size);
         white-space: nowrap;
         height: 36px;
         border-bottom: 1px solid #f1f5f9;
@@ -126,7 +121,7 @@
 
       mat-icon,
       .material-symbols-outlined {
-        font-size: sizes.$fontSizeLarge;
+        font-size: var(--arlas-sys-title-font-size);
         width: 18px;
         height: 18px;
         line-height: 18px;
@@ -156,7 +151,7 @@
 
           .value {
             font-family: monospace;
-            font-size: sizes.$fontSizeSmall;
+            font-size: var(--arlas-sys-minor-font-size);
           }
         }
       }
@@ -174,11 +169,11 @@
   }
 
   mat-paginator {
-    --mat-paginator-container-text-size: #{sizes.$fontSizeSmall};
-    --mat-paginator-select-trigger-text-size: #{sizes.$fontSizeSmall};
+    --mat-paginator-container-text-size: #{var(--arlas-sys-minor-font-size)};
+    --mat-paginator-select-trigger-text-size: #{var(--arlas-sys-minor-font-size)};
     --mat-paginator-container-size: 40px;
     min-height: 40px;
-    font-size: sizes.$fontSizeSmall;
+    font-size: var(--arlas-sys-minor-font-size);
 
     ::ng-deep {
       .mat-mdc-paginator-container {
@@ -190,28 +185,8 @@
       .mat-mdc-paginator-range-label,
       .mat-mdc-paginator-page-size-value,
       .mat-mdc-select-value {
-        font-size: sizes.$fontSizeSmall;
+        font-size: var(--arlas-sys-minor-font-size);
       }
     }
-  }
-
-  .mat-chip-successful {
-    @include mixins.chip-color-border(colors.$successColor, colors.$successBackgroundColor);
-  }
-
-  .mat-chip-accepted {
-    @include mixins.chip-color-border(colors.$infoColor, colors.$infoBackgroundColor);
-  }
-
-  .mat-chip-running {
-    @include mixins.chip-color-border(colors.$progressColor, colors.$progressBackgroundColor);
-  }
-
-  .mat-chip-failed {
-    @include mixins.chip-color-border(colors.$errorColor, colors.$errorBackgroundColor);
-  }
-
-  .mat-chip-dismissed {
-    @include mixins.chip-color-border(colors.$dismissedColor, colors.$dismissedBackgroundColor);
   }
 }

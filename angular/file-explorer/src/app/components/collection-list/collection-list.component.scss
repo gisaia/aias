@@ -39,7 +39,7 @@
     .search-icon {
       color: rgba(0, 0, 0, 0.54);
       margin-right: 12px;
-      font-size: sizes.$fontSizeXLarge;
+      font-size: var(--arlas-sys-dialog-title-font-size);
       height: 20px;
       width: 20px;
     }
@@ -48,14 +48,14 @@
       border: none;
       outline: none;
       width: 100%;
-      font-size: sizes.$fontSizeDefault;
+      font-size: var(--arlas-sys-content-font-size);
       background: transparent;
       font-family: inherit;
     }
 
     .clear-btn {
       .mat-icon {
-        font-size: sizes.$fontSizeLarge;
+        font-size: var(--arlas-sys-title-font-size);
         width: 18px;
         height: 18px;
       }
@@ -65,7 +65,7 @@
 
 .no-results-msg {
   padding: 16px;
-  font-size: sizes.$fontSizeDefault;
+  font-size: var(--arlas-sys-content-font-size);
   color: rgba(0, 0, 0, 0.54);
   text-align: center;
 }
