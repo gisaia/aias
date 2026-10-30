@@ -72,6 +72,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh
     - name: Run am tests
       run: test/tests_am.sh
@@ -89,6 +91,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh
     - name: Run downloads tests
       run: test/tests_downloads.sh
@@ -114,6 +118,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh
     - name: Logs dockers aproc-service
       run: test/logs.sh arlas-server
@@ -143,6 +149,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh
     - name: Run dc3 tests
       run: test/tests_dc3.sh
@@ -169,6 +177,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack fs
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh
     - name: Run ingest tests on file system
       run: test/tests_ingest_fs.sh
@@ -195,6 +205,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack gs
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh gs
     - name: Run ingest tests on google storage for optic data
       run: test/tests_ingest_gs_optic.sh
@@ -220,6 +232,8 @@ jobs:
       run: |
         pip install -r test/requirements.tests.txt
     - name: Start stack gs
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh gs
     - name: Run ingest tests on google storage for other data
       run: test/tests_ingest_gs_other.sh
@@ -244,7 +258,9 @@ jobs:
     - name: Install test/requirements
       run: |
         pip install -r test/requirements.tests.txt
-    - name: Start stack local S3
+    - name: Start stack local s3
+      env:
+        APROC_TASK_ENCRYPTION_KEYS: ${{ secrets.APROC_TASK_ENCRYPTION_KEYS }}
       run: test/start_stack.sh seaweedfs
     - name: Run ingest tests on seaweedFS
       run: test/tests_ingest_s3_local.sh

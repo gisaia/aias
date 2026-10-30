@@ -28,8 +28,7 @@ from extensions.aproc.proc.processes.process_model import InputProcess, OutputPr
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
 DRIVERS_CONFIGURATION_FILE_PARAM_NAME = "drivers"
 LOGGER = Logger.get_logger()
-
-
+LOGGED_SETTINGS = {"drivers", "inputs_directory", "max_number_of_archive_for_ingest", "aproc_endpoint", "resource_id_hash_starts_at", "alternative_asset_href_field"}
 class InputDirectoryIngestProcess(InputProcess):
     collection: str = Field(title="Collection name", description="Name of the collection where the items will be registered")
     catalog: str = Field(title="Catalog name", description="Name of the catalog, within the collection, where the items will be registered")
@@ -72,7 +71,7 @@ class AprocProcess(Process):
             raise DriverException("Invalid configuration for ingest drivers ({})".format(configuration))
         AprocProcess.input_model = InputDirectoryIngestProcess
         LOGGER.info("Service configuration:")
-        LOGGER.info(IngestConfiguration.settings.model_dump_json())
+        LOGGER.info(IngestConfiguration.settings.model_dump_json(include=LOGGED_SETTINGS))
 
     @staticmethod
     def get_process_description() -> ProcessDescription:

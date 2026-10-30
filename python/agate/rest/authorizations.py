@@ -4,9 +4,21 @@ from agate.settings import Configuration, Rule
 import jwt
 from urllib import parse
 import re
+from aias_common.masking import mask
 
 LOGGER = Logger.get_logger()
+def _jwt_names() -> set[str]:
+    return {
+        name
+        for name in (
+            *(s.jwt_name for s in Configuration.settings.services.values()),
+            Configuration.settings.urbac.jwt_header,
+        )
+        if name
+    }
 
+def _mask_jwt_secrets(value) -> str:
+    return mask(value, *_jwt_names())
 
 class Authorizations:
 
@@ -84,19 +96,19 @@ class Authorizations:
             query = parse.urlparse(requested_path).query
             param = parse.parse_qs(query).get(param_name)
             if param is None or len(param) < 1:
-                msg = "Parameter {} not found in query {}".format(param_name, query)
+                msg = "Parameter {} not found in query {}".format(param_name, _mask_jwt_secrets(query))
                 LOGGER.error(msg)
                 return None
             else:
                 param = param[0]
-            LOGGER.debug("{}={}".format(param_name, param))
+            LOGGER.debug(_mask_jwt_secrets("{}={}".format(param_name, param)))
             if rule.part.endswith(".path") or rule.part.endswith(".query"):
                 url: parse.ParseResult = parse.urlparse(param)
                 if rule.part.endswith(".url.path"):
-                    LOGGER.debug("Using path of url {} as target".format(param))
+                    LOGGER.debug("Using path of url {} as target".format(_mask_jwt_secrets(param)))
                     return url.path
                 elif rule.part.endswith(".url.query"):
-                    LOGGER.debug("Using query of url {} as target".format(param))
+                    LOGGER.debug("Using path of url {} as target".format(_mask_jwt_secrets(param)))
                     return url.query
             else:
                 LOGGER.debug("Using query parameter {} as target".format(param_name))
@@ -135,7 +147,8 @@ class Authorizations:
         for rule in rules:
             part = Authorizations.extract_url_part(rule, path)
             if part:
-                LOGGER.debug("Using {} as target for pattern matching on {}".format(part, rule.pattern))
+                safe_part = _mask_jwt_secrets(part)
+                LOGGER.debug("Using {} as target for pattern matching on {}".format(safe_part, rule.pattern))
             else:
                 msg = "Unable to identify the URL part for pattern matching with rule '{}'".format(rule)
                 LOGGER.warning(msg)
@@ -143,7 +156,7 @@ class Authorizations:
             matches = re.finditer(pattern=rule.pattern, string=part)
             for match in matches:
                 if match.start() == 0:
-                    LOGGER.debug("{} matches pattern {}".format(part, rule.pattern))
+                    LOGGER.debug("{} matches pattern {}".format(safe_part, rule.pattern))
                     if not arlas_control:
                         return True
                     else:
@@ -152,16 +165,16 @@ class Authorizations:
                             if r.ok:
                                 response = r.json()
                                 if response["hits"] is not None and len(response["hits"]) > 0:
-                                    LOGGER.debug("ARLAS returned {} result(s) for {}".format(len(response["hits"]), part))
+                                    LOGGER.debug("ARLAS returned {} result(s) for {}".format(len(response["hits"]), safe_part))
                                     return True
                                 else:
-                                    LOGGER.debug("ARLAS returned zero results for {}".format(part))
+                                    LOGGER.debug("ARLAS returned zero results for {}".format(safe_part))
                             else:
                                 LOGGER.error("ARLAS failed to answer {}: {}".format(str(r.status_code), str(r.content)))
-                                LOGGER.error("  with headers {}".format(headers))
+                                LOGGER.error("  with headers {}".format(_mask_jwt_secrets(headers)))
                         except Exception as e:
                             LOGGER.exception(e)
                 else:
-                    LOGGER.debug("{} does not match pattern {} at position 0".format(part, rule.pattern))
-            LOGGER.debug("{} does not match {}".format(rule.pattern, part))
+                    LOGGER.debug("{} does not match pattern {} at position 0".format(safe_part, rule.pattern))
+            LOGGER.debug("{} does not match {}".format(rule.pattern, safe_part))
         return False

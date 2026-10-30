@@ -13,6 +13,8 @@ from aproc.core.processes.exception import ProcessException
 from aproc.core.processes.process import Process, Subscriber
 from aproc.core.processes.processes import Processes
 from aias_common.rest.exception import OGCException, RESTException
+from aproc.core.task_security import forwardable
+from aias_common.masking import mask
 
 LOGGER = Logger.get_logger()
 
@@ -214,12 +216,12 @@ def get_process_description(process_id: str):
                 }
              })
 def post_process_execute(process_id: str, execute: Execute, request: Request):
-    LOGGER.debug("Execute process {} with inputs {}".format(process_id, execute.model_dump_json()))
+    LOGGER.debug("Execute process {} with inputs {}".format(process_id, mask(execute.model_dump_json())))
     process = __get_process(process_id)
     try:
         if hasattr(process, "input_model"):
             inputs = execute.model_dump(exclude_none=True).get("inputs")
-            context = dict(map(lambda v: v, request.headers.items()))
+            context = forwardable(request.headers)
             p_input = process.input_model(**inputs)
             p_input.subscriber = Subscriber()
             if execute.subscriber:
@@ -229,11 +231,13 @@ def post_process_execute(process_id: str, execute: Execute, request: Request):
                     p_input.subscriber.inProgressUri = execute.subscriber.inProgressUri
                 if execute.subscriber.failedUri is not None:
                     p_input.subscriber.failedUri = execute.subscriber.failedUri
-            job: StatusInfo = Processes.execute(process_name=process_id, headers=context, input=p_input)
+            job: StatusInfo = Processes.execute(process_name=process_id, headers={**context, "Content-Type": "application/json"}, input=p_input)
             job.processID = process_id
             return JSONResponse(content=job.model_dump(exclude_none=True), status_code=status.HTTP_201_CREATED)
         return JSONResponse(content=process.execute().model_dump(exclude_none=True), status_code=status.HTTP_200_OK)
     except Exception as e:
         LOGGER.exception(e)
-        error = RESTException(type="Exception", status=500, title="Can not execute {} with inputs {}".format(process_id, execute.model_dump_json()), detail=str(e))
+        request_id = request.headers.get("x-request-id", "n/a")
+        error = RESTException(type="Exception", status=500,title="Can not execute {}".format(process_id),
+                              detail="Internal error, request id: {}".format(request_id))
         return JSONResponse(content=error.model_dump(exclude_none=True), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
