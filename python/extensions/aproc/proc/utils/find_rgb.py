@@ -10,14 +10,17 @@ RED_BAND = 0.660
 
 
 def find_rgb_bands(bands: list[Band]):
-    # If no bands have an index, then take the first band
-    if len([band for band in bands if band.index is not None]) == 0:
-        LOGGER.warn("No indexes are defined for the given bands. Using the first band only")
+    # If less than 3 bands have an index and a central wavelength, then take the first band
+    if len([band for band in bands if band.index is not None and band.eo__center_wavelength is not None]) < 3:
+        LOGGER.warn("Not enough bands have an index and a center wavelength. Using the first band only")
         return [1]
 
     def update_closest_band(band: Band, target_wavelength: float, closest_band):
+        # Skip the band if the necessary parameters are not defined
+        if band.eo__center_wavelength is None or band.index is None:
+            return closest_band
 
-        if (closest_band is None or abs(band.eo__center_wavelength - target_wavelength) < abs(closest_band["wavelength"] - target_wavelength)):
+        if closest_band is None or abs(band.eo__center_wavelength - target_wavelength) < abs(closest_band["wavelength"] - target_wavelength):
             closest_band = {"idx": band.index, "wavelength": band.eo__center_wavelength}
         return closest_band
 
