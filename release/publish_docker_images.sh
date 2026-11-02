@@ -16,6 +16,5 @@ publish_docker aproc-proc
 publish_docker aproc-service
 publish_docker agate
 publish_docker airs
-publish_docker stac-geodes
 publish_docker arlas-fam-wui
 
