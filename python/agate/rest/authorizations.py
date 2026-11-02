@@ -80,7 +80,11 @@ class Authorizations:
             key = Authorizations.keys.get(jwt_headers['kid'])
             if key:
                 LOGGER.debug("check token with audience {} and algorithm {}".format(Configuration.settings.urbac.jwt_audience, jwt_headers['alg']))
-                token = jwt.decode(encoded_token, key, audience=Configuration.settings.urbac.jwt_audience.split(","), algorithms=[jwt_headers['alg']])
+                jwt_audience = Configuration.settings.urbac.jwt_audience
+                if jwt_audience:
+                    token = jwt.decode(encoded_token, key, audience=jwt_audience.split(","), algorithms=[jwt_headers["alg"]])
+                else:
+                    token = jwt.decode(encoded_token, key, algorithms=[jwt_headers["alg"]])
             else:
                 msg = "Key {} not found".format(jwt_headers['kid'])
                 raise Exception(msg)
