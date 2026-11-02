@@ -26,7 +26,7 @@
   overflow: hidden;
   --mat-tree-node-min-height: 24px;
   --mat-icon-button-state-layer-size: 20px;
-  --mat-icon-button-icon-size: #{sizes.$fontSizeLarge};
+  --mat-icon-button-icon-size: #{var(--arlas-sys-title-font-size)};
   --mat-icon-button-touch-target-display: none;
   --mat-button-container-height: 22px;
   --mat-button-touch-target-display: none;
@@ -89,7 +89,7 @@
     }
 
     .name {
-      font-size: sizes.$fontSizeDefault;
+      font-size: var(--arlas-sys-content-font-size);
       border: none;
       background-color: transparent;
       cursor: default;

@@ -46,7 +46,7 @@
       .list-icon {
         width: 20px;
         height: 20px;
-        font-size: sizes.$fontSizeXLarge;
+        font-size: var(--arlas-sys-dialog-title-font-size);
       }
 
       .item-content {
@@ -66,7 +66,7 @@
           gap: 5px;
 
           .label {
-            font-size: sizes.$fontSizeDefault;
+            font-size: var(--arlas-sys-content-font-size);
             font-weight: 500;
             white-space: normal;
             overflow-wrap: anywhere;
@@ -74,7 +74,7 @@
 
           .detail {
             color: rgba(0, 0, 0, 0.58);
-            font-size: sizes.$fontSizeSmall;
+            font-size: var(--arlas-sys-minor-font-size);
 
             overflow-wrap: anywhere;
             white-space: pre-wrap;
@@ -170,6 +170,6 @@
     border: 1px solid colors.$infoBorderColor;
     color: colors.$infoColor;
     background-color: colors.$infoBackgroundColor;
-    font-size: sizes.$fontSizeDefault;
+    font-size: var(--arlas-sys-content-font-size);
   }
 }

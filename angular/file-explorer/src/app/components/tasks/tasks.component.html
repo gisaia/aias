@@ -13,10 +13,7 @@
       <th mat-header-cell *matHeaderCellDef>{{'Status' | translate}}</th>
       <td mat-cell *matCellDef="let task">
         <div class="status-content">
-          <mat-chip-set>
-            <mat-chip class="mat-chip-{{task.status}}" [matTooltip]="task.message">
-            {{task.status | translate}}</mat-chip>
-          </mat-chip-set>
+          <arlas-task-status [task]="task" [matTooltip]="task.message"></arlas-task-status>
           @if (task.status === 'running') {
             <button mat-icon-button class="cancel-job" [matTooltip]="'Cancel' | translate"
                 (click)="cancelJob(task, task.jobID); $event.stopPropagation()">

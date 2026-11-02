@@ -17,18 +17,9 @@
  * under the License.
  */
 
-/* You can add global styles to this file, and also import other style files */
-@use "styles/sizes.scss" as sizes;
 @use "arlas-web-components/assets/theme" as darkTheme;
 
 :root {
-  --arlas-sys-minor-font-size: 12px;
-  --arlas-sys-content-font-size: 14px;
-  --arlas-sys-subtitle-font-size: 16px;
-  --arlas-sys-title-font-size: 18px;
-  --arlas-sys-dialog-title-font-size: 20px;
-
-  --aias-font-size-xxl: 24px;
   --arlas-iam-form-header-background: #00bcd4;
   --arlas-iam-form-bg-color: #ededed;
   --arlas-login-title-text: #fff;
@@ -107,7 +98,7 @@
 }
 
 .aias-tooltip {
-  font-size: sizes.$fontSizeSmall;
+  font-size: var(--arlas-sys-minor-font-size);
 }
 
 html,
@@ -117,8 +108,6 @@ body {
   min-height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-
-  --mat-dialog-supporting-text-tracking: 0;
 }
 
 .toast-container {
