@@ -110,6 +110,7 @@ RUN apt-get update \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --only-upgrade \
         libcurl4t64 \
+        libbrotli1=1.2.0-3ubuntu0.1 \
         libcurl3t64-gnutls \
         curl && \
     rm -rf /var/lib/apt/lists/*
