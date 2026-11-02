@@ -61,10 +61,13 @@ class Driver(EnrichDriver):
         with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
             gdal.Warp(merged_tif, tiffs, **cog_warp_options)
 
-        CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
+        cog_type, src_bands, stretched_bands = CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height,
+                                                                      options=Driver.configuration.get('cog_warp_options', {}),
+                                                                      visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         os.remove(merged_tif)  # !DELETE!
 
-        return [CogBuilderHelper.create_asset(item, enrichment, target)]
+        bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)
+        return [CogBuilderHelper.create_asset(item, enrichment, target, cog_type, bands)]
 
     def __load_metadata(self, data_path: str) -> dict:
         from osgeo import gdal

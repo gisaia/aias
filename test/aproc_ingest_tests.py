@@ -226,7 +226,7 @@ class IngestTests(AprocTests):
     def check_cog(self, item: Item, asset_type: str, max_size: int):
         self.assertIsNotNone(item.assets.get(asset_type), f"{asset_type} asset exists")
         self.assertGreater(item.assets.get(asset_type).size, 0, f"{asset_type} size greater than 0")
-        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, "format is cog")
+        self.assertEqual(item.assets.get(asset_type).asset_format.lower(), asset_type, f"format is {asset_type}")
         self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, "projection is 3857")
         from osgeo import gdal
         with gdal.Open(item.assets.get(asset_type).href) as ds:
