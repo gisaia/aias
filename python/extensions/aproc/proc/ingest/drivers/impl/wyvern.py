@@ -47,13 +47,14 @@ class Driver(IngestDriver):
                 list[Band]: List of Band objects
             """
             bands = []
-            for b in bands_raw:
+            for idx, b in enumerate(bands_raw):
                 name = b.get('name', None)
                 common_name = b.get('common_name', None)
                 if not (name or common_name):
                     continue
                 kwargs = dict(
                     name=name,
+                    index=idx + 1,
                     eo__common_name=common_name,
                     eo__center_wavelength=b.get('center_wavelength', None),
                     eo__full_width_half_max=b.get('full_width_half_max', None)
