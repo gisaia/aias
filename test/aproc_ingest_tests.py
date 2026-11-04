@@ -1,7 +1,6 @@
 import json
 import threading
 import unittest
-from extensions.aproc.proc.enrich.enrich_process import OutputEnrichProcess
 from test.aproc_tests import AprocTests
 from test.utils import APROC_ENDPOINT, CATALOG, COLLECTION, MAX_ITERATIONS
 from time import sleep
@@ -9,14 +8,16 @@ from time import sleep
 import requests
 import uvicorn
 from airs.core.models import mapper
-from airs.core.models.model import AssetFormat, Item, Role
+from airs.core.models.model import AssetFormat, CogType, Item, Role
 from aproc.core.models.ogc import Execute
 from aproc.core.models.ogc.execute import Subscriber
 from aproc.core.models.ogc.job import StatusCode, StatusInfo
 from aproc.core.models.ogc.process import ProcessDescription, ProcessList
+from extensions.aproc.proc.enrich.enrich_process import OutputEnrichProcess
 from extensions.aproc.proc.ingest.directory_ingest_process import \
     InputDirectoryIngestProcess
-from extensions.aproc.proc.ingest.ingest_process import InputIngestProcess, OutputIngestProcess
+from extensions.aproc.proc.ingest.ingest_process import (InputIngestProcess,
+                                                         OutputIngestProcess)
 from fastapi import FastAPI, Request
 
 AST = "ast/"
@@ -176,7 +177,7 @@ class IngestTests(AprocTests):
         r = requests.get("/".join([APROC_ENDPOINT, "jobs"]))
         self.assertTrue(r.ok, str(r.status_code) + ": " + str(r.content))
 
-    def check_result(self, item: Item, assets: list, archive=True, check_epsg=True, check_gsd=True, data_key=Role.data.value, check_secondary_id=True):
+    def check_result(self, item: Item, assets: list[str], archive=True, check_epsg=True, check_gsd=True, data_key=Role.data.value, check_secondary_id=True):
         self.assertEqual(item.collection, COLLECTION)
         self.assertEqual(item.catalog, CATALOG)
         self.assertIsNotNone(item.id)
@@ -224,12 +225,14 @@ class IngestTests(AprocTests):
             self.assertIsNotNone(item.properties.proj__epsg)
 
     def check_cog(self, item: Item, asset_type: str, max_size: int):
-        self.assertIsNotNone(item.assets.get(asset_type), f"{asset_type} asset exists")
-        self.assertGreater(item.assets.get(asset_type).size, 0, f"{asset_type} size greater than 0")
-        self.assertEqual(item.assets.get(asset_type).asset_format, AssetFormat.cog.value, "format is cog")
-        self.assertEqual(item.assets.get(asset_type).proj__epsg, 3857, "projection is 3857")
+        cog_asset = item.assets.get(asset_type)
+
+        self.assertIsNotNone(cog_asset, f"{asset_type} asset exists")
+        self.assertGreater(cog_asset.size, 0, f"{asset_type} size greater than 0")
+        self.assertEqual(cog_asset.asset_format.lower(), asset_type, f"format is {asset_type}")
+        self.assertEqual(cog_asset.proj__epsg, 3857, "projection is 3857")
         from osgeo import gdal
-        with gdal.Open(item.assets.get(asset_type).href) as ds:
+        with gdal.Open(cog_asset.href) as ds:
             src_width = ds.RasterXSize
             src_height = ds.RasterYSize
             self.assertLessEqual(src_width, max_size, f"{asset_type} width less than {max_size}")
@@ -238,8 +241,26 @@ class IngestTests(AprocTests):
             self.assertGreater(src_height, 0, f"{asset_type} height greater than 0")
             self.assertIsNotNone(src_width, f"{asset_type} width is not None")
             self.assertIsNotNone(src_height, f"{asset_type} height is not None")
-        info = gdal.Info(item.assets.get(asset_type).href, options=gdal.InfoOptions(format="json"))
+        info = gdal.Info(cog_asset.href, options=gdal.InfoOptions(format="json"))
         self.assertEqual(info.get("metadata").get("IMAGE_STRUCTURE", {}).get("LAYOUT", None), "COG", "layout is COG")
+
+        # Check COG Asset metadata
+        self.assertIsNotNone(cog_asset.airs__cog_type, f"{asset_type} asset has a COG type")
+        if asset_type == AssetFormat.overview_cog.value.lower():
+            self.assertNotEqual(cog_asset.airs__cog_type, CogType.non_visual.value, f"{asset_type} COG type is not non-visual")
+            if cog_asset.airs__cog_type == CogType.rgb.value:
+                self.assertEqual(cog_asset.airs__nb_bands, 3, f"{asset_type} asset is RGB and thus has 3 bands")
+            elif cog_asset.airs__cog_type == CogType.rgba.value:
+                self.assertEqual(cog_asset.airs__nb_bands, 4, f"{asset_type} asset is RGBA and thus has 4 bands")
+            elif cog_asset.airs__cog_type == CogType.grayscale.value:
+                self.assertEqual(cog_asset.airs__nb_bands, 1, f"{asset_type} asset is grayscale and thus has 1 band")
+
+        self.assertIsNotNone(cog_asset.eo__bands, f"{asset_type} asset has bands")
+        self.assertEqual(cog_asset.airs__nb_bands, len(cog_asset.eo__bands), f"{asset_type} asset should have a registered number of bands equal to its number of bands")
+        for band in cog_asset.eo__bands:
+            self.assertGreaterEqual(band.index, 1, f"{asset_type} band index is greater than one")
+            self.assertIsNotNone(band.name, f"{asset_type} band has a name")
+            self.assertIsNotNone(band.airs__is_stretched, f"{asset_type} band should specify if it was stretched")
 
     def test_landing_page(self):
         landing_page = json.loads(requests.get(APROC_ENDPOINT).content)

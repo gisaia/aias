@@ -4,7 +4,7 @@ import os
 from celery import Task
 from cryptography.fernet import Fernet, MultiFernet
 
-FORWARDED_HEADERS = frozenset({"authorization","arlas-org-filter","x-request-id"})
+FORWARDED_HEADERS = frozenset({"authorization", "arlas-org-filter", "x-request-id"})
 ENCRYPT_KEY = "_encrypt"
 MAX_AGE_SECONDS = 3600
 

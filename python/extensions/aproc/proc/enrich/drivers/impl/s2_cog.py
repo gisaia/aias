@@ -37,10 +37,7 @@ class Driver(EnrichDriver):
                 if resource.assets.get(Role.data.value) and resource.assets.get(Role.data.value).href:
                     # If a all band cog is requested, check that the data asset is not a zip (SAFE archive)
                     if self.supports_format(resource, extra_params, [AssetFormat.all_bands_cog.value.lower()]):
-                        if resource.assets.get(Role.data.value).type != MimeType.ZIP.value:
-                            return True
-                        else:
-                            return False
+                        return resource.assets.get(Role.data.value).type != MimeType.ZIP.value
                     else:
                         # no all band cog requested, so we can build the TCI COG from the SAFE archive
                         return True
@@ -65,8 +62,10 @@ class Driver(EnrichDriver):
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
         target_asset_location = self.get_target_asset_filepath(item.id, enrichment)
-        self.__build_TCI_COG(item, target_asset_location, cog_max_width_or_height)
-        return CogBuilderHelper.create_asset(item, enrichment, target_asset_location)
+        cog_type, src_bands, stretched_bands = self.__build_TCI_COG(item, target_asset_location, cog_max_width_or_height)
+
+        bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)
+        return CogBuilderHelper.create_asset(item, enrichment, target_asset_location, cog_type, bands)
 
     def __build_TCI_COG(self, item: Item, target_asset_location: str, cog_max_width_or_height: int):
         href = self.get_asset_href(item)
@@ -87,8 +86,11 @@ class Driver(EnrichDriver):
                 AccessManager.pull(href, tci_file_path)
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-            CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=True)
+            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height,
+                                                                          options=Driver.configuration.get('cog_warp_options', {}), visual=True)
             os.remove(tci_file_path)  # !DELETE!
+
+            return cog_type, src_bands, stretched_bands
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))
 
@@ -130,9 +132,10 @@ class Driver(EnrichDriver):
 
     def __create_all_bands_asset(self, item: Item):
         target_asset_location = self.get_target_asset_filepath(item.id, AssetFormat.all_bands_cog.value)
-        self.__build_all_bands_COG(item, target_asset_location)
+        cog_type, src_bands, stretched_bands = self.__build_all_bands_COG(item, target_asset_location)
 
-        return CogBuilderHelper.create_asset(item, AssetFormat.all_bands_cog.value.lower(), target_asset_location)
+        bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)
+        return CogBuilderHelper.create_asset(item, AssetFormat.all_bands_cog.value.lower(), target_asset_location, cog_type, bands)
 
     def __build_all_bands_COG(self, item: Item, target_asset_location: str):
         band_assets = list(filter(
@@ -156,8 +159,11 @@ class Driver(EnrichDriver):
                 kwargs = {"separate": True}
                 gdal.BuildVRT(source_files_vrt, local_assets, **kwargs)
                 all_bands_cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
-                CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=all_bands_cog_max_width_or_height)
+                cog_type, src_bands, stretched_bands = CogBuilderHelper.build(source_files_vrt, target_asset_location,
+                                                                              max_px_width_or_height=all_bands_cog_max_width_or_height)
 
             AccessManager.clean(source_files_vrt)  # !DELETE!
+
+            return cog_type, src_bands, stretched_bands
         else:
             raise DriverException("Data asset not found for {}/{}".format(item.collection, item.id))

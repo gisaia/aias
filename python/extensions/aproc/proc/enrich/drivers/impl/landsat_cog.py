@@ -71,7 +71,10 @@ class Driver(EnrichDriver):
             # Build VRT to facilitate COG built
             kwargs = {"separate": True}
             gdal.BuildVRT(source_files_vrt, band_files, **kwargs)
-            CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}), visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
-        # AccessManager.clean(source_files_vrt)  # !DELETE!
+            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=cog_max_width_or_height,
+                                                                          options=Driver.configuration.get('cog_warp_options', {}),
+                                                                          visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
+        AccessManager.clean(source_files_vrt)  # !DELETE!
 
-        return CogBuilderHelper.create_asset(item, enrichment, target_asset_location)
+        bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)
+        return CogBuilderHelper.create_asset(item, enrichment, target_asset_location, cog_type, bands)

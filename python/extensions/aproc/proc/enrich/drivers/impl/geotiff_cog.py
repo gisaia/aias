@@ -1,6 +1,6 @@
 from typing import Any
 
-from airs.core.models.model import Asset, AssetFormat, Item, MimeType, Role
+from airs.core.models.model import Asset, AssetFormat, Item, MimeType
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
@@ -43,6 +43,9 @@ class Driver(EnrichDriver):
         if enrichment == AssetFormat.overview_cog.value.lower():
             cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
 
-        CogBuilderHelper.build(source, target, max_px_width_or_height=cog_max_width_or_height, options=Driver.configuration.get('cog_warp_options', {}),
-                               visual=enrichment.lower() == AssetFormat.overview_cog.value.lower(), eo__bands=item.properties.eo__bands)
-        return [CogBuilderHelper.create_asset(item, enrichment, target)]
+        cog_type, src_bands, stretched_bands = CogBuilderHelper.build(source, target, max_px_width_or_height=cog_max_width_or_height,
+                                                                      options=Driver.configuration.get('cog_warp_options', {}),
+                                                                      visual=enrichment.lower() == AssetFormat.overview_cog.value.lower(),
+                                                                      eo__bands=item.properties.eo__bands)
+        bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)
+        return [CogBuilderHelper.create_asset(item, enrichment, target, cog_type, bands)]

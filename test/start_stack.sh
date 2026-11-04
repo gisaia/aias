@@ -35,4 +35,8 @@ docker compose -f docker/compose/docker-compose.yaml -f docker/compose/docker-co
 export BUCKET_NAME=archives
 docker compose -f docker/compose/docker-compose.yaml -f docker/compose/docker-compose-create-bucket.yaml up seaweedfs createbuckets -d --build --wait || true
 
+export APROC_TASK_ENCRYPTION_KEYS="$(docker run --rm python:3.13-slim \
+    sh -c 'pip install --no-cache-dir cryptography >/dev/null && \
+    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"')"
+
 docker compose -f docker/compose/docker-compose.yaml -f docker/compose/docker-compose-tests.yaml up --build --wait || true

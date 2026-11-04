@@ -360,23 +360,34 @@ class ItemGroup(BaseModel):
     model_config = ConfigDict(json_encoders=json_encoders)
 
 
+class CogType(str, Enum):
+    rgb = "RGB"
+    rgba = "RGBA"
+    grayscale = "grayscale"
+    non_visual = "non-visual"
+
+
 class Band(BaseModel, extra=Extra.allow):
-    index: int = Field(default=None, ge=1, title="[ARLAS] Band index within the asset, starting at 1")
-    asset: str = Field(default=None, title="[ARLAS] Name of the asset, must be present in `item.assets`")
-    path_within_asset: str = Field(default=None, title="[ARLAS] If the band is nested within a sub file of the asset (e.g. tgz, zip), then the path within the asset must be provided, undefined otherwise.")
-    variable_value_alias: dict[float, str] = Field(default=None, title="[ARLAS] Dictionary of value->alias for bands encoding semantic tags (e.g land cover classification)")
+    index: int | None = Field(default=None, ge=1, title="[ARLAS] Band index within the asset, starting at 1")
+    asset: str | None = Field(default=None, title="[ARLAS] Name of the asset, must be present in `item.assets`")
+    path_within_asset: str | None = Field(default=None, title="[ARLAS] If the band is nested within a sub file of the asset (e.g. tgz, zip), then the path within the asset must be provided, undefined otherwise.")
+    variable_value_alias: dict[float, str] | None = Field(default=None, title="[ARLAS] Dictionary of value->alias for bands encoding semantic tags (e.g land cover classification)")
     name: str = Field(title="[STAC] The name of the band (e.g., B01, B8, band2, red).", max_length=300)
+    description: str | None = Field(default=None, title="[STAC] Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
+
     eo__common_name: str | None = Field(default=None, title="[STAC, extension eo] The name commonly used to refer to the band to make it easier to search for bands across instruments. See the list of accepted common names.")
-    description: str = Field(default=None, title="[STAC] Description to fully explain the band. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
-    eo__center_wavelength: float = Field(default=None, title="[STAC, extension eo] The center wavelength of the band, in micrometers (μm).")
-    eo__full_width_half_max: float = Field(default=None, title="[STAC, extension eo] Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).")
-    eo__solar_illumination: float = Field(default=None, title="[STAC, extension eo] The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.")
+    eo__center_wavelength: float | None = Field(default=None, title="[STAC, extension eo] The center wavelength of the band, in micrometers (μm).")
+    eo__full_width_half_max: float | None = Field(default=None, title="[STAC, extension eo] Full width at half maximum (FWHM). The width of the band, as measured at half the maximum transmission, in micrometers (μm).")
+    eo__solar_illumination: float | None = Field(default=None, title="[STAC, extension eo] The solar illumination of the band, as measured at half the maximum transmission, in W/m2/micrometers.")
     eo__gsd: float | None = Field(default=None, title="[STAC, extension eo] Ground Sampling Distance (resolution)")
-    dc3__quality_indicators: Indicators = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube variable (band).")
-    dc3__expression: str = Field(default=None, description=EXPRESSION_DESCRIPTION)
-    dc3__unit: str = Field(default=None, description=UNIT_DESCRIPTION)
-    dc3__min: float = Field(default=None, description=MIN_DESCRIPTION)
-    dc3__max: float = Field(default=None, description=MAX_DESCRIPTION)
+
+    airs__is_stretched: bool | None = Field(default=None, title="[ARLAS, extension AIRS] Whether the source band was stretched when creating this band of the COG asset")
+
+    dc3__quality_indicators: Indicators | None = Field(default=None, title="[ARLAS, extension dc3] Set of indicators for estimating the quality of the datacube variable (band).")
+    dc3__expression: str | None = Field(default=None, description=EXPRESSION_DESCRIPTION)
+    dc3__unit: str | None = Field(default=None, description=UNIT_DESCRIPTION)
+    dc3__min: float | None = Field(default=None, description=MIN_DESCRIPTION)
+    dc3__max: float | None = Field(default=None, description=MAX_DESCRIPTION)
     dc3__rgb: RGB | None = Field(default=None, description=RGB_DESCRIPTION)
     dc3__cmap: ColorMap | None = Field(default=None, description=CMAP_DESCRIPTION)
 
@@ -387,21 +398,27 @@ class Asset(BaseModel, extra=Extra.allow):
     href: str | None = Field(default=None, title="[STAC] Absolute link to the asset object.")
     asset_type: str | None = Field(default=None, title="[ARLAS] Type of data (ResourceType)")
     asset_format: str | None = Field(default=None, title="[ARLAS] Data format (AssetFormat)")
-    storage__requester_pays: bool | None = Field(default=None, title="[STAC, extension storage]Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets")
-    storage__tier: str | None = Field(default=None, title="[STAC, extension storage]Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
-    storage__platform: str | None = Field(default=None, title="[STAC, extension storage]PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
-    storage__region: str | None = Field(default=None, title="[STAC, extension storage]The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)")
-    airs__managed: bool | None = Field(default=False, title="[ARLAS, extension AIRS] Whether the asset is managed by AIRS or not.")
-    airs__object_store_bucket: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store bucket for the asset object.")
-    airs__object_store_key: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store key of the asset object.")
     title: str | None = Field(default=None, title="[STAC] Optional displayed title for clients and users.", max_length=300)
     description: str | None = Field(default=None, title="[STAC] A description of the Asset providing additional details, such as how it was processed or created. CommonMark 0.29 syntax MAY be used for rich text representation.", max_length=300)
     type: str | None = Field(default=None, title="[STAC] Optional description of the media type. Registered Media Types are preferred. See MimeType for common media types.", max_length=300)
     roles: list[str] | None = Field(default=None, title="[STAC] Optional, Semantic roles (i.e. thumbnail, overview, data, metadata) of the asset.", min_length=1, max_length=300)
     extra_fields: dict[str, Any] | None = Field(default=None, title="[ARLAS] Optional, additional fields for this asset. This is used by extensions as a way to serialize and deserialize properties on asset object JSON.")
     gsd: float | None = Field(default=None, title="[deprecated, use eo:gsd instead] Ground Sampling Distance (resolution) of the asset")
+
+    storage__requester_pays: bool | None = Field(default=None, title="[STAC, extension storage]Is the data requester pays or is it data manager/cloud provider pays. Defaults to false. Whether the requester pays for accessing assets")
+    storage__tier: str | None = Field(default=None, title="[STAC, extension storage]Cloud Provider Storage Tiers (Standard, Glacier, etc.)")
+    storage__platform: str | None = Field(default=None, title="[STAC, extension storage]PaaS solutions (ALIBABA, AWS, AZURE, GCP, IBM, ORACLE, OTHER)")
+    storage__region: str | None = Field(default=None, title="[STAC, extension storage]The region where the data is stored. Relevant to speed of access and inter region egress costs (as defined by PaaS provider)")
+
+    airs__managed: bool | None = Field(default=False, title="[ARLAS, extension AIRS] Whether the asset is managed by AIRS or not.")
+    airs__object_store_bucket: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store bucket for the asset object.")
+    airs__object_store_key: str | None = Field(default=None, title="[ARLAS, extension AIRS] Object store key of the asset object.")
+    airs__nb_bands: int | None = Field(default=None, title="[ARLAS, extension AIRS] Number of bands available in this asset")
+    airs__cog_type: CogType | None = Field(default=None, title="[ARLAS, extension AIRS] Type of COG of this asset")
+
     eo__gsd: float | None = Field(default=None, title="[STAC, extension eo] Ground Sampling Distance (resolution)")
     eo__bands: list[Band] | None = Field(default=None, title="[STAC, extension eo] An array of available bands where each object is a Band Object. If given, requires at least one band.", )
+
     sar__instrument_mode: str | None = Field(default=None, title="[STAC, extension sar] The name of the sensor acquisition mode that is commonly used. This should be the short name, if available. For example, WV for \"Wave mode\" of Sentinel-1 and Envisat ASAR satellites.")
     sar__frequency_band: str | None = Field(default=None, title="[STAC, extension sar] The common name for the frequency band to make it easier to search for bands across instruments. See section \"Common Frequency Band Names\" for a list of accepted names.")
     sar__center_frequency: float | None = Field(default=None, title="[STAC, extension sar] The center frequency of the instrument, in gigahertz (GHz).")
@@ -415,6 +432,7 @@ class Asset(BaseModel, extra=Extra.allow):
     sar__looks_azimuth: float | None = Field(default=None, title="[STAC, extension sar] Number of azimuth looks, which is the number of groups of signal samples (looks) parallel to the flight path.")
     sar__looks_equivalent_number: float | None = Field(default=None, title="[STAC, extension sar] The equivalent number of looks (ENL).")
     sar__observation_direction: str | None = Field(default=None, title="[STAC, extension sar] Antenna pointing direction relative to the flight trajectory of the satellite, either left or right.")
+
     proj__epsg: int | None = Field(default=None, title="[STAC, extension proj] EPSG code of the datasource.")
     proj__wkt2: str | None = Field(default=None, title="[STAC, extension proj] PROJJSON object representing the Coordinate Reference System (CRS) that the proj:geometry and proj:bbox fields represent.")
     proj__geometry: Any | None = Field(default=None, title="[STAC, extension proj] Defines the footprint of this Item.")
