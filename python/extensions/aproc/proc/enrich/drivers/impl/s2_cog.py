@@ -37,10 +37,7 @@ class Driver(EnrichDriver):
                 if resource.assets.get(Role.data.value) and resource.assets.get(Role.data.value).href:
                     # If a all band cog is requested, check that the data asset is not a zip (SAFE archive)
                     if self.supports_format(resource, extra_params, [AssetFormat.all_bands_cog.value.lower()]):
-                        if resource.assets.get(Role.data.value).type != MimeType.ZIP.value:
-                            return True
-                        else:
-                            return False
+                        return resource.assets.get(Role.data.value).type != MimeType.ZIP.value
                     else:
                         # no all band cog requested, so we can build the TCI COG from the SAFE archive
                         return True

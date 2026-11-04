@@ -1,6 +1,6 @@
 from typing import Any
 
-from airs.core.models.model import Asset, AssetFormat, Item, MimeType, Role
+from airs.core.models.model import Asset, AssetFormat, Item, MimeType
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
 from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
