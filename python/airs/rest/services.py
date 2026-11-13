@@ -20,7 +20,7 @@ LOGGER = Logger.get_logger()
 
 @ROUTER.post('/collections/{collection}/_init', description="Init a collection.",
              response_model_exclude_none=True)
-async def init_collection(collection: str, request: Request) -> JSONResponse:
+def init_collection(collection: str, request: Request) -> JSONResponse:
     if not collection:
         LOGGER.error("Invalid collection")
         raise BadRequest(detail=__INVALID_COLLECTION_MSG__)
@@ -31,7 +31,7 @@ async def init_collection(collection: str, request: Request) -> JSONResponse:
 @ROUTER.get('/collections', description="List collections.",
             response_model=CollectionDescriptionListResponse,
             response_model_exclude_none=True)
-async def list_collection(request: Request) -> CollectionDescriptionListResponse:
+def list_collection(request: Request) -> CollectionDescriptionListResponse:
     return rs.list_collections()
 
 
@@ -39,7 +39,7 @@ async def list_collection(request: Request) -> CollectionDescriptionListResponse
              response_model=Item,
              response_model_exclude_none=True,
              status_code=status.HTTP_201_CREATED)
-async def create_item(collection: str, item: Item, request: Request) -> Item:
+def create_item(collection: str, item: Item, request: Request) -> Item:
     """ From https://github.com/stac-api-extensions/transaction:
         POST
         When the body is a partial Item:
@@ -76,7 +76,7 @@ async def create_item(collection: str, item: Item, request: Request) -> Item:
 
 
 @ROUTER.put('/collections/{collection}/items/{id}', description="Update an item. Asset should/must exist (depends on the server configuration)")
-async def update_item(collection: str, id: str, item: Item, request: Request) -> JSONResponse:
+def update_item(collection: str, id: str, item: Item, request: Request) -> JSONResponse:
     """ From https://github.com/stac-api-extensions/transaction:
         PUT
         Must populate the id and collection fields in the Item from the URI.
@@ -117,7 +117,7 @@ async def update_item(collection: str, id: str, item: Item, request: Request) ->
 
 
 @ROUTER.delete('/collections/{collection}/items/{id}', description="Delete an item and its assets (depends on the server configuration)")
-async def delete_item(collection: str, id: str) -> Response:
+def delete_item(collection: str, id: str) -> Response:
     """ From https://github.com/stac-api-extensions/transaction:
         DELETE
         Must return 200 or 204 for a successful operation.
@@ -139,7 +139,7 @@ async def delete_item(collection: str, id: str) -> Response:
 
 
 @ROUTER.get('/collections/{collection}/items/{id}', description="Retrieve an item")
-async def get_item(collection: str, id: str) -> JSONResponse:
+def get_item(collection: str, id: str) -> JSONResponse:
     if not rs.item_exists(collection, id):
         LOGGER.error(f"Item {collection}/{id} does not exist")
         raise NotFound(detail="Item does not exist")
@@ -161,7 +161,7 @@ async def upload_asset(collection: str, item_id: str, asset_name: str, file: Upl
 
 
 @ROUTER.head('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Tests if an asset exists.")
-async def retrieve_asset(collection: str, item_id: str, asset_name: str) -> Response:
+def retrieve_asset(collection: str, item_id: str, asset_name: str) -> Response:
     if rs.asset_exists(collection=collection, item_id=item_id, asset_name=asset_name):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
@@ -170,7 +170,7 @@ async def retrieve_asset(collection: str, item_id: str, asset_name: str) -> Resp
 
 
 @ROUTER.delete('/collections/{collection}/items/{item_id}/assets/{asset_name}', description="Delete an asset.")
-async def delete_asset(collection: str, item_id: str, asset_name: str) -> Response:
+def delete_asset(collection: str, item_id: str, asset_name: str) -> Response:
     if rs.asset_exists(collection=collection, item_id=item_id, asset_name=asset_name):
         rs.delete_asset(collection, item_id, asset_name)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -180,6 +180,6 @@ async def delete_asset(collection: str, item_id: str, asset_name: str) -> Respon
 
 
 @ROUTER.post('/collections/{collection}/_reindex', description="Reindex a collection")
-async def reindex_asset(collection: str) -> Response:
+def reindex_asset(collection: str) -> Response:
     rs.reindex(collection=collection)
     return Response(status_code=status.HTTP_200_OK)
