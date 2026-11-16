@@ -5,8 +5,9 @@ from aias_common.access.manager import AccessManager, AnyStorage
 from airs.core.models.model import Asset, AssetFormat, Item, ItemFormat, Role
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
-    CogBuilderHelper
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import (
+    ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY, COG_MAX_WIDTH_OR_HEIGHT_KEY,
+    COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY, CogBuilderHelper)
 
 
 class Driver(EnrichDriver):
@@ -43,13 +44,13 @@ class Driver(EnrichDriver):
     # Implements drivers method
     def create_enrichment(self, item: Item, enrichment: str) -> list[Asset]:
         if enrichment.lower() == AssetFormat.cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[COG_MAX_WIDTH_OR_HEIGHT_KEY]
             band_files = [self.get_vsi_file(item.assets.get(a.value).href) for a in [Role.red_band, Role.green_band, Role.blue_band]]
         elif enrichment.lower() == AssetFormat.overview_cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY]
             band_files = [self.get_vsi_file(item.assets.get(a.value).href) for a in [Role.red_band, Role.green_band, Role.blue_band]]
         elif enrichment.lower() == AssetFormat.all_bands_cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY]
             # Assets describing a band (it has eo__bands) is used in the all_bands_cog.
             bands = [b for b in item.assets.values() if b.eo__bands]
             band_files = [self.get_vsi_file(b.href) for b in bands]
@@ -71,8 +72,8 @@ class Driver(EnrichDriver):
             # Build VRT to facilitate COG built
             kwargs = {"separate": True}
             gdal.BuildVRT(source_files_vrt, band_files, **kwargs)
-            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(source_files_vrt, target_asset_location, max_px_width_or_height=cog_max_width_or_height,
-                                                                          options=Driver.configuration.get('cog_warp_options', {}),
+            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(Driver, source_files_vrt, target_asset_location,
+                                                                          max_px_width_or_height=cog_max_width_or_height,
                                                                           visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         AccessManager.clean(source_files_vrt)  # !DELETE!
 

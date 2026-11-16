@@ -11,9 +11,23 @@ from extensions.aproc.proc.enrich.enrich_process import \
     supported_assets_for_enrichment
 from extensions.aproc.proc.utils.find_rgb import find_rgb_bands
 
+# COG sizes
+# Keys
+COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY = "cog_overview_max_width_or_height"
+COG_MAX_WIDTH_OR_HEIGHT_KEY = "cog_max_width_or_height"
+ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY = "all_bands_cog_max_width_or_height"
+# Values
 COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT = 2000
 COG_MAX_WIDTH_OR_HEIGHT = 10000
 ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT = 10000
+
+# Stretch parameters
+STRETCH_DATA_RANGE_THRESHOLD_KEY = "stretch_data_range_threshold"
+STRETCH_LOWER_CUTOFF_PCT_KEY = "stretch_lower_cutoff_pct"
+STRETCH_HIGHER_CUTOFF_PCT_KEY = "stretch_higher_cutoff_pct"
+
+# GDAL options
+COG_WARP_OPTIONS_KEY = "cog_warp_options"
 
 
 class CogBuilderHelper:
@@ -25,26 +39,35 @@ class CogBuilderHelper:
         EnrichDriver.init(configuration)
         driver.configuration = configuration or {}
         supported_assets_for_enrichment.update(driver.SUPPORTED_ASSET_TYPES)
-        driver.configuration['cog_overview_max_width_or_height'] = driver.configuration.get('cog_overview_max_width_or_height', COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
-        driver.configuration['cog_max_width_or_height'] = driver.configuration.get('cog_max_width_or_height', COG_MAX_WIDTH_OR_HEIGHT)
-        driver.configuration['all_bands_cog_max_width_or_height'] = driver.configuration.get('all_bands_cog_max_width_or_height', ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
+        driver.configuration[COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY] = driver.configuration.get(COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT)
+        driver.configuration[COG_MAX_WIDTH_OR_HEIGHT_KEY] = driver.configuration.get(COG_MAX_WIDTH_OR_HEIGHT_KEY, COG_MAX_WIDTH_OR_HEIGHT)
+        driver.configuration[ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY] = driver.configuration.get(ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY, ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT)
 
     @staticmethod
-    def build(source: str, target: str, max_px_width_or_height: int = 2000, options: dict = {}, visual: bool = False, eo__bands: list[Band] = []):
+    def build(driver: type[EnrichDriver], source: str, target: str, max_px_width_or_height: int = 2000, visual: bool = False, eo__bands: list[Band] = []):
         """ Generate a COG from a source file and store it in the target location.
 
         Args:
             source (str): source file location (can be a local path or a remote URL like VSI)
             target (str): target file location
             max_px_width_or_height (int, optional): maximum width or height for the COG.
-            options (dict, optional): additional GDAL options provided to WARP. See osgeo.gdal.WarpOptions in https://gdal.org/en/stable/api/python/utilities.html
             visual (bool, optional): whether the generated COG is for direct visualization purposes.
+            eo__bands (list[Band], optional): EO bands of the source asset
 
         Returns:
             cog_type (CogType): type of COG generated
             src_bands (list[int]): list of the band indices used in the source data
             stretched_bands (list[bool]): list of whether each used band was stretched
         """
+        # additional GDAL options provided to WARP. See osgeo.gdal.WarpOptions in https://gdal.org/en/stable/api/python/utilities.html
+        options = driver.configuration.get(COG_WARP_OPTIONS_KEY, {})
+        # for a visual COG, if a band data range is below that threshold, then the band is stretched
+        stretch_data_range_threshold = driver.configuration.get(STRETCH_DATA_RANGE_THRESHOLD_KEY, 25.0)
+        # for a visual COG, if the band is stretched, designates the cutoff percentage for the lowest value of the distribution
+        stretch_lower_cutoff_pct = driver.configuration.get(STRETCH_LOWER_CUTOFF_PCT_KEY, 0.02)
+        # for a visual COG, if the band is stretched, designates the cutoff percentage for the highest value of the distribution
+        stretch_higher_cutoff_pct = driver.configuration.get(STRETCH_HIGHER_CUTOFF_PCT_KEY, 0.98)
+
         import numpy as np
         from osgeo import gdal
         gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
@@ -93,14 +116,14 @@ class CogBuilderHelper:
                                     stretched_bands.append(False)
                                     LOGGER.warning(f"Band {band_idx} of {source} has min=max={min_val}. Skipping stretch to 0-255 for COG creation.")
                                     max_val = min_val + 1.0
-                                elif min_val < 0.0 or max_val > 255.0 or (max_val - min_val < 25.0):
+                                elif min_val < 0.0 or max_val > 255.0 or (max_val - min_val < stretch_data_range_threshold):
                                     stretched_bands.append(True)
                                     hist = ds.GetRasterBand(band_idx).GetHistogram(min_val, max_val, 1024, False, True)
                                     cumulative = np.cumsum(hist)
                                     total_pixels = cumulative[-1]
                                     bin_edges = np.linspace(min_val, max_val, 1024)
-                                    stretch_min = bin_edges[np.searchsorted(cumulative, total_pixels * 0.02)]
-                                    stretch_max = bin_edges[np.searchsorted(cumulative, total_pixels * 0.98)]
+                                    stretch_min = bin_edges[np.searchsorted(cumulative, total_pixels * stretch_lower_cutoff_pct)]
+                                    stretch_max = bin_edges[np.searchsorted(cumulative, total_pixels * stretch_higher_cutoff_pct)]
                                     LOGGER.debug(f"Stretching band {band_idx} ({stretch_min}, {stretch_max}) of {source} to 0-255 for COG creation (inital min/max: {min_val}, {max_val})")
                                     scale_params.append([stretch_min, stretch_max])
                                 else:

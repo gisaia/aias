@@ -5,8 +5,9 @@ from aias_common.access.manager import AccessManager
 from airs.core.models.model import Asset, AssetFormat, Item, MimeType, Role
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
-    CogBuilderHelper
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import (
+    COG_MAX_WIDTH_OR_HEIGHT_KEY, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY,
+    CogBuilderHelper)
 from extensions.aproc.proc.utils.compare import includes_case_insensitive
 
 
@@ -45,9 +46,9 @@ class Driver(EnrichDriver):
         source = data_asset.href
         target = self.get_target_asset_filepath(item.id, enrichment)
 
-        cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
+        cog_max_width_or_height = Driver.configuration[COG_MAX_WIDTH_OR_HEIGHT_KEY]
         if enrichment == AssetFormat.overview_cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY]
 
         # There is an issue when trying to create the COG directly from remote storage:
         # - the jpeg2000 file's georeference can be in a .aux.xml file, failing the creation of the COG
@@ -58,7 +59,7 @@ class Driver(EnrichDriver):
 
         with AccessManager.make_local_list(files_to_pull) as local_files:
             self.LOGGER.info("Building cog from {}".format(source))
-            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(local_files[0], target, max_px_width_or_height=cog_max_width_or_height,
+            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(Driver, local_files[0], target, max_px_width_or_height=cog_max_width_or_height,
                                                                           visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
 
         bands = CogBuilderHelper.create_bands(item, src_bands, stretched_bands)

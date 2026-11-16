@@ -11,8 +11,9 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
-    CogBuilderHelper
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import (
+    ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY, COG_MAX_WIDTH_OR_HEIGHT_KEY,
+    COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY, CogBuilderHelper)
 
 
 class Driver(EnrichDriver):
@@ -57,9 +58,9 @@ class Driver(EnrichDriver):
             raise DriverException("Unsupported asset type {}. Supported types are : {}".format(enrichment, ", ".join(Driver.SUPPORTED_ASSET_TYPES)))
 
     def __create_TCI_asset(self, item: Item, enrichment: str):
-        cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
+        cog_max_width_or_height = Driver.configuration[COG_MAX_WIDTH_OR_HEIGHT_KEY]
         if enrichment == AssetFormat.overview_cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY]
 
         target_asset_location = self.get_target_asset_filepath(item.id, enrichment)
         cog_type, src_bands, stretched_bands = self.__build_TCI_COG(item, target_asset_location, cog_max_width_or_height)
@@ -86,8 +87,9 @@ class Driver(EnrichDriver):
                 AccessManager.pull(href, tci_file_path)
                 self.LOGGER.info("Fetching the data took {} s".format(time() - start))
 
-            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(tci_file_path, target_asset_location, max_px_width_or_height=cog_max_width_or_height,
-                                                                          options=Driver.configuration.get('cog_warp_options', {}), visual=True)
+            cog_type, src_bands, stretched_bands = CogBuilderHelper.build(Driver, tci_file_path, target_asset_location,
+                                                                          max_px_width_or_height=cog_max_width_or_height,
+                                                                          visual=True)
             os.remove(tci_file_path)  # !DELETE!
 
             return cog_type, src_bands, stretched_bands
@@ -154,12 +156,12 @@ class Driver(EnrichDriver):
             from osgeo import gdal
             gdal.SetConfigOption('CPL_TMPDIR', tempfile.gettempdir())
             with AccessManager.make_local_list(band_files) as local_assets:
-
                 # Build VRT to facilitate COG built
                 kwargs = {"separate": True}
                 gdal.BuildVRT(source_files_vrt, local_assets, **kwargs)
-                all_bands_cog_max_width_or_height = Driver.configuration['all_bands_cog_max_width_or_height']
-                cog_type, src_bands, stretched_bands = CogBuilderHelper.build(source_files_vrt, target_asset_location,
+
+                all_bands_cog_max_width_or_height = Driver.configuration[ALL_BANDS_COG_MAX_WIDTH_OR_HEIGHT_KEY]
+                cog_type, src_bands, stretched_bands = CogBuilderHelper.build(Driver, source_files_vrt, target_asset_location,
                                                                               max_px_width_or_height=all_bands_cog_max_width_or_height)
 
             AccessManager.clean(source_files_vrt)  # !DELETE!

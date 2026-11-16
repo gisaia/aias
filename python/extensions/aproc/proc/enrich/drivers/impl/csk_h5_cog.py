@@ -7,8 +7,9 @@ from airs.core.models.model import (Asset, AssetFormat, Item, ItemFormat,
                                     MimeType, Role)
 from extensions.aproc.proc.drivers.exceptions import DriverException
 from extensions.aproc.proc.enrich.drivers.enrich_driver import EnrichDriver
-from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import \
-    CogBuilderHelper
+from extensions.aproc.proc.enrich.drivers.impl.cog_builder_helper import (
+    COG_MAX_WIDTH_OR_HEIGHT_KEY, COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY,
+    CogBuilderHelper)
 from extensions.aproc.proc.ingest.drivers.impl.cosmoskymed import \
     csk_h5_scenes_to_geotiffs
 
@@ -48,9 +49,9 @@ class Driver(EnrichDriver):
         source = data_asset.href
         target = self.get_target_asset_filepath(item.id, enrichment)
 
-        cog_max_width_or_height = Driver.configuration['cog_max_width_or_height']
+        cog_max_width_or_height = Driver.configuration[COG_MAX_WIDTH_OR_HEIGHT_KEY]
         if enrichment == AssetFormat.overview_cog.value.lower():
-            cog_max_width_or_height = Driver.configuration['cog_overview_max_width_or_height']
+            cog_max_width_or_height = Driver.configuration[COG_OVERVIEW_MAX_WIDTH_OR_HEIGHT_KEY]
 
         metadata = self.__load_metadata(source)
 
@@ -61,8 +62,7 @@ class Driver(EnrichDriver):
         with csk_h5_scenes_to_geotiffs(source, metadata) as tiffs:
             gdal.Warp(merged_tif, tiffs, **cog_warp_options)
 
-        cog_type, src_bands, stretched_bands = CogBuilderHelper.build(merged_tif, target, max_px_width_or_height=cog_max_width_or_height,
-                                                                      options=Driver.configuration.get('cog_warp_options', {}),
+        cog_type, src_bands, stretched_bands = CogBuilderHelper.build(Driver, merged_tif, target, max_px_width_or_height=cog_max_width_or_height,
                                                                       visual=enrichment.lower() == AssetFormat.overview_cog.value.lower())
         os.remove(merged_tif)  # !DELETE!
 
