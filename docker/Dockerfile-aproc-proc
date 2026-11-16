@@ -112,6 +112,7 @@ RUN apt-get update && \
         libcurl4t64 \
         libbrotli1=1.2.0-3ubuntu0.1 \
         libcurl3t64-gnutls \
+        apt libapt-pkg7.0 \
         curl && \
     rm -rf /var/lib/apt/lists/*
 
