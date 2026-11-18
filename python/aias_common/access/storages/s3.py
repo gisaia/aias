@@ -1,18 +1,121 @@
+import asyncio
 import os
+import threading
+from contextlib import AsyncExitStack
 from urllib.parse import urlparse, urlunparse
+
+import aioboto3
+import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
 
 from aias_common.access.configuration import AccessType, S3StorageConfiguration
 from aias_common.access.file import File
 from aias_common.access.logger import Logger
 from aias_common.access.storages.abstract import AbstractStorage
 from fastapi_utilities import ttl_lru_cache
-import aioboto3
-from memory_profiler import profile
 
 from aias_common.access.storages.path_helper import endslash, join_pathes, noslash
 
 LOGGER = Logger.get_logger()
 
+# Max connections kept in each client's HTTP pool (botocore default: 10).
+# One shared client now serves ~40 threads (sync) and many coroutines (async):
+# with 10, requests would queue (async) or hit "Connection pool is full" (sync).
+# The pool is only an upper bound: connections are opened on demand.
+_MAX_POOL_CONNECTIONS = 50
+
+# Sync (boto3) clients, shared between the threads of the FastAPI thread pool.
+_SYNC_CLIENTS: dict[tuple, object] = {}
+
+# threading.Lock: only one thread creates a given client; the others wait, then reuse it.
+# It must be a threading lock: an asyncio lock does not protect against threads.
+_SYNC_LOCK = threading.Lock()
+
+# Async (aioboto3) clients, shared between coroutines of one event loop.
+# Value = (AsyncExitStack, client). The stack keeps the client open for the process lifetime.
+_ASYNC_CLIENTS: dict[tuple, tuple[AsyncExitStack, object]] = {}
+
+# One asyncio.Lock per event loop (an asyncio lock is bound to the loop that uses it).
+# It makes concurrent coroutines wait with "await" without blocking the loop.
+_ASYNC_LOCKS: dict[int, asyncio.Lock] = {}
+
+# Get the key for the cache
+def _client_key(conf: S3StorageConfiguration) -> tuple:
+    # Same key = same shared client. The bucket is not included: it is given on each call.
+    # Credentials are included, so rotated keys lead to a new client.
+    if conf.is_anon_client:
+        return (conf.endpoint, conf.region, True, None, None)
+    return (conf.endpoint, conf.region, False,
+            conf.api_key.access_key, conf.api_key.secret_key)
+
+# Get arg for client
+def _client_kwargs(conf: S3StorageConfiguration) -> dict:
+    # Same arguments for boto3 and aioboto3 clients.
+    kwargs = {"region_name": conf.region, "endpoint_url": conf.endpoint}
+    if conf.is_anon_client:
+        # Anonymous access: requests are not signed
+        kwargs["config"] = Config(signature_version=UNSIGNED, max_pool_connections=_MAX_POOL_CONNECTIONS)
+    else:
+        kwargs["config"] = Config(max_pool_connections=_MAX_POOL_CONNECTIONS)
+        kwargs["aws_access_key_id"] = conf.api_key.access_key
+        kwargs["aws_secret_access_key"] = conf.api_key.secret_key
+    return kwargs
+
+# ---------------------------------------------------------------------------
+# S3 client caches: one client per configuration and per process.
+# Creating a client costs 0.3-2 s of CPU (botocore models, SSL context). Doing it
+# on each request blocks the event loop, so we create each client once and reuse it.
+# ---------------------------------------------------------------------------
+def _get_sync_client(conf: S3StorageConfiguration):
+    """Client boto3 partagé entre threads (créé une seule fois par configuration)."""
+    key = _client_key(conf)
+    # Fast path: once the client exists, every call returns here without taking the lock.
+    client = _SYNC_CLIENTS.get(key)
+    if client is None:
+        # Slow path, first use only: threads enter one at a time.
+        with _SYNC_LOCK:
+            # Re-check: a thread that waited for the lock may find the client already created.
+            client = _SYNC_CLIENTS.get(key)
+            if client is None:
+                # Dedicated Session: boto3 sessions are not thread-safe, clients are.
+                client = boto3.session.Session().client("s3", **_client_kwargs(conf))
+                _SYNC_CLIENTS[key] = client
+                LOGGER.info("Shared boto3 S3 client created for %s", conf.endpoint)
+    return client
+
+
+async def _get_async_client(conf: S3StorageConfiguration):
+    # An aioboto3 client belongs to the loop that created it, so the loop is part of the key.
+    loop_id = id(asyncio.get_running_loop())
+    key = (loop_id, *_client_key(conf))
+    # Fast path: client already created, nothing to wait for.
+    entry = _ASYNC_CLIENTS.get(key)
+    if entry is not None:
+        return entry[1]
+    # Get (or create) the lock of the current loop.
+    lock = _ASYNC_LOCKS.get(loop_id)
+    if lock is None:
+        lock = _ASYNC_LOCKS.setdefault(loop_id, asyncio.Lock())
+
+    async with lock:
+        # Re-check: a coroutine that waited for the lock may find the client already created.
+        entry = _ASYNC_CLIENTS.get(key)
+        if entry is None:
+            # The exit stack keeps the client open for the whole process lifetime.
+            # A plain "async with ... as s3" would close it at the end of each request.
+            stack = AsyncExitStack()
+            try:
+                client = await stack.enter_async_context(
+                    aioboto3.Session().client("s3", **_client_kwargs(conf)))
+            except BaseException:
+                # Creation failed: release what was opened and cache nothing.
+                await stack.aclose()
+                raise
+            entry = (stack, client)
+            _ASYNC_CLIENTS[key] = entry
+            LOGGER.info("Shared aioboto3 S3 client created for %s", conf.endpoint)
+    return entry[1]
 
 class S3Storage(AbstractStorage):
 
@@ -31,51 +134,7 @@ class S3Storage(AbstractStorage):
         return self.storage_configuration
 
     def get_storage_parameters(self) -> dict:
-        import boto3
-        conf = self.get_configuration()
-        if conf.is_anon_client:
-            from botocore import UNSIGNED
-            from botocore.client import Config
-
-            client = boto3.client(
-                "s3",
-                region_name=conf.region,
-                endpoint_url=conf.endpoint,
-                config=Config(signature_version=UNSIGNED)
-            )
-        else:
-            client = boto3.client(
-                "s3",
-                region_name=conf.region,
-                endpoint_url=conf.endpoint,
-                aws_access_key_id=conf.api_key.access_key,
-                aws_secret_access_key=conf.api_key.secret_key,
-            )
-
-        return {"client": client}
-
-    def __aioboto3_client(self):
-        conf = self.get_configuration()
-        if conf.is_anon_client:
-            from botocore import UNSIGNED
-            from botocore.client import Config
-            session = aioboto3.Session()
-            client = session.client(
-                "s3",
-                region_name=conf.region,
-                endpoint_url=conf.endpoint,
-                config=Config(signature_version=UNSIGNED)
-            )
-        else:
-            session = aioboto3.Session()
-            client = session.client(
-                "s3",
-                region_name=conf.region,
-                endpoint_url=conf.endpoint,
-                aws_access_key_id=conf.api_key.access_key,
-                aws_secret_access_key=conf.api_key.secret_key,
-            )
-        return client
+        return {"client": _get_sync_client(self.get_configuration())}
 
     def supports(self, href: str):
         scheme = urlparse(href).scheme
@@ -160,7 +219,6 @@ class S3Storage(AbstractStorage):
             extraArgs["ContentType"] = content_type
         client.upload_file(href, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extraArgs)
 
-    @profile
     async def async_push_file_obj(self, file_obj, dst: str, content_type: str | None = None):
         """push source file like object on destination
 
@@ -183,8 +241,8 @@ class S3Storage(AbstractStorage):
                 LOGGER.debug(f"{total / 1000000} bytes transfered so far")
             nb_calls = nb_calls + 1
 
-        async with self.__aioboto3_client() as s3:
-            await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args, Callback=log_progress)
+        s3 = await _get_async_client(self.get_configuration())
+        await s3.upload_fileobj(file_obj, Bucket=self.get_configuration().bucket, Key=self.__get_href_key(dst), ExtraArgs=extra_args, Callback=log_progress)
 
     @ttl_lru_cache(ttl=AbstractStorage.cache_tt, max_size=AbstractStorage.cache_size)
     def __head_object(self, href: str):
@@ -339,4 +397,3 @@ class S3Storage(AbstractStorage):
     def get_matching_s3_keys(self, prefix="", suffix=""):
         for obj in self.get_matching_s3_objects(prefix, suffix):
             yield obj["Key"]
-
