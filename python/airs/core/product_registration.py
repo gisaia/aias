@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from typing import List
 import elasticsearch
+from functools import lru_cache
 from airs.core.models.stacapi import CollectionDescription, CollectionDescriptionListResponse
 import pygeohash as pgh
 from zoneinfo import ZoneInfo
@@ -133,7 +134,6 @@ def upload_item(item: Item) -> str:
     item = to_airs_item(item)
     key = get_item_relative_path(item.collection, item.id)
     return __upload_item(key, item)
-
 
 def __s3storage() -> S3Storage:
     return S3Storage(S3StorageConfiguration(
@@ -622,16 +622,14 @@ def __get_collection_name_from_es_index_name(index: str) -> str:
     else:
         return index
 
+@lru_cache(maxsize=1)
+def __build_es(url: str, login: str | None, pwd: str | None):
+    if login:
+        return elasticsearch.Elasticsearch(
+            url, basic_auth=(login, pwd), verify_certs=False
+        )
+    return elasticsearch.Elasticsearch(url)
 
 def __getES():
-    if Configuration.settings.index.login:
-        return elasticsearch.Elasticsearch(
-            Configuration.settings.index.endpoint_url,
-            basic_auth=(
-                Configuration.settings.index.login,
-                Configuration.settings.index.pwd,
-            ),
-            verify_certs=False,
-        )
-    else:
-        return elasticsearch.Elasticsearch(Configuration.settings.index.endpoint_url)
+    s = Configuration.settings.index
+    return __build_es(s.endpoint_url, s.login, s.pwd)
