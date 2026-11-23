@@ -109,6 +109,8 @@ RUN apt-get update \
 # Fix CVE-2026-92392
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --only-upgrade \
+        openjdk-17-jre \
+        openjdk-17-jre-headless \
         libcurl4t64 \
         libbrotli1=1.2.0-3ubuntu0.1 \
         libcurl3t64-gnutls \
