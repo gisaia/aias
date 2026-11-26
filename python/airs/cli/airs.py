@@ -18,6 +18,7 @@ AIRS_CORS_ORIGINS = os.getenv("AIRS_CORS_ORIGINS", "*")
 AIRS_CORS_METHODS = os.getenv("AIRS_CORS_METHODS", "*")
 AIRS_CORS_HEADERS = os.getenv("AIRS_CORS_HEADERS", "*")
 AIAS_VERSION = os.getenv("AIAS_VERSION", "0.0")
+AIRS_TIMEOUT_KEEP_ALIVE = int(os.getenv("AIRS_TIMEOUT_KEEP_ALIVE", "5"))
 
 
 @cli.command(help="Start the ARLAS Item Registration Service.")
@@ -28,14 +29,14 @@ def run(configuration_file: str = typer.Argument(..., help="Configuration file")
     api = FastAPI(version=AIAS_VERSION, title='ARLAS Item Product Registration Service',
                   description='ARLAS Item Registration Service API',
                   middleware=[Middleware(CORSMiddleware, allow_origins=AIRS_CORS_ORIGINS.split(","),
-                                         allow_methods=AIRS_CORS_ORIGINS.split(","),
+                                         allow_methods=AIRS_CORS_METHODS.split(","),
                                          allow_headers=AIRS_CORS_HEADERS.split(","))
                               ])
     api.include_router(ROUTER, prefix=AIRS_PREFIX)
     api.include_router(HEALTHCHECK, prefix=AIRS_PREFIX)
     for eh in EXCEPTION_HANDLERS:
         api.add_exception_handler(eh.exception, eh.handler)
-    uvicorn.run(api, host=host, port=port)
+    uvicorn.run(api, host=host, port=port, timeout_keep_alive=AIRS_TIMEOUT_KEEP_ALIVE)
 
 
 if __name__ == "__main__":
